@@ -303,7 +303,7 @@ public class RedeliverHandler extends PacketHandler
                     ref.consumed(c.getStoredConsumerUID(),
                         s.isDupsOK(c.getConsumerUID()), false);
                 } else {
-                    ref.removeDelivered(c.getStoredConsumerUID(), true);
+                    ref.removeDelivered(c.getStoredConsumerUID(), false);
                 }
             }
             Iterator itr = cToM.entrySet().iterator();

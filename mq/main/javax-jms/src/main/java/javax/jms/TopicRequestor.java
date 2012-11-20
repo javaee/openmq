@@ -40,13 +40,13 @@
 
 package javax.jms;
 
-/** The <CODE>TopicRequestor</CODE> helper class simplifies
+/** The {@code TopicRequestor} helper class simplifies
   * making service requests.
   *
-  * <P>The <CODE>TopicRequestor</CODE> constructor is given a non-transacted 
-  * <CODE>TopicSession</CODE> and a destination <CODE>Topic</CODE>. It creates a 
-  * <CODE>TemporaryTopic</CODE> for the responses and provides a 
-  * <CODE>request</CODE> method that sends the request message and waits 
+  * <P>The {@code TopicRequestor} constructor is given a non-transacted 
+  * {@code TopicSession} and a destination {@code Topic}. It creates a 
+  * {@code TemporaryTopic} for the responses and provides a 
+  * {@code request} method that sends the request message and waits 
   * for its reply.
   *
   * <P>This is a basic request/reply abstraction that should be sufficient 
@@ -68,17 +68,17 @@ public class TopicRequestor {
     TopicSubscriber subscriber;
 
 
-    /** Constructor for the <CODE>TopicRequestor</CODE> class.
+    /** Constructor for the {@code TopicRequestor} class.
       * 
       * <P>This implementation assumes the session parameter to be non-transacted,
-      * with a delivery mode of either <CODE>AUTO_ACKNOWLEDGE</CODE> or 
-      * <CODE>DUPS_OK_ACKNOWLEDGE</CODE>.
+      * with a delivery mode of either {@code AUTO_ACKNOWLEDGE} or 
+      * {@code DUPS_OK_ACKNOWLEDGE}.
       *
-      * @param session the <CODE>TopicSession</CODE> the topic belongs to
+      * @param session the {@code TopicSession} the topic belongs to
       * @param topic the topic to perform the request/reply call on
       *
       * @exception JMSException if the JMS provider fails to create the
-      *                         <CODE>TopicRequestor</CODE> due to some internal
+      *                         {@code TopicRequestor} due to some internal
       *                         error.
       * @exception InvalidDestinationException if an invalid topic is specified.
       */ 
@@ -96,7 +96,7 @@ public class TopicRequestor {
 
 
     /** Sends a request and waits for a reply. The temporary topic is used for
-      * the <CODE>JMSReplyTo</CODE> destination; the first reply is returned, 
+      * the {@code JMSReplyTo} destination; the first reply is returned, 
       * and any following replies are discarded.
       *
       * @param message the message to send
@@ -115,19 +115,19 @@ public class TopicRequestor {
     }
 
 
-    /** Closes the <CODE>TopicRequestor</CODE> and its session.
+    /** Closes the {@code TopicRequestor} and its session.
       *
       * <P>Since a provider may allocate some resources on behalf of a 
-      * <CODE>TopicRequestor</CODE> outside the Java virtual machine, clients 
+      * {@code TopicRequestor} outside the Java virtual machine, clients 
       * should close them when they 
       * are not needed. Relying on garbage collection to eventually reclaim 
       * these resources may not be timely enough.
       *
-      * <P>Note that this method closes the <CODE>TopicSession</CODE> object 
-      * passed to the <CODE>TopicRequestor</CODE> constructor.
+      * <P>Note that this method closes the {@code TopicSession} object 
+      * passed to the {@code TopicRequestor} constructor.
       *  
       * @exception JMSException if the JMS provider fails to close the
-      *                         <CODE>TopicRequestor</CODE> due to some internal
+      *                         {@code TopicRequestor} due to some internal
       *                         error.
       */
 

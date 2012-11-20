@@ -776,6 +776,7 @@ class ConsumerStateDAOImpl extends BaseDAOImpl implements ConsumerStateDAO {
         }
     }
 
+    int faultCount = 0;
     /**
      * Clear the transaction from all consumer states associated with it.
      * @param conn Database Connection
@@ -792,8 +793,10 @@ class ConsumerStateDAOImpl extends BaseDAOImpl implements ConsumerStateDAO {
         Exception myex = null;
         try {
             if (FI.FAULT_INJECTION) {
-                if (FI.checkFault(FI.FAULT_TXN_ROLLBACK_DBCONSTATE_CLEARTID, null)) {
-                    FI.unsetFault(FI.FAULT_TXN_ROLLBACK_DBCONSTATE_CLEARTID);
+                HashMap m = new HashMap();
+		m.put(FaultInjection.FAULT_COUNT_PROP, String.valueOf(faultCount));
+                if (FI.checkFault(FI.FAULT_TXN_ROLLBACK_DBCONSTATE_CLEARTID, m)) {
+                    faultCount++;
                     throw new BrokerException("FAULT INJECTION:"+
                         FI.FAULT_TXN_ROLLBACK_DBCONSTATE_CLEARTID);
                 }

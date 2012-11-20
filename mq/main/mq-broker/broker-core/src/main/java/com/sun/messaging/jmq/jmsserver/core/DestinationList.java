@@ -229,8 +229,6 @@ public class DestinationList implements ConnToPartitionStrategyContext
 
     public static final int MAX_PRODUCER_BYTES_BATCH = -1;
 
-    public static final String TEMP_CNT = "JMQ_SUN_JMSQ_TempRedeliverCnt";
-
     private static final String AUTO_MAX_NUM_MSGS = Globals.IMQ+
                  ".autocreate.destination.maxNumMsgs";
     private static final String AUTO_MAX_TOTAL_BYTES = Globals.IMQ+
@@ -727,7 +725,7 @@ public class DestinationList implements ConnToPartitionStrategyContext
         }
 
         Set destroyConns = new HashSet();
-        Hashtable cc =  ref.getRemoteConsumerUIDs(); 
+        Map cc =  ref.getRemoteConsumerUIDs(); 
         Consumer consumer = null;
         ConsumerUID cuid = null;
         Iterator citr = cc.keySet().iterator();
@@ -2797,28 +2795,32 @@ public class DestinationList implements ConnToPartitionStrategyContext
     }
 
     public static void addPartitionListener(PartitionListener listener) {
-        synchronized(destinationListList) {
+        synchronized(partitionListeners) {
             partitionListeners.add(listener);
         }
     }
 
     public static void removePartitionListener(PartitionListener listener) {
-        synchronized(destinationListList) {
+        synchronized(partitionListeners) {
             partitionListeners.remove(listener);
         }
     }
 
     private static void notifyPartitionRemoved(PartitionedStore ps, DestinationList dl) {
-        Iterator<PartitionListener> itr =  partitionListeners.iterator();
-        while (itr.hasNext()) {
-            itr.next().partitionRemoved(ps.getPartitionID(), dl);
+        synchronized(partitionListeners) {
+            Iterator<PartitionListener> itr =  partitionListeners.iterator();
+            while (itr.hasNext()) {
+                itr.next().partitionRemoved(ps.getPartitionID(), dl);
+            }
         }
     }
 
     private static void notifyPartitionAdded(PartitionedStore ps, DestinationList dl) {
-        Iterator<PartitionListener> itr =  partitionListeners.iterator();
-        while (itr.hasNext()) {
-            itr.next().partitionAdded(ps.getPartitionID(), dl);
+        synchronized(partitionListeners) {
+            Iterator<PartitionListener> itr =  partitionListeners.iterator();
+            while (itr.hasNext()) {
+                itr.next().partitionAdded(ps.getPartitionID(), dl);
+            }
         }
     }
 

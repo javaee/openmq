@@ -42,7 +42,7 @@ package javax.jms;
 /**
  * This unchecked exception must be thrown when a destination either is not
  * understood by a provider or is no longer valid, and the method signature does
- * not permit a <code>InvalidDestinationException</code> to be thrown.
+ * not permit a {@code InvalidDestinationException} to be thrown.
  *
  * @version     2.0
  **/
@@ -50,7 +50,7 @@ package javax.jms;
 public class InvalidDestinationRuntimeException extends JMSRuntimeException {
 
 	/**
-	 * Constructs a <code>InvalidDestinationRuntimeException</code> with the specified detail message
+	 * Constructs a {@code InvalidDestinationRuntimeException} with the specified detail message
 	 * 
 	 * @param detailMessage
 	 *            a description of the exception
@@ -60,7 +60,7 @@ public class InvalidDestinationRuntimeException extends JMSRuntimeException {
 	}
 	
 	/**
-	 * Constructs a <code>InvalidDestinationRuntimeException</code> with the specified detail message
+	 * Constructs a {@code InvalidDestinationRuntimeException} with the specified detail message
 	 * and error code.
 	 * 
 	 * @param detailMessage
@@ -73,7 +73,7 @@ public class InvalidDestinationRuntimeException extends JMSRuntimeException {
 	}
 
 	/**
-	 * Constructs a <code>InvalidDestinationRuntimeException</code> with the specified detail message,
+	 * Constructs a {@code InvalidDestinationRuntimeException} with the specified detail message,
 	 * error code and cause
 	 * 
 	 * @param detailMessage

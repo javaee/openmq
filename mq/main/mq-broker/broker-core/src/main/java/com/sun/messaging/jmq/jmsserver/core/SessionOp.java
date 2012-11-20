@@ -110,6 +110,7 @@ public class SessionOp extends SessionOpSpi
         SysMessageID id = null;
         TransactionUID tuid = null;
         int hc = 0;
+        boolean markConsumed = false;
 
         public ackEntry(SysMessageID id,
               ConsumerUID uid) 
@@ -123,6 +124,14 @@ public class SessionOp extends SessionOpSpi
 
         public String toString() {
             return id+"["+uid+","+storedcid+"]"+ (tuid == null? "":"TUID="+tuid);
+        }
+
+        public boolean hasMarkConsumed() {
+            return markConsumed;
+        }
+
+        public void markConsumed() {
+            markConsumed = true;
         }
 
         public String getDebugMessage(boolean full)
@@ -416,6 +425,11 @@ public class SessionOp extends SessionOpSpi
     public boolean detachConsumer(ConsumerSpi c, SysMessageID id,
            boolean redeliverPendingConsume, boolean redeliverAll, Connection conn)
     {
+        if (Session.DEBUG || Session.DEBUG_CLUSTER_MSG) {
+            logger.log(logger.INFO, 
+            "detachConsumer("+c+", "+id+", "+redeliverPendingConsume+", "+
+             redeliverAll+", "+conn.getConnectionUID()+")");
+        }
         Consumer con = (Consumer)c;
         ConsumerUID cuid = con.getConsumerUID();
         ConsumerUID suid = con.getStoredConsumerUID();
@@ -434,6 +448,7 @@ public class SessionOp extends SessionOpSpi
         TransactionList[] tls = DL.getTransactionList(
                                 ((IMQConnection)conn).getPartitionedStore());
         TransactionList translist = tls[0];
+        TransactionUID tid = null;
 
         // get all the messages for the consumer
         synchronized (deliveredMessages) {
@@ -461,13 +476,30 @@ public class SessionOp extends SessionOpSpi
                 }
                 // see if we are for a different consumer
                 //forward port 6829773
-                if (!val.storedcid.equals(suid) || !val.uid.equals(cuid))
+                if (!val.storedcid.equals(suid) || !val.uid.equals(cuid)) {
                     continue;
+                }
                 PacketReference pr = val.getReference();
+                tid = null;
+                if (session.isTransacted()) { 
+                    tid = translist.getConsumedInTransaction(
+                              val.getSysMessageID(), val.uid);
+                    if (tid == null) {
+                        if (pr != null) {
+                            pr.removeInDelivery(suid);
+                            s.add(pr);
+                            addRemotePendings(pr, val.storedcid, 
+                                new TransactionUID(0), remotePendings);
+                        }
+                        itr.remove();
+                        continue;
+                    }
+                }
                 // we know the consumer saw it .. mark it consumed
                 if (pr != null) {
                     try {
                         pr.consumed(suid, !session.isUnsafeAck(cuid), session.isAutoAck(cuid));
+                        val.markConsumed();
                     } catch (Exception ex) {
                         Object[] args = { "["+pr+","+suid+"]", cuid, ex.getMessage() }; 
                         logger.log(Logger.WARNING, Globals.getBrokerResources().getKString(
@@ -482,26 +514,9 @@ public class SessionOp extends SessionOpSpi
                     itr.remove();
                     continue;
                 } 
-                if (session.isTransacted()) { 
-                    if (!translist.isConsumedInTransaction(
-                            val.getSysMessageID(), val.uid)) {
-                        if (pr != null) {
-                            pr.removeInDelivery(suid);
-                            s.add(pr);
-                        }
-                        itr.remove();
-                        continue;
-                    }
-                }
                 if (pr != null && !pr.isLocal() && session.isValid()) {
-                    BrokerAddress ba = pr.getBrokerAddress();   
-                    if (ba != null) {
-                        List l = (List)remotePendings.get(ba);
-                        if (l == null) {
-                            l = new ArrayList();
-                            remotePendings.put(ba, l);
-                        }
-                        l.add(pr.getSysMessageID());
+                    if (addRemotePendings(pr, val.storedcid, 
+                                          tid, remotePendings)) {
                         detachedRConsumerUIDs.add(val.uid);	
                     }
                 }
@@ -515,17 +530,12 @@ public class SessionOp extends SessionOpSpi
                     continue;
                 PacketReference pr = val.getReference();
                 if (session.isTransacted()) { 
-                    if (translist.isConsumedInTransaction(
-                            val.getSysMessageID(), val.uid)) {
+                    tid = translist.getConsumedInTransaction(
+                              val.getSysMessageID(), val.uid);
+                    if (tid != null) {
                         if (pr != null && !pr.isLocal() && session.isValid()) {
-                            BrokerAddress ba = pr.getBrokerAddress();   
-                            if (ba != null) {
-                                List l = (List)remotePendings.get(ba);
-                                if (l == null) {
-                                    l = new ArrayList();
-                                    remotePendings.put(ba, l);
-                                }
-                                l.add(pr.getSysMessageID());
+                            if (addRemotePendings(pr, val.storedcid,
+                                                  tid, remotePendings)) {
                                 detachedRConsumerUIDs.add(val.uid);	
                             }
                         }
@@ -540,7 +550,7 @@ public class SessionOp extends SessionOpSpi
                 itr.remove();
                 try {
                     if (pr != null) {
-                        pr.removeDelivered(suid, true);
+                        pr.removeDelivered(suid, false);
                      }
                 } catch (Exception ex) {
                     logger.log(Logger.WARNING,
@@ -563,8 +573,31 @@ public class SessionOp extends SessionOpSpi
         return false;   
     }
 
+    private static boolean addRemotePendings(
+        PacketReference pr, ConsumerUID suid, 
+        TransactionUID tid, Map pendings) {
+
+        BrokerAddress ba = pr.getBrokerAddress();   
+        if (ba != null) {
+            Map m = (Map)pendings.get(ba);
+            if (m == null) {
+                m = new HashMap();
+                pendings.put(ba, m);
+            }
+            Map mm = (Map)m.get(tid);
+            if (mm == null) {
+                mm = new LinkedHashMap();
+                m.put(tid, mm);
+            }
+            mm.put(pr.getSysMessageID(), 
+                Integer.valueOf(pr.getRedeliverCount(suid)));
+            return true;
+        }
+        return false;
+    }
+
     public Object ackInTransaction(ConsumerUID cuid, SysMessageID id, 
-                                   TransactionUID tuid) 
+                                   TransactionUID tuid, int deliverCnt)
                                    throws BrokerException {
 
         // remove from the session pending list
@@ -609,6 +642,9 @@ public class SessionOp extends SessionOpSpi
                 throw bex;
         }
         entry.setTUID(tuid);
+        if (deliverCnt > 0) {
+            ref.updateForJMSXDeliveryCount(entry.getStoredUID(), deliverCnt, false);
+        }
         return ref.getBrokerAddress();
     }
 
@@ -744,8 +780,10 @@ public class SessionOp extends SessionOpSpi
                             PacketReference ref = e.getReference();
                             if (ref != null) {
                                 try {
-                                    ref.consumed(suid, !session.isUnsafeAck(cuid), 
-                                                 session.isAutoAck(cuid));
+                                    if (!e.hasMarkConsumed()) {
+                                        ref.consumed(suid, !session.isUnsafeAck(cuid), 
+                                                     session.isAutoAck(cuid));
+                                    }
                                 } catch (Exception ex) {
                                     logger.log(Logger.INFO,"Internal Error " +
                                        "Unable to consume " + suid + ":" + ref, ex);
@@ -815,8 +853,9 @@ public class SessionOp extends SessionOpSpi
      * If the message can not be routed, returns the packet reference
      * (to clean up)
      */
-    public Object handleUndeliverable(ConsumerSpi con, SysMessageID id)
-    throws BrokerException {
+    public Object handleUndeliverable(ConsumerSpi con, SysMessageID id, 
+                                      int deliverCnt, boolean deliverCntUpdateOnly)
+                                      throws BrokerException {
 
         Consumer c = (Consumer)con;
         ConsumerUID cuid = c.getConsumerUID();
@@ -835,6 +874,10 @@ public class SessionOp extends SessionOpSpi
            return null;
         }
         ConsumerUID storedid = c.getStoredConsumerUID();
+        if (deliverCntUpdateOnly) {
+            ref.updateForJMSXDeliveryCount(storedid, deliverCnt, false);
+            return null;
+        }
         if (storedid.equals(cuid)) {
             //not a durable or receiver, nothing to do
             try {

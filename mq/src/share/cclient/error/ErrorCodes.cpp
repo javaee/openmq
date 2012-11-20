@@ -246,6 +246,7 @@ errorStr(const MQError errorCode)
   case MQ_CONSUMER_NOT_FOUND:                   return "Message consumer not found";
   case MQ_DESTINATION_CONSUMER_LIMIT_EXCEEDED:  return "The number of consumers on the destination exceeded limit";
   case MQ_CONSUMER_DESTINATION_NOT_FOUND:       return "Destination that this consumer was on no longer exists";
+  case MQ_NOLOCAL_DURABLE_CONSUMER_WITHOUT_CLIENTID: return "Client ID must set when noLocal is true to create durable subscription";
 
 
   case MQ_CONNECTION_START_ERROR:               return "Connection start failed";

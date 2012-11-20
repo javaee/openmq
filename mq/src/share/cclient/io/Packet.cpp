@@ -134,6 +134,7 @@ Packet::init()
   producerID       = 0;
   expiration       = 0;        // 64 bit
   deliveryTime     = 0;        // 64 bit
+  deliveryCount    = 0;        // 32 bit
   propertiesOffset = 0;
   propertiesSize   = 0;
   encryption       = 0;
@@ -337,6 +338,11 @@ Packet::readVariableHeader(const PRUint8 * const varHeaderBuffer,
     {
       RETURN_IF_ERROR( varHeaderStream.readInt16(&varHeaderID) ); //skip length
       RETURN_IF_ERROR( varHeaderStream.readUint64(&deliveryTime) );
+    }
+    else if ( varHeaderID == (PRUint16)Packet::DELIVERY_COUNT )
+    {
+      RETURN_IF_ERROR( varHeaderStream.readInt16(&varHeaderID) ); //skip length
+      RETURN_IF_ERROR( varHeaderStream.readUint32(&deliveryCount) );
     }
     // Otherwise if it's the header terminator, then we've successfully read the
     // variable headers.
@@ -744,6 +750,14 @@ Packet::getDeliveryTime() const
   CHECK_OBJECT_VALIDITY();
 
   return deliveryTime;
+}
+
+PRUint32
+Packet::getDeliveryCount() const
+{
+  CHECK_OBJECT_VALIDITY();
+
+  return deliveryCount;
 }
 
 PRUint32
@@ -1475,6 +1489,7 @@ Packet::print(FILE * out)
   fprintf(out, "Producer ID:        %s\n", producerIDLong.toString());
   Long deliveryTimeLong(deliveryTime);
   fprintf(out, "Delivery Time:        %s\n", deliveryTimeLong.toString());
+  fprintf(out, "Delivery Count:        %d\n", deliveryCount);
 
   for (int i = Packet::MIN_VALID_ID; i <= Packet::MAX_VALID_ID; i++) {
     fprintf(out, "%-18s", PACKET_VARIABLE_HEADER_NAMES[i]);

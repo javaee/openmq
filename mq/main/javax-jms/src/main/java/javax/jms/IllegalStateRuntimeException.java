@@ -43,8 +43,8 @@ package javax.jms;
  * This unchecked exception is thrown when a method is invoked at an illegal or
  * inappropriate time or if the provider is not in an appropriate state for the
  * requested operation, and the method signature does not permit a
- * <code>IllegalStateRuntimeException</code> to be thrown. For example, this
- * exception must be thrown if <code>JMSContext.commit</code> is called on a
+ * {@code IllegalStateRuntimeException} to be thrown. For example, this
+ * exception must be thrown if {@code JMSContext.commit} is called on a
  * non-transacted session.
  *
  * @version     2.0
@@ -52,7 +52,7 @@ package javax.jms;
 public class IllegalStateRuntimeException extends JMSRuntimeException {
 
 	/**
-	 * Constructs a <code>IllegalStateRuntimeException</code> with the specified detail message
+	 * Constructs a {@code IllegalStateRuntimeException} with the specified detail message
 	 * 
 	 * @param detailMessage
 	 *            a description of the exception
@@ -62,7 +62,7 @@ public class IllegalStateRuntimeException extends JMSRuntimeException {
 	}
 
 	/**
-	 * Constructs a <code>IllegalStateRuntimeException</code> with the specified detail message
+	 * Constructs a {@code IllegalStateRuntimeException} with the specified detail message
 	 * and error code.
 	 * 
 	 * @param detailMessage
@@ -75,7 +75,7 @@ public class IllegalStateRuntimeException extends JMSRuntimeException {
 	}
 
 	/**
-	 * Constructs a <code>IllegalStateRuntimeException</code> with the specified detail message,
+	 * Constructs a {@code IllegalStateRuntimeException} with the specified detail message,
 	 * error code and cause
 	 * 
 	 * @param detailMessage

@@ -40,13 +40,13 @@
 
 package javax.jms;
 
-/** The <CODE>QueueRequestor</CODE> helper class simplifies
+/** The {@code QueueRequestor} helper class simplifies
   * making service requests.
   *
-  * <P>The <CODE>QueueRequestor</CODE> constructor is given a non-transacted 
-  * <CODE>QueueSession</CODE> and a destination <CODE>Queue</CODE>. It creates a
-  * <CODE>TemporaryQueue</CODE> for the responses and provides a 
-  * <CODE>request</CODE> method that sends the request message and waits 
+  * <P>The {@code QueueRequestor} constructor is given a non-transacted 
+  * {@code QueueSession} and a destination {@code Queue}. It creates a
+  * {@code TemporaryQueue} for the responses and provides a 
+  * {@code request} method that sends the request message and waits 
   * for its reply.
   *
   * <P>This is a basic request/reply abstraction that should be sufficient 
@@ -65,17 +65,17 @@ public class QueueRequestor {
     QueueReceiver  receiver;
 
 
-    /** Constructor for the <CODE>QueueRequestor</CODE> class.
+    /** Constructor for the {@code QueueRequestor} class.
       *  
       * <P>This implementation assumes the session parameter to be non-transacted,
-      * with a delivery mode of either <CODE>AUTO_ACKNOWLEDGE</CODE> or 
-      * <CODE>DUPS_OK_ACKNOWLEDGE</CODE>.
+      * with a delivery mode of either {@code AUTO_ACKNOWLEDGE} or 
+      * {@code DUPS_OK_ACKNOWLEDGE}.
       *
-      * @param session the <CODE>QueueSession</CODE> the queue belongs to
+      * @param session the {@code QueueSession} the queue belongs to
       * @param queue the queue to perform the request/reply call on
       *  
       * @exception JMSException if the JMS provider fails to create the
-      *                         <CODE>QueueRequestor</CODE> due to some internal
+      *                         {@code QueueRequestor} due to some internal
       *                         error.
       * @exception InvalidDestinationException if an invalid queue is specified.
       */ 
@@ -93,7 +93,7 @@ public class QueueRequestor {
 
 
     /** Sends a request and waits for a reply. The temporary queue is used for
-      * the <CODE>JMSReplyTo</CODE> destination, and only one reply per request 
+      * the {@code JMSReplyTo} destination, and only one reply per request 
       * is expected.
       *  
       * @param message the message to send
@@ -112,19 +112,19 @@ public class QueueRequestor {
     }
 
 
-    /** Closes the <CODE>QueueRequestor</CODE> and its session.
+    /** Closes the {@code QueueRequestor} and its session.
       *
       * <P>Since a provider may allocate some resources on behalf of a 
-      * <CODE>QueueRequestor</CODE> outside the Java virtual machine, clients 
+      * {@code QueueRequestor} outside the Java virtual machine, clients 
       * should close them when they 
       * are not needed. Relying on garbage collection to eventually reclaim 
       * these resources may not be timely enough.
       *  
-      * <P>Note that this method closes the <CODE>QueueSession</CODE> object 
-      * passed to the <CODE>QueueRequestor</CODE> constructor.
+      * <P>Note that this method closes the {@code QueueSession} object 
+      * passed to the {@code QueueRequestor} constructor.
       *
       * @exception JMSException if the JMS provider fails to close the
-      *                         <CODE>QueueRequestor</CODE> due to some internal
+      *                         {@code QueueRequestor} due to some internal
       *                         error.
       */
 

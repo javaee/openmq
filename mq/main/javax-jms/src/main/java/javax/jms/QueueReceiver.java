@@ -41,24 +41,24 @@
 package javax.jms;
 
 
-/** A client uses a <CODE>QueueReceiver</CODE> object to receive messages that 
+/** A client uses a {@code QueueReceiver} object to receive messages that 
   * have been delivered to a queue.
   *
-  * <P>Although it is possible to have multiple <CODE>QueueReceiver</CODE>s 
+  * <P>Although it is possible to have multiple {@code QueueReceiver}s 
   * for the same queue, the JMS API does not define how messages are 
-  * distributed between the <CODE>QueueReceiver</CODE>s.
+  * distributed between the {@code QueueReceiver}s.
   *
-  * <P>If a <CODE>QueueReceiver</CODE> specifies a message selector, the 
+  * <P>If a {@code QueueReceiver} specifies a message selector, the 
   * messages that are not selected remain on the queue. By definition, a message
-  * selector allows a <CODE>QueueReceiver</CODE> to skip messages. This 
+  * selector allows a {@code QueueReceiver} to skip messages. This 
   * means that when the skipped messages are eventually read, the total ordering
   * of the reads does not retain the partial order defined by each message 
-  * producer. Only <CODE>QueueReceiver</CODE>s without a message selector
+  * producer. Only {@code QueueReceiver}s without a message selector
   * will read messages in message producer order.
   *
-  * <P>Creating a <CODE>MessageConsumer</CODE> provides the same features as
-  * creating a <CODE>QueueReceiver</CODE>. A <CODE>MessageConsumer</CODE> object is 
-  * recommended for creating new code. The  <CODE>QueueReceiver</CODE> is
+  * <P>Creating a {@code MessageConsumer} provides the same features as
+  * creating a {@code QueueReceiver}. A {@code MessageConsumer} object is 
+  * recommended for creating new code. The  {@code QueueReceiver} is
   * provided to support existing code.
   *
   * @version     1.1 February 2, 2002
@@ -75,9 +75,9 @@ package javax.jms;
 
 public interface QueueReceiver extends MessageConsumer {
 
-    /** Gets the <CODE>Queue</CODE> associated with this queue receiver.
+    /** Gets the {@code Queue} associated with this queue receiver.
       *  
-      * @return this receiver's <CODE>Queue</CODE> 
+      * @return this receiver's {@code Queue} 
       *  
       * @exception JMSException if the JMS provider fails to get the queue for
       *                         this queue receiver

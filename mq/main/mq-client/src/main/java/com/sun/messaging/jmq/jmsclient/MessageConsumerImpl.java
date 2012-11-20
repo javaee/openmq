@@ -354,7 +354,6 @@ public class MessageConsumerImpl extends Consumer
                 session.acknowledgeExpired(message);
                 return;
             }
-
             try {
                 messageListener.onMessage(message);
             } catch (Exception e) {
@@ -838,6 +837,10 @@ public class MessageConsumerImpl extends Consumer
 
         if ( durable ) {
             ps.println ("durableName: " + getDurableName());
+        }
+
+        if ( getSharedSubscriptionName() != null ) {
+            ps.println ("sharedSubscriptionName: " + getSharedSubscriptionName());
         }
 
         ps.println ("destination: " + getDestination());

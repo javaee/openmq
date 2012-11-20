@@ -123,6 +123,7 @@ public class FaultInjection extends RuntimeFaultInjection
      public static final String DST_NAME_PROP = "mqDestinationName";
      public static final String BROKERID_PROP = "mqBrokerID"; 
      private static final String SLEEP_INTERVAL_PROP = "mqSleepInterval"; //in secs
+     public static final String FAULT_COUNT_PROP = "mqFaultCount";
      private static final int   SLEEP_INTERVAL_DEFAULT = 60; 
 
      public static final String FAULT_ACK_MSG_1 = "msg.ack.1";

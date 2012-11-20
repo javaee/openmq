@@ -40,27 +40,27 @@
 
 package javax.jms;
 
-/** A <CODE>QueueConnection</CODE> object is an active connection to a 
-  * point-to-point JMS provider. A client uses a <CODE>QueueConnection</CODE> 
-  * object to create one or more <CODE>QueueSession</CODE> objects
+/** A {@code QueueConnection} object is an active connection to a 
+  * point-to-point JMS provider. A client uses a {@code QueueConnection} 
+  * object to create one or more {@code QueueSession} objects
   * for producing and consuming messages.
   *
-  *<P>A <CODE>QueueConnection</CODE> can be used to create a
-  * <CODE>QueueSession</CODE>, from which specialized  queue-related objects
+  *<P>A {@code QueueConnection} can be used to create a
+  * {@code QueueSession}, from which specialized  queue-related objects
   * can be created.
   * A more general, and recommended, approach is to use the 
-  * <CODE>Connection</CODE> object.
+  * {@code Connection} object.
   * 
   *
-  * <P>The <CODE>QueueConnection</CODE> object
+  * <P>The {@code QueueConnection} object
   * should be used to support existing code that has already used it.
   *
-  * <P>A <CODE>QueueConnection</CODE> cannot be used to create objects 
+  * <P>A {@code QueueConnection} cannot be used to create objects 
   * specific to the   publish/subscribe domain. The
-  * <CODE>createDurableConnectionConsumer</CODE> method inherits
-  * from  <CODE>Connection</CODE>, but must throw an 
-  * <CODE>IllegalStateException</CODE>
-  * if used from <CODE>QueueConnection</CODE>.
+  * {@code createDurableConnectionConsumer} method inherits
+  * from  {@code Connection}, but must throw an 
+  * {@code IllegalStateException}
+  * if used from {@code QueueConnection}.
   *
   * @version     1.1 - April 9, 2002
   * @author      Mark Hapner
@@ -74,18 +74,18 @@ package javax.jms;
 
 public interface QueueConnection extends Connection {
 
-    /** Creates a <CODE>QueueSession</CODE> object.
+    /** Creates a {@code QueueSession} object.
       *  
       * @param transacted indicates whether the session is transacted
       * @param acknowledgeMode indicates whether the consumer or the
       * client will acknowledge any messages it receives; ignored if the session
-      * is transacted. Legal values are <code>Session.AUTO_ACKNOWLEDGE</code>, 
-      * <code>Session.CLIENT_ACKNOWLEDGE</code>, and 
-      * <code>Session.DUPS_OK_ACKNOWLEDGE</code>.
+      * is transacted. Legal values are {@code Session.AUTO_ACKNOWLEDGE}, 
+      * {@code Session.CLIENT_ACKNOWLEDGE}, and 
+      * {@code Session.DUPS_OK_ACKNOWLEDGE}.
       *  
       * @return a newly created queue session
       *  
-      * @exception JMSException if the <CODE>QueueConnection</CODE> object fails
+      * @exception JMSException if the {@code QueueConnection} object fails
       *                         to create a session due to some internal error or
       *                         lack of support for the specific transaction
       *                         and acknowledgement mode.
@@ -115,11 +115,11 @@ public interface QueueConnection extends Connection {
       *
       * @return the connection consumer
       *  
-      * @exception JMSException if the <CODE>QueueConnection</CODE> object fails
+      * @exception JMSException if the {@code QueueConnection} object fails
       *                         to create a connection consumer due to some
       *                         internal error or invalid arguments for 
-      *                         <CODE>sessionPool</CODE> and 
-      *                         <CODE>messageSelector</CODE>.
+      *                         {@code sessionPool} and 
+      *                         {@code messageSelector}.
       * @exception InvalidDestinationException if an invalid queue is specified.
       * @exception InvalidSelectorException if the message selector is invalid.
       * @see javax.jms.ConnectionConsumer

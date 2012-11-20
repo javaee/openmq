@@ -468,6 +468,10 @@ public class Packet implements JMSPacket {
         return packetVariableHeader.getLongField(PacketString.DELIVERY_TIME);
     }
 
+    public synchronized int getDeliveryCount() {
+        return packetVariableHeader.getIntField(PacketString.DELIVERY_COUNT);
+    }
+
     public synchronized long getTimestamp() {
 	return sysMessageID.timestamp;
     }
@@ -898,6 +902,11 @@ public class Packet implements JMSPacket {
 
     public synchronized void setProducerID(long n) {
         packetVariableHeader.setLongField(PacketString.PRODUCERID, n);
+	bufferDirty = true;
+    }
+
+    public synchronized void setDeliveryCount(int n) {
+        packetVariableHeader.setIntField(PacketString.DELIVERY_COUNT, n);
 	bufferDirty = true;
     }
 
@@ -1628,6 +1637,9 @@ public class Packet implements JMSPacket {
         }
         if (getDeliveryTime() != 0L) {
 	    os.println("      DeliveryTime: " + getDeliveryTime());
+        }
+        if (getDeliveryCount() != 0) {
+	    os.println("      DeliveryCount: " + getDeliveryCount());
         }
 	if (getDestination() != null)
 	    os.println("     Destination: " + getDestination());

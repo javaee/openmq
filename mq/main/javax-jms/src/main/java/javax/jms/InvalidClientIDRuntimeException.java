@@ -43,7 +43,7 @@ package javax.jms;
 /**
  * This unchecked exception must be thrown when a client attempts to set a
  * connection's client ID to a value that is rejected by a provider, and the
- * method signature does not permit a <code>InvalidClientIDException</code> to
+ * method signature does not permit a {@code InvalidClientIDException} to
  * be thrown.
  * 
  * @version 2.0
@@ -52,7 +52,7 @@ package javax.jms;
 public class InvalidClientIDRuntimeException extends JMSRuntimeException {
 	
 	/**
-	 * Constructs a <code>InvalidClientIDRuntimeException</code> with the specified detail message
+	 * Constructs a {@code InvalidClientIDRuntimeException} with the specified detail message
 	 * 
 	 * @param detailMessage
 	 *            a description of the exception
@@ -62,7 +62,7 @@ public class InvalidClientIDRuntimeException extends JMSRuntimeException {
 	}
 
 	/**
-	 * Constructs a <code>InvalidClientIDRuntimeException</code> with the specified detail message
+	 * Constructs a {@code InvalidClientIDRuntimeException} with the specified detail message
 	 * and error code.
 	 * 
 	 * @param detailMessage
@@ -76,7 +76,7 @@ public class InvalidClientIDRuntimeException extends JMSRuntimeException {
 
 
 	/**
-	 * Constructs a <code>InvalidClientIDRuntimeException</code> with the specified detail message,
+	 * Constructs a {@code InvalidClientIDRuntimeException} with the specified detail message,
 	 * error code and cause
 	 * 
 	 * @param detailMessage

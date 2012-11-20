@@ -450,6 +450,7 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
         checkSessionState();
         checkTemporaryDestination(topic);
         checkClientIDWithBroker();
+        checkNoLocalForDuraOrShared(noLocal, name, true);
         return new TopicSubscriberImpl (this, topic, name,
                                         messageSelector, noLocal);
     }
@@ -712,6 +713,30 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
         }
     }
 
+    protected void checkNoLocalForDuraOrShared(boolean noLocal,
+        String name, boolean durable)
+        throws JMSException {
+        if (!noLocal) {
+            return;
+        }
+
+        String clientID = connection.getClientID();
+
+        if (clientID == null) {
+            if (durable) {
+                String errorString = AdministeredObject.cr.getKString(
+                    AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_DURA, name);
+                throw new javax.jms.IllegalStateException(errorString, 
+                    AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_DURA);
+            } else { 
+                String errorString = AdministeredObject.cr.getKString(
+                    AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_SHARE, name);
+                throw new javax.jms.IllegalStateException(errorString, 
+                    AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_SHARE);
+            }
+        }
+    }
+
     protected void checkTemporaryDestination(Topic topic) throws JMSException {
         if ((topic == null) || topic instanceof TemporaryTopic) {
             String errorString = AdministeredObject.cr.getKString(
@@ -723,39 +748,58 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
         }
     }
 
-	@Override
-	public MessageConsumer createSharedConsumer(Topic topic,
-			String sharedSubscriptionName) throws JMSException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("This method is new in JMS 2.0 and is not yet implemented");
-	}
+    @Override
+    public MessageConsumer createSharedConsumer(Topic topic,
+        String sharedSubscriptionName) throws JMSException {
 
-	@Override
-	public MessageConsumer createSharedConsumer(Topic topic,
-			String sharedSubscriptionName, String messageSelector)
-			throws JMSException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("This method is new in JMS 2.0 and is not yet implemented");
-	}
+        return createSharedConsumer(topic, 
+            sharedSubscriptionName, null, false);
+    }
 
-	@Override
-	public MessageConsumer createSharedConsumer(Topic topic,
-			String sharedSubscriptionName, String messageSelector,
-			boolean noLocal) throws JMSException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("This method is new in JMS 2.0 and is not yet implemented");
-	}
+    @Override
+    public MessageConsumer createSharedConsumer(Topic topic,
+        String sharedSubscriptionName, String messageSelector)
+        throws JMSException {
+        return createSharedConsumer(topic, 
+            sharedSubscriptionName, messageSelector, false);
+    }
 
-	@Override
-	public MessageConsumer createDurableConsumer(Topic topic, String name)
-			throws JMSException {
-		return createDurableSubscriber(topic, name);
-	}
+    @Override
+    public MessageConsumer createSharedConsumer(Topic topic,
+        String sharedSubscriptionName, String messageSelector,
+        boolean noLocal) throws JMSException {
+        checkSessionState();
+        checkTemporaryDestination(topic);
+        checkNoLocalForDuraOrShared(noLocal, sharedSubscriptionName, false);
+        if (topic == null) {
+            String errorString = AdministeredObject.cr.getKString(
+                    AdministeredObject.cr.X_DESTINATION_NOTFOUND, "null" );
+            throw new InvalidDestinationException(errorString,
+                    AdministeredObject.cr.X_DESTINATION_NOTFOUND);
+        }
+        if (sharedSubscriptionName == null || 
+            sharedSubscriptionName.trim().length() == 0) {
+            String errorString = AdministeredObject.cr.getKString(
+                AdministeredObject.cr.X_INVALID_SHARED_SUBSCRIPTION_NAME, 
+                ""+sharedSubscriptionName);
+            JMSException jmse = new JMSException(errorString, 
+                AdministeredObject.cr.X_INVALID_SHARED_SUBSCRIPTION_NAME);
+            ExceptionHandler.throwJMSException(jmse);
+        }
 
-	@Override
-	public MessageConsumer createDurableConsumer(Topic topic, String name,
-			String messageSelector, boolean noLocal) throws JMSException {
-		return createDurableSubscriber(topic, name, messageSelector, noLocal);
-	}
+        return new TopicSubscriberImpl(this, topic, 
+            messageSelector, noLocal, sharedSubscriptionName);
+    }
 
+    @Override
+    public MessageConsumer createDurableConsumer(Topic topic, String name)
+    throws JMSException {
+        return createDurableSubscriber(topic, name);
+    }
+
+    @Override
+    public MessageConsumer createDurableConsumer(Topic topic, String name,
+        String messageSelector, boolean noLocal) throws JMSException {
+        return createDurableSubscriber(topic, name, messageSelector, noLocal);
+    }
 }

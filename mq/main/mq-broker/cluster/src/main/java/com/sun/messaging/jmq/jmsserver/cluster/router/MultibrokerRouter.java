@@ -64,6 +64,8 @@ import java.util.Vector;
 import com.sun.messaging.jmq.io.Packet;
 import com.sun.messaging.jmq.io.Status;
 import com.sun.messaging.jmq.io.SysMessageID;
+import com.sun.messaging.jmq.util.timer.WakeupableTimer;
+import com.sun.messaging.jmq.util.timer.TimerEventHandler;
 import com.sun.messaging.jmq.jmsserver.DMQ;
 import com.sun.messaging.jmq.jmsserver.FaultInjection;
 import com.sun.messaging.jmq.jmsserver.Globals;
@@ -110,6 +112,14 @@ import com.sun.messaging.jmq.jmsserver.persist.api.NoPersistPartition;
 public class MultibrokerRouter implements ClusterRouter
 {
     private static boolean DEBUG = false;
+
+    private static boolean DEBUG_CLUSTER_TXN =
+                Globals.getConfig().getBooleanProperty(
+                        Globals.IMQ + ".cluster.debug.txn");
+    private static boolean DEBUG_CLUSTER_MSG =
+               Globals.getConfig().getBooleanProperty(
+               Globals.IMQ + ".cluster.debug.msg");
+
     private static Logger logger = Globals.getLogger();
     private static final FaultInjection FI = FaultInjection.getInjection();
 
@@ -129,6 +139,10 @@ public class MultibrokerRouter implements ClusterRouter
 
     BrokerConsumers bc = null;
     DestinationList DL = Globals.getDestinationList();
+
+    protected static boolean getDEBUG() {
+        return (DEBUG || DEBUG_CLUSTER_TXN || DEBUG_CLUSTER_MSG);
+    }
 
     public MultibrokerRouter(ClusterBroadcast cb)
     {
@@ -165,9 +179,9 @@ public class MultibrokerRouter implements ClusterRouter
     }
 
     public void removeConsumer(com.sun.messaging.jmq.jmsserver.core.ConsumerUID c,
-                               Set pendingMsgs, boolean cleanup)
-       throws BrokerException, IOException
-    {
+        Map<TransactionUID, LinkedHashMap<SysMessageID, Integer>> pendingMsgs, boolean cleanup)
+        throws BrokerException, IOException {
+
         bc.removeConsumer(c, pendingMsgs, cleanup);
     }
 
@@ -194,18 +208,22 @@ public class MultibrokerRouter implements ClusterRouter
         bc.destroy();
     }
 
-    public void handleJMSMsg(Packet p, List consumers, BrokerAddress sender,
-              boolean sendMsgDeliveredAck)
-        throws BrokerException
-    {
+    public void handleJMSMsg(Packet p, Map<ConsumerUID, Integer> consumers,
+                             BrokerAddress sender, boolean sendMsgDeliveredAck)
+                             throws BrokerException {
+
+        Map<ConsumerUID, Integer> deliveryCnts = consumers;
         boolean hasflowcontrol = true;
         ArrayList<Consumer> targetVector = new ArrayList<Consumer>();
         ArrayList ignoreVector = new ArrayList();
         PartitionedStore pstore = Globals.getStore().getPrimaryPartition(); //PART
 
-        Iterator itr = consumers.iterator();
+        Iterator<Map.Entry<ConsumerUID, Integer>> itr = 
+                        consumers.entrySet().iterator();
+        Map.Entry<ConsumerUID, Integer> entry = null;
         while (itr.hasNext()) {
-            ConsumerUID uid = (ConsumerUID)itr.next();
+            entry = itr.next();
+            ConsumerUID uid = entry.getKey();
             Consumer interest = Consumer.getConsumer(uid);
             if (interest != null && interest.isValid()) {
                 // we need the interest for updating the ref
@@ -236,6 +254,9 @@ public class MultibrokerRouter implements ClusterRouter
                 }
                 DL.remoteCheckMessageHomeChange(ref, sender);
                 if (addr == null) {
+                    Object[] args = { ref.getSysMessageID(), sender, targetVector };
+                    logger.log(logger.WARNING, Globals.getBrokerResources().getKString(
+                               BrokerResources.W_IGNORE_REMOTE_MSG_SENT_FROM, args));
                     ignoreVector.addAll(targetVector);
                     targetVector.clear();
                     sendIgnoreAck(p.getSysMessageID(), ref, sender, ignoreVector);
@@ -265,6 +286,9 @@ public class MultibrokerRouter implements ClusterRouter
             if (ref.getBrokerAddress() == null) {
                 ref.clearDestroyRemoteWriteLock();
                 acquiredWriteLock = false;
+                Object[] args = { ref.getSysMessageID(), sender, targetVector };
+                logger.log(logger.WARNING, Globals.getBrokerResources().getKString(
+                           BrokerResources.W_IGNORE_REMOTE_MSG_SENT_FROM, args));
                 ignoreVector.addAll(targetVector);
                 targetVector.clear();
                 sendIgnoreAck(p.getSysMessageID(), ref, sender, ignoreVector);
@@ -317,7 +341,7 @@ public class MultibrokerRouter implements ClusterRouter
                 if (!exists && !targetVector.isEmpty()) {
                     ref.setNeverStore(true);
                     // OK .. we dont need to route .. its already happened
-                    ref.store(targetVector);
+                    ref.storeRemoteInterests(targetVector, deliveryCnts);
                     itr = dsts.iterator();
                     while (itr.hasNext()) {
                         DestinationUID did = (DestinationUID)itr.next();
@@ -384,6 +408,7 @@ public class MultibrokerRouter implements ClusterRouter
                 ref.clearDestroyRemoteWriteLock();
             }
         }
+
         // Now deliver the message...
         String debugString = "\n";
 
@@ -415,12 +440,13 @@ public class MultibrokerRouter implements ClusterRouter
                         }
                     }
                 } catch (Exception ex) {
-                    logger.log(logger.INFO,"Internal error processing ack",
-                           ex);
+                    logger.log(logger.INFO,"Internal error processing ack", ex);
+
+                } finally {
+                    ref.removeRemoteConsumerUID(
+                        interest.getStoredConsumerUID(),
+                        interest.getConsumerUID());
                 }
-            } else {
-                ref.addRemoteConsumerUID(interest.getConsumerUID(), 
-                        interest.getConsumerUID().getConnectionUID());
             }
 
             if (DEBUG) {
@@ -499,29 +525,15 @@ public class MultibrokerRouter implements ClusterRouter
     }
 }
 
-
 /**
  * This class represents the remote Consumers associated with
  * the brokers in this cluster.
  */
 class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.EventListener
 {
-    private static boolean DEBUG = false;
-
-    private static boolean DEBUG_CLUSTER_TXN =
-                Globals.getConfig().getBooleanProperty(
-                        Globals.IMQ + ".cluster.debug.txn");
-    private static boolean DEBUG_CLUSTER_MSG =
-               Globals.getConfig().getBooleanProperty(
-               Globals.IMQ + ".cluster.debug.msg");
-
     //obsolete private property
     private static String REDELIVER_REMOTE_REJECTED =
         Globals.IMQ+".cluster.disableRedeliverRemoteRejectedMsg"; //4.5
-
-    static {
-        if (!DEBUG) DEBUG = DEBUG_CLUSTER_TXN || DEBUG_CLUSTER_MSG;
-    }
 
     Thread thr = null;
 
@@ -539,18 +551,136 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
     public static int BTOBFLOW = Globals.getConfig().getIntProperty(
                Globals.IMQ + ".cluster.consumerFlowLimit",1000); 
 
-    Map deliveredMessages = new LinkedHashMap();
-    Map pendingConsumerUIDs = Collections.synchronizedMap(new LinkedHashMap());
-    Map cleanupList = new HashMap();
     DestinationList DL = Globals.getDestinationList();
+    Map deliveredMessages = new LinkedHashMap();
+    Map cleanupList = new HashMap();
+
+    private Map<com.sun.messaging.jmq.jmsserver.core.ConsumerUID, 
+        Map<TransactionUID, Set<ackEntry>>> pendingConsumerUIDs = 
+        Collections.synchronizedMap(
+            new LinkedHashMap<com.sun.messaging.jmq.jmsserver.core.ConsumerUID, 
+                              Map<TransactionUID, Set<ackEntry>>>());
+
+    private Object pendingCheckTimerLock = new Object();
+    private boolean pendingCheckTimerShutdown = false;
+    private WakeupableTimer pendingCheckTimer = null;
+
+    //0 no timeout, in seconds
+    public static int pendingCheckInterval = Globals.getConfig().getIntProperty(
+               Globals.IMQ + ".cluster.pendingTransactionCheckInterval", 180); 
+
+    private static boolean getDEBUG() {
+        return MultibrokerRouter.getDEBUG();
+    }
 
     public BrokerConsumers(Protocol p)
     {
         this.protocol = p;
+        if (pendingCheckInterval < p.getClusterAckWaitTimeout()) {
+            pendingCheckInterval = p.getClusterAckWaitTimeout();
+        }
         this.fi = FaultInjection.getInjection();
         Thread thr =new MQThread(this,"Broker Monitor");
         thr.setDaemon(true);
         thr.start();
+    }
+
+    public void notifyPendingCheckTimer() {
+        synchronized(pendingCheckTimerLock) {    
+            if (pendingCheckInterval > 0 && 
+                pendingCheckTimer == null && !pendingCheckTimerShutdown) {
+                pendingCheckTimer = new WakeupableTimer(
+                        "ClusterRouterPendingTransactionTimer",
+                        new PendingCheckEventHandler(),
+                        pendingCheckInterval*1000L, pendingCheckInterval*1000L,
+                        br.getKString(br.I_CLUSTER_ROUTER_PENDING_TXN_CHECK_THREAD_START),
+                        br.getKString(br.I_CLUSTER_ROUTER_PENDING_TXN_CHECK_THREAD_EXIT));
+            }
+        }
+    }
+
+    private class PendingCheckEventHandler implements TimerEventHandler {
+        public PendingCheckEventHandler() {
+        }
+        public void handleOOMError(Throwable e) {
+            logger.logStack(logger.WARNING,
+            "OutOfMemoryError[ClusterRouterPendingTransactionTimer]", e);
+        }
+        public void handleLogInfo(String msg) {
+            logger.log(logger.INFO, msg+"[ClusterRouterPendingTransactionTimer]");
+        }
+        public void handleLogWarn(String msg, Throwable e) {
+            logger.logStack(logger.WARNING, msg+"[ClusterRouterPendingTransactionTimer]", e);
+        }
+        public void handleLogError(String msg, Throwable e) {
+            logger.logStack(logger.WARNING, msg+"[ClusterRouterPendingTransactionTimer]", e);
+        }
+
+        public void handleTimerExit(Throwable e) {
+            synchronized(pendingCheckTimerLock) {
+                pendingCheckTimer = null;
+            }
+            if (valid) {
+                logger.log(logger.WARNING, br.getKString(
+                    br.I_CLUSTER_ROUTER_PENDING_TXN_CHECK_THREAD_EXIT));
+            }
+        }
+
+        public long runTask() {
+            Set<Map<TransactionUID, Set<ackEntry>>> maps = null;
+            synchronized(pendingConsumerUIDs) {
+                maps = new LinkedHashSet<Map<TransactionUID, Set<ackEntry>>>(
+                               pendingConsumerUIDs.values());
+            }
+            Map<TransactionUID, Set<ackEntry>> map = null;
+            Iterator<Map<TransactionUID, Set<ackEntry>>> itr = maps.iterator();
+            while (itr.hasNext()) {
+                map = itr.next();
+                if (map == null) {
+                    continue;
+                }
+                TransactionUID tid = null;
+                Set<ackEntry> entries = null;
+                Map.Entry<TransactionUID, Set<ackEntry>> pair = null;
+                Iterator<Map.Entry<TransactionUID, Set<ackEntry>>> itr1 =
+                                                map.entrySet().iterator();
+                while (itr1.hasNext()) {
+                    pair = itr1.next();
+                    tid = pair.getKey();
+                    if (tid == null) {
+                        continue;
+                    }
+                    entries = pair.getValue();
+                    ackEntry entry = null;
+                    Iterator<ackEntry> itr2 = entries.iterator();
+                    while (itr2.hasNext()) {
+                        entry = itr2.next();
+                        if (entry.isPendingTimeout(pendingCheckInterval*1000L)) {
+                            protocol.sendTransactionInquiry(tid, 
+                                 entry.getConsumerUID().getBrokerAddress());
+                        }
+                    } 
+                }
+            }
+
+            //now prepared pending transactions 
+            TransactionList[] tls = Globals.getDestinationList().getTransactionList(null);
+            TransactionList tl = null;
+            ArrayList tids = null;
+            TransactionUID tid = null;
+            for (int i = 0; i < tls.length; i++) {
+                tl = tls[i];
+                if (tl == null) {
+                    continue;
+                }
+                tids = tl.getPreparedRemoteTransactions(Long.valueOf(pendingCheckInterval*1000L));
+                if (tids == null || tids.size() == 0) {
+                    continue;
+                }
+                protocol.sendPreparedTransactionInquiries(tids, null);
+            }
+            return 0L;
+        }
     }
 
     class ackEntry
@@ -561,6 +691,8 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
         SysMessageID id = null;
         com.sun.messaging.jmq.jmsserver.core.BrokerAddress address = null;
         TransactionUID tuid = null;
+        long pendingStartTime =  0L;
+        boolean markConsumed = false;
 
         public ackEntry(SysMessageID id,
               com.sun.messaging.jmq.jmsserver.core.ConsumerUID uid,
@@ -574,8 +706,27 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
              pref = null;
         }
 
+        public void markConsumed() {
+            markConsumed = true;
+        }
+
+        public boolean hasMarkConsumed() {
+            return markConsumed;
+        }
+
         public String toString() {
-            return ""+id+"["+uid+", "+storedcid+"]TUID="+tuid+", address="+address;
+            return ""+id+"["+uid+", "+storedcid+"]TUID="+tuid+", ("+pendingStartTime+")";
+        }
+
+        /**
+         * The time when this entry becomes pending when remote consumer closed
+         */
+        public void pendingStarted() {
+            pendingStartTime = System.currentTimeMillis();
+        }
+
+        public boolean isPendingTimeout(long timeout) {
+            return ((System.currentTimeMillis()-pendingStartTime) >= timeout);
         }
 
         public void setTUID(TransactionUID uid) {
@@ -720,20 +871,28 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
         itr = l.iterator();
         while (itr.hasNext()) {
             ConsumerUID cuid = (com.sun.messaging.jmq.jmsserver.core.ConsumerUID)itr.next();
+            Map<TransactionUID, Set<ackEntry>> pending0, pending = null;
             synchronized(deliveredMessages) {
-
-            Set pending = (Set)pendingConsumerUIDs.get(cuid);
+                pending0 = pendingConsumerUIDs.get(cuid);
+                if (pending0 != null) {
+                    pending = new LinkedHashMap<TransactionUID, Set<ackEntry>>(pending0);
+                } 
+            }
             if (pending == null) {
                 ht.put("[pendingConsumerUIDs]"+cuid.toString(), "null");
             } else {
-                v = new Vector(pending);
-                if (v.size() == 0) {
-                    ht.put("[pendingConsumerUIDs]"+cuid.toString(), "none");
-                } else {
-                    ht.put("[pendingConsumerUIDs]"+cuid.toString(), v);
+                Hashtable htt = new Hashtable();
+                Map.Entry<TransactionUID, Set<ackEntry>> pair = null;
+                TransactionUID key = null;
+                Iterator<Map.Entry<TransactionUID, Set<ackEntry>>> itr1 = 
+                                            pending.entrySet().iterator();
+                while (itr1.hasNext()) {
+                    pair = itr1.next();
+                    key = pair.getKey();
+                    htt.put("PENDING-TID:"+(key ==  null ? "null":key),
+                            new Vector(pair.getValue()));
                 }
-            }
-
+                ht.put("[pendingConsumerUIDs]"+cuid.toString(),  htt);
             }
         }
 
@@ -770,6 +929,12 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
         synchronized(activeConsumers) {
             activeConsumers.notify();
         }
+        synchronized(pendingCheckTimerLock) { 
+            pendingCheckTimerShutdown = true;
+            if (pendingCheckTimer != null) {
+                pendingCheckTimer.cancel();
+            }
+        }
     }
 
 
@@ -795,7 +960,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
          (com.sun.messaging.jmq.jmsserver.core.BrokerAddress address) 
         throws BrokerException
     {
-        if (DEBUG) {
+        if (getDEBUG()) {
         logger.log(logger.INFO, "BrokerConsumers.brokerDown:"+address);
         }
 
@@ -805,7 +970,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
             Iterator itr = consumers.keySet().iterator();
             while (itr.hasNext()) {
                 cuid = (com.sun.messaging.jmq.jmsserver.core.ConsumerUID)itr.next();
-                if (DEBUG) {
+                if (getDEBUG()) {
                 logger.log(logger.INFO, "Check remote consumer "+cuid+" from "+cuid.getBrokerAddress());
                 }
                 if (address.equals(cuid.getBrokerAddress())) {
@@ -821,7 +986,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
             Iterator itr = pendingConsumerUIDs.keySet().iterator();
             while (itr.hasNext()) {
                 cuid  = (com.sun.messaging.jmq.jmsserver.core.ConsumerUID)itr.next();
-                if (DEBUG) {
+                if (getDEBUG()) {
                 logger.log(logger.INFO, "Check closed remote consumer "+cuid+" from "+cuid.getBrokerAddress());
                 }
                 if (address.equals(cuid.getBrokerAddress())) {
@@ -856,7 +1021,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
 
             synchronized(removeConsumerLock) {
                 if (consumers.get(uid) == null) {
-                    if (DEBUG || DEBUG_CLUSTER_TXN || DEBUG_CLUSTER_MSG) {
+                    if (getDEBUG()) {
                     Globals.getLogger().log(Logger.INFO,
                     "BrokerConsumers.forwardMessageToRemote(): "+ref+", ignore removed consumer: "+consumer);
                     }
@@ -886,7 +1051,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
     public void removeConsumers(ConnectionUID uid) 
         throws BrokerException
     {
-        if (DEBUG) {
+        if (getDEBUG()) {
         logger.log(logger.INFO, "BrokerConsumers.removeConsumers for remote connection: "+uid);
         }
         Set removedConsumers = new HashSet();
@@ -923,19 +1088,20 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
     private Object removeConsumerLock = new Object();
 
     public void removeConsumer(
-       com.sun.messaging.jmq.jmsserver.core.ConsumerUID uid, boolean cleanup) 
+        com.sun.messaging.jmq.jmsserver.core.ConsumerUID uid, boolean cleanup) 
         throws BrokerException {
         removeConsumer(uid, null, cleanup);
     }
 
     public void removeConsumer(
         com.sun.messaging.jmq.jmsserver.core.ConsumerUID uid, 
-        Set pendingMsgs, boolean cleanup) 
+        Map<TransactionUID, LinkedHashMap<SysMessageID, Integer>> pendingMsgs,
+        boolean cleanup) 
         throws BrokerException {
-          if (DEBUG) {
-              logger.log(logger.INFO, "BrokerConsumers.removeConsumer:"+uid+
-                         ", pending="+(pendingMsgs == null ? "null":pendingMsgs.size())+
-                         ", cleanup="+cleanup);
+
+        if (getDEBUG()) {
+           logger.log(logger.INFO, "BrokerConsumers.removeConsumer("+uid+
+                                   ", "+pendingMsgs+ ", "+cleanup+")");
           }
           Consumer c = null;
           synchronized(removeConsumerLock) {
@@ -966,6 +1132,10 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
           Map<PartitionedStore, LinkedHashSet> openmsgmp = 
               new LinkedHashMap<PartitionedStore, LinkedHashSet>();
 
+          Map<TransactionUID, Set<ackEntry>> mypending = 
+              new LinkedHashMap<TransactionUID, Set<ackEntry>>();
+          boolean haspendingtxn = false;
+
           // OK .. get the acks .. if its a FalconRemote
           // we sent the messages directly and must explicitly ack
           synchronized(deliveredMessages) {
@@ -973,7 +1143,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                   cleanupList.put(uid, c.getParentList());
               }
               Map cparentmp = (Map)cleanupList.get(uid);
-              if (DEBUG) {
+              if (getDEBUG()) {
               logger.log(logger.INFO, "BrokerConsumers.removeConsumer:"+uid+
                           ", pending="+pendingMsgs+", cleanup="+cleanup+", cparentmp="+cparentmp);
               }
@@ -983,19 +1153,59 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                   if (!e.getConsumerUID().equals(uid)) {
                       continue; 
                   }
-                  if (e.getTUID() != null) {
-                      continue;
-                  }
-                  if (pendingMsgs != null && !cleanup) {
-                      if (pendingMsgs.contains(e.getSysMessageID())) {
+                  if (pendingMsgs != null) {
+                      Iterator<Map.Entry<TransactionUID, LinkedHashMap<SysMessageID, Integer>>> 
+                          itr1 = pendingMsgs.entrySet().iterator(); 
+                      Map.Entry<TransactionUID, LinkedHashMap<SysMessageID, Integer>> pair = null;
+                      TransactionUID tid = null;
+                      LinkedHashMap<SysMessageID, Integer> sysiddcts = null;
+                      Set<SysMessageID> mysysids = null;
+                      Set<ackEntry> ackentries = null;
+                      boolean found = false;
+                      Integer deliverCnt = null;
+                      while (itr1.hasNext()) {
+                          pair = itr1.next();
+                          tid = pair.getKey();
+                          sysiddcts = pair.getValue();
+                          deliverCnt = sysiddcts.get(e.getSysMessageID());
+                          if (deliverCnt != null) {
+                              if (tid != null && tid.longValue() == 0L) {
+                                  updateConsumed(e, deliverCnt, false);
+                                  continue;
+                              }
+                              if (cleanup || e.getTUID() != null) {
+                                  updateConsumed(e, deliverCnt, false);
+                                  break;
+                              }
+                              found = true; 
+                              ackentries = mypending.get(tid);
+                              if (ackentries == null) {
+                                  ackentries = new LinkedHashSet();
+                                  mypending.put(tid, ackentries);
+                              }
+                              if (tid != null && !haspendingtxn) {
+                                  haspendingtxn = true;
+                              }
+                              ackentries.add(e);
+                              updateConsumed(e, deliverCnt, false);
+                              break;
+                          }
+                      }
+                      if (found) {
                           continue;
                       }
                   }
-                  if (DEBUG && DEBUG_CLUSTER_MSG) {
+                  if (e.getTUID() != null) {
+                      continue;
+                  }
+                  if (getDEBUG()) {
                       logger.log(logger.DEBUG, 
                       "BrokerConsumers.removeConsumer:"+uid+", remove ackEntry="+e+ ", c="+c);
                   }
                   itr.remove();
+                  if (cleanup) {
+                      updateConsumed(e, Integer.valueOf(1), true);
+                  }
                   if (c != null) {
                       if (c.isFalconRemote()) {
                           e.acknowledged(false);
@@ -1055,8 +1265,8 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
               if (cleanup || pendingMsgs == null) {
                   cleanupList.remove(uid);
                   pendingConsumerUIDs.remove(uid);
-              } else {
-                  pendingConsumerUIDs.put(uid, pendingMsgs);
+              } else if (mypending.size() > 0) {
+                  pendingConsumerUIDs.put(uid, mypending);
               }
           }
 
@@ -1066,28 +1276,114 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
               d.removeConsumer(uid, false);
               }
           }
+
+          List<Set<ackEntry>> l = null;
+          synchronized(pendingConsumerUIDs) {
+              l = new ArrayList<Set<ackEntry>>(mypending.values());
+          }
+          Set<ackEntry> entries = null;
+          Iterator<Set<ackEntry>> itr = l.iterator();
+          while (itr.hasNext()) {
+              entries = itr.next();
+              ackEntry entry = null;
+              Iterator<ackEntry> itr1 = entries.iterator();
+              while (itr1.hasNext()) {
+                  entry = itr1.next();
+                  entry.pendingStarted();
+              }
+          }
+          if (haspendingtxn) {
+              notifyPendingCheckTimer();
+          }
+    }
+
+    private void updateConsumed(ackEntry e, Integer deliverCnt, boolean cleanup) {
+        int cnt = deliverCnt.intValue();
+        if (cnt <= 0) {
+            cnt = 1;
+        }
+        PacketReference pr = e.getReference();
+        if (pr != null && !e.hasMarkConsumed()) {
+            ConsumerUID cuid = e.getConsumerUID();
+            ConsumerUID suid = e.getStoredConsumerUID();
+            try {
+                 pr.updateForJMSXDeliveryCount(suid, cnt, !cleanup);
+                 e.markConsumed();
+             } catch (Exception ex) {
+                 Object[] args = { "["+pr+","+suid+"]", cuid, ex.getMessage() };
+                 logger.log(Logger.WARNING, Globals.getBrokerResources().getKString(
+                 BrokerResources.W_UNABLE_UPDATE_REF_STATE_ON_CLOSE_CONSUMER, args)+
+                 (cleanup ? "[RC]":"[R]"), ex);
+             }
+        }
     }
 
     /**
      *  This method must be called only when holding deliveredMessages lock
      */
-    private void cleanupPendingConsumerUID(com.sun.messaging.jmq.jmsserver.core.ConsumerUID cuid, SysMessageID sysid) {
+    private void cleanupPendingConsumerUID(
+        com.sun.messaging.jmq.jmsserver.core.ConsumerUID cuid,
+                                           SysMessageID sysid) {
 
         assert Thread.holdsLock(deliveredMessages);
 
-        Set pending = (Set)pendingConsumerUIDs.get(cuid);
-        if (pending == null) return;
-
-        pending.remove(sysid);
-
-        if (pending.isEmpty()) {
-            pendingConsumerUIDs.remove(cuid);
-            cleanupList.remove(cuid);
+        Map<TransactionUID, Set<ackEntry>> pending = pendingConsumerUIDs.get(cuid);
+        if (pending == null) {
+            return;
+        }
+        TransactionUID tid = null;
+        Set<ackEntry> entries = null;
+        Iterator<TransactionUID> itr = pending.keySet().iterator();
+        while (itr.hasNext()) {
+            tid = itr.next();
+            entries = pending.get(tid);
+            if (entries.remove(new ackEntry(sysid, cuid, null))) {
+                if (entries.isEmpty()) {
+                    pending.remove(tid);
+                    if (pending.isEmpty()) { 
+                        pendingConsumerUIDs.remove(cuid);
+                        cleanupList.remove(cuid);
+                    }
+                }
+                return;
+            }
         }
     }
+
+    private List<ackEntry> getPendingConsumerUID(TransactionUID tid) {
+
+        assert Thread.holdsLock(deliveredMessages);
+
+        Set<Map<TransactionUID, Set<ackEntry>>> maps = null;
+        synchronized(pendingConsumerUIDs) {
+            maps = new LinkedHashSet<Map<TransactionUID, Set<ackEntry>>>(
+                           pendingConsumerUIDs.values());
+        }
+        Map<TransactionUID, Set<ackEntry>> map = null;
+        Iterator<Map<TransactionUID, Set<ackEntry>>> itr = maps.iterator();
+        while (itr.hasNext()) {
+            map = itr.next();
+            if (map == null) {
+                continue;
+            }
+            TransactionUID mytid = null;
+            Set<ackEntry> entries = null;
+            Map.Entry<TransactionUID, Set<ackEntry>> pair = null;
+            Iterator<Map.Entry<TransactionUID, Set<ackEntry>>> itr1 =
+                                             map.entrySet().iterator();
+            while (itr1.hasNext()) {
+                pair = itr1.next();
+                mytid = pair.getKey();
+                if (mytid == null || !mytid.equals(tid)) {
+                    continue;
+                }
+                return new ArrayList<ackEntry>(pair.getValue());
+            }
+        }
+        return new ArrayList<ackEntry>();
+    }
+
                     
-
-
     public boolean acknowledgeMessageFromRemote(int ackType, SysMessageID sysid,
                               com.sun.messaging.jmq.jmsserver.core.ConsumerUID cuid,
                               Map optionalProps) throws BrokerException {
@@ -1128,7 +1424,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                 } else {
                     logstrtyp = (tidi == null ? "orphaned":"inactive");
                 }
-                if (DEBUG) {
+                if (getDEBUG()) {
                     logger.log(Logger.INFO, 
                     "Releasing message ["+cuid+", "+sysid+"]("+logstrtyp+")"+logstrop);
                 }
@@ -1139,15 +1435,15 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                     cleanupPendingConsumerUID(cuid, sysid);
                 }
                 if (value == null) {
-                    if (DEBUG) {
+                    if (getDEBUG()) {
                         logger.log(Logger.INFO, 
-                        "Releasing message ["+cuid+", "+sysid+"]("+logstrtyp+")"+logstrop);
+                        "Releasing message ["+cuid+", "+sysid+"]("+logstrtyp+")"+logstrop+": entry not found");
                     }
                     return true;
                 }
                 PacketReference ref =value.getReference();
                 if (ref == null) {
-                    if (DEBUG) {
+                    if (getDEBUG()) {
                         logger.log(Logger.INFO, 
                         "Releasing message ["+value+"]("+logstrtyp+") ref null"+logstrop);
                     }
@@ -1188,7 +1484,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                 }
                 PacketReference ref =value.getReference();
                 if (ref == null || ref.isDestroyed() || ref.isInvalid()) {
-                    if (DEBUG) {
+                    if (getDEBUG()) {
                     logger.log(Logger.INFO, "Cleanup dead message (not remote delivered): "+ value);
                     }
                     synchronized(deliveredMessages) {
@@ -1201,7 +1497,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
            /* dont do anything .. we will soon be closing the consumer and that
             * will cause the right things to happen 
             */
-            if (DEBUG) {
+            if (getDEBUG()) {
                 logger.log(Logger.DEBUG, "got message ignored ack, can not process [" +
                                           sysid + "," + cuid+"]" + ackType);
             }
@@ -1240,12 +1536,12 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                     return false;
                 }  
                 if (value == null && !cuid.equals(PacketReference.getQueueUID())) {  
-                    if (DEBUG || DEBUG_CLUSTER_TXN || DEBUG_CLUSTER_MSG) {
+                    if (getDEBUG()) {
                         logger.log(logger.INFO, "Mark dead message: entry not found:"+sysid+","+cuid);
                     }
                     return false;
                 }
-                if (DEBUG) {
+                if (getDEBUG()) {
                     Globals.getLogger().log(logger.INFO,
                         "Dead message "+sysid+" notification from  "+cuid.getBrokerAddress()+
                         " for remote consumer "+ cuid);
@@ -1287,7 +1583,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                             ref.removeInDelivery(e.getStoredConsumerUID()); 
                             removeRemoteDeadMessage(ackType, ref, uid, sid, optionalProps);
                         } 
-                        if (DEBUG) {
+                        if (getDEBUG()) {
                             logger.log(Logger.INFO, "Cleanup remote dead ack entries("+(i++)+"th): "+ e);
                         }
                         itr.remove();
@@ -1358,7 +1654,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
             try {
 
             if (ref.isDead()) { 
-                if (DEBUG) {
+                if (getDEBUG()) {
                     Globals.getLogger().log(logger.INFO,
                     "Remove dead message "+ref+
                     " for remote consumer "+ cuid +" on destination "+d+" with reason "+rr);
@@ -1472,7 +1768,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                         tltasmap.put(tl, tltas);
                     }
                     tltas.add(ta);
-                    if (DEBUG_CLUSTER_TXN) {
+                    if (getDEBUG()) {
                         dbuf.append("\n\t["+ta+"]"+tl);
                     }
                 }
@@ -1486,7 +1782,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                     tas = (TransactionAcknowledgement[])tltas.toArray(new TransactionAcknowledgement[0]);
                     TransactionState ts = new TransactionState();
                     ts.setState(TransactionState.PREPARED);
-                    if (DEBUG_CLUSTER_TXN) {
+                    if (getDEBUG()) {
                         logger.log(logger.INFO, 
                         "Preparing remote transaction "+tid + " for ["+tltas+"]"+tl+" from "+txnHomeBroker);
                     }
@@ -1499,22 +1795,75 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                     value.setTUID(tid);
                 }
             }
-            if (DEBUG_CLUSTER_TXN) {
+            Iterator<TransactionList> itr = tltasmap.keySet().iterator();
+            while (itr.hasNext()) {
+                tl = itr.next();
+                tl.pendingStartedForRemotePreparedTransaction(tid);
+            }
+            notifyPendingCheckTimer();
+            if (getDEBUG()) {
                 logger.log(logger.INFO, "Prepared remote transaction "+tid + " from "+txnHomeBroker+dbuf.toString());
             }
             return;
         }
 
         if (ackType == ClusterBroadcast.MSG_ROLLEDBACK) {
-            if (DEBUG_CLUSTER_TXN) {
+            if (getDEBUG()) {
             logger.log(logger.INFO, "Rolling back remote transaction "+tid + " from "+txnHomeBroker);
             }
             List<Object[]> list = TransactionList.getTransListsAndRemoteTranStates(tid);
             if (list == null) {
-                logger.log(logger.INFO, br.getKString(
-                br.I_ROLLBACK_REMOTE_TXN_NOT_FOUND, tid, txnHomeBroker));
+                if (getDEBUG()) {
+                    logger.log(logger.INFO, "Rolling back non-prepared remote transaction "+tid + " from "+txnHomeBroker);
+                }
+                List<ackEntry> entries = null;
+                synchronized(deliveredMessages) {
+                    entries = getPendingConsumerUID(tid);
+                    Iterator<ackEntry> itr = entries.iterator();
+                    ackEntry e = null;
+                    while (itr.hasNext()) {
+                        e = itr.next();
+                        if (deliveredMessages.get(e) == null) {
+                            itr.remove();
+                            continue;
+                        }
+                        if (consumers.get(e.getConsumerUID()) != null) {
+                            itr.remove();
+                            continue;
+                        }
+                    }
+                    deliveredMessages.remove(e);
+                    cleanupPendingConsumerUID(e.getConsumerUID(), e.getSysMessageID());
+                }
+                if (entries.size() == 0) {
+                    logger.log(logger.INFO, br.getKString(
+                        br.I_ROLLBACK_REMOTE_TXN_NOT_FOUND, tid, txnHomeBroker));
+                    return;
+                }
+                Iterator<ackEntry> itr =  entries.iterator();
+                while (itr.hasNext()) {
+                    ackEntry e = itr.next();
+                    SysMessageID sysid = e.getSysMessageID();
+                    com.sun.messaging.jmq.jmsserver.core.ConsumerUID cuid = e.getConsumerUID();
+                    com.sun.messaging.jmq.jmsserver.core.ConsumerUID suid = e.getStoredConsumerUID();
+                    if (suid == null) {
+                        suid = cuid;
+                    }
+                    PacketReference ref = DL.get(null, sysid); //PART
+                    if (ref == null) {
+                        if (getDEBUG()) {
+                        logger.log(logger.INFO,
+                        "["+sysid+":"+cuid+"] reference not found in rolling back remote non-prepared transaction "+tid);
+                        }
+                        continue;
+                    }
+                    ref.removeInDelivery(suid);
+                    ref.getDestination().forwardOrphanMessage(ref, suid);
+                } 
                 return;
-            }
+
+            } //if list == null
+
             TransactionList tl =  null;
             Object[] oo = null;
             for (int li = 0; li < list.size(); li++) {
@@ -1553,17 +1902,17 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                     entry =  new ackEntry(sysid, uid, null);
                     value = (ackEntry)deliveredMessages.get(entry);
                     if (value == null) {
-                        if (DEBUG_CLUSTER_TXN) {
+                        if (getDEBUG()) {
                             logger.log(logger.INFO, 
                             "["+sysid+":"+uid+"] not found in rolling back remote transaction "+tid);
                         }
                         continue; 
                     }
                     if (value.getTUID() == null || !value.getTUID().equals(tid)) {
-                        if (DEBUG_CLUSTER_TXN) {
+                        if (getDEBUG()) {
                             logger.log(logger.INFO, 
                             "["+sysid+":"+uid+"] with TUID="+value.getTUID()+
-                            ", in rolling back remote transaction "+tid);
+                            ", in confict for rolling back remote transaction "+tid);
                         }
                         continue;
                     }
@@ -1587,7 +1936,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                 }
                 PacketReference ref = DL.get(null, sysid); //PART
                 if (ref == null) {
-                    if (DEBUG_CLUSTER_TXN) {
+                    if (getDEBUG()) {
                     logger.log(logger.INFO, 
                     "["+sysid+":"+cuid+"] reference not found in rolling back remote transaction "+tid);
                     }
@@ -1622,7 +1971,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
         ArrayList cLogIntList = null;
 
         if (ackType == ClusterBroadcast.MSG_ACKNOWLEDGED) {
-            if (DEBUG_CLUSTER_TXN) {
+            if (getDEBUG()) {
             logger.log(logger.INFO, "Committing remote transaction "+tid + " from "+txnHomeBroker);
             }
             List<Object[]> list = TransactionList.getTransListsAndRemoteTranStates(tid);
@@ -1638,7 +1987,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
             tl = (TransactionList)oo[0];
             if (!tl.updateRemoteTransactionState(tid,
                     TransactionState.COMMITTED, (sysids == null), true, true)) {
-                if (DEBUG_CLUSTER_TXN) {
+                if (getDEBUG()) {
                 logger.log(logger.INFO, "Remote transaction "+tid + " already committed, from "+txnHomeBroker);
                 }
                 continue;
@@ -1807,7 +2156,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
             if (suid == null) suid = cuid;
             PacketReference ref = DL.get(null, sysid); //PART
             if (ref == null) {
-                if (DEBUG_CLUSTER_TXN) {
+                if (getDEBUG()) {
                 logger.log(logger.INFO, 
                 "["+sysid+":"+cuid+"] reference not found in rolling back recovery remote transaction "+tid);
                 }
@@ -1866,7 +2215,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
     public void addConsumer(Consumer c) 
         throws BrokerException
     {
-        if (DEBUG) {
+        if (getDEBUG()) {
             logger.log(logger.INFO, "BrokerConsumers.addConsumer: "+c);
         }
 
@@ -2066,7 +2415,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
             boolean cb = false;
             synchronized(removeConsumerLock) {
                 if (consumers.get(c.getConsumerUID()) == null) {
-                    if (DEBUG || DEBUG_CLUSTER_TXN || DEBUG_CLUSTER_MSG) {
+                    if (getDEBUG()) {
                     Globals.getLogger().log(Logger.INFO, 
                     "BrokerConsumers.run(): ignore removed consumer: "+c);
                     }
@@ -2086,7 +2435,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                                                   c.getStoredConsumerUID());
                     synchronized(deliveredMessages) {
                         deliveredMessages.put(entry, entry);
-                        if (DEBUG && DEBUG_CLUSTER_MSG) {
+                        if (getDEBUG()) {
                         logger.log(logger.DEBUG, "deliveredMessages:"+entry);
                         }
                     }

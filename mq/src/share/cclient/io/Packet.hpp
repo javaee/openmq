@@ -124,6 +124,7 @@ protected:
     TRANSACTION_ID       = 8,
     PRODUCER_ID          = 9,
     DELIVERY_TIME        = 10,
+    DELIVERY_COUNT       = 11,
 
 
     // ID of the smallest valid ID, ignore variable header items below this
@@ -202,6 +203,7 @@ protected:
   PRUint64        producerID;
   PRUint64        expiration;
   PRUint64        deliveryTime;
+  PRUint32        deliveryCount;
   PRUint32        propertiesOffset;
   PRUint32        propertiesSize;
   PRUint8         priority;
@@ -339,6 +341,7 @@ public:
   PRUint64 getTimestamp() const;
   PRUint64 getExpiration() const;
   PRUint64 getDeliveryTime() const;
+  PRUint32 getDeliveryCount() const;
   PRUint32 getPort() const;
   PRUint32 getSequence() const;
   PRUint8 getEncryption() const;

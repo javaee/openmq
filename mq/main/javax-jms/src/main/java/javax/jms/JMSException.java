@@ -47,7 +47,7 @@ package javax.jms;
  * <UL>
  *   <LI> A provider-specific string describing the error. This string is 
  *        the standard exception message and is available via the
- *        <CODE>getMessage</CODE> method.
+ *        {@code getMessage} method.
  *   <LI> A provider-specific string error code 
  *   <LI> A reference to another exception. Often a JMS API exception will 
  *        be the result of a lower-level problem. If appropriate, this 
@@ -62,12 +62,12 @@ public class JMSException extends Exception {
   **/
   private String errorCode;
 
-  /** <CODE>Exception</CODE> reference.
+  /** {@code Exception} reference.
   **/
   private Exception linkedException;
 
 
-  /** Constructs a <CODE>JMSException</CODE> with the specified reason and 
+  /** Constructs a {@code JMSException} with the specified reason and 
    *  error code.
    *
    *  @param  reason        a description of the exception
@@ -81,7 +81,7 @@ public class JMSException extends Exception {
     linkedException = null;
   }
 
-  /** Constructs a <CODE>JMSException</CODE> with the specified reason and with
+  /** Constructs a {@code JMSException} with the specified reason and with
    *  the error code defaulting to null.
    *
    *  @param  reason        a description of the exception
@@ -105,7 +105,7 @@ public class JMSException extends Exception {
   /**
    * Gets the exception linked to this one.
    *
-   * @return the linked <CODE>Exception</CODE>, null if none
+   * @return the linked {@code Exception}, null if none
   **/
   public 
   Exception getLinkedException() {
@@ -113,9 +113,9 @@ public class JMSException extends Exception {
   }
 
   /**
-   * Adds a linked <CODE>Exception</CODE>.
+   * Adds a linked {@code Exception}.
    *
-   * @param ex       the linked <CODE>Exception</CODE>
+   * @param ex       the linked {@code Exception}
   **/
   public void setLinkedException(Exception ex) {
       linkedException = ex;

@@ -53,6 +53,7 @@ import com.sun.messaging.jmq.util.ServiceType;
 import com.sun.messaging.jmq.jmsserver.core.BrokerAddress;
 import com.sun.messaging.jmq.jmsserver.Globals;
 import com.sun.messaging.jmq.jmsserver.core.*;
+import com.sun.messaging.jmq.jmsserver.data.TransactionUID;
 import com.sun.messaging.jmq.jmsserver.cluster.api.*;
 import com.sun.messaging.jmq.jmsserver.cluster.router.ClusterRouter; 
 import com.sun.messaging.jmq.jmsserver.cluster.router.MultibrokerRouter; 
@@ -690,10 +691,12 @@ public  class ClusterBroadcaster implements ClusterBroadcast,
      * Interest removal notification. This method is called when
      * any remote interest is removed.
      */
-    public void interestRemoved(Consumer cuid, Set pendingMsgs, boolean cleanup) {
+    public void interestRemoved(Consumer cuid, 
+        Map<TransactionUID, LinkedHashMap<SysMessageID, Integer>> pendingMsgs,
+        boolean cleanup) {
         if (DEBUG) {
             logger.log(Logger.INFO, "callback interestRemoved " + cuid+
-                       ", pendingMsgs="+pendingMsgs+", cleanup="+cleanup);
+                ", pendingMsgs="+pendingMsgs+", cleanup="+cleanup);
         }
         try {
             clusterRouter.removeConsumer(cuid.getConsumerUID(), pendingMsgs, cleanup);
@@ -801,8 +804,11 @@ public  class ClusterBroadcaster implements ClusterBroadcast,
        }
     }
 
-    public void processRemoteMessage(Packet msg, List consumers, BrokerAddress home,
-                                     boolean sendMsgRedeliver) throws BrokerException {
+    public void processRemoteMessage(Packet msg, 
+        Map<ConsumerUID, Integer> consumers, 
+        BrokerAddress home,
+        boolean sendMsgRedeliver) 
+        throws BrokerException {
 
         clusterRouter.handleJMSMsg(msg, consumers, home, sendMsgRedeliver); 
     }

@@ -84,7 +84,8 @@ public class MessageDataHandler extends GPacketHandler {
         ClusterMessageInfo cmi =  ClusterMessageInfo.newInstance(pkt, c);
         boolean sendMsgDeliveredAck = cmi.getSendMessageDeliveredAck();
 
-        ArrayList cuidVector = new ArrayList();
+        LinkedHashMap<ConsumerUID, Integer> cuids = 
+            new LinkedHashMap<ConsumerUID, Integer>();
 
         Packet roPkt;
 
@@ -98,7 +99,7 @@ public class MessageDataHandler extends GPacketHandler {
             Iterator itr = cmi.readPayloadConsumerUIDs();
             while (itr.hasNext()) {
                 ConsumerUID intid = (ConsumerUID)itr.next();
-                cuidVector.add(intid);
+                cuids.put(intid, cmi.getDeliveryCount(intid));
             }
             roPkt = cmi.readPayloadMessage();
             BrokerAddress home = cmi.getHomeBrokerAddress();
@@ -109,7 +110,7 @@ public class MessageDataHandler extends GPacketHandler {
             if (home != null && partitionid != null) {
                 home.setStoreSessionUID(new UID(partitionid.longValue()));
             }
-            cb.processRemoteMessage(roPkt, cuidVector, home, sendMsgDeliveredAck);
+            cb.processRemoteMessage(roPkt, cuids, home, sendMsgDeliveredAck);
         } catch (Exception e) {
             logger.logStack(logger.ERROR,"Internal Exception, unable to process message " +
                        pkt, e);

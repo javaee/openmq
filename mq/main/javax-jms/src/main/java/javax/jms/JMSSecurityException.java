@@ -51,7 +51,7 @@ package javax.jms;
 
 public class JMSSecurityException extends JMSException {
 
-  /** Constructs a <CODE>JMSSecurityException</CODE> with the specified 
+  /** Constructs a {@code JMSSecurityException} with the specified 
    *  reason and error code.
    *
    *  @param  reason        a description of the exception
@@ -64,7 +64,7 @@ public class JMSSecurityException extends JMSException {
     super(reason, errorCode);
   }
 
-  /** Constructs a <CODE>JMSSecurityException</CODE> with the specified 
+  /** Constructs a {@code JMSSecurityException} with the specified 
    *  reason. The error code defaults to null.
    *
    *  @param  reason        a description of the exception

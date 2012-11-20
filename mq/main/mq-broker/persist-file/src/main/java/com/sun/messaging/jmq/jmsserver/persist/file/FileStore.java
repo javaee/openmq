@@ -3013,7 +3013,7 @@ public class FileStore extends Store implements PartitionedStore,
             MsgStore msgStore = getMsgStore();
             if (msgStore.containsMessage(did, mid)) {
                 logger.log(logger.FORCE,
-                    BrokerResources.I_REPLACE_MSG_TXNLOG, mid);
+                    BrokerResources.I_REPLACE_MSG_TXNLOG, mid, did);
                 msgStore.removeMessage(did, mid, false);
             } else {
                 logger.log(logger.FORCE,

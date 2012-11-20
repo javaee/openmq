@@ -45,7 +45,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Specifies one or more <code>JMSConnectionFactoryDefinition</code>
+ *  Specifies one or more {@code JMSConnectionFactoryDefinition}
  *  annotations.
  *
  *  @see JMSConnectionFactoryDefinition

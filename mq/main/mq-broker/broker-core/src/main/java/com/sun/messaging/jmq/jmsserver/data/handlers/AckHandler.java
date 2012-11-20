@@ -185,6 +185,7 @@ public class AckHandler extends PacketHandler
         String deadcmt = null;
         int deadrs = DEAD_REASON_UNDELIVERABLE;
         int deliverCnt = 0;
+        boolean deliverCntUpdateOnly = false;
         int ackType = ACKNOWLEDGE_REQUEST;
         boolean JMQValidate = false;
         try {
@@ -208,9 +209,25 @@ public class AckHandler extends PacketHandler
                 if (val != null) {
                     deadrs = val.intValue();
                 }
-                val = (Integer)props.get("JMSXDeliveryCount");
-                deliverCnt = (val == null ? -1 : val.intValue());
-            }   
+            } 
+            if (props != null) {
+                if (ackType == DEAD_REQUEST ||
+                    ackType == UNDELIVERABLE_REQUEST || tid != null) {
+                    //Client runtime retry count
+                    Integer val = (Integer)props.get("JMSXDeliveryCount");
+                    deliverCnt = (val == null ? -1 : val.intValue());
+                    if (tid == null) {
+                        if (deliverCnt >= 0) {
+                            deliverCnt += 1;
+                        } 
+                    }
+                }   
+                if (ackType == UNDELIVERABLE_REQUEST) {
+                    Boolean val = (Boolean)props.get("JMSXDeliveryCountUpdateOnly");
+                    deliverCntUpdateOnly = (val == null ? false : val.booleanValue());
+                }
+            }
+            
         } catch (Exception ex) {
             // assume not dead
             logger.logStack(Logger.INFO, "Internal Error: bad protocol", ex);
@@ -264,10 +281,11 @@ public class AckHandler extends PacketHandler
                      handleDeadMsgs(con, ids, cids, deadrs,
                                      deadthr, deadcmt, deliverCnt, cleanList);
                 } else if (ackType == UNDELIVERABLE_REQUEST) {
-                     handleUndeliverableMsgs(con, ids, cids, cleanList);
+                     handleUndeliverableMsgs(con, ids, cids, cleanList, 
+                                             deliverCnt, deliverCntUpdateOnly);
                 } else {
                     if (tid != null) {
-                        handleTransaction(translist, con, tid, ids, cids);
+                        handleTransaction(translist, con, tid, ids, cids, deliverCnt);
                      } else  {
                         handleAcks(con, ids, cids, msg.getSendAcknowledge(), cleanList);
                      }
@@ -508,7 +526,7 @@ public class AckHandler extends PacketHandler
 
     public void handleTransaction(TransactionList translist, IMQConnection con,
                                   TransactionUID tid, SysMessageID[] ids,
-                                  ConsumerUID[] cids) 
+                                  ConsumerUID[] cids, int deliverCnt) 
                                   throws BrokerException {
 
         for (int i = 0; i < ids.length; i++) {
@@ -550,7 +568,7 @@ public class AckHandler extends PacketHandler
                 }
                 boolean isxa = translist.addAcknowledgement(tid, ids[i], cids[i], sid);
                 BrokerAddress addr = (BrokerAddress)s.ackInTransaction(
-                                         cids[i], ids[i], tid, isxa);
+                                         cids[i], ids[i], tid, isxa, deliverCnt);
                 if (addr != null && addr != Globals.getMyAddress()) {
                     translist.setAckBrokerAddress(tid, ids[i], cids[i], addr);
                 }
@@ -705,8 +723,9 @@ public class AckHandler extends PacketHandler
 
 
     public void handleUndeliverableMsgs(IMQConnection con, 
-        SysMessageID[] ids, ConsumerUID[] cids, List cleanList) 
-                                        throws BrokerException {
+        SysMessageID[] ids, ConsumerUID[] cids, List cleanList, 
+        int deliverCnt, boolean deliverCntUpdateOnly) 
+        throws BrokerException {
 
         for (int i=0; i < ids.length; i ++) {
             Session s = Session.getSession(cids[i]);
@@ -722,7 +741,8 @@ public class AckHandler extends PacketHandler
                                     ids[i]+", cid="+cids[i]+", on connection "+con);
             }
             PacketReference ref = (s == null ? null : 
-                                   (PacketReference)s.handleUndeliverable(cids[i], ids[i]));
+                                   (PacketReference)s.handleUndeliverable(
+                                    cids[i], ids[i], deliverCnt, deliverCntUpdateOnly));
 
             // if we return the reference, we could not re-deliver it ...
             // no consumers .. so clean it up

@@ -96,6 +96,10 @@ public class MessageDeliveryTimeTimer implements TimerEventHandler {
                                   d.getDestinationUID());
      }
 
+     public String toString() {
+         return "[DeliveryDelayTimer]"+destination.getDestinationUID();
+     }
+
      public void addMessage(MessageDeliveryTimeInfo di) {
          if (DEBUG) {
              logger.log(logger.INFO, "DeliveryTimeTimer.addMessage("+di+")");
@@ -147,10 +151,12 @@ public class MessageDeliveryTimeTimer implements TimerEventHandler {
      }
 
      public synchronized void removeMessage(MessageDeliveryTimeInfo di) {
-         boolean b  = messages.remove(di);
-         if (b && messages.isEmpty()) {
-             removeTimer();
+         boolean b = messages.remove(di);
+         if (DEBUG && b) {
+             logger.log(logger.INFO, 
+             "Removed message "+di+" from delivery delay timer "+this);
          }
+
      }
 
      public synchronized void destroy() {
@@ -227,7 +233,6 @@ public class MessageDeliveryTimeTimer implements TimerEventHandler {
          } catch (IllegalStateException ex) {
              logger.logStack(Logger.DEBUG, "Exception on cancel "+this, ex);
          }
-         mytimer = null;
      }
 
      protected void routeTransactedMessage(PacketReference ref)

@@ -40,12 +40,12 @@
 
 package javax.jms;
 
-/** An <CODE>XAQueueConnection</CODE> provides the same create options as 
-  * <CODE>QueueConnection</CODE> (optional).  
-  * The only difference is that an <CODE>XAConnection</CODE> is by definition 
+/** An {@code XAQueueConnection} provides the same create options as 
+  * {@code QueueConnection} (optional).  
+  * The only difference is that an {@code XAConnection} is by definition 
   * transacted.
   *
-  *<P>The <CODE>XAQueueConnection</CODE> interface is optional.  JMS providers 
+  *<P>The {@code XAQueueConnection} interface is optional.  JMS providers 
   * are not required to support this interface. This interface is for 
   * use by JMS providers to support transactional environments. 
   * Client programs are strongly encouraged to use the transactional support
@@ -63,11 +63,11 @@ package javax.jms;
 public interface XAQueueConnection 
 	extends XAConnection, QueueConnection {
 
-    /** Creates an <CODE>XAQueueSession</CODE> object.
+    /** Creates an {@code XAQueueSession} object.
       *  
-      * @return a newly created <CODE>XAQueueSession</CODE>
+      * @return a newly created {@code XAQueueSession}
       *  
-      * @exception JMSException if the <CODE>XAQueueConnection</CODE> object 
+      * @exception JMSException if the {@code XAQueueConnection} object 
       *                         fails to create an XA queue session due to some
       *                         internal error.
       */ 
@@ -75,14 +75,14 @@ public interface XAQueueConnection
     XAQueueSession
     createXAQueueSession() throws JMSException;
 
-    /** Creates an <CODE>XAQueueSession</CODE> object.
+    /** Creates an {@code XAQueueSession} object.
       *
       * @param transacted       usage undefined
       * @param acknowledgeMode  usage undefined
       *  
-      * @return a newly created <CODE>XAQueueSession</CODE>
+      * @return a newly created {@code XAQueueSession}
       *  
-      * @exception JMSException if the <CODE>XAQueueConnection</CODE> object 
+      * @exception JMSException if the {@code XAQueueConnection} object 
       *                         fails to create an XA queue session due to some
       *                         internal error.
       */ 

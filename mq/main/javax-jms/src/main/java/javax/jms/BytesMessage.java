@@ -43,15 +43,15 @@ package javax.jms;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-/** A <CODE>BytesMessage</CODE> object is used to send a message containing a 
-  * stream of uninterpreted bytes. It inherits from the <CODE>Message</CODE> 
+/** A {@code BytesMessage} object is used to send a message containing a 
+  * stream of uninterpreted bytes. It inherits from the {@code Message} 
   * interface and adds a bytes
   * message body. The receiver of the message supplies the interpretation
   * of the bytes.
   *
-  * <P>The <CODE>BytesMessage</CODE> methods are based largely on those found in
-  * <CODE>java.io.DataInputStream</CODE> and
-  * <CODE>java.io.DataOutputStream</CODE>.
+  * <P>The {@code BytesMessage} methods are based largely on those found in
+  * {@code java.io.DataInputStream} and
+  * {@code java.io.DataOutputStream}.
   *
   * <P>This message type is for client encoding of existing message formats. 
   * If possible, one of the other self-defining message types should be used 
@@ -63,30 +63,30 @@ import java.io.OutputStream;
   *
   * <P>The primitive types can be written explicitly using methods
   * for each type. They may also be written generically as objects.
-  * For instance, a call to <CODE>BytesMessage.writeInt(6)</CODE> is
-  * equivalent to <CODE>BytesMessage.writeObject(new Integer(6))</CODE>.
+  * For instance, a call to {@code BytesMessage.writeInt(6)} is
+  * equivalent to {@code BytesMessage.writeObject(new Integer(6))}.
   * Both forms are provided, because the explicit form is convenient for
   * static programming, and the object form is needed when types are not known
   * at compile time.
   *
-  * <P>When the message is first created, and when <CODE>clearBody</CODE>
+  * <P>When the message is first created, and when {@code clearBody}
   * is called, the body of the message is in write-only mode. After the 
-  * first call to <CODE>reset</CODE> has been made, the message body is in 
+  * first call to {@code reset} has been made, the message body is in 
   * read-only mode. 
   * After a message has been sent, the client that sent it can retain and 
   * modify it without affecting the message that has been sent. The same message
   * object can be sent multiple times.
   * When a message has been received, the provider has called 
-  * <CODE>reset</CODE> so that the message body is in read-only mode for the client.
+  * {@code reset} so that the message body is in read-only mode for the client.
   *
-  * <P>If <CODE>clearBody</CODE> is called on a message in read-only mode, 
+  * <P>If {@code clearBody} is called on a message in read-only mode, 
   * the message body is cleared and the message is in write-only mode.
   *
   * <P>If a client attempts to read a message in write-only mode, a 
-  * <CODE>MessageNotReadableException</CODE> is thrown.
+  * {@code MessageNotReadableException} is thrown.
   *
   * <P>If a client attempts to write a message in read-only mode, a 
-  * <CODE>MessageNotWriteableException</CODE> is thrown.
+  * {@code MessageNotWriteableException} is thrown.
   *
   * @version     1.1 April 2, 2002
   * @author      Mark Hapner
@@ -119,9 +119,9 @@ public interface BytesMessage extends Message {
        
       long getBodyLength() throws JMSException;
 
-    /** Reads a <code>boolean</code> from the bytes message stream.
+    /** Reads a {@code boolean} from the bytes message stream.
       *
-      * @return the <code>boolean</code> value read
+      * @return the {@code boolean} value read
       *
       * @exception JMSException if the JMS provider fails to read the message 
       *                         due to some internal error.
@@ -139,7 +139,7 @@ public interface BytesMessage extends Message {
     /** Reads a signed 8-bit value from the bytes message stream.
       *
       * @return the next byte from the bytes message stream as a signed 8-bit
-      * <code>byte</code>
+      * {@code byte}
       *
       * @exception JMSException if the JMS provider fails to read the message 
       *                         due to some internal error.
@@ -224,7 +224,7 @@ public interface BytesMessage extends Message {
     /** Reads a signed 32-bit integer from the bytes message stream.
       *
       * @return the next four bytes from the bytes message stream, interpreted
-      * as an <code>int</code>
+      * as an {@code int}
       *
       * @exception JMSException if the JMS provider fails to read the message 
       *                         due to some internal error.
@@ -241,7 +241,7 @@ public interface BytesMessage extends Message {
     /** Reads a signed 64-bit integer from the bytes message stream.
       *
       * @return the next eight bytes from the bytes message stream, interpreted
-      * as a <code>long</code>
+      * as a {@code long}
       *
       * @exception JMSException if the JMS provider fails to read the message 
       *                         due to some internal error.
@@ -255,10 +255,10 @@ public interface BytesMessage extends Message {
     readLong() throws JMSException;
 
 
-    /** Reads a <code>float</code> from the bytes message stream.
+    /** Reads a {@code float} from the bytes message stream.
       *
       * @return the next four bytes from the bytes message stream, interpreted
-      * as a <code>float</code>
+      * as a {@code float}
       *
       * @exception JMSException if the JMS provider fails to read the message 
       *                         due to some internal error.
@@ -272,10 +272,10 @@ public interface BytesMessage extends Message {
     readFloat() throws JMSException;
 
 
-    /** Reads a <code>double</code> from the bytes message stream.
+    /** Reads a {@code double} from the bytes message stream.
       *
       * @return the next eight bytes from the bytes message stream, interpreted
-      * as a <code>double</code>
+      * as a {@code double}
       *
       * @exception JMSException if the JMS provider fails to read the message 
       *                         due to some internal error.
@@ -313,13 +313,13 @@ public interface BytesMessage extends Message {
 
     /** Reads a byte array from the bytes message stream.
       *
-      * <P>If the length of array <code>value</code> is less than the number of 
+      * <P>If the length of array {@code value} is less than the number of 
       * bytes remaining to be read from the stream, the array should 
       * be filled. A subsequent call reads the next increment, and so on.
       * 
       * <P>If the number of bytes remaining in the stream is less than the 
       * length of 
-      * array <code>value</code>, the bytes should be read into the array. 
+      * array {@code value}, the bytes should be read into the array. 
       * The return value of the total number of bytes read will be less than
       * the length of the array, indicating that there are no more bytes left 
       * to be read from the stream. The next read of the stream returns -1.
@@ -341,25 +341,25 @@ public interface BytesMessage extends Message {
 
     /** Reads a portion of the bytes message stream.
       *
-      * <P>If the length of array <code>value</code> is less than the number of
+      * <P>If the length of array {@code value} is less than the number of
       * bytes remaining to be read from the stream, the array should 
       * be filled. A subsequent call reads the next increment, and so on.
       * 
       * <P>If the number of bytes remaining in the stream is less than the 
       * length of 
-      * array <code>value</code>, the bytes should be read into the array. 
+      * array {@code value}, the bytes should be read into the array. 
       * The return value of the total number of bytes read will be less than
       * the length of the array, indicating that there are no more bytes left 
       * to be read from the stream. The next read of the stream returns -1.
       *
-      * <p> If <code>length</code> is negative, or
-      * <code>length</code> is greater than the length of the array
-      * <code>value</code>, then an <code>IndexOutOfBoundsException</code> is
+      * <p> If {@code length} is negative, or
+      * {@code length} is greater than the length of the array
+      * {@code value}, then an {@code IndexOutOfBoundsException} is
       * thrown. No bytes will be read from the stream for this exception case.
       *  
       * @param value the buffer into which the data is read
       * @param length the number of bytes to read; must be less than or equal to
-      *        <code>value.length</code>
+      *        {@code value.length}
       * 
       * @return the total number of bytes read into the buffer, or -1 if
       * there is no more data because the end of the stream has been reached
@@ -375,13 +375,13 @@ public interface BytesMessage extends Message {
 			throws JMSException;
 
 
-    /** Writes a <code>boolean</code> to the bytes message stream as a 1-byte 
+    /** Writes a {@code boolean} to the bytes message stream as a 1-byte 
       * value.
-      * The value <code>true</code> is written as the value 
-      * <code>(byte)1</code>; the value <code>false</code> is written as 
-      * the value <code>(byte)0</code>.
+      * The value {@code true} is written as the value 
+      * {@code (byte)1}; the value {@code false} is written as 
+      * the value {@code (byte)0}.
       *
-      * @param value the <code>boolean</code> value to be written
+      * @param value the {@code boolean} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -394,10 +394,10 @@ public interface BytesMessage extends Message {
 			throws JMSException;
 
 
-    /** Writes a <code>byte</code> to the bytes message stream as a 1-byte 
+    /** Writes a {@code byte} to the bytes message stream as a 1-byte 
       * value.
       *
-      * @param value the <code>byte</code> value to be written
+      * @param value the {@code byte} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -409,10 +409,10 @@ public interface BytesMessage extends Message {
     writeByte(byte value) throws JMSException;
 
 
-    /** Writes a <code>short</code> to the bytes message stream as two bytes,
+    /** Writes a {@code short} to the bytes message stream as two bytes,
       * high byte first.
       *
-      * @param value the <code>short</code> to be written
+      * @param value the {@code short} to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -424,10 +424,10 @@ public interface BytesMessage extends Message {
     writeShort(short value) throws JMSException;
 
 
-    /** Writes a <code>char</code> to the bytes message stream as a 2-byte
+    /** Writes a {@code char} to the bytes message stream as a 2-byte
       * value, high byte first.
       *
-      * @param value the <code>char</code> value to be written
+      * @param value the {@code char} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -439,10 +439,10 @@ public interface BytesMessage extends Message {
     writeChar(char value) throws JMSException;
 
 
-    /** Writes an <code>int</code> to the bytes message stream as four bytes, 
+    /** Writes an {@code int} to the bytes message stream as four bytes, 
       * high byte first.
       *
-      * @param value the <code>int</code> to be written
+      * @param value the {@code int} to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -454,10 +454,10 @@ public interface BytesMessage extends Message {
     writeInt(int value) throws JMSException;
 
 
-    /** Writes a <code>long</code> to the bytes message stream as eight bytes, 
+    /** Writes a {@code long} to the bytes message stream as eight bytes, 
       * high byte first.
       *
-      * @param value the <code>long</code> to be written
+      * @param value the {@code long} to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -469,13 +469,13 @@ public interface BytesMessage extends Message {
     writeLong(long value) throws JMSException;
 
 
-    /** Converts the <code>float</code> argument to an <code>int</code> using 
+    /** Converts the {@code float} argument to an {@code int} using 
       * the
-      * <code>floatToIntBits</code> method in class <code>Float</code>,
-      * and then writes that <code>int</code> value to the bytes message
+      * {@code floatToIntBits} method in class {@code Float},
+      * and then writes that {@code int} value to the bytes message
       * stream as a 4-byte quantity, high byte first.
       *
-      * @param value the <code>float</code> value to be written
+      * @param value the {@code float} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -487,13 +487,13 @@ public interface BytesMessage extends Message {
     writeFloat(float value) throws JMSException;
 
 
-    /** Converts the <code>double</code> argument to a <code>long</code> using 
+    /** Converts the {@code double} argument to a {@code long} using 
       * the
-      * <code>doubleToLongBits</code> method in class <code>Double</code>,
-      * and then writes that <code>long</code> value to the bytes message
+      * {@code doubleToLongBits} method in class {@code Double},
+      * and then writes that {@code long} value to the bytes message
       * stream as an 8-byte quantity, high byte first.
       *
-      * @param value the <code>double</code> value to be written
+      * @param value the {@code double} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -513,7 +513,7 @@ public interface BytesMessage extends Message {
       * X/Open Company Ltd., Document Number: P316. This information also 
       * appears in ISO/IEC 10646, Annex P. 
       *
-      * @param value the <code>String</code> value to be written
+      * @param value the {@code String} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -559,8 +559,8 @@ public interface BytesMessage extends Message {
     /** Writes an object to the bytes message stream.
       *
       * <P>This method works only for the objectified primitive
-      * object types (<code>Integer</code>, <code>Double</code>, 
-      * <code>Long</code>&nbsp;...), <code>String</code> objects, and byte 
+      * object types ({@code Integer}, {@code Double}, 
+      * {@code Long}&nbsp;...), {@code String} objects, and byte 
       * arrays.
       *
       * @param value the object in the Java programming language ("Java 
@@ -572,7 +572,7 @@ public interface BytesMessage extends Message {
       * @exception MessageNotWriteableException if the message is in read-only 
       *                                         mode.
       * @exception java.lang.NullPointerException if the parameter 
-      *                                           <code>value</code> is null.
+      *                                           {@code value} is null.
       */ 
 
     void 

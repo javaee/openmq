@@ -40,8 +40,8 @@
 
 package javax.jms;
 
-/** The delivery modes supported by the JMS API are <CODE>PERSISTENT</CODE> and
-  * <CODE>NON_PERSISTENT</CODE>.
+/** The delivery modes supported by the JMS API are {@code PERSISTENT} and
+  * {@code NON_PERSISTENT}.
   *
   * <P>A client marks a message as persistent if it feels that the 
   * application will have problems if the message is lost in transit.
@@ -51,7 +51,7 @@ package javax.jms;
   *
   * <P>Delivery mode covers only the transport of the message to its 
   * destination. Retention of a message at the destination until
-  * its receipt is acknowledged is not guaranteed by a <CODE>PERSISTENT</CODE> 
+  * its receipt is acknowledged is not guaranteed by a {@code PERSISTENT} 
   * delivery mode. Clients should assume that message retention 
   * policies are set administratively. Message retention policy
   * governs the reliability of message delivery from destination
@@ -61,7 +61,7 @@ package javax.jms;
   *
   * <P>A message is guaranteed to be delivered once and only once
   * by a JMS provider if the delivery mode of the message is 
-  * <CODE>PERSISTENT</CODE> 
+  * {@code PERSISTENT} 
   * and if the destination has a sufficient message retention policy.
   *
   *
@@ -75,10 +75,10 @@ public interface DeliveryMode {
 
     /** This is the lowest-overhead delivery mode because it does not require 
       * that the message be logged to stable storage. The level of JMS provider
-      * failure that causes a <CODE>NON_PERSISTENT</CODE> message to be lost is 
+      * failure that causes a {@code NON_PERSISTENT} message to be lost is 
       * not defined.
       *
-      * <P>A JMS provider must deliver a <CODE>NON_PERSISTENT</CODE> message 
+      * <P>A JMS provider must deliver a {@code NON_PERSISTENT} message 
       * with an 
       * at-most-once guarantee. This means that it may lose the message, but it 
       * must not deliver it twice.
@@ -88,7 +88,7 @@ public interface DeliveryMode {
 
     /** This delivery mode instructs the JMS provider to log the message to stable 
       * storage as part of the client's send operation. Only a hard media 
-      * failure should cause a <CODE>PERSISTENT</CODE> message to be lost.
+      * failure should cause a {@code PERSISTENT} message to be lost.
       */
 
     static final int PERSISTENT = 2;

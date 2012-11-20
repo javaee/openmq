@@ -50,6 +50,7 @@ import com.sun.messaging.jmq.io.Packet;
 import com.sun.messaging.jmq.io.SysMessageID;
 import com.sun.messaging.jmq.jmsserver.core.PacketReference;
 import com.sun.messaging.jmq.jmsserver.core.Consumer;
+import com.sun.messaging.jmq.jmsserver.data.TransactionUID;
 import com.sun.messaging.jmq.jmsserver.core.Subscription;
 import com.sun.messaging.jmq.jmsserver.core.Destination;
 import com.sun.messaging.jmq.jmsserver.core.DestinationUID;
@@ -70,8 +71,15 @@ public interface MessageBusCallback {
      */
     public void configSyncComplete();
 
-    public void processRemoteMessage(Packet msg, List consumers, BrokerAddress home,
-                                     boolean sendMsgRedeliver) throws BrokerException;
+    /**
+     * @param consumers contains mapping for each consumer UID
+     *        to its delivery count or null if unknown
+     */
+    public void processRemoteMessage(Packet msg, 
+        Map<ConsumerUID, Integer> consumers, 
+        BrokerAddress home, boolean sendMsgRedeliver) 
+        throws BrokerException;
+
     /**
      * Process an acknowledgement.
      */
@@ -94,7 +102,9 @@ public interface MessageBusCallback {
      * Interest removal notification. This method is called when
      * any remote interest is removed.
      */
-    public void interestRemoved(Consumer cuid, Set pendingMsgs, boolean cleanup);
+    public void interestRemoved(Consumer cuid, 
+        Map<TransactionUID, LinkedHashMap<SysMessageID, Integer>> pendingMsgs,
+        boolean cleanup);
 
     /**
      * Durable subscription unsubscribe notification. This method is

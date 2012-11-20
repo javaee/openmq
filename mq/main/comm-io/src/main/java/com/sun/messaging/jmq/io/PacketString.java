@@ -60,7 +60,8 @@ public class PacketString {
     public static final int TRANSACTIONID     = 8;
     public static final int PRODUCERID        = 9;
     public static final int DELIVERY_TIME     = 10;
-    public static final int LAST              = 11;
+    public static final int DELIVERY_COUNT    = 11;
+    public static final int LAST              = 12;
 
     public static final String[] names = {
 	"NULL", "JMSDestination", "JMSMessageID",

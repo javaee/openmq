@@ -40,24 +40,24 @@
 
 package javax.jms;
 
-/** A client uses a <CODE>TopicPublisher</CODE> object to publish messages on a 
-  * topic. A <CODE>TopicPublisher</CODE> object is the publish-subscribe form
+/** A client uses a {@code TopicPublisher} object to publish messages on a 
+  * topic. A {@code TopicPublisher} object is the publish-subscribe form
   * of a message producer.
   *
-  * <P>Normally, the <CODE>Topic</CODE> is specified when a 
-  * <CODE>TopicPublisher</CODE> is created.  In this case, an attempt to use 
-  * the <CODE>publish</CODE> methods for an unidentified 
-  * <CODE>TopicPublisher</CODE> will throw a 
-  * <CODE>java.lang.UnsupportedOperationException</CODE>.
+  * <P>Normally, the {@code Topic} is specified when a 
+  * {@code TopicPublisher} is created.  In this case, an attempt to use 
+  * the {@code publish} methods for an unidentified 
+  * {@code TopicPublisher} will throw a 
+  * {@code java.lang.UnsupportedOperationException}.
   *
-  * <P>If the <CODE>TopicPublisher</CODE> is created with an unidentified 
-  * <CODE>Topic</CODE>, an attempt to use the <CODE>publish</CODE> methods that 
-  * assume that the <CODE>Topic</CODE> has been identified will throw a 
-  * <CODE>java.lang.UnsupportedOperationException</CODE>.
+  * <P>If the {@code TopicPublisher} is created with an unidentified 
+  * {@code Topic}, an attempt to use the {@code publish} methods that 
+  * assume that the {@code Topic} has been identified will throw a 
+  * {@code java.lang.UnsupportedOperationException}.
   *
-  * <P>During the execution of its <CODE>publish</CODE> method,
+  * <P>During the execution of its {@code publish} method,
   * a message must not be changed by other threads within the client. 
-  * If the message is modified, the result of the <CODE>publish</CODE> is 
+  * If the message is modified, the result of the {@code publish} is 
   * undefined.
   * 
   * <P>After publishing a message, a client may retain and modify it
@@ -65,30 +65,30 @@ package javax.jms;
   * object may be published multiple times.
   * 
   * <P>The following message headers are set as part of publishing a 
-  * message: <code>JMSDestination</code>, <code>JMSDeliveryMode</code>, 
-  * <code>JMSExpiration</code>, <code>JMSPriority</code>, 
-  * <code>JMSMessageID</code> and <code>JMSTimeStamp</code>.
+  * message: {@code JMSDestination}, {@code JMSDeliveryMode}, 
+  * {@code JMSExpiration}, {@code JMSPriority}, 
+  * {@code JMSMessageID} and {@code JMSTimeStamp}.
   * When the message is published, the values of these headers are ignored. 
-  * After completion of the <CODE>publish</CODE>, the headers hold the values 
+  * After completion of the {@code publish}, the headers hold the values 
   * specified by the method publishing the message. It is possible for the 
-  * <CODE>publish</CODE> method not to set <code>JMSMessageID</code> and 
-  * <code>JMSTimeStamp</code> if the 
+  * {@code publish} method not to set {@code JMSMessageID} and 
+  * {@code JMSTimeStamp} if the 
   * setting of these headers is explicitly disabled by the 
-  * <code>MessageProducer.setDisableMessageID</code> or
-  * <code>MessageProducer.setDisableMessageTimestamp</code> method.
+  * {@code MessageProducer.setDisableMessageID} or
+  * {@code MessageProducer.setDisableMessageTimestamp} method.
   *
-  *<P>Creating a <CODE>MessageProducer</CODE> provides the same features as
-  * creating a <CODE>TopicPublisher</CODE>. A <CODE>MessageProducer</CODE> object is 
-  * recommended when creating new code. The  <CODE>TopicPublisher</CODE> is
+  *<P>Creating a {@code MessageProducer} provides the same features as
+  * creating a {@code TopicPublisher}. A {@code MessageProducer} object is 
+  * recommended when creating new code. The  {@code TopicPublisher} is
   * provided to support existing code.
 
   *
-  *<P>Because <CODE>TopicPublisher</CODE> inherits from 
-  * <CODE>MessageProducer</CODE>, it inherits the
-  * <CODE>send</CODE> methods that are a part of the <CODE>MessageProducer</CODE> 
-  * interface. Using the <CODE>send</CODE> methods will have the same
+  *<P>Because {@code TopicPublisher} inherits from 
+  * {@code MessageProducer}, it inherits the
+  * {@code send} methods that are a part of the {@code MessageProducer} 
+  * interface. Using the {@code send} methods will have the same
   * effect as using the
-  * <CODE>publish</CODE> methods: they are functionally the same.
+  * {@code publish} methods: they are functionally the same.
   * 
   *
   * @version    1.1 February 2, 2002
@@ -102,12 +102,12 @@ package javax.jms;
 
 public interface TopicPublisher extends MessageProducer {
 
-    /** Gets the topic associated with this <CODE>TopicPublisher</CODE>.
+    /** Gets the topic associated with this {@code TopicPublisher}.
       *
       * @return this publisher's topic
       *  
       * @exception JMSException if the JMS provider fails to get the topic for
-      *                         this <CODE>TopicPublisher</CODE>
+      *                         this {@code TopicPublisher}
       *                         due to some internal error.
       */
 
@@ -116,7 +116,7 @@ public interface TopicPublisher extends MessageProducer {
 
  
     /** Publishes a message to the topic.
-      * Uses the <CODE>TopicPublisher</CODE>'s default delivery mode, priority,
+      * Uses the {@code TopicPublisher}'s default delivery mode, priority,
       * and time to live.
       *
       * @param message the message to publish
@@ -125,10 +125,10 @@ public interface TopicPublisher extends MessageProducer {
       *                         due to some internal error.
       * @exception MessageFormatException if an invalid message is specified.
       * @exception InvalidDestinationException if a client uses this method
-      *                         with a <CODE>TopicPublisher</CODE> with
+      *                         with a {@code TopicPublisher} with
       *                         an invalid topic.
       * @exception java.lang.UnsupportedOperationException if a client uses this
-      *                         method with a <CODE>TopicPublisher</CODE> that
+      *                         method with a {@code TopicPublisher} that
       *                         did not specify a topic at creation time.
       * 
       * @see javax.jms.MessageProducer#getDeliveryMode()
@@ -152,10 +152,10 @@ public interface TopicPublisher extends MessageProducer {
       *                         due to some internal error.
       * @exception MessageFormatException if an invalid message is specified.
       * @exception InvalidDestinationException if a client uses this method
-      *                         with a <CODE>TopicPublisher</CODE> with
+      *                         with a {@code TopicPublisher} with
       *                         an invalid topic.
       * @exception java.lang.UnsupportedOperationException if a client uses this
-      *                         method with a <CODE>TopicPublisher</CODE> that
+      *                         method with a {@code TopicPublisher} that
       *                         did not specify a topic at creation time.
       */
  
@@ -167,7 +167,7 @@ public interface TopicPublisher extends MessageProducer {
 
 
     /** Publishes a message to a topic for an unidentified message producer. 
-      * Uses the <CODE>TopicPublisher</CODE>'s default delivery mode, 
+      * Uses the {@code TopicPublisher}'s default delivery mode, 
       * priority, and time to live.
       *  
       * <P>Typically, a message producer is assigned a topic at creation 

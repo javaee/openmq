@@ -230,11 +230,29 @@ public class ConsumerHandler extends PacketHandler
                 Boolean share = (Boolean)props.get("JMQShare");
                 Integer size = (Integer)props.get("JMQSize");
 
-                if (queue && nolocal != null && nolocal.booleanValue()) {
-                    Globals.getLogger().log(Logger.ERROR, BrokerResources.E_INTERNAL_BROKER_ERROR,
+                if (nolocal != null && nolocal.booleanValue()) {
+                    if (queue) {
+                        Globals.getLogger().log(Logger.ERROR, 
+                            BrokerResources.E_INTERNAL_BROKER_ERROR,
                             "NoLocal is not supported on Queue Receivers");
-                   throw new BrokerException("Unsupported property on queues JMQNoLocal "
-                        + "is set to " + nolocal, Status.ERROR);
+                        throw new BrokerException(
+                            "Unsupported property on queues JMQNoLocal "
+                            + "is set to " + nolocal, Status.ERROR);
+                    }
+                    //JMS 2.0
+                    if (durablename != null && clientid == null) {
+                        String emsg = Globals.getBrokerResources().getKString(
+                            BrokerResources.X_NO_CLIENTID_NOLOCAL_DURA, durablename);
+                        Globals.getLogger().log(Logger.ERROR, emsg); 
+                        throw new BrokerException(emsg, Status.PRECONDITION_FAILED);
+                    }
+                    /* JMS 2.0 pending
+                    if (share != null && share.booleanValue() && clientid == null) {
+                        String emsg = Globals.getBrokerResources().getKString(
+                            BrokerResources.X_NO_CLIENTID_NOLOCAL_SHARE, sharedSubcriptionName);
+                        Globals.getLogger().log(Logger.ERROR, emsg); 
+                    }
+                    */
                 }
                 if (reconnect != null && reconnect.booleanValue()) {
                     Globals.getLogger().log(Logger.ERROR,
@@ -242,17 +260,23 @@ public class ConsumerHandler extends PacketHandler
                         "JMQReconnect not implemented");
                 }
 
-
-                if (share != null && share.booleanValue() && 
-                       ! ClientIDHandler.CAN_USE_SHARED_CONSUMERS) {
-                    throw new BrokerException(
-                        Globals.getBrokerResources().getKString(
-                            BrokerResources.X_FEATURE_UNAVAILABLE,
+                // Must have a clientID to add a durable for < JMS 2.0 clients 
+                if (durablename != null) {
+                    if (clientid == null && 
+                        con.getClientProtocolVersion() < con.MQ500_PROTOCOL) {
+                        throw new BrokerException(
                             Globals.getBrokerResources().getKString(
-                                BrokerResources.M_SHARED_CONS), destination),
-                            BrokerResources.X_FEATURE_UNAVAILABLE,
-                            (Throwable) null,
-                            Status.NOT_ALLOWED);
+                            BrokerResources.X_NO_CLIENTID, durablename),
+                            BrokerResources.X_NO_CLIENTID, null,
+                            Status.PRECONDITION_FAILED);
+                    }
+                    if (clientid != null && clientid.trim().length() == 0) {
+                        throw new BrokerException(
+                            Globals.getBrokerResources().getKString(
+                            BrokerResources.X_INVALID_CLIENTID, clientid),
+                            BrokerResources.X_INVALID_CLIENTID, null,
+                            Status.PRECONDITION_FAILED);
+                    }
                 }
 
                 // see if we are a wildcard destination
@@ -305,25 +329,6 @@ public class ConsumerHandler extends PacketHandler
                     dest_uid = d.getDestinationUID();
                 }
     
-                // Must have a clientID to add a durable for < JMS 2.0 clients 
-                if (durablename != null) {
-                    if (clientid == null && 
-                        con.getClientProtocolVersion() < con.MQ500_PROTOCOL) {
-                        throw new BrokerException(
-                            Globals.getBrokerResources().getKString(
-                            BrokerResources.X_NO_CLIENTID, durablename),
-                            BrokerResources.X_NO_CLIENTID, null,
-                            Status.PRECONDITION_FAILED);
-                    }
-                    if (clientid != null && clientid.trim().length() == 0) {
-                        throw new BrokerException(
-                            Globals.getBrokerResources().getKString(
-                            BrokerResources.X_INVALID_CLIENTID, clientid),
-                            BrokerResources.X_INVALID_CLIENTID, null,
-                            Status.PRECONDITION_FAILED);
-                    }
-                }
-
                 Consumer c = null;
                 
                 try { 

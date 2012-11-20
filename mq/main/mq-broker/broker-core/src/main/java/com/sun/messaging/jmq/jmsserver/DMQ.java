@@ -97,7 +97,7 @@ package com.sun.messaging.jmq.jmsserver;
  *                <TH>Description</TH>
  *            </TR>
  *            <TR>
- *                <TD>JMSXDeliveryCount</td>
+ *                <TD>JMS_SUN_DMQ_DELIVERY_COUNT</td>
  *                <TD>Integer</td>
  *                <TD>number</td>
  *                <TD>largest number of times the message was delivered to a given consumer (only set for ERROR or UNDELIVERABLE messages)</TD>
@@ -249,6 +249,18 @@ public class DMQ
      */
     public static final String UNDELIVERED_REASON=
           "JMS_SUN_DMQ_UNDELIVERED_REASON";
+
+    /**
+     * The largest number of times the message was delivered to a given
+     * consumer that gives ERROR or UNDELIVERABLE before mark dead
+     * <br>
+     *
+     * Usage:<BR><BLOCKQUOTE><I>
+     *    int count  = msg.getIntProperty(DMQ.DELIVERY_COUNT);
+     * </I></BLOCKQUOTE>
+     */
+    public static final String DELIVERY_COUNT=
+          "JMS_SUN_DMQ_DELIVERY_COUNT";
 
     /**
      * Exception which caused the message to become dead (optional).

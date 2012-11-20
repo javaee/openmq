@@ -502,9 +502,12 @@ public class Consumer implements ConsumerSpi, EventBroadcaster,
 
     public void destroyConsumer(Set delivered, Map remotePendings, 
                 boolean remoteCleanup, boolean destroyingDest, boolean notify) {
-        if (DEBUG)
-            logger.log(logger.DEBUG, "destroyConsumer : " + this +
-                       ", delivered size="+delivered.size());
+
+        if (DEBUG) {
+            logger.log(logger.INFO, "destroyConsumer("+delivered.size()+
+            ", "+remotePendings+", "+remoteCleanup+", "+destroyingDest+", "+notify);
+        }
+
         synchronized(destroyLock) {
             if (!valid) {
                // already removed
@@ -1405,7 +1408,16 @@ public class Consumer implements ConsumerSpi, EventBroadcaster,
                 return null;
             }
             p.setConsumerID(uid.longValue());
-            p.setRedelivered(ref.getRedeliverFlag(getStoredConsumerUID()));
+            ConsumerUID suid = getStoredConsumerUID();
+            boolean rflag = ref.getRedeliverFlag(suid);
+            p.setRedelivered(rflag);
+            int rcnt = ref.getRedeliverCount(suid)+1;
+            if (rflag) {
+                if (rcnt < 2) {
+                    rcnt = 2;
+                }
+            }
+            p.setDeliveryCount(rcnt);
             if (ref.isLast(uid)) {
                 ref.removeIsLast(uid);
                 p.setIsLast(true);

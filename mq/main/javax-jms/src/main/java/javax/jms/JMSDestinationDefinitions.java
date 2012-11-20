@@ -45,7 +45,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Specifies one or more <code>JMSDestinationDefinition</code> annotations.
+ *  Specifies one or more {@code JMSDestinationDefinition} annotations.
  *
  *  @see JMSDestinationDefinition
  */

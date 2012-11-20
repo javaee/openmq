@@ -42,8 +42,8 @@ package javax.jms;
 
 import java.util.Enumeration;
 
-/** A <CODE>ConnectionMetaData</CODE> object provides information describing the 
-  * <CODE>Connection</CODE> object.
+/** A {@code ConnectionMetaData} object provides information describing the 
+  * {@code Connection} object.
   *
   * @version     1.0 - 13 March 1998
   * @author      Mark Hapner

@@ -40,13 +40,13 @@
 
 package javax.jms;
 
-/** A client uses a <CODE>TopicSubscriber</CODE> object to receive messages that
-  * have been published to a topic. A <CODE>TopicSubscriber</CODE> object is the
-  * publish/subscribe form of a message consumer. A <CODE>MessageConsumer</CODE>
-  * can be created by using <CODE>Session.createConsumer</CODE>. 
+/** A client uses a {@code TopicSubscriber} object to receive messages that
+  * have been published to a topic. A {@code TopicSubscriber} object is the
+  * publish/subscribe form of a message consumer. A {@code MessageConsumer}
+  * can be created by using {@code Session.createConsumer}. 
   *
-  * <P>A <CODE>TopicSession</CODE> allows the creation of multiple 
-  * <CODE>TopicSubscriber</CODE> objects per topic.  It will deliver each 
+  * <P>A {@code TopicSession} allows the creation of multiple 
+  * {@code TopicSubscriber} objects per topic.  It will deliver each 
   * message for a topic to each
   * subscriber eligible to receive it. Each copy of the message
   * is treated as a completely separate message. Work done on one copy has
@@ -54,7 +54,7 @@ package javax.jms;
   * others; one message may be delivered immediately, while another waits
   * for its subscriber to process messages ahead of it.
   *
-  * <P>Regular <CODE>TopicSubscriber</CODE> objects are not durable. They 
+  * <P>Regular {@code TopicSubscriber} objects are not durable. They 
   * receive only messages that are published while they are active.
   *
   * <P>Messages filtered out by a subscriber's message selector will never 
@@ -62,13 +62,13 @@ package javax.jms;
   * do not exist.
   *
   * <P>In some cases, a connection may both publish and subscribe to a topic.
-  * The subscriber <CODE>NoLocal</CODE> attribute allows a subscriber to inhibit
+  * The subscriber {@code NoLocal} attribute allows a subscriber to inhibit
   * the 
   * delivery of messages published by its own connection.
   *
   * <P>If a client needs to receive all the messages published on a topic, 
   * including the ones published while the subscriber is inactive, it uses 
-  * a durable <CODE>TopicSubscriber</CODE>. The JMS provider retains a record of
+  * a durable {@code TopicSubscriber}. The JMS provider retains a record of
   * this durable 
   * subscription and insures that all messages from the topic's publishers 
   * are retained until they are acknowledged by this durable 
@@ -77,25 +77,25 @@ package javax.jms;
   * <P>Sessions with durable subscribers must always provide the same client 
   * identifier. In addition, each client must specify a name that uniquely 
   * identifies (within client identifier) each durable subscription it creates.
-  * Only one session at a time can have a <CODE>TopicSubscriber</CODE> for a 
+  * Only one session at a time can have a {@code TopicSubscriber} for a 
   * particular durable subscription. 
   *
   * <P>A client can change an existing durable subscription by creating a 
-  * durable <CODE>TopicSubscriber</CODE> with the same name and a new topic 
+  * durable {@code TopicSubscriber} with the same name and a new topic 
   * and/or message 
   * selector. Changing a durable subscription is equivalent to unsubscribing 
   * (deleting) the old one and creating a new one.
   *
-  * <P>The <CODE>unsubscribe</CODE> method is used to delete a durable 
-  * subscription. The <CODE>unsubscribe</CODE> method can be used at the 
-  * <CODE>Session</CODE> or <CODE>TopicSession</CODE> level.
+  * <P>The {@code unsubscribe} method is used to delete a durable 
+  * subscription. The {@code unsubscribe} method can be used at the 
+  * {@code Session} or {@code TopicSession} level.
   * This method deletes the state being 
   * maintained on behalf of the subscriber by its provider.
   *
-  * <P>Creating a <CODE>MessageConsumer</CODE> provides the same features as
-  * creating a <CODE>TopicSubscriber</CODE>. To create a durable subscriber, 
-  * use of <CODE>Session.CreateDurableSubscriber</CODE> is recommended. The 
-  * <CODE>TopicSubscriber</CODE> is provided to support existing code.
+  * <P>Creating a {@code MessageConsumer} provides the same features as
+  * creating a {@code TopicSubscriber}. To create a durable subscriber, 
+  * use of {@code Session.CreateDurableSubscriber} is recommended. The 
+  * {@code TopicSubscriber} is provided to support existing code.
   * 
   * 
   * @version     1.1 - February 2, 2002
@@ -112,9 +112,9 @@ package javax.jms;
 
 public interface TopicSubscriber extends MessageConsumer {
 
-    /** Gets the <CODE>Topic</CODE> associated with this subscriber.
+    /** Gets the {@code Topic} associated with this subscriber.
       *  
-      * @return this subscriber's <CODE>Topic</CODE>
+      * @return this subscriber's {@code Topic}
       *  
       * @exception JMSException if the JMS provider fails to get the topic for
       *                         this topic subscriber
@@ -125,13 +125,13 @@ public interface TopicSubscriber extends MessageConsumer {
     getTopic() throws JMSException;
 
 
-    /** Gets the <CODE>NoLocal</CODE> attribute for this subscriber. 
+    /** Gets the {@code NoLocal} attribute for this subscriber. 
       * The default value for this attribute is false.
       *  
       * @return true if locally published messages are being inhibited
       *  
       * @exception JMSException if the JMS provider fails to get the
-      *                         <CODE>NoLocal</CODE> attribute for
+      *                         {@code NoLocal} attribute for
       *                         this topic subscriber
       *                         due to some internal error.
       */ 

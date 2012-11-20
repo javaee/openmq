@@ -130,6 +130,10 @@ public class WakeupableTimer implements Runnable
                         time = System.currentTimeMillis();
                         waittime = mynexttime - time;
                         if (waittime <= 0L) {
+                            waittime = 0L;
+                            if (repeatinterval > 0L) {
+                                waittime = repeatinterval;                              
+                            } 
                             break;
                         }
                     }

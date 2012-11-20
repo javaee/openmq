@@ -42,8 +42,8 @@ package javax.jms;
 
 /**
  * <P> This exception must be thrown when an unexpected 
- *     end of stream has been reached when a <CODE>StreamMessage</CODE> or 
- *     <CODE>BytesMessage</CODE> is being read.
+ *     end of stream has been reached when a {@code StreamMessage} or 
+ *     {@code BytesMessage} is being read.
  *
  * @version     26 August 1998
  * @author      Rahul Sharma
@@ -51,7 +51,7 @@ package javax.jms;
 
 public class MessageEOFException extends JMSException {
 
-  /** Constructs a <CODE>MessageEOFException</CODE> with the specified 
+  /** Constructs a {@code MessageEOFException} with the specified 
    *  reason and error code.
    *
    *  @param  reason        a description of the exception
@@ -64,7 +64,7 @@ public class MessageEOFException extends JMSException {
     super(reason, errorCode);
   }
 
-  /** Constructs a <CODE>MessageEOFException</CODE> with the specified 
+  /** Constructs a {@code MessageEOFException} with the specified 
    *  reason. The error code defaults to null.
    *
    *  @param  reason        a description of the exception

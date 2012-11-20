@@ -666,6 +666,8 @@ public class BrokerResources extends MQResourceBundle {
     final public static String I_WAIT_FOR_QUEUE_REMOTE_MSG_LOCK = "B1469";
     final public static String I_REMOTE_NEW_MSG_ROUTED_ALREADY = "B1470";
     final public static String I_CREATED_NEW_CONSUMER_FOR_OLD = "B1471";
+    final public static String I_CLUSTER_ROUTER_PENDING_TXN_CHECK_THREAD_START = "B1472";
+    final public static String I_CLUSTER_ROUTER_PENDING_TXN_CHECK_THREAD_EXIT = "B1473";
 
     // 2000-2999 Warning Messages
     final public static String W_AUTH_FAILED	 	= "B2000";
@@ -966,6 +968,7 @@ public class BrokerResources extends MQResourceBundle {
     final public static String W_ROLLBACK_TXN_NOTIFY_RMEOTE_BKRS_FAIL = "B2272";
     final public static String W_UNABLE_UPDATE_CLUSTER_TXN_COMPLETE_STATE = "B2273";
     final public static String W_UNABLE_GET_TXN_BROKERS_ON_TXN_COMPLETE = "B2274";
+    final public static String W_IGNORE_REMOTE_MSG_SENT_FROM = "B2275";
 
     // 3000-3999 Error Messages
     final public static String E_PERSISTENT_OPEN 	= "B3000";
@@ -1726,6 +1729,8 @@ public class BrokerResources extends MQResourceBundle {
     final public static String X_RM_TXN_ACK_IN_STORE = "B4429";
     final public static String X_REMOVE_TRANSACTION = "B4430";
     final public static String X_STORE_CHECK_EXISTENCE_TXN_AFTER_ADD_FAILURE = "B4431";
+    final public static String X_NO_CLIENTID_NOLOCAL_DURA = "B4432";
+    final public static String X_STORE_DELIVERED_ON_ADD_DELIVERYCOUNT = "B4433";
 
     /***************** End of message key constants *******************/
 

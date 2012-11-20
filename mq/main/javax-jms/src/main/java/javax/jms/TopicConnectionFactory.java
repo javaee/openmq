@@ -40,15 +40,15 @@
 
 package javax.jms;
 
-/** A client uses a <CODE>TopicConnectionFactory</CODE> object to create 
-  * <CODE>TopicConnection</CODE> objects with a publish/subscribe JMS provider.
+/** A client uses a {@code TopicConnectionFactory} object to create 
+  * {@code TopicConnection} objects with a publish/subscribe JMS provider.
   *
-  * <P>A<CODE> TopicConnectionFactory</CODE> can be used to create a 
-  * <CODE>TopicConnection</CODE>, from which specialized topic-related objects
+  * <P>A{@code  TopicConnectionFactory} can be used to create a 
+  * {@code TopicConnection}, from which specialized topic-related objects
   * can be  created. A more general, and recommended approach 
-  * is to use the <CODE>ConnectionFactory</CODE> object.
+  * is to use the {@code ConnectionFactory} object.
   *  
-  * <P> The <CODE>TopicConnectionFactory</CODE> object
+  * <P> The {@code TopicConnectionFactory} object
   * should be used to support existing code.
   *
   * @version    1.1 - February 2, 2002
@@ -63,7 +63,7 @@ public interface TopicConnectionFactory extends ConnectionFactory {
 
     /** Creates a topic connection with the default user identity.
       * The connection is created in stopped mode. No messages 
-      * will be delivered until the <code>Connection.start</code> method
+      * will be delivered until the {@code Connection.start} method
       * is explicitly called.
       *
       * @return a newly created topic connection
@@ -80,7 +80,7 @@ public interface TopicConnectionFactory extends ConnectionFactory {
 
     /** Creates a topic connection with the specified user identity.
       * The connection is created in stopped mode. No messages 
-      * will be delivered until the <code>Connection.start</code> method
+      * will be delivered until the {@code Connection.start} method
       * is explicitly called.
       *  
       * @param userName the caller's user name

@@ -40,23 +40,23 @@
 
 package javax.jms;
 
-/** The <CODE>XAConnectionFactory</CODE> interface is a base interface for the
-  * <CODE>XAQueueConnectionFactory</CODE> and 
-  * <CODE>XATopicConnectionFactory</CODE> interfaces.
+/** The {@code XAConnectionFactory} interface is a base interface for the
+  * {@code XAQueueConnectionFactory} and 
+  * {@code XATopicConnectionFactory} interfaces.
   *
   * <P>Some application servers provide support for grouping JTS capable 
   * resource use into a distributed transaction (optional). To include JMS API transactions 
   * in a JTS transaction, an application server requires a JTS aware JMS
   * provider. A JMS provider exposes its JTS support using an
-  * <CODE>XAConnectionFactory</CODE> object, which an application server uses 
-  * to create <CODE>XAConnection</CODE> objects.
+  * {@code XAConnectionFactory} object, which an application server uses 
+  * to create {@code XAConnection} objects.
   *
-  * <P><CODE>XAConnectionFactory</CODE> objects are JMS administered objects, 
-  * just like <CODE>ConnectionFactory</CODE> objects. It is expected that 
+  * <P>{@code XAConnectionFactory} objects are JMS administered objects, 
+  * just like {@code ConnectionFactory} objects. It is expected that 
   * application servers will find them using the Java Naming and Directory
   * Interface (JNDI) API.
   *
-  *<P>The <CODE>XAConnectionFactory</CODE> interface is optional. JMS providers 
+  *<P>The {@code XAConnectionFactory} interface is optional. JMS providers 
   * are not required to support this interface. This interface is for 
   * use by JMS providers to support transactional environments. 
   * Client programs are strongly encouraged to use the transactional support
@@ -74,12 +74,12 @@ package javax.jms;
 
 public interface XAConnectionFactory {
     
-     /** Creates an <CODE>XAConnection</CODE> with the default user identity.
+     /** Creates an {@code XAConnection} with the default user identity.
       * The connection is created in stopped mode. No messages 
-      * will be delivered until the <code>Connection.start</code> method
+      * will be delivered until the {@code Connection.start} method
       * is explicitly called.
       *
-      * @return a newly created <CODE>XAConnection</CODE>
+      * @return a newly created {@code XAConnection}
       *
       * @exception JMSException if the JMS provider fails to create an XA  
       *                         connection due to some internal error.
@@ -95,7 +95,7 @@ public interface XAConnectionFactory {
 
     /** Creates an XA  connection with the specified user identity.
       * The connection is created in stopped mode. No messages 
-      * will be delivered until the <code>Connection.start</code> method
+      * will be delivered until the {@code Connection.start} method
       * is explicitly called.
       *  
       * @param userName the caller's user name

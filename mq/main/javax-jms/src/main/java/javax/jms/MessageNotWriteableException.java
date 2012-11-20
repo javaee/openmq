@@ -50,7 +50,7 @@ package javax.jms;
 
 public class MessageNotWriteableException extends JMSException {
 
-  /** Constructs a <CODE>MessageNotWriteableException</CODE> with the specified 
+  /** Constructs a {@code MessageNotWriteableException} with the specified 
    *  reason and error code.
    *
    *  @param  reason        a description of the exception
@@ -63,7 +63,7 @@ public class MessageNotWriteableException extends JMSException {
     super(reason, errorCode);
   }
 
-  /** Constructs a <CODE>MessageNotWriteableException</CODE> with the specified 
+  /** Constructs a {@code MessageNotWriteableException} with the specified 
    *  reason. The error code defaults to null.
    *
    *  @param  reason        a description of the exception

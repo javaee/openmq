@@ -310,6 +310,8 @@ public class TransactionHandler extends PacketHandler
         Boolean redeliverMsgBool = (Boolean)props.get("JMQRedeliver");
         redeliverMsgs = (redeliverMsgBool == null ? false : 
                       redeliverMsgBool.booleanValue());
+        Boolean b = (Boolean)props.get("JMQUpdateConsumed");
+        boolean updateConsumed = (b == null ? false: b.booleanValue());
    
         Boolean redeliverFlag = (Boolean)props.get("JMQSetRedelivered");
         setRedeliverFlag = (redeliverFlag == null ? true :
@@ -791,7 +793,8 @@ public class TransactionHandler extends PacketHandler
                     // if redeliverMsgs is true, we want to redeliver
                     // to both active and inactive consumers 
                     boolean processActiveConsumers = redeliverMsgs;
-                    redeliverUnacked(translist, id, processActiveConsumers, setRedeliverFlag);
+                    redeliverUnacked(translist, id, processActiveConsumers, 
+                                     setRedeliverFlag, updateConsumed);
                 } catch (BrokerException ex) {
                     if (ex instanceof MaxConsecutiveRollbackException) {
                         rbex = ex;
@@ -813,7 +816,7 @@ public class TransactionHandler extends PacketHandler
                             br.X_ROLLBACK_TXN, id, ex.getMessage()));
                     }
                     // doRollback has already logged error
-                    if (rbex != null) {
+                    if (rbex == null) {
                         reason = ex.getMessage();
                         status = ex.getStatusCode();
                     }
@@ -821,7 +824,7 @@ public class TransactionHandler extends PacketHandler
 
                 } catch (BrokerException ex) {
                     // preRollback has already logged error
-                    if (rbex != null) {
+                    if (rbex == null) {
                         reason = ex.getMessage();
                         status = ex.getStatusCode();
                     }
@@ -841,7 +844,7 @@ public class TransactionHandler extends PacketHandler
                     } catch (Exception ex) {
                         logger.logStack(Logger.ERROR,
                             ex.toString() + ": TUID=" + id + " Xid=" + xid, ex);
-                        if (rbex != null) {
+                        if (rbex == null) {
                             status = Status.ERROR;
                             reason = ex.getMessage();
                             if (ex instanceof BrokerException) {
@@ -1870,21 +1873,27 @@ public class TransactionHandler extends PacketHandler
                     while (ciditr.hasNext()) {
                         ConsumerUID cid = (ConsumerUID)ciditr.next();
                         try {
-                            if (ref.acknowledged(cid, sid, 
-                                                 !(cid.isNoAck()||cid.isDupsOK()),
-                                                 false, id, translist, null, false)) {
-                                try {
-
-                                if (dst != null) {
-                                    dst.removeRemoteMessage(sysid, RemoveReason.ACKNOWLEDGED, ref);
-                                } else { 
-                                    logger.log(Logger.INFO, "Process transaction rollback "+id+
-                                    ": orphan consumed remote message destination already removed " + sysid);
-                                }
-
-                                } finally {
-                                    ref.postAcknowledgedRemoval();
-                                }
+                            ref.acquireDestroyRemoteReadLock();
+                            try {
+                                 if (ref.isLastRemoteConsumerUID(sid, cid)) {
+                                     if (ref.acknowledged(cid, sid, 
+                                             !(cid.isNoAck()||cid.isDupsOK()),
+                                             false, id, translist, null, false)) {
+                                         try {
+                                             if (dst != null) {
+                                                 dst.removeRemoteMessage(sysid,
+                                                     RemoveReason.ACKNOWLEDGED, ref);
+                                             } else { 
+                                                 logger.log(Logger.INFO, "Process transaction rollback "+id+
+                                                 ": orphan consumed remote message destination already removed " + sysid);
+                                             }
+                                         } finally {
+                                             ref.postAcknowledgedRemoval();
+                                         }
+                                     }
+                                 }
+                            } finally {
+                                ref.clearDestroyRemoteReadLock();
                             }
                         } catch(Exception ex) {
                             logger.logStack((DEBUG_CLUSTER_TXN ? Logger.WARNING:Logger.DEBUG),
@@ -1964,7 +1973,7 @@ public class TransactionHandler extends PacketHandler
      */
     public void redeliverUnacked(TransactionList translist, 
                 TransactionUID tid, boolean processActiveConsumers,
-                boolean redeliver) 
+                boolean redeliver, boolean updateConsumed) 
                 throws BrokerException {
 
         List plist = null;
@@ -2051,8 +2060,10 @@ public class TransactionHandler extends PacketHandler
             SortedSet ss = (SortedSet)entry.getValue();
 
             Consumer cs = Consumer.getConsumer(intid);
-            if (cs == null || processActiveConsumers) {
-                updateRefsState(stored, ss, redeliver, updatedRefs, tid);
+            if ((cs != null && processActiveConsumers) ||
+                updateConsumed) {
+                updateRefsState(stored, ss, 
+                    (redeliver | updateConsumed), updatedRefs, tid);
             }
             if (cs == null) {
                 if (DEBUG) {
@@ -2197,7 +2208,7 @@ public class TransactionHandler extends PacketHandler
                 if (redeliver) {
                     ref.consumed(storedCuid, false, false);
                 } else {
-                    ref.removeDelivered(storedCuid, true);
+                    ref.removeDelivered(storedCuid, false);
                 }
                 updatedRefs.add(ref);
             } catch (Exception ex) {
@@ -2240,26 +2251,31 @@ public class TransactionHandler extends PacketHandler
                         translist.removeOrphanAck(tid, sysid, storedID, intid);
                     }
                     try {
-                        if (ref.acknowledged(intid, storedID, 
-                                             !(intid.isNoAck()||intid.isDupsOK()),
-                                             false, tid, translist, null, false)) {
-                            try {
-
-                            Destination d = ref.getDestination();
-                            if (d != null) {
-                                d.removeRemoteMessage(sysid, RemoveReason.ACKNOWLEDGED, ref);
-                            } else {
-                                if (DEBUG || DEBUG_CLUSTER_TXN) {
-                                logger.log(logger.INFO, "Destination "+ref.getDestinationUID()+
-                                " not found on cleanup remote message ["+
-                                  intid + "," + storedID + "," + ref+"]"+
-                                " for rollback transaction " +tid+" for inactive consumer");
+                        ref.acquireDestroyRemoteReadLock();
+                        try {
+                            if (ref.isLastRemoteConsumerUID(storedID, intid)) {
+                                if (ref.acknowledged(intid, storedID, 
+                                        !(intid.isNoAck()||intid.isDupsOK()),
+                                        false, tid, translist, null, false)) {
+                                    try {
+                                        Destination d = ref.getDestination();
+                                        if (d != null) {
+                                            d.removeRemoteMessage(sysid, RemoveReason.ACKNOWLEDGED, ref);
+                                        } else {
+                                            if (DEBUG || DEBUG_CLUSTER_TXN) {
+                                                logger.log(logger.INFO, "Destination "+ref.getDestinationUID()+
+                                                " not found on cleanup remote message ["+
+                                                 intid + "," + storedID + "," + ref+"]"+
+                                                " for rollback transaction " +tid+" for inactive consumer");
+                                            }
+                                        }
+                                    } finally {
+                                        ref.postAcknowledgedRemoval();
+                                    }
                                 }
                             }
-
-                            } finally {
-                                ref.postAcknowledgedRemoval();
-                            }
+                        } finally {
+                            ref.clearDestroyRemoteReadLock();
                         }
                     } catch(Exception ex) {
                         logger.logStack((DEBUG_CLUSTER_TXN ? Logger.WARNING:Logger.DEBUG),
@@ -2322,17 +2338,9 @@ public class TransactionHandler extends PacketHandler
                     }
                     continue;
                 }
-                try {
-                    if (redeliver) {
-                        ref.consumed(storedID, false, false);
-                    } else {
-                        ref.removeDelivered(storedID, false);
-                    }
-                } catch (IOException ex) {
-                    logger.log(Logger.WARNING,"Internal error",
-                           ex);
+                if (!redeliver) {
+                    ref.removeDelivered(storedID, false);
                 }
-
                 Destination d= ref.getDestination();
                 if (d == null) {
                     if (DEBUG) {

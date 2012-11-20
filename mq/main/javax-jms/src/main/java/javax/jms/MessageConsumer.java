@@ -40,33 +40,33 @@
 
 package javax.jms;
 
-/** A client uses a <CODE>MessageConsumer</CODE> object to receive messages 
- * from a destination.  A <CODE>MessageConsumer</CODE> object is created by 
- * passing a <CODE>Destination</CODE> object to a message-consumer creation
+/** A client uses a {@code MessageConsumer} object to receive messages 
+ * from a destination.  A {@code MessageConsumer} object is created by 
+ * passing a {@code Destination} object to a message-consumer creation
  * method supplied by a session.
  *
- * <P><CODE>MessageConsumer</CODE> is the parent interface for all message 
+ * <P>{@code MessageConsumer} is the parent interface for all message 
  * consumers.
  *
- * <P>A <CODE>MessageConsumer</CODE> can be created with a message selector. A message
+ * <P>A {@code MessageConsumer} can be created with a message selector. A message
  * selector allows 
  * the client to restrict the messages delivered to the message consumer to 
  * those that match the selector.
  * <p>
- * A client may either synchronously receive a <CODE>MessageConsumer</CODE>'s 
- * messages or have the <CODE>MessageConsumer</CODE> asynchronously deliver them 
+ * A client may either synchronously receive a {@code MessageConsumer}'s 
+ * messages or have the {@code MessageConsumer} asynchronously deliver them 
  * as they arrive. 
  * <p>
  * For synchronous receipt, a client can request the next message from a 
- * <CODE>MessageConsumer</CODE> using one of its <code>receive</code> methods. There are several 
- * variations of <code>receive</code> that allow a client to poll or wait for the next message. 
+ * {@code MessageConsumer} using one of its {@code receive} methods. There are several 
+ * variations of {@code receive} that allow a client to poll or wait for the next message. 
  * <p>
- * For asynchronous delivery, a client can register a <code>MessageListener</code> object 
- * with a <CODE>MessageConsumer</CODE>.
- * As messages arrive at the <CODE>MessageConsumer</CODE>, it delivers them by calling 
- * the <code>MessageListener</code>'s <code>onMessage</code> method.
+ * For asynchronous delivery, a client can register a {@code MessageListener} object 
+ * with a {@code MessageConsumer}.
+ * As messages arrive at the {@code MessageConsumer}, it delivers them by calling 
+ * the {@code MessageListener}'s {@code onMessage} method.
  * <p>
- * It is a client programming error for a <code>MessageListener</code> to throw an exception.
+ * It is a client programming error for a {@code MessageListener} to throw an exception.
  *
  * @version     2.0
  *
@@ -74,7 +74,7 @@ package javax.jms;
  * @see         javax.jms.TopicSubscriber
  * @see         javax.jms.Session
  */
-public interface MessageConsumer {
+public interface MessageConsumer extends AutoCloseable{
 
     /** Gets this message consumer's message selector expression.
      *  
@@ -91,14 +91,14 @@ public interface MessageConsumer {
     getMessageSelector() throws JMSException;
 
 
-    /** Gets the <code>MessageConsumer</code>'s <code>MessageListener</code>. 
+    /** Gets the {@code MessageConsumer}'s {@code MessageListener}. 
      * <p>
      * This method must not be used in a Java EE web or EJB application. 
-     * Doing so may cause a <code>JMSException</code> to be thrown though this is not guaranteed.
+     * Doing so may cause a {@code JMSException} to be thrown though this is not guaranteed.
      * 
-     * @return the <code>MessageConsumer</code>'s <code>MessageListener</code>, or null if one was not set
+     * @return the {@code MessageConsumer}'s {@code MessageListener}, or null if one was not set
      *  
-     * @exception JMSException if the JMS provider fails to get the <code>MessageListener</code>
+     * @exception JMSException if the JMS provider fails to get the {@code MessageListener}
      *                         for one of the following reasons:
      *                         <ul>
      *                         <li>an internal error has occurred or
@@ -110,23 +110,23 @@ public interface MessageConsumer {
      */
     MessageListener getMessageListener() throws JMSException;
     
-    /** Sets the <code>MessageConsumer</code>'s <CODE>MessageListener</CODE>.
+    /** Sets the {@code MessageConsumer}'s {@code MessageListener}.
      * <p>
-     * Setting the the <code>MessageListener</code> to null is the equivalent of 
-     * unsetting the <code>MessageListener</code> for the <code>MessageConsumer</code>. 
+     * Setting the the {@code MessageListener} to null is the equivalent of 
+     * unsetting the {@code MessageListener} for the {@code MessageConsumer}. 
      * <p>
      * The effect of calling this method
      * while messages are being consumed by an existing listener
-     * or the <code>MessageConsumer</code> is being used to consume messages synchronously
+     * or the {@code MessageConsumer} is being used to consume messages synchronously
      * is undefined.
      * <p>
      * This method must not be used in a Java EE web or EJB application. 
-     * Doing so may cause a <code>JMSException</code> to be thrown though this is not guaranteed.
+     * Doing so may cause a {@code JMSException} to be thrown though this is not guaranteed.
      * 
      * @param listener the listener to which the messages are to be 
      *                 delivered
      *  
-     * @exception JMSException if the JMS provider fails to set the <code>MessageConsumer</code>'s <CODE>MessageListener</CODE>
+     * @exception JMSException if the JMS provider fails to set the {@code MessageConsumer}'s {@code MessageListener}
      *                         for one of the following reasons:
      *                         <ul>
      *                         <li>an internal error has occurred or  
@@ -143,7 +143,7 @@ public interface MessageConsumer {
       * <P>This call blocks indefinitely until a message is produced
       * or until this message consumer is closed.
       *
-      * <P>If this <CODE>receive</CODE> is done within a transaction, the 
+      * <P>If this {@code receive} is done within a transaction, the 
       * consumer retains the message until the transaction commits.
       *  
       * @return the next message produced for this message consumer, or 
@@ -163,7 +163,7 @@ public interface MessageConsumer {
       *  
       * <P>This call blocks until a message arrives, the
       * timeout expires, or this message consumer is closed.
-      * A <CODE>timeout</CODE> of zero never expires, and the call blocks 
+      * A {@code timeout} of zero never expires, and the call blocks 
       * indefinitely.
       *
       * @param timeout the timeout value (in milliseconds)
@@ -196,13 +196,13 @@ public interface MessageConsumer {
     /** Closes the message consumer.
       *
       * <P>Since a provider may allocate some resources on behalf of a
-      * <CODE>MessageConsumer</CODE> outside the Java virtual machine, clients 
+      * {@code MessageConsumer} outside the Java virtual machine, clients 
       * should close them when they
       * are not needed. Relying on garbage collection to eventually reclaim
       * these resources may not be timely enough.
       *
-      * <P>This call blocks until a <CODE>receive</CODE> or message listener in 
-      * progress has completed. A blocked message consumer <CODE>receive</CODE> 
+      * <P>This call blocks until a {@code receive} or message listener in 
+      * progress has completed. A blocked message consumer {@code receive} 
       * call 
       * returns null when this message consumer is closed.
       *  

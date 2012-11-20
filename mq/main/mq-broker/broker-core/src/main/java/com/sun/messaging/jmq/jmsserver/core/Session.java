@@ -81,8 +81,8 @@ import com.sun.messaging.jmq.jmsserver.plugin.spi.DestinationSpi;
 
 public class Session implements EventBroadcaster, EventListener
 {
-    private static boolean DEBUG = false;
-    public static final boolean DEBUG_CLUSTER_MSG =
+    protected static boolean DEBUG = false;
+    protected static final boolean DEBUG_CLUSTER_MSG =
                    Globals.getConfig().getBooleanProperty(
                         Globals.IMQ + ".cluster.debug.msg") || DEBUG;
 
@@ -129,6 +129,10 @@ public class Session implements EventBroadcaster, EventListener
 
     private static boolean NOACK_ENABLED = false;
     static {
+        if (Globals.getLogger().getLevel() <= Logger.DEBUG) {
+            DEBUG = true;
+        }
+
         try {
             LicenseBase license = Globals.getCurrentLicense(null);
             NOACK_ENABLED = license.getBooleanProperty(
@@ -180,7 +184,7 @@ public class Session implements EventBroadcaster, EventListener
         ht.put("allSessions", all);
         all = new Hashtable();
         synchronized(ConsumerToSession) {
-            ht.put("ConsumerToSession", String.valueOf(ConsumerToSession.size()));
+            ht.put("ConsumerToSessionCnt", String.valueOf(ConsumerToSession.size()));
             Iterator itr = ConsumerToSession.keySet().iterator();
             while (itr.hasNext()) {
                 Object o = itr.next();
@@ -610,7 +614,7 @@ public class Session implements EventBroadcaster, EventListener
     }
 
     public Object ackInTransaction(ConsumerUID cuid, SysMessageID id, 
-        TransactionUID tuid, boolean isXA)
+        TransactionUID tuid, boolean isXA, int deliverCnt)
         throws BrokerException {
 
         //workaround client REDELIVER protocol for XA transaction
@@ -622,7 +626,7 @@ public class Session implements EventBroadcaster, EventListener
         }
         currentTransactionID = tuid;
 
-        return ssop.ackInTransaction(cuid, id, tuid);
+        return ssop.ackInTransaction(cuid, id, tuid, deliverCnt);
     }
 
 
@@ -631,7 +635,10 @@ public class Session implements EventBroadcaster, EventListener
             if (!valid) return;
             valid = false;
         }
-        logger.log(Logger.DEBUG,"Close Session " + uid);
+
+        if (DEBUG) {
+            logger.log(Logger.INFO, "Close Session " + uid);
+        }
         
         Connection conn = Globals.getConnectionManager().getConnection(getConnectionUID());
         boolean old = false;
@@ -673,13 +680,12 @@ public class Session implements EventBroadcaster, EventListener
      * If the message can not be routed, returns the packet reference
      * (to clean up)
      */
-    public Object handleUndeliverable(ConsumerUID cuid,
-           SysMessageID id)
-        throws BrokerException
-    {
+    public Object handleUndeliverable(ConsumerUID cuid, SysMessageID id, 
+                                      int deliverCnt, boolean deliverCntUpdateOnly)
+                                      throws BrokerException {
 
         ConsumerSpi c = coreLifecycle.getConsumer(cuid);
-        return ssop.handleUndeliverable(c, id);
+        return ssop.handleUndeliverable(c, id, deliverCnt, deliverCntUpdateOnly);
     }
 
     /**

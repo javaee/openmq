@@ -40,18 +40,18 @@
 
 package javax.jms;
 
-/** A <CODE>TextMessage</CODE> object is used to send a message containing a 
-  * <CODE>java.lang.String</CODE>.
-  * It inherits from the <CODE>Message</CODE> interface and adds a text message 
+/** A {@code TextMessage} object is used to send a message containing a 
+  * {@code java.lang.String}.
+  * It inherits from the {@code Message} interface and adds a text message 
   * body.
   *
   * <P>This message type can be used to transport text-based messages, including
   *  those with XML content.
   *
-  * <P>When a client receives a <CODE>TextMessage</CODE>, it is in read-only 
+  * <P>When a client receives a {@code TextMessage}, it is in read-only 
   * mode. If a client attempts to write to the message at this point, a 
-  * <CODE>MessageNotWriteableException</CODE> is thrown. If 
-  * <CODE>clearBody</CODE> is 
+  * {@code MessageNotWriteableException} is thrown. If 
+  * {@code clearBody} is 
   * called, the message can now be both read from and written to.
   *
   * @version     1.1 - February 2, 2002
@@ -73,7 +73,7 @@ public interface TextMessage extends Message {
 
     /** Sets the string containing this message's data.
       *  
-      * @param string the <CODE>String</CODE> containing the message's data
+      * @param string the {@code String} containing the message's data
       *  
       * @exception JMSException if the JMS provider fails to set the text due to
       *                         some internal error.
@@ -88,7 +88,7 @@ public interface TextMessage extends Message {
     /** Gets the string containing this message's data.  The default
       * value is null.
       *  
-      * @return the <CODE>String</CODE> containing the message's data
+      * @return the {@code String} containing the message's data
       *  
       * @exception JMSException if the JMS provider fails to get the text due to
       *                         some internal error.

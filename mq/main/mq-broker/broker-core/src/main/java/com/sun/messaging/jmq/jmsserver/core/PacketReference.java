@@ -221,8 +221,8 @@ public class PacketReference implements Sized, Ordered
     Thread lockOwner = null;
 
     private Object destroyRemoteLock = new Object();
-    private List destroyRemoteReadLocks = 
-        Collections.synchronizedList(new ArrayList());
+    private List<Thread> destroyRemoteReadLocks = 
+                          new ArrayList<Thread>();
     private Thread destroyRemoteWriteLockThread = null;
 
     /**
@@ -289,6 +289,12 @@ public class PacketReference implements Sized, Ordered
     ConsumerUID lastDead = null;
 
     private PartitionedStore pstore = null;
+
+    static {
+        if (Globals.getLogger().getLevel() <= Logger.DEBUG) {
+            DEBUG = true;
+        }
+    }
     
     public PartitionedStore getPartitionedStore() {
         return pstore;
@@ -322,8 +328,18 @@ public class PacketReference implements Sized, Ordered
             this.stored = stored;
         }
 
-        public synchronized int incrementRedeliver(){
+        public synchronized int setRedeliver(int n) {
+            redeliverCnt = n;
+            return redeliverCnt;
+        }
+
+        public synchronized int incrementRedeliver() {
             redeliverCnt ++;
+            return redeliverCnt;
+        }
+
+        public synchronized int incrementRedeliver(int n) {
+            redeliverCnt += n;
             return redeliverCnt;
         }
 
@@ -333,7 +349,9 @@ public class PacketReference implements Sized, Ordered
         }
         
         public synchronized boolean setState(int state) {
-            if (this.state == state) return false;
+            if (this.state == state) {
+                return false;
+            }
             this.state = state;
             timestamp = System.currentTimeMillis();
             return true;
@@ -365,8 +383,9 @@ public class PacketReference implements Sized, Ordered
         }
 
         public synchronized boolean setStateIfLess(int state, int max) {
-            if (compareStateLT(max))
+            if (compareStateLT(max)) {
                 return setState(state);
+            }
             return false;
         }
 
@@ -617,7 +636,7 @@ public class PacketReference implements Sized, Ordered
             throw new RuntimeException("Bogus ID");
         }
         if (ackInfo == null)  {
-            throw new RuntimeException("Internal Error: No AckInfo for message "+ getSysMessageID());
+            throw new RuntimeException("No AckInfo for message "+ getSysMessageID());
         }
         return (ConsumerMessagePair) ackInfo.get(cuid);
     }
@@ -727,15 +746,126 @@ public class PacketReference implements Sized, Ordered
         deliveredMsgAcks.add(uid);
     }
 
-    Hashtable remoteConsumerUIDs = new Hashtable();
+    LinkedHashMap<ConsumerUID, LinkedHashMap<ConsumerUID, ConnectionUID>>
+        remoteConsumerUIDs = new LinkedHashMap<ConsumerUID, 
+                 LinkedHashMap<ConsumerUID, ConnectionUID>>();
 
-    public void addRemoteConsumerUID(ConsumerUID cuid, 
-                                     ConnectionUID cnuid) {
-        remoteConsumerUIDs.put(cuid, cnuid);
+    /**
+     * At least destroyRemoteLock reader lock is required to call this method
+     */
+    private void addRemoteConsumerUID(ConsumerUID suid, 
+                                      ConsumerUID cuid, 
+                                      ConnectionUID connuid) {
+        synchronized(remoteConsumerUIDs) {
+            LinkedHashMap<ConsumerUID, ConnectionUID> m = remoteConsumerUIDs.get(suid);
+            if (m == null) {
+                m = new LinkedHashMap<ConsumerUID, ConnectionUID>();
+                remoteConsumerUIDs.put(suid, m);
+            }
+            m.put(cuid, connuid);
+        }
     }
 
-    public Hashtable getRemoteConsumerUIDs() {
-        return remoteConsumerUIDs;
+    public void removeRemoteConsumerUID(ConsumerUID suid, ConsumerUID cuid) {
+        acquireDestroyRemoteReadLock();
+        try {
+            synchronized(remoteConsumerUIDs) {
+                LinkedHashMap<ConsumerUID, ConnectionUID> m = remoteConsumerUIDs.get(suid);
+                if (m != null) {
+                    m.remove(cuid);
+                    if (m.isEmpty()) {
+                        remoteConsumerUIDs.remove(suid);
+                    }
+                }
+            }
+        } finally {
+            clearDestroyRemoteReadLock();
+        }
+    }
+
+    /**
+     * Caller must ensure isLocal false to call this method
+     */
+    public boolean isNoAckRemoteConsumers() {
+        acquireDestroyRemoteReadLock();
+        try {
+            Iterator<Map.Entry<ConsumerUID, LinkedHashMap<ConsumerUID, ConnectionUID>>> itr = null;
+            Map.Entry<ConsumerUID, LinkedHashMap<ConsumerUID, ConnectionUID>> pair = null;
+            LinkedHashMap<ConsumerUID, ConnectionUID> m = null;
+            Iterator<ConsumerUID> itr1 = null;
+            ConsumerUID cuid = null, suid = null;
+            synchronized(remoteConsumerUIDs) {
+                itr = remoteConsumerUIDs.entrySet().iterator();
+                while (itr.hasNext()) {
+                    pair = itr.next();
+                    suid = pair.getKey();
+                    m = pair.getValue();
+                    if (m == null || m.isEmpty()) {
+                        continue;
+                    }
+                    try {
+                        if (isAcknowledged(suid)) {
+                            continue;
+                        }
+                    } catch (Exception e) { 
+                        continue;
+                    }
+                    itr1 = m.keySet().iterator();
+                    while (itr1.hasNext()) {
+                        cuid = itr1.next();
+                        if (!cuid.isNoAck()) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        } finally {
+            clearDestroyRemoteReadLock();
+        }
+    }
+
+    /**
+     * At least destroyRemoteLock reader lock is required to call this method
+     */
+    public boolean isLastRemoteConsumerUID(ConsumerUID suid, ConsumerUID cuid) {
+        ConsumerUID lastuid = null;
+        synchronized(remoteConsumerUIDs) {
+            LinkedHashMap<ConsumerUID, ConnectionUID> m = remoteConsumerUIDs.get(suid);
+            if (DEBUG) {
+                Globals.getLogger().log(Logger.INFO, 
+                "PacketReference.isLastRemoteConsumerUID("+suid+", "+cuid+"): "+m+", ref="+this);
+            }
+            if (m == null) {
+                return true;
+            }
+            Iterator<ConsumerUID> itr = m.keySet().iterator();
+            while (itr.hasNext()) {
+                lastuid = itr.next(); 
+                if (DEBUG) {
+                    Globals.getLogger().log(Logger.INFO, 
+                    "PacketReference.isLastRemoteConsumerUID("+suid+", "+cuid+"): lastuid="+lastuid+", ref="+this);
+                }
+            }
+            return (lastuid == null || lastuid.equals(cuid));
+        }
+    }
+
+    public Map<ConsumerUID, ConnectionUID> getRemoteConsumerUIDs() {
+        LinkedHashMap<ConsumerUID, ConnectionUID> allm = 
+            new LinkedHashMap<ConsumerUID, ConnectionUID>();
+        synchronized(remoteConsumerUIDs) {
+            Iterator<LinkedHashMap<ConsumerUID, ConnectionUID>> itr =
+                               remoteConsumerUIDs.values().iterator();
+            LinkedHashMap<ConsumerUID, ConnectionUID> m = null;
+            while (itr.hasNext()) {
+                m = itr.next();
+                if (m != null && !m.isEmpty()) {
+                    allm.putAll(m);
+                }
+            }
+        }
+        return allm;
     }
 
     private void setExpireTime(long time) {
@@ -1350,7 +1480,7 @@ public class PacketReference implements Sized, Ordered
         }
     }
 
-    public void store(Collection consumers) throws BrokerException {        
+    public void store(Collection consumers) throws BrokerException {
 
     	if (destroyed || pktPtr == null) {
             return;
@@ -1409,7 +1539,7 @@ public class PacketReference implements Sized, Ordered
         isStoredWithInterest = true;
         assert interestCnt != 0;
     }
-    
+
     public ConsumerUID[] getRoutingForStore(Collection consumers)
 			throws BrokerException {
 
@@ -1450,33 +1580,65 @@ public class PacketReference implements Sized, Ordered
 
 	}
 
-    public synchronized void addRemoteInterests(Collection uids) {
-        ConsumerMessagePair oldcmp, newcmp; 
-        Object o = null;
-        ConsumerUID cuid = null, uid = null;
-        Iterator itr = uids.iterator();
-        while (itr.hasNext()) {
-            o = itr.next();
-            if (o instanceof ConsumerUID) {
-                cuid = (ConsumerUID)o;
-            } else {
-                cuid = ((Consumer)o).getStoredConsumerUID(); 
-                uid = ((Consumer)o).getConsumerUID();
+    /**
+     * This method is called for a newly created PacketReference 
+     * (before queue to destination destMessages) from cluster router
+     */
+    public void storeRemoteInterests(Collection<Consumer> interests,
+        Map<ConsumerUID, Integer> deliveryCnts) 
+        throws BrokerException {
+        if (DEBUG) {
+            Globals.getLogger().log(Logger.INFO, 
+            "storeRemoteInterests("+interests+", "+deliveryCnts+") for "+
+             msgid+"["+getDestination()+"]");
+        }
+        try {
+            store(interests);
+        } finally {
+            Consumer interest = null;
+            ConsumerUID suid = null, uid = null;
+            Iterator<Consumer> itr = interests.iterator();
+            while (itr.hasNext()) {
+                interest = itr.next();
+                suid = interest.getStoredConsumerUID(); 
+                uid = interest.getConsumerUID();
+                addRemoteConsumerUID(suid, uid, uid.getConnectionUID());
+                Integer dct = deliveryCnts.get(uid); 
+                if (dct != null && dct.intValue() > 0) {
+                    updateForJMSXDeliveryCount(suid, dct.intValue(), true);
+                }
             }
+        }
+    }
+    
 
+    /**
+     * This method is called while holding destroyRemoteLock writer lock
+     */
+    public synchronized void addRemoteInterests(Collection<Consumer> interests) {
+        ConsumerMessagePair oldcmp, newcmp; 
+        Consumer interest = null;
+        ConsumerUID suid = null, uid = null;
+        Iterator<Consumer> itr = interests.iterator();
+        while (itr.hasNext()) {
+            interest = itr.next();
+            suid = interest.getStoredConsumerUID(); 
+            uid = interest.getConsumerUID();
             if (ackInfo == null) {
                 ackInfo = Collections.synchronizedMap(new HashMap());
             }
-            oldcmp = (ConsumerMessagePair)ackInfo.get(cuid);
+            oldcmp = (ConsumerMessagePair)ackInfo.get(suid);
             if (oldcmp == null || oldcmp.getState() >= ACKED) {
                     interestCnt++;
             } else {
                 overriding();
             }
 
-            newcmp = new ConsumerMessagePair(cuid, false);
+            newcmp = new ConsumerMessagePair(suid, false);
             newcmp.setState(ROUTED);
-            ackInfo.put(cuid, newcmp);
+            ackInfo.put(suid, newcmp);
+
+            addRemoteConsumerUID(suid, uid, uid.getConnectionUID());
         }
     }
 
@@ -1792,8 +1954,14 @@ public class PacketReference implements Sized, Ordered
      * is received in autoack mode
      */
     public void consumed(ConsumerUID intid, boolean sync, boolean delivered) 
-        throws BrokerException, IOException
-    {
+        throws BrokerException, IOException {
+
+        if (DEBUG) {
+            Globals.getLogger().log(Logger.INFO, 
+            "PacketReference.consumed("+intid+", "+sync+", "+delivered+
+            ") for "+msgid+"["+getDestination()+"]");
+        }
+
         if (destroyed || invalid) {
             Globals.getLogger().log(Logger.DEBUG,"consumed on destroyed ref "
                  + msgid + ":" + intid);
@@ -1825,6 +1993,61 @@ public class PacketReference implements Sized, Ordered
 
     }
 
+    public void updateForJMSXDeliveryCount(ConsumerUID suid, int n, boolean set) {
+        if (DEBUG) {
+            Globals.getLogger().log(Logger.INFO, 
+            "PacketReference.updateForJMSXDeliveryCount("+suid+", "+n+", "+set+
+            ") for "+msgid+"["+getDestination()+"]");
+        }
+        if (destroyed || invalid) {
+            if (DEBUG) {
+            Globals.getLogger().log(Logger.INFO, 
+            "updateForJMSXDeliveryCount("+suid+", "+n+", "+set+") on destroyed ref "+
+             msgid+"["+destination+"]");
+            }
+            return;
+        }
+
+        ConsumerMessagePair cmp = getAck(suid);
+
+        if (cmp == null) {
+            // nothing to do
+            if (DEBUG) {
+            Globals.getLogger().log(Logger.INFO,
+            "updateForJMSXDeliveryCount("+suid+", "+n+","+set+"): unknown interest for ref "+
+             msgid+"["+destination+"]ackInfo="+ackInfo);
+            }
+            return;
+        }
+        if (cmp.setStateIfLess(DELIVERED, DELIVERED)) {
+            if (cmp.isStored() && destination != null) {
+                if (DEBUG) {
+                Globals.getLogger().log(Logger.INFO,
+                "updateForJMSXDeliveryCount("+suid+", "+n+", "+set+") for ref "+msgid+"["+
+                 destination+"]: update delivered in store");
+                }
+                try {
+                    pstore.updateInterestState(
+                        destination, msgid, suid, 
+                        PartitionedStore.INTEREST_STATE_DELIVERED, 
+                        Destination.PERSIST_SYNC && false,
+                        null, false);
+                } catch (Exception e) {
+                    Object[] args = { String.valueOf(n), suid, 
+                                      msgid+"["+destination+"]" };
+                    Globals.getLogger().logStack(Logger.WARNING, 
+                    Globals.getBrokerResources().getKString(
+                    BrokerResources.X_STORE_DELIVERED_ON_ADD_DELIVERYCOUNT, args), e);
+                }
+            }
+        }
+        if (set) {
+            cmp.setRedeliver(n);
+        } else {
+            cmp.incrementRedeliver(n);
+        }
+        cmp.setStateIfLess(CONSUMED, CONSUMED);
+    }
 
     public boolean matches(ConsumerUID id) {
         return getAck(id) != null;
@@ -2060,14 +2283,14 @@ public class PacketReference implements Sized, Ordered
                             }
                         } else {
                             try {
-                            Globals.getClusterBroadcast().
+                                Globals.getClusterBroadcast().
                                     acknowledgeMessage(getBrokerAddress(),
                                                        getSysMessageID(), 
                                                        intid, 
                                                        ClusterBroadcast.MSG_IGNORED, 
                                                        null, false /*no wait ack*/);
                             } catch (BrokerException e) {
-                            Globals.getLogger().log(Logger.DEBUG, e.getMessage());
+                                Globals.getLogger().log(Logger.DEBUG, e.getMessage());
                             }
                         }
                     }
@@ -2315,13 +2538,13 @@ public class PacketReference implements Sized, Ordered
         clearDestroyRemoteReadLock(); 
     }
 
-    private void acquireDestroyRemoteReadLock() {
+    public void acquireDestroyRemoteReadLock() {
         Thread myth = Thread.currentThread(); 
         long totalwaited = 0L;
         long pretime = 0L, curtime = 0L;
         long waitime = 15000L;
         synchronized(destroyRemoteLock) {
-            while (destroyRemoteWriteLockThread != null && 
+            while (destroyRemoteWriteLockThread != null &&
                    myth != destroyRemoteWriteLockThread) {
                 curtime = System.currentTimeMillis();
                 totalwaited += (pretime == 0L ? 0L:(curtime - pretime));
@@ -2340,13 +2563,14 @@ public class PacketReference implements Sized, Ordered
                 } catch (Exception e) {
                 }
             }
-            destroyRemoteReadLocks.add(Thread.currentThread());
+            destroyRemoteReadLocks.add(myth);
         }
     }
 
-    private void clearDestroyRemoteReadLock() {
+    public void clearDestroyRemoteReadLock() {
+        Thread myth = Thread.currentThread(); 
         synchronized(destroyRemoteLock) {
-            destroyRemoteReadLocks.remove(Thread.currentThread());
+            destroyRemoteReadLocks.remove(myth);
             destroyRemoteLock.notifyAll();
         }
     }
@@ -2356,7 +2580,7 @@ public class PacketReference implements Sized, Ordered
         long pretime = 0L, curtime = 0L;
         long waitime = 15000L;
         synchronized(destroyRemoteLock) {
-            while (!destroyRemoteReadLocks.isEmpty() && 
+            while (!destroyRemoteReadLocks.isEmpty() || 
                    destroyRemoteWriteLockThread != null) {
                 curtime = System.currentTimeMillis();
                 totalwaited += (pretime == 0L ? 0L:(curtime - pretime));
@@ -2392,6 +2616,11 @@ public class PacketReference implements Sized, Ordered
         }
     }
 
+    /**
+     * If this reference is in its Destination.destMessages, this 
+     * method must only be called after this reference is removed 
+     * from its Destination.destMessages
+     */
     public void destroy() {
         assert getLBitSet() == false;
         boolean alreadydestroyed = false;
@@ -2553,7 +2782,8 @@ public class PacketReference implements Sized, Ordered
             Globals.getClusterBroadcast().
                 acknowledgeMessage(getBrokerAddress(),
                 getSysMessageID(), intid, 
-                ClusterBroadcast.MSG_DEAD, props, true);
+                ClusterBroadcast.MSG_DEAD, props, 
+                !(intid.isDupsOK() || intid.isNoAck()));
             cmp.setState(ACKED);
         } else {
             lastDead = storedid;

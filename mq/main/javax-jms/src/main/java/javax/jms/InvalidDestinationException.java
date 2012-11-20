@@ -51,7 +51,7 @@ package javax.jms;
 
 public class InvalidDestinationException extends JMSException {
 
-  /** Constructs an <CODE>InvalidDestinationException</CODE> with the specified 
+  /** Constructs an {@code InvalidDestinationException} with the specified 
    *  reason and error code.
    *
    *  @param  reason        a description of the exception
@@ -64,7 +64,7 @@ public class InvalidDestinationException extends JMSException {
     super(reason, errorCode);
   }
 
-  /** Constructs an <CODE>InvalidDestinationException</CODE> with the specified 
+  /** Constructs an {@code InvalidDestinationException} with the specified 
    *  reason. The error code defaults to null.
    *
    *  @param  reason        a description of the exception

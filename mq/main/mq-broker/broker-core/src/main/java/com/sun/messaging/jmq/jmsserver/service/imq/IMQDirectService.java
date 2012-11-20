@@ -2068,6 +2068,22 @@ public class IMQDirectService extends IMQService implements JMSService
 	return (msg);
     }
 
+    public JMSServiceReply acknowledgeMessage(long connectionId, 
+        long sessionId, long consumerId, SysMessageID sysMessageID,
+        long transactionId, MessageAckType ackType) 
+        throws JMSServiceException  {
+        return acknowledgeMessage(connectionId, sessionId, consumerId,
+            sysMessageID, transactionId, ackType, -1, null, null);
+    }
+
+    public JMSServiceReply acknowledgeMessage(long connectionId, 
+        long sessionId, long consumerId, SysMessageID sysMessageID,
+        long transactionId, MessageAckType ackType, int retryCnt) 
+        throws JMSServiceException  {
+        return acknowledgeMessage(connectionId, sessionId, consumerId,
+            sysMessageID, transactionId, ackType, retryCnt, null, null);
+    }
+
     /**
      *  Acknowledge a message to the broker.
      *
@@ -2083,6 +2099,15 @@ public class IMQDirectService extends IMQService implements JMSService
      *
      *  @param  ackType The MessageAckType for this message acknowledgement
      *
+     *  @param  retryCnt retry count of client runtime in delivery the message
+     *                   applicable to ackType
+     *                   DEAD_REQUEST 
+     *                   UNDELIVERABLE_REQUEST
+     *                   or non-null transactionId
+     *                   should be 0 otherwise
+     *  @param  deadComment if ackType is DEAD_REQUEST
+     *  @param  deadThr if ackType is DEAD_REQUEST
+     *
      *  @return The JMSServiceReply which contains status and information
      *          about the acknowledge request.
      *
@@ -2095,17 +2120,17 @@ public class IMQDirectService extends IMQService implements JMSService
      *          {@link JMSServiceReply.Status}
      *
      */
-    public JMSServiceReply acknowledgeMessage(long connectionId, long sessionId,
-            long consumerId, SysMessageID sysMessageID, long transactionId,
-            MessageAckType ackType) throws JMSServiceException  {
+    public JMSServiceReply acknowledgeMessage(long connectionId, 
+        long sessionId, long consumerId, SysMessageID sysMessageID,
+        long transactionId, MessageAckType ackType, int retryCnt,
+        String deadComment, Throwable deadThr) 
+        throws JMSServiceException  {
+
 	boolean validate = false;
         TransactionUID txnUID = null;
         int brokerAckType;
-        int deliverCnt = -1;
 	SysMessageID ids[] = null;
 	ConsumerUID cids[] = null;
-        Throwable deadThr = null;
-	String deadComment = null;
 	JMSServiceReply reply;
 	HashMap props = new HashMap();
 	IMQConnection cxn;
@@ -2132,11 +2157,11 @@ public class IMQDirectService extends IMQService implements JMSService
      	     *                 if ackType != DEAD)
      	     * deadComment - the explaination why a message was marked dead (should be null
      	     *               if ackType != DEAD)
-     	     * deliverCnt - number of times a dead message was delivered (should be 0
-     	     *               if ackType != DEAD)
+     	     * retryCnt - number of times a message was retried
+             *
      	     */
             protocol.acknowledge(cxn, txnUID, validate, brokerAckType, 
-	    		deadThr, deadComment, deliverCnt, ids, cids);
+	    		 deadThr, deadComment, retryCnt, ids, cids);
 	} catch(Exception e)  {
 	    String errStr = 
 	    "acknowledgeMessage: Sending Acknowledgement failed. Connection ID: "

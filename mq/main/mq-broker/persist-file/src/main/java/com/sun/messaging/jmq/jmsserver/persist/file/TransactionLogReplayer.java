@@ -185,7 +185,7 @@ public class TransactionLogReplayer
         // TO DO 
         // This should use existing routing
 		
-        logger.log(Logger.FORCE, BrokerResources.I_RECONSTRUCT_MSG_TXNLOG, mid);
+        logger.log(Logger.FORCE, BrokerResources.I_RECONSTRUCT_MSG_TXNLOG, mid, dst+" [reroute]");
         PacketReference pr = PacketReference.createReferenceWithDestination(
                                  msgStore.parent, pkt, dst, null);
         if (pr.isExpired()) {

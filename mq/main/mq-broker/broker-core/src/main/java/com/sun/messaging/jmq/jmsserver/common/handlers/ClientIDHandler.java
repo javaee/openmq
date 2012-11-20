@@ -72,18 +72,6 @@ public class ClientIDHandler extends PacketHandler
     private Logger logger = Globals.getLogger();
     private static boolean DEBUG = false;
  
-    public static final boolean CAN_USE_SHARED_CONSUMERS = getValue();
-
-    private static final boolean getValue() {
-        try {
-            LicenseBase license = Globals.getCurrentLicense(null);
-            return license.getBooleanProperty(
-                                license.PROP_ENABLE_SHARED_SUB, false);
-        } catch (BrokerException ex) {
-            return false;
-        }
-    }
-
     public ClientIDHandler() {
     }
 
@@ -211,16 +199,6 @@ public class ClientIDHandler extends PacketHandler
         try {
         	// validate and expand the specified clientID
             String clientid = cclientid == null ? null : validate(cclientid, con);
-
-            if (shared && ! CAN_USE_SHARED_CONSUMERS) {
-            	// user is not licensed to use shared consumers
-                logger.log(Logger.WARNING,BrokerResources.X_FEATURE_UNAVAILABLE,Globals.getBrokerResources().getKString(BrokerResources.M_SHARED_CONS), clientid);
-                throw new BrokerException(
-                		Globals.getBrokerResources().getKString(BrokerResources.X_FEATURE_UNAVAILABLE,Globals.getBrokerResources().getKString(BrokerResources.M_SHARED_CONS), clientid),
-                        BrokerResources.X_FEATURE_UNAVAILABLE,
-                        (Throwable) null,
-                        Status.NOT_ALLOWED);
-            }
 
             // retrieve the old client id
             String oldid = (String)con.getClientData(IMQConnection.CLIENT_ID);

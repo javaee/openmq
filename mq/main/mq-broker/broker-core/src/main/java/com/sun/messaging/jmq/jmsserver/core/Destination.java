@@ -358,10 +358,9 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
      * place the message in the DMQ.<P>
      * called from Destination and Consumer.
      */
-    void markDead(PacketReference pr, Reason reason,
-        Hashtable props)
-        throws BrokerException
-    {
+    private void markDead(PacketReference pr, 
+        Reason reason, Hashtable props)
+        throws BrokerException {
         
         Packet p = pr.getPacket();
         if (p == null) {
@@ -439,12 +438,13 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
                 logger.log(Logger.INFO, BrokerResources.I_DMQ_REMOVING_MSG, args); 
             }
             if (!pr.isLocal()) {
+                boolean waitack = !pr.isNoAckRemoteConsumers();
                 Globals.getClusterBroadcast().acknowledgeMessage(
                                               pr.getBrokerAddress(),
                                               pr.getSysMessageID(),
                                               pr.getQueueUID(), 
                                               ClusterBroadcast.MSG_DEAD,
-                                              props, true /*wait for ack*/);
+                                              props, waitack);
            }
            return;
         }
@@ -473,7 +473,7 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
         Integer cnt = (Integer)props.remove(TEMP_CNT);
         if (cnt != null) {
             // set as a header property
-            props.put("JMSXDeliveryCount", cnt);
+            props.put(DMQ.DELIVERY_COUNT, cnt);
         } else { // total deliver cnt ?
         }
 
@@ -528,10 +528,11 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
             props.put(DMQ.DEAD_BROKER, Globals.getMyAddress().toString());
 
         if (!pr.isLocal()) {
+            boolean waitack = !pr.isNoAckRemoteConsumers();
             Globals.getClusterBroadcast().
                 acknowledgeMessage(pr.getBrokerAddress(),
                 pr.getSysMessageID(), pr.getQueueUID(), 
-                ClusterBroadcast.MSG_DEAD, props, true /*wait for ack*/);
+                ClusterBroadcast.MSG_DEAD, props, waitack);
             return; // done
 
         }
@@ -2045,14 +2046,20 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
             for (int i=0; i < total; i ++) {
                 PacketReference ref = (PacketReference)pfers.get(i);
                 try {
-                    if (ref.matches(sid)) {
-                        match ++;
-                        if (ref.isAcknowledged(sid)) {
-                            ackno ++;
+                    try {
+                        if (ref.matches(sid)) {
+                            match ++;
+                            if (ref.isAcknowledged(sid)) {
+                                ackno ++;
+                            }
+                            if (ref.isDelivered(sid)) {
+                                delivered ++;
+                            }
                         }
-                        if (ref.isDelivered(sid)) {
-                            delivered ++;
-                        }
+                    } catch (Exception e) {
+                        logger.log(logger.INFO, "Destination.getDebugState(): "+this+
+                            " for message reference "+ref+" and stored consumer uid "+
+                             sid+": "+e.toString());
                     }
                 } catch (Exception e) {}
             }
@@ -3325,7 +3332,18 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
 
             // OK really remove the message
             ref.setInvalid();
-            ref = (PacketReference) destMessages.remove(id, r);
+            if (remoteRef == null) {
+                ref = (PacketReference)destMessages.remove(id, r);
+            } else {
+                Object errValue = Boolean.valueOf(false);
+                Object o = destMessages.removeWithValue(id, remoteRef, errValue, r);
+                if (o == errValue) {
+                    logger.log(((DEBUG_CLUSTER||DEBUG) ? Logger.INFO:Logger.DEBUG),
+                           "Requeued message found on remote reference removal " + id);
+                    return ret;
+                }
+                ref = (PacketReference)o;
+            }
 
             } //synchronized(_removeMessageLock)
 

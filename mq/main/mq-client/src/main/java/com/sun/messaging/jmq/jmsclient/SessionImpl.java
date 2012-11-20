@@ -2723,12 +2723,13 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
 
         } finally {
         	
-        	//HACC -- reset flag (set when received exception from mdb/ack)
-        	this.isRollbackOnly = false;
-        	this.rollbackCause = null;
-        	
+            //HACC -- reset flag (set when received exception from mdb/ack)
+            this.isRollbackOnly = false;
+            this.rollbackCause = null;
+      	
             //This will release sync state.
             failoverOccurred = false;
+
             releaseInSyncState();
         }
     }

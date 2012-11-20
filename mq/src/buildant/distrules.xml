@@ -57,6 +57,11 @@
           description="Builds the MQ install image(s)">
     </target>
 
+     <target name="install-mqgf-ri"
+          depends="zip_install-mqgf-ri"
+          description="Builds the MQ install image(s)">
+    </target>
+
     <target name="zip_install"
 	    description="Builds MQ zip Install Image">
 	<echo message="### Building MQ zip Install Image..."/>
@@ -791,6 +796,233 @@
 
     </target>
 
+
+<target name="zip_install-mqgf-ri"
+            description="Builds MQ zip Install Image">
+        <echo message="### Building MQ zip Install Image..."/>
+
+        <!-- Remove old install dir-->
+        <echo message="### Remove old zip install dir ${mq.zip.installdir}"/>
+        <delete dir="${mq.zip.installdir}"/>
+
+        <!-- Make new install dir-->
+        <echo message="### Making directory ${mq.zip.installdir}"/>
+        <mkdir dir="${mq.zip.installdir}"/>
+
+        <!-- etc dir -->
+        <echo message="### etc files"/>
+        <mkdir dir="${mq.zip.installdir}/etc/rc"/>
+        <mkdir dir="${mq.zip.installdir}/etc/registry"/>
+        <mkdir dir="${mq.zip.installdir}/etc/xml/template"/>
+
+        <copy todir="${mq.zip.installdir}/etc">
+            <fileset dir="${archetc.dir}">
+                <include name="passfile.sample"/>
+                <include name="imq*.conf"/>
+            </fileset>
+        </copy>
+
+	<!--  For GFv3, add IMQ_DEFAULT_VARHOME value for GF. -->
+	<echo file="${mq.zip.installdir}/etc/imqenv.conf" append="true"># Set this for GlassFish
+	</echo>
+	<echo file="${mq.zip.installdir}/etc/imqenv.conf" append="true">IMQ_DEFAULT_VARHOME=../../glassfish/domains/domain1/imq
+        </echo>
+
+        <chmod perm="444">
+            <fileset dir="${mq.zip.installdir}/etc">
+                <include name="imq*.conf"/>
+                <include name="passfile.sample"/>
+            </fileset>
+        </chmod>
+
+        <copy tofile="${mq.zip.installdir}/etc/rc/imq">
+            <fileset dir="${base_src.dir}/solaris/etc">
+                <include name="imq.sh"/>
+            </fileset>
+        </copy>
+
+	<copy todir="${mq.zip.installdir}/etc/registry">
+            <fileset dir="${base_src.dir}/share/etc/registry">
+                <include name="*.xml"/>
+            </fileset>
+        </copy>
+
+        <copy tofile="${mq.zip.installdir}/etc/xml/com.sun.cmm.mq.xml">
+            <fileset dir="${base_src.dir}/share/etc">
+                <include name="com.sun.cmm.mq.xml"/>
+            </fileset>
+        </copy>
+
+        <copy tofile="${mq.zip.installdir}/etc/xml/template/com.sun.cmm.mq.xml">
+            <fileset dir="${base_src.dir}/share/etc/template">
+                <include name="com.sun.cmm.mq.xml"/>
+            </fileset>
+        </copy>
+
+        <!-- bin dir -->
+        <echo message="### bin files "/>
+        <mkdir dir="${mq.zip.installdir}/bin"/>
+
+        <copy tofile="${mq.zip.installdir}/bin/imqbrokerd">
+            <fileset dir="${base_src.dir}/solaris/bin">
+                <include name="imqbrokerd.sh"/>
+            </fileset>
+        </copy>
+        <copy tofile="${mq.zip.installdir}/bin/imqcmd">
+            <fileset dir="${base_src.dir}/solaris/bin">
+                <include name="imqcmd.sh"/>
+            </fileset>
+        </copy>
+        <copy tofile="${mq.zip.installdir}/bin/imqobjmgr">
+            <fileset dir="${base_src.dir}/solaris/bin">
+                <include name="imqobjmgr.sh"/>
+            </fileset>
+        </copy>
+        <copy tofile="${mq.zip.installdir}/bin/imqusermgr">
+            <fileset dir="${base_src.dir}/solaris/bin">
+                <include name="imqusermgr.sh"/>
+            </fileset>
+        </copy>
+	<chmod file="${mq.zip.installdir}/bin/imq*" perm="755"/>
+
+        <echo message="### bin .exe files "/>
+        <copy todir="${mq.zip.installdir}/bin">
+            <fileset dir="${buildcfg.dir}/tools/ri/bins">
+                <include name="imqbrokerd.exe"/>
+            </fileset>
+        </copy>
+        <copy todir="${mq.zip.installdir}/bin">
+            <fileset dir="${buildcfg.dir}/tools/ri/bins">
+                <include name="imqbrokersvc.exe"/>
+            </fileset>
+        </copy>
+        <copy todir="${mq.zip.installdir}/bin">
+            <fileset dir="${buildcfg.dir}/tools/ri/bins">
+                <include name="imqcmd.exe"/>
+            </fileset>
+        </copy>
+        <copy todir="${mq.zip.installdir}/bin">
+            <fileset dir="${buildcfg.dir}/tools/ri/bins">
+                <include name="imqobjmgr.exe"/>
+            </fileset>
+        </copy>
+        <copy todir="${mq.zip.installdir}/bin">
+            <fileset dir="${buildcfg.dir}/tools/ri/bins">
+                <include name="imqusermgr.exe"/>
+            </fileset>
+        </copy>
+
+        <!-- lib dir -->
+        <echo message="### lib files"/>
+        <mkdir dir="${mq.zip.installdir}/lib"/>
+
+        <copy todir="${mq.zip.installdir}/lib">
+            <fileset dir="${classes.dir}">
+                <include name="*.jar"/>
+                <include name="*.rar"/>
+            </fileset>
+        </copy>
+	 <chmod perm="755">
+            <fileset dir="${mq.zip.installdir}/lib">
+                <include name="*.jar"/>
+                <exclude name="fscontext.jar"/>
+                <exclude name="jhall.jar"/>
+            </fileset>
+        </chmod>
+        <chmod perm="644">
+            <fileset dir="${mq.zip.installdir}/lib">
+                <include name="*.rar"/>
+            </fileset>
+        </chmod>
+
+        <!-- lib/imqinit -->
+        <copy tofile="${mq.zip.installdir}/lib/imqinit">
+            <fileset dir="${base_src.dir}/solaris/etc">
+                <include name="imqinit.sh"/>
+            </fileset>
+        </copy>
+        <chmod perm="444">
+            <fileset dir="${mq.zip.installdir}/lib">
+                <include name="imqinit"/>
+            </fileset>
+        </chmod>
+	<!-- lib/help dir -->
+        <echo message="### lib/help"/>
+        <mkdir dir="${mq.zip.installdir}/lib/help"/>
+        <copy todir="${mq.zip.installdir}/lib/help">
+            <fileset dir="${archlib.dir}/help"/>
+        </copy>
+        <chmod perm="755" type="dir">
+            <fileset dir="${mq.zip.installdir}/lib/help">
+                <include name="en"/>
+                <include name="images"/>
+            </fileset>
+        </chmod>
+        <chmod perm="644">
+            <fileset dir="${mq.zip.installdir}/lib/help">
+                <include name="Master.hs"/>
+                <include name="en/*.*"/>
+                <include name="images/*.*"/>
+            </fileset>
+        </chmod>
+
+	 <!-- lib/props dir -->
+        <!-- use default_linux.properties (generic & no syslog)  -->
+        <echo message="### lib/props"/>
+        <mkdir dir="${mq.zip.installdir}/lib/props/broker"/>
+
+        <copy todir="${mq.zip.installdir}/lib/props/broker">
+            <fileset dir="${archlib.dir}/props/broker">
+                <include name="install.properties"/>
+            </fileset>
+        </copy>
+
+        <copy tofile="${mq.zip.installdir}/lib/props/broker/default.properties">
+            <fileset dir="${archlib.dir}/props/broker">
+                <include name="default_linux.properties"/>
+            </fileset>
+        </copy>
+
+	 <!-- lib/install dir -->
+        <!-- These files only used if image was installed by the installer.-->
+        <echo message="### lib/props"/>
+        <mkdir dir="${mq.zip.installdir}/lib/install"/>
+
+        <echo message="### lib/install"/>
+        <copy todir="${mq.zip.installdir}/lib/install">
+            <fileset dir="${buildcfg.dir}/tools/ri/bins">
+                <include name="*.class"/>
+            </fileset>
+        </copy>
+
+        <copy tofile="${mq.zip.installdir}/lib/install/init-config">
+            <fileset dir="${base_src.dir}/share/install/sys/mq/bin">
+                <include name="init-config-zip"/>
+            </fileset>
+        </copy>
+
+        <copy tofile="${mq.zip.installdir}/lib/install/mqconfigmf">
+            <fileset dir="${base_src.dir}/share/install/sys/mq/bin">
+                <include name="mqconfigmf"/>
+            </fileset>
+        </copy>
+        <chmod perm="755">
+            <fileset dir="${mq.zip.installdir}/lib/install">
+                <include name="init-config"/>
+                <include name="mqconfigmf"/>
+            </fileset>
+        </chmod>
+
+	<!-- lib/ext dir -->
+        <echo message="### lib/ext"/>
+        <mkdir dir="${mq.zip.installdir}/lib/ext"/>
+        <copy tofile="${mq.zip.installdir}/lib/ext/README">
+            <fileset dir="${base_src.dir}/doc/en">
+                <include name="README-lib"/>
+            </fileset>
+        </copy>
+
+    </target>
 
 
    <!-- ===================  Create Bundle(s) ================= -->

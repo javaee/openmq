@@ -40,20 +40,20 @@
 
 package javax.jms;
 
-/** A <CODE>ServerSessionPool</CODE> object is an object implemented by an 
-  * application server to provide a pool of <CODE>ServerSession</CODE> objects 
-  * for processing the messages of a <CODE>ConnectionConsumer</CODE> (optional).
+/** A {@code ServerSessionPool} object is an object implemented by an 
+  * application server to provide a pool of {@code ServerSession} objects 
+  * for processing the messages of a {@code ConnectionConsumer} (optional).
   *
-  * <P>Its only method is <CODE>getServerSession</CODE>. The JMS API does not 
+  * <P>Its only method is {@code getServerSession}. The JMS API does not 
   * architect how the pool is implemented. It could be a static pool of 
-  * <CODE>ServerSession</CODE> objects, or it could use a sophisticated 
-  * algorithm to dynamically create <CODE>ServerSession</CODE> objects as 
+  * {@code ServerSession} objects, or it could use a sophisticated 
+  * algorithm to dynamically create {@code ServerSession} objects as 
   * needed.
   *
-  * <P>If the <CODE>ServerSessionPool</CODE> is out of 
-  * <CODE>ServerSession</CODE> objects, the <CODE>getServerSession</CODE> call 
-  * may block. If a <CODE>ConnectionConsumer</CODE> is blocked, it cannot 
-  * deliver new messages until a <CODE>ServerSession</CODE> is 
+  * <P>If the {@code ServerSessionPool} is out of 
+  * {@code ServerSession} objects, the {@code getServerSession} call 
+  * may block. If a {@code ConnectionConsumer} is blocked, it cannot 
+  * deliver new messages until a {@code ServerSession} is 
   * eventually returned.
   *
   * @version     1.0 - 9 March 1998
@@ -70,7 +70,7 @@ public interface ServerSessionPool {
       * @return a server session from the pool
       *  
       * @exception JMSException if an application server fails to
-      *                         return a <CODE>ServerSession</CODE> out of its
+      *                         return a {@code ServerSession} out of its
       *                         server session pool.
       */ 
 

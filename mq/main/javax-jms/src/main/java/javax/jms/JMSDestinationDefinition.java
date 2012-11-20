@@ -46,13 +46,13 @@ import java.lang.annotation.Target;
 
 /**
  *  Annotation used to define a Java Message Service (JMS) destination
- *  and be registered with JNDI. The <code>JMSDestination</code>
+ *  and be registered with JNDI. The {@code JMSDestination}
  *  may be configured by setting the annotation elements for commonly used
- *  <code>JMSDestination</code> properties.  Additional standard and
- *  vendor-specific properties may be specified using the <code>properties
- *  </code> element. Once defined, a destination resource may be referenced by
- *  a component using the <code>lookup</code> element of the
- *  <code>Resource</code> annotation.
+ *  {@code JMSDestination} properties.  Additional standard and
+ *  vendor-specific properties may be specified using the {@code properties
+ *  } element. Once defined, a destination resource may be referenced by
+ *  a component using the {@code lookup} element of the
+ *  {@code Resource} annotation.
  *
  *  @see javax.annotation.Resource
  */
@@ -72,7 +72,7 @@ public @interface JMSDestinationDefinition {
 
     /**
      *  JMS destination implementation class name which implements:
-     *  <code>javax.jms.Queue</code> or <code>javax.jms.Topic</code>
+     *  {@code javax.jms.Queue} or {@code javax.jms.Topic}
      */
     String className();
 
@@ -88,7 +88,7 @@ public @interface JMSDestinationDefinition {
 
     /**
      *  JMS destination property.  This may be a vendor-specific property
-     *  or a less commonly used <code>ConnectionFactory</code> property.
+     *  or a less commonly used {@code ConnectionFactory} property.
      *  <p>
      *  Properties are specified using the format:
      *  <i>propertyName=propertyValue</i> with one property per array element.

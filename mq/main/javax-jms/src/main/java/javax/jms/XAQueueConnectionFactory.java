@@ -40,10 +40,10 @@
 
 package javax.jms;
 
-/** An <CODE>XAQueueConnectionFactory</CODE> provides the same create options as
-  * a <CODE>QueueConnectionFactory</CODE> (optional).
+/** An {@code XAQueueConnectionFactory} provides the same create options as
+  * a {@code QueueConnectionFactory} (optional).
   *
-  * <P>The <CODE>XATopicConnectionFactory</CODE> interface is optional.  JMS providers 
+  * <P>The {@code XATopicConnectionFactory} interface is optional.  JMS providers 
   * are not required to support this interface. This interface is for 
   * use by JMS providers to support transactional environments. 
   * Client programs are strongly encouraged to use the transactional support
@@ -64,7 +64,7 @@ public interface XAQueueConnectionFactory
 
     /** Creates an XA queue connection with the default user identity.
       * The connection is created in stopped mode. No messages 
-      * will be delivered until the <code>Connection.start</code> method
+      * will be delivered until the {@code Connection.start} method
       * is explicitly called.
       *
       * @return a newly created XA queue connection
@@ -81,7 +81,7 @@ public interface XAQueueConnectionFactory
 
     /** Creates an XA queue connection with the specified user identity.
       * The connection is created in stopped mode. No messages 
-      * will be delivered until the <code>Connection.start</code> method
+      * will be delivered until the {@code Connection.start} method
       * is explicitly called.
       *  
       * @param userName the caller's user name

@@ -264,10 +264,10 @@ public class ProtocolImpl implements Protocol
                         handler.DEAD_REASON_UNDELIVERABLE,
                         exception, deadComment, deliverCnt, cleanList);
         } else if (ackType == handler.UNDELIVERABLE_REQUEST) {
-            handler.handleUndeliverableMsgs(con, ids, cids, cleanList);
+            handler.handleUndeliverableMsgs(con, ids, cids, cleanList, deliverCnt, false);
         
         } else if (tid != null) {
-            handler.handleTransaction(tl, con, tid, ids, cids);
+            handler.handleTransaction(tl, con, tid, ids, cids, deliverCnt);
         } else {
             handler.handleAcks(con, ids, cids, true, cleanList); //XXX ackack flag
         }
@@ -579,7 +579,7 @@ public class ProtocolImpl implements Protocol
           ConsumerHandler handler = (ConsumerHandler)
                       pr.getHandler(PacketType.ADD_CONSUMER);
           handler.destroyConsumer(con, session, uid,
-                  null, null, null, true, false);
+                  null, null, null, false, false);
       }
 
 
@@ -871,7 +871,7 @@ public class ProtocolImpl implements Protocol
           BrokerException bex = null;
           if (redeliver) {
               try {
-                  handler.redeliverUnacked(tl, id, true, setRedeliver);
+                  handler.redeliverUnacked(tl, id, true, setRedeliver, false);
               } catch (MaxConsecutiveRollbackException e) {
                   bex = e;
               }

@@ -50,6 +50,7 @@ import com.sun.messaging.jmq.util.UID;
 import com.sun.messaging.jmq.io.GPacket;
 import com.sun.messaging.jmq.io.SysMessageID;
 import com.sun.messaging.jmq.jmsserver.core.*;
+import com.sun.messaging.jmq.jmsserver.data.TransactionUID;
 import com.sun.messaging.jmq.jmsserver.util.BrokerException;
 import com.sun.messaging.jmq.jmsserver.service.ConnectionUID;
 import com.sun.messaging.jmq.jmsserver.cluster.api.FileTransferCallback;
@@ -80,7 +81,7 @@ public interface Protocol extends ClusterCallback
 
     public boolean waitForConfigSync();
 
-    public void sendMessage(PacketReference pkt, Collection targets,
+    public void sendMessage(PacketReference pkt, Collection<Consumer> targets,
                             boolean sendMsgDeliveredAck);
 
     public void sendMessageAck(com.sun.messaging.jmq.jmsserver.core.BrokerAddress msgHome, 
@@ -196,6 +197,15 @@ public interface Protocol extends ClusterCallback
 
     public void sendClusterTransactionInfo(long tid,
                 com.sun.messaging.jmq.jmsserver.core.BrokerAddress to);
+
+    public void sendTransactionInquiry(TransactionUID tid,
+                com.sun.messaging.jmq.jmsserver.core.BrokerAddress to);
+
+    public void sendPreparedTransactionInquiries(List<TransactionUID> tids,
+                com.sun.messaging.jmq.jmsserver.core.BrokerAddress to);
+
+    //in seconds
+    public int getClusterAckWaitTimeout();
 
     public com.sun.messaging.jmq.jmsserver.core.BrokerAddress lookupBrokerAddress(String brokerid);
 

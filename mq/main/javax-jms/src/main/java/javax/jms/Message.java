@@ -43,8 +43,8 @@ package javax.jms;
 import java.util.Enumeration;
 import java.util.Properties;
 
-/** The <CODE>Message</CODE> interface is the root interface of all JMS 
-  * messages. It defines the message header and the <CODE>acknowledge</CODE> 
+/** The {@code Message} interface is the root interface of all JMS 
+  * messages. It defines the message header and the {@code acknowledge} 
   * method used for all messages.
   *
   * <P>Most message-oriented middleware (MOM) products treat messages as 
@@ -85,20 +85,20 @@ import java.util.Properties;
   *
   * <P>The JMS API defines five types of message body:
   * <UL>
-  *   <LI>Stream - A <CODE>StreamMessage</CODE> object's message body contains 
+  *   <LI>Stream - A {@code StreamMessage} object's message body contains 
   *       a stream of primitive values in the Java programming 
   *       language ("Java primitives"). It is filled and read sequentially.
-  *   <LI>Map - A <CODE>MapMessage</CODE> object's message body contains a set 
-  *       of name-value pairs, where names are <CODE>String</CODE> 
+  *   <LI>Map - A {@code MapMessage} object's message body contains a set 
+  *       of name-value pairs, where names are {@code String} 
   *       objects, and values are Java primitives. The entries can be accessed 
   *       sequentially or randomly by name. The order of the entries is 
   *       undefined.
-  *   <LI>Text - A <CODE>TextMessage</CODE> object's message body contains a 
-  *       <CODE>java.lang.String</CODE> object. This message type can be used
+  *   <LI>Text - A {@code TextMessage} object's message body contains a 
+  *       {@code java.lang.String} object. This message type can be used
   *       to transport plain-text messages, and XML messages.
-  *   <LI>Object - An <CODE>ObjectMessage</CODE> object's message body contains 
-  *       a <CODE>Serializable</CODE> Java object.
-  *   <LI>Bytes - A <CODE>BytesMessage</CODE> object's message body contains a 
+  *   <LI>Object - An {@code ObjectMessage} object's message body contains 
+  *       a {@code Serializable} Java object.
+  *   <LI>Bytes - A {@code BytesMessage} object's message body contains a 
   *       stream of uninterpreted bytes. This message type is for 
   *       literally encoding a body to match an existing message format. In 
   *       many cases, it is possible to use one of the other body types, 
@@ -109,17 +109,17 @@ import java.util.Properties;
   *
   * <H4>Message Headers</H4>
   *
-  * <P>The <CODE>JMSCorrelationID</CODE> header field is used for linking one 
+  * <P>The {@code JMSCorrelationID} header field is used for linking one 
   * message with
   * another. It typically links a reply message with its requesting message.
   *
-  * <P><CODE>JMSCorrelationID</CODE> can hold a provider-specific message ID,
-  * an application-specific <CODE>String</CODE> object, or a provider-native 
-  * <CODE>byte[]</CODE> value.
+  * <P>{@code JMSCorrelationID} can hold a provider-specific message ID,
+  * an application-specific {@code String} object, or a provider-native 
+  * {@code byte[]} value.
   *
   * <H4>Message Properties</H4>
   *
-  * <P>A <CODE>Message</CODE> object contains a built-in facility for supporting
+  * <P>A {@code Message} object contains a built-in facility for supporting
   * application-defined property values. In effect, this provides a mechanism 
   * for adding application-specific header fields to a message.
   *
@@ -130,17 +130,17 @@ import java.util.Properties;
   * <P>Property names must obey the rules for a message selector identifier. 
   * Property names must not be null, and must not be empty strings. If a property
   * name is set and it is either null or an empty string, an 
-  * <CODE>IllegalArgumentException</CODE> must be thrown.
+  * {@code IllegalArgumentException} must be thrown.
   *
-  * <P>Property values can be <CODE>boolean</CODE>, <CODE>byte</CODE>, 
-  * <CODE>short</CODE>, <CODE>int</CODE>, <CODE>long</CODE>, <CODE>float</CODE>,
-  * <CODE>double</CODE>, and <CODE>String</CODE>.
+  * <P>Property values can be {@code boolean}, {@code byte}, 
+  * {@code short}, {@code int}, {@code long}, {@code float},
+  * {@code double}, and {@code String}.
   *
   * <P>Property values are set prior to sending a message. When a client 
   * receives a message, its properties are in read-only mode. If a 
   * client attempts to set properties at this point, a 
-  * <CODE>MessageNotWriteableException</CODE> is thrown. If 
-  * <CODE>clearProperties</CODE> is called, the properties can now be both
+  * {@code MessageNotWriteableException} is thrown. If 
+  * {@code clearProperties} is called, the properties can now be both
   * read from and written to. Note that header fields are distinct from 
   * properties. Header fields are never in read-only mode. 
   *
@@ -155,10 +155,10 @@ import java.util.Properties;
   *
   * <P>Message properties support the following conversion table. The marked 
   * cases must be supported. The unmarked cases must throw a 
-  * <CODE>JMSException</CODE>. The <CODE>String</CODE>-to-primitive conversions 
+  * {@code JMSException}. The {@code String}-to-primitive conversions 
   * may throw a runtime exception if the
-  * primitive's <CODE>valueOf</CODE> method does not accept the 
-  * <CODE>String</CODE> as a valid representation of the primitive.
+  * primitive's {@code valueOf} method does not accept the 
+  * {@code String} as a valid representation of the primitive.
   *
   * <P>A value written as the row type can be read as the column type.
   *
@@ -177,46 +177,46 @@ import java.util.Properties;
   * </PRE>
   *
   * <P>In addition to the type-specific set/get methods for properties, JMS 
-  * provides the <CODE>setObjectProperty</CODE> and 
-  * <CODE>getObjectProperty</CODE> methods. These support the same set of 
+  * provides the {@code setObjectProperty} and 
+  * {@code getObjectProperty} methods. These support the same set of 
   * property types using the objectified primitive values. Their purpose is 
   * to allow the decision of property type to made at execution time rather 
   * than at compile time. They support the same property value conversions.
   *
-  * <P>The <CODE>setObjectProperty</CODE> method accepts values of class 
-  * <CODE>Boolean</CODE>, <CODE>Byte</CODE>, <CODE>Short</CODE>, 
-  * <CODE>Integer</CODE>, <CODE>Long</CODE>, <CODE>Float</CODE>, 
-  * <CODE>Double</CODE>, and <CODE>String</CODE>. An attempt 
-  * to use any other class must throw a <CODE>JMSException</CODE>.
+  * <P>The {@code setObjectProperty} method accepts values of class 
+  * {@code Boolean}, {@code Byte}, {@code Short}, 
+  * {@code Integer}, {@code Long}, {@code Float}, 
+  * {@code Double}, and {@code String}. An attempt 
+  * to use any other class must throw a {@code JMSException}.
   *
-  * <P>The <CODE>getObjectProperty</CODE> method only returns values of class 
-  * <CODE>Boolean</CODE>, <CODE>Byte</CODE>, <CODE>Short</CODE>, 
-  * <CODE>Integer</CODE>, <CODE>Long</CODE>, <CODE>Float</CODE>, 
-  * <CODE>Double</CODE>, and <CODE>String</CODE>.
+  * <P>The {@code getObjectProperty} method only returns values of class 
+  * {@code Boolean}, {@code Byte}, {@code Short}, 
+  * {@code Integer}, {@code Long}, {@code Float}, 
+  * {@code Double}, and {@code String}.
   *
   * <P>The order of property values is not defined. To iterate through a 
-  * message's property values, use <CODE>getPropertyNames</CODE> to retrieve 
+  * message's property values, use {@code getPropertyNames} to retrieve 
   * a property name enumeration and then use the various property get methods 
   * to retrieve their values.
   *
-  * <P>A message's properties are deleted by the <CODE>clearProperties</CODE>
+  * <P>A message's properties are deleted by the {@code clearProperties}
   * method. This leaves the message with an empty set of properties.
   *
   * <P>Getting a property value for a name which has not been set returns a 
-  * null value. Only the <CODE>getStringProperty</CODE> and 
-  * <CODE>getObjectProperty</CODE> methods can return a null value. 
+  * null value. Only the {@code getStringProperty} and 
+  * {@code getObjectProperty} methods can return a null value. 
   * Attempting to read a null value as a primitive type must be treated as 
-  * calling the primitive's corresponding <CODE>valueOf(String)</CODE> 
+  * calling the primitive's corresponding {@code valueOf(String)} 
   * conversion method with a null value.
   *
-  * <P>The JMS API reserves the <CODE>JMSX</CODE> property name prefix for JMS 
+  * <P>The JMS API reserves the {@code JMSX} property name prefix for JMS 
   * defined properties.
   * The full set of these properties is defined in the Java Message Service
   * specification. The specification also defines whether support for each
   * property is mandatory or optional.  
   * New JMS defined properties may be added in later versions 
   * of the JMS API.  The 
-  * <CODE>String[] ConnectionMetaData.getJMSXPropertyNames</CODE> method 
+  * {@code String[] ConnectionMetaData.getJMSXPropertyNames} method 
   * returns the names of the JMSX properties supported by a connection.
   *
   * <P>JMSX properties may be referenced in message selectors whether or not
@@ -230,15 +230,15 @@ import java.util.Properties;
   * JMSX properties defined in the specification as "set by provider on 
   * receive" are available only to the consumers.
   *
-  * <P><CODE>JMSXGroupID</CODE> and <CODE>JMSXGroupSeq</CODE> are standard 
+  * <P>{@code JMSXGroupID} and {@code JMSXGroupSeq} are standard 
   * properties that clients 
   * should use if they want to group messages. All providers must support them.
   * Unless specifically noted, the values and semantics of the JMSX properties 
   * are undefined.
   *
-  * <P>The JMS API reserves the <CODE>JMS_<I>vendor_name</I></CODE> property 
+  * <P>The JMS API reserves the {@code JMS_<I>vendor_name</I>} property 
   * name prefix for provider-specific properties. Each provider defines its own 
-  * value for <CODE><I>vendor_name</I></CODE>. This is the mechanism a JMS 
+  * value for {@code <I>vendor_name</I>}. This is the mechanism a JMS 
   * provider uses to make its special per-message services available to a JMS 
   * client.
   *
@@ -254,7 +254,7 @@ import java.util.Properties;
   * model. It does not provide implementations of these interfaces.
   *
   * <P>Each JMS provider supplies a set of message factories with its 
-  * <CODE>Session</CODE> object for creating instances of messages. This allows 
+  * {@code Session} object for creating instances of messages. This allows 
   * a provider to use message implementations tailored to its specific needs.
   *
   * <P>A provider must be prepared to accept message implementations that are 
@@ -263,7 +263,7 @@ import java.util.Properties;
   *
   * <P>Note the following exception case when a provider is handling a foreign 
   * message implementation. If the foreign message implementation contains a 
-  * <CODE>JMSReplyTo</CODE> header field that is set to a foreign destination 
+  * {@code JMSReplyTo} header field that is set to a foreign destination 
   * implementation, the provider is not required to handle or preserve the 
   * value of this header field. 
   *
@@ -275,7 +275,7 @@ import java.util.Properties;
   * and property values
   * match the 
   * selector are delivered. What it means for a message not to be delivered
-  * depends on the <CODE>MessageConsumer</CODE> being used (see 
+  * depends on the {@code MessageConsumer} being used (see 
   * {@link javax.jms.QueueReceiver QueueReceiver} and 
   * {@link javax.jms.TopicSubscriber TopicSubscriber}).
   *
@@ -285,7 +285,7 @@ import java.util.Properties;
   * true when the message's header field values and property values are 
   * substituted for their corresponding identifiers in the selector.
   *
-  * <P>A message selector is a <CODE>String</CODE> whose syntax is based on a 
+  * <P>A message selector is a {@code String} whose syntax is based on a 
   * subset of 
   * the SQL92 conditional expression syntax. If the value of a message selector 
   * is an empty string, the value is treated as a null and indicates that there 
@@ -304,40 +304,40 @@ import java.util.Properties;
   *   <UL>
   *     <LI>A string literal is enclosed in single quotes, with a single quote 
   *         represented by doubled single quote; for example, 
-  *         <CODE>'literal'</CODE> and <CODE>'literal''s'</CODE>. Like 
+  *         {@code 'literal'} and {@code 'literal''s'}. Like 
   *         string literals in the Java programming language, these use the 
   *         Unicode character encoding.
   *     <LI>An exact numeric literal is a numeric value without a decimal 
-  *         point, such as <CODE>57</CODE>, <CODE>-957</CODE>, and  
-  *         <CODE>+62</CODE>; numbers in the range of <CODE>long</CODE> are 
+  *         point, such as {@code 57}, {@code -957}, and  
+  *         {@code +62}; numbers in the range of {@code long} are 
   *         supported. Exact numeric literals use the integer literal 
   *         syntax of the Java programming language.
   *     <LI>An approximate numeric literal is a numeric value in scientific 
-  *         notation, such as <CODE>7E3</CODE> and <CODE>-57.9E2</CODE>, or a 
-  *         numeric value with a decimal, such as <CODE>7.</CODE>, 
-  *         <CODE>-95.7</CODE>, and <CODE>+6.2</CODE>; numbers in the range of 
-  *         <CODE>double</CODE> are supported. Approximate literals use the 
+  *         notation, such as {@code 7E3} and {@code -57.9E2}, or a 
+  *         numeric value with a decimal, such as {@code 7.}, 
+  *         {@code -95.7}, and {@code +6.2}; numbers in the range of 
+  *         {@code double} are supported. Approximate literals use the 
   *         floating-point literal syntax of the Java programming language.
-  *     <LI>The boolean literals <CODE>TRUE</CODE> and <CODE>FALSE</CODE>.
+  *     <LI>The boolean literals {@code TRUE} and {@code FALSE}.
   *   </UL>
   *   <LI>Identifiers:
   *   <UL>
   *     <LI>An identifier is an unlimited-length sequence of letters 
   *         and digits, the first of which must be a letter. A letter is any 
-  *         character for which the method <CODE>Character.isJavaLetter</CODE>
-  *         returns true. This includes <CODE>'_'</CODE> and <CODE>'$'</CODE>.
+  *         character for which the method {@code Character.isJavaLetter}
+  *         returns true. This includes {@code '_'} and {@code '$'}.
   *         A letter or digit is any character for which the method 
-  *         <CODE>Character.isJavaLetterOrDigit</CODE> returns true.
-  *     <LI>Identifiers cannot be the names <CODE>NULL</CODE>, 
-  *         <CODE>TRUE</CODE>, and <CODE>FALSE</CODE>.
-  *     <LI>Identifiers cannot be <CODE>NOT</CODE>, <CODE>AND</CODE>, 
-  *         <CODE>OR</CODE>, <CODE>BETWEEN</CODE>, <CODE>LIKE</CODE>, 
-  *         <CODE>IN</CODE>, <CODE>IS</CODE>, or <CODE>ESCAPE</CODE>.
+  *         {@code Character.isJavaLetterOrDigit} returns true.
+  *     <LI>Identifiers cannot be the names {@code NULL}, 
+  *         {@code TRUE}, and {@code FALSE}.
+  *     <LI>Identifiers cannot be {@code NOT}, {@code AND}, 
+  *         {@code OR}, {@code BETWEEN}, {@code LIKE}, 
+  *         {@code IN}, {@code IS}, or {@code ESCAPE}.
   *     <LI>Identifiers are either header field references or property 
   *         references.  The type of a property value in a message selector 
   *         corresponds to the type used to set the property. If a property 
   *         that does not exist in a message is referenced, its value is 
-  *         <CODE>NULL</CODE>.
+  *         {@code NULL}.
   *     <LI>The conversions that apply to the get methods for properties do not
   *         apply when a property is used in a message selector expression.
   *         For example, suppose you set a property as a string value, as in the
@@ -348,17 +348,17 @@ import java.util.Properties;
   *         <PRE>"NumberOfOrders > 1"</PRE>
   *     <LI>Identifiers are case-sensitive.
   *     <LI>Message header field references are restricted to 
-  *         <CODE>JMSDeliveryMode</CODE>, <CODE>JMSPriority</CODE>, 
-  *         <CODE>JMSMessageID</CODE>, <CODE>JMSTimestamp</CODE>, 
-  *         <CODE>JMSCorrelationID</CODE>, and <CODE>JMSType</CODE>. 
-  *         <CODE>JMSMessageID</CODE>, <CODE>JMSCorrelationID</CODE>, and 
-  *         <CODE>JMSType</CODE> values may be null and if so are treated as a 
-  *         <CODE>NULL</CODE> value.
-  *     <LI>Any name beginning with <CODE>'JMSX'</CODE> is a JMS defined  
+  *         {@code JMSDeliveryMode}, {@code JMSPriority}, 
+  *         {@code JMSMessageID}, {@code JMSTimestamp}, 
+  *         {@code JMSCorrelationID}, and {@code JMSType}. 
+  *         {@code JMSMessageID}, {@code JMSCorrelationID}, and 
+  *         {@code JMSType} values may be null and if so are treated as a 
+  *         {@code NULL} value.
+  *     <LI>Any name beginning with {@code 'JMSX'} is a JMS defined  
   *         property name.
-  *     <LI>Any name beginning with <CODE>'JMS_'</CODE> is a provider-specific 
+  *     <LI>Any name beginning with {@code 'JMS_'} is a provider-specific 
   *         property name.
-  *     <LI>Any name that does not begin with <CODE>'JMS'</CODE> is an 
+  *     <LI>Any name that does not begin with {@code 'JMS'} is an 
   *         application-specific property name.
   *   </UL>
   *   <LI>White space is the same as that defined for the Java programming
@@ -366,20 +366,20 @@ import java.util.Properties;
   *   <LI>Expressions: 
   *   <UL>
   *     <LI>A selector is a conditional expression; a selector that evaluates 
-  *         to <CODE>true</CODE> matches; a selector that evaluates to 
-  *         <CODE>false</CODE> or unknown does not match.
+  *         to {@code true} matches; a selector that evaluates to 
+  *         {@code false} or unknown does not match.
   *     <LI>Arithmetic expressions are composed of themselves, arithmetic 
   *         operations, identifiers (whose value is treated as a numeric 
   *         literal), and numeric literals.
   *     <LI>Conditional expressions are composed of themselves, comparison 
   *         operations, and logical operations.
   *   </UL>
-  *   <LI>Standard bracketing <CODE>()</CODE> for ordering expression evaluation
+  *   <LI>Standard bracketing {@code ()} for ordering expression evaluation
   *      is supported.
-  *   <LI>Logical operators in precedence order: <CODE>NOT</CODE>, 
-  *       <CODE>AND</CODE>, <CODE>OR</CODE>
-  *   <LI>Comparison operators: <CODE>=</CODE>, <CODE>></CODE>, <CODE>>=</CODE>,
-  *       <CODE><</CODE>, <CODE><=</CODE>, <CODE><></CODE> (not equal)
+  *   <LI>Logical operators in precedence order: {@code NOT}, 
+  *       {@code AND}, {@code OR}
+  *   <LI>Comparison operators: {@code =}, {@code >}, {@code >=},
+  *       {@code <}, {@code <=}, {@code <>} (not equal)
   *   <UL>
   *     <LI>Only like type values can be compared. One exception is that it 
   *         is valid to compare exact numeric values and approximate numeric 
@@ -387,88 +387,88 @@ import java.util.Properties;
   *         numeric promotion in the Java programming language. If the 
   *         comparison of non-like type values is attempted, the value of the 
   *         operation is false. If either of the type values evaluates to 
-  *         <CODE>NULL</CODE>, the value of the expression is unknown.   
-  *     <LI>String and boolean comparison is restricted to <CODE>=</CODE> and 
-  *         <CODE><></CODE>. Two strings are equal 
+  *         {@code NULL}, the value of the expression is unknown.   
+  *     <LI>String and boolean comparison is restricted to {@code =} and 
+  *         {@code <>}. Two strings are equal 
   *         if and only if they contain the same sequence of characters.
   *   </UL>
   *   <LI>Arithmetic operators in precedence order:
   *   <UL>
-  *     <LI><CODE>+</CODE>, <CODE>-</CODE> (unary)
-  *     <LI><CODE>*</CODE>, <CODE>/</CODE> (multiplication and division)
-  *     <LI><CODE>+</CODE>, <CODE>-</CODE> (addition and subtraction)
+  *     <LI>{@code +}, {@code -} (unary)
+  *     <LI>{@code *}, {@code /} (multiplication and division)
+  *     <LI>{@code +}, {@code -} (addition and subtraction)
   *     <LI>Arithmetic operations must use numeric promotion in the Java 
   *         programming language.
   *   </UL>
-  *   <LI><CODE><I>arithmetic-expr1</I> [NOT] BETWEEN <I>arithmetic-expr2</I> 
-  *       AND <I>arithmetic-expr3</I></CODE> (comparison operator)
+  *   <LI>{@code <I>arithmetic-expr1</I> [NOT] BETWEEN <I>arithmetic-expr2</I> 
+  *       AND <I>arithmetic-expr3</I>} (comparison operator)
   *   <UL>
-  *     <LI><CODE>"age&nbsp;BETWEEN&nbsp;15&nbsp;AND&nbsp;19"</CODE> is 
+  *     <LI>{@code "age&nbsp;BETWEEN&nbsp;15&nbsp;AND&nbsp;19"} is 
   *         equivalent to 
-  *         <CODE>"age&nbsp;>=&nbsp;15&nbsp;AND&nbsp;age&nbsp;<=&nbsp;19"</CODE>
-  *     <LI><CODE>"age&nbsp;NOT&nbsp;BETWEEN&nbsp;15&nbsp;AND&nbsp;19"</CODE> 
+  *         {@code "age&nbsp;>=&nbsp;15&nbsp;AND&nbsp;age&nbsp;<=&nbsp;19"}
+  *     <LI>{@code "age&nbsp;NOT&nbsp;BETWEEN&nbsp;15&nbsp;AND&nbsp;19"} 
   *         is equivalent to 
-  *         <CODE>"age&nbsp;<&nbsp;15&nbsp;OR&nbsp;age&nbsp;>&nbsp;19"</CODE>
+  *         {@code "age&nbsp;<&nbsp;15&nbsp;OR&nbsp;age&nbsp;>&nbsp;19"}
   *   </UL>
-  *   <LI><CODE><I>identifier</I> [NOT] IN (<I>string-literal1</I>, 
-  *       <I>string-literal2</I>,...)</CODE> (comparison operator where 
-  *       <CODE><I>identifier</I></CODE> has a <CODE>String</CODE> or 
-  *       <CODE>NULL</CODE> value)
+  *   <LI>{@code <I>identifier</I> [NOT] IN (<I>string-literal1</I>, 
+  *       <I>string-literal2</I>,...)} (comparison operator where 
+  *       {@code <I>identifier</I>} has a {@code String} or 
+  *       {@code NULL} value)
   *   <UL>
-  *     <LI><CODE>"Country&nbsp;IN&nbsp;('&nbsp;UK',&nbsp;'US',&nbsp;'France')"</CODE>
+  *     <LI>{@code "Country&nbsp;IN&nbsp;('&nbsp;UK',&nbsp;'US',&nbsp;'France')"}
   *         is true for 
-  *         <CODE>'UK'</CODE> and false for <CODE>'Peru'</CODE>; it is 
+  *         {@code 'UK'} and false for {@code 'Peru'}; it is 
   *         equivalent to the expression 
-  *         <CODE>"(Country&nbsp;=&nbsp;'&nbsp;UK')&nbsp;OR&nbsp;(Country&nbsp;=&nbsp;'&nbsp;US')&nbsp;OR&nbsp;(Country&nbsp;=&nbsp;'&nbsp;France')"</CODE>
-  *     <LI><CODE>"Country&nbsp;NOT&nbsp;IN&nbsp;('&nbsp;UK',&nbsp;'US',&nbsp;'France')"</CODE> 
-  *         is false for <CODE>'UK'</CODE> and true for <CODE>'Peru'</CODE>; it 
+  *         {@code "(Country&nbsp;=&nbsp;'&nbsp;UK')&nbsp;OR&nbsp;(Country&nbsp;=&nbsp;'&nbsp;US')&nbsp;OR&nbsp;(Country&nbsp;=&nbsp;'&nbsp;France')"}
+  *     <LI>{@code "Country&nbsp;NOT&nbsp;IN&nbsp;('&nbsp;UK',&nbsp;'US',&nbsp;'France')"} 
+  *         is false for {@code 'UK'} and true for {@code 'Peru'}; it 
   *         is equivalent to the expression 
-  *         <CODE>"NOT&nbsp;((Country&nbsp;=&nbsp;'&nbsp;UK')&nbsp;OR&nbsp;(Country&nbsp;=&nbsp;'&nbsp;US')&nbsp;OR&nbsp;(Country&nbsp;=&nbsp;'&nbsp;France'))"</CODE>
-  *     <LI>If identifier of an <CODE>IN</CODE> or <CODE>NOT IN</CODE> 
-  *         operation is <CODE>NULL</CODE>, the value of the operation is 
+  *         {@code "NOT&nbsp;((Country&nbsp;=&nbsp;'&nbsp;UK')&nbsp;OR&nbsp;(Country&nbsp;=&nbsp;'&nbsp;US')&nbsp;OR&nbsp;(Country&nbsp;=&nbsp;'&nbsp;France'))"}
+  *     <LI>If identifier of an {@code IN} or {@code NOT IN} 
+  *         operation is {@code NULL}, the value of the operation is 
   *         unknown.
   *   </UL>
-  *   <LI><CODE><I>identifier</I> [NOT] LIKE <I>pattern-value</I> [ESCAPE 
-  *       <I>escape-character</I>]</CODE> (comparison operator, where 
-  *       <CODE><I>identifier</I></CODE> has a <CODE>String</CODE> value; 
-  *       <CODE><I>pattern-value</I></CODE> is a string literal where 
-  *       <CODE>'_'</CODE> stands for any single character; <CODE>'%'</CODE> 
+  *   <LI>{@code <I>identifier</I> [NOT] LIKE <I>pattern-value</I> [ESCAPE 
+  *       <I>escape-character</I>]} (comparison operator, where 
+  *       {@code <I>identifier</I>} has a {@code String} value; 
+  *       {@code <I>pattern-value</I>} is a string literal where 
+  *       {@code '_'} stands for any single character; {@code '%'} 
   *       stands for any sequence of characters, including the empty sequence; 
   *       and all other characters stand for themselves. The optional 
-  *       <CODE><I>escape-character</I></CODE> is a single-character string 
+  *       {@code <I>escape-character</I>} is a single-character string 
   *       literal whose character is used to escape the special meaning of the 
-  *       <CODE>'_'</CODE> and <CODE>'%'</CODE> in 
-  *       <CODE><I>pattern-value</I></CODE>.)
+  *       {@code '_'} and {@code '%'} in 
+  *       {@code <I>pattern-value</I>}.)
   *   <UL>
-  *     <LI><CODE>"phone&nbsp;LIKE&nbsp;'12%3'"</CODE> is true for 
-  *         <CODE>'123'</CODE> or <CODE>'12993'</CODE> and false for 
-  *         <CODE>'1234'</CODE>
-  *     <LI><CODE>"word&nbsp;LIKE&nbsp;'l_se'"</CODE> is true for 
-  *         <CODE>'lose'</CODE> and false for <CODE>'loose'</CODE>
-  *     <LI><CODE>"underscored&nbsp;LIKE&nbsp;'\_%'&nbsp;ESCAPE&nbsp;'\'"</CODE>
-  *          is true for <CODE>'_foo'</CODE> and false for <CODE>'bar'</CODE>
-  *     <LI><CODE>"phone&nbsp;NOT&nbsp;LIKE&nbsp;'12%3'"</CODE> is false for 
-  *         <CODE>'123'</CODE> or <CODE>'12993'</CODE> and true for 
-  *         <CODE>'1234'</CODE>
-  *     <LI>If <CODE><I>identifier</I></CODE> of a <CODE>LIKE</CODE> or 
-  *         <CODE>NOT LIKE</CODE> operation is <CODE>NULL</CODE>, the value 
+  *     <LI>{@code "phone&nbsp;LIKE&nbsp;'12%3'"} is true for 
+  *         {@code '123'} or {@code '12993'} and false for 
+  *         {@code '1234'}
+  *     <LI>{@code "word&nbsp;LIKE&nbsp;'l_se'"} is true for 
+  *         {@code 'lose'} and false for {@code 'loose'}
+  *     <LI>{@code "underscored&nbsp;LIKE&nbsp;'\_%'&nbsp;ESCAPE&nbsp;'\'"}
+  *          is true for {@code '_foo'} and false for {@code 'bar'}
+  *     <LI>{@code "phone&nbsp;NOT&nbsp;LIKE&nbsp;'12%3'"} is false for 
+  *         {@code '123'} or {@code '12993'} and true for 
+  *         {@code '1234'}
+  *     <LI>If {@code <I>identifier</I>} of a {@code LIKE} or 
+  *         {@code NOT LIKE} operation is {@code NULL}, the value 
   *         of the operation is unknown.
   *   </UL>
-  *   <LI><CODE><I>identifier</I> IS NULL</CODE> (comparison operator that tests
+  *   <LI>{@code <I>identifier</I> IS NULL} (comparison operator that tests
   *       for a null header field value or a missing property value)
   *   <UL>
-  *     <LI><CODE>"prop_name&nbsp;IS&nbsp;NULL"</CODE>
+  *     <LI>{@code "prop_name&nbsp;IS&nbsp;NULL"}
   *   </UL>
-  *   <LI><CODE><I>identifier</I> IS NOT NULL</CODE> (comparison operator that
+  *   <LI>{@code <I>identifier</I> IS NOT NULL} (comparison operator that
   *       tests for the existence of a non-null header field value or a property
   *       value)
   *   <UL>
-  *     <LI><CODE>"prop_name&nbsp;IS&nbsp;NOT&nbsp;NULL"</CODE>
+  *     <LI>{@code "prop_name&nbsp;IS&nbsp;NOT&nbsp;NULL"}
   *   </UL>
   *
   * <P>JMS providers are required to verify the syntactic correctness of a 
   *    message selector at the time it is presented. A method that provides a 
-  *  syntactically incorrect selector must result in a <CODE>JMSException</CODE>.
+  *  syntactically incorrect selector must result in a {@code JMSException}.
   * JMS providers may also optionally provide some semantic checking at the time
   * the selector is presented. Not all semantic checking can be performed at
   * the time a message selector is presented, because property types are not known.
@@ -480,22 +480,22 @@ import java.util.Properties;
   *
   * <H4>Null Values</H4>
   *
-  * <P>As noted above, property values may be <CODE>NULL</CODE>. The evaluation 
-  * of selector expressions containing <CODE>NULL</CODE> values is defined by 
-  * SQL92 <CODE>NULL</CODE> semantics. A brief description of these semantics 
+  * <P>As noted above, property values may be {@code NULL}. The evaluation 
+  * of selector expressions containing {@code NULL} values is defined by 
+  * SQL92 {@code NULL} semantics. A brief description of these semantics 
   * is provided here.
   *
-  * <P>SQL treats a <CODE>NULL</CODE> value as unknown. Comparison or arithmetic
+  * <P>SQL treats a {@code NULL} value as unknown. Comparison or arithmetic
   * with an unknown value always yields an unknown value.
   *
-  * <P>The <CODE>IS NULL</CODE> and <CODE>IS NOT NULL</CODE> operators convert 
-  * an unknown value into the respective <CODE>TRUE</CODE> and 
-  * <CODE>FALSE</CODE> values.
+  * <P>The {@code IS NULL} and {@code IS NOT NULL} operators convert 
+  * an unknown value into the respective {@code TRUE} and 
+  * {@code FALSE} values.
   *
   * <P>The boolean operators use three-valued logic as defined by the 
   * following tables:
   *
-  * <P><B>The definition of the <CODE>AND</CODE> operator</B>
+  * <P><B>The definition of the {@code AND} operator</B>
   *
   * <PRE>
   * | AND  |   T   |   F   |   U
@@ -506,7 +506,7 @@ import java.util.Properties;
   * +------+-------+-------+-------
   * </PRE>
   *
-  * <P><B>The definition of the <CODE>OR</CODE> operator</B>
+  * <P><B>The definition of the {@code OR} operator</B>
   *
   * <PRE>
   * | OR   |   T   |   F   |   U
@@ -517,7 +517,7 @@ import java.util.Properties;
   * +------+-------+-------+------- 
   * </PRE> 
   *
-  * <P><B>The definition of the <CODE>NOT</CODE> operator</B>
+  * <P><B>The definition of the {@code NOT} operator</B>
   *
   * <PRE>
   * | NOT
@@ -530,15 +530,15 @@ import java.util.Properties;
   *
   * <H4>Special Notes</H4>
   *
-  * <P>When used in a message selector, the <CODE>JMSDeliveryMode</CODE> header 
-  *    field is treated as having the values <CODE>'PERSISTENT'</CODE> and 
-  *    <CODE>'NON_PERSISTENT'</CODE>.
+  * <P>When used in a message selector, the {@code JMSDeliveryMode} header 
+  *    field is treated as having the values {@code 'PERSISTENT'} and 
+  *    {@code 'NON_PERSISTENT'}.
   *
-  * <P>Date and time values should use the standard <CODE>long</CODE> 
+  * <P>Date and time values should use the standard {@code long} 
   *    millisecond value. When a date or time literal is included in a message 
   *    selector, it should be an integer literal for a millisecond value. The 
   *    standard way to produce millisecond values is to use 
-  *    <CODE>java.util.Calendar</CODE>.
+  *    {@code java.util.Calendar}.
   *
   * <P>Although SQL supports fixed decimal comparison and arithmetic, JMS 
   *    message selectors do not. This is the reason for restricting exact 
@@ -563,7 +563,7 @@ import java.util.Properties;
 
 public interface Message {
 
-    /** The message producer's default delivery mode is <CODE>PERSISTENT</CODE>.
+    /** The message producer's default delivery mode is {@code PERSISTENT}.
      *
      *  @see DeliveryMode#PERSISTENT
      */
@@ -586,14 +586,14 @@ public interface Message {
 
     /** Gets the message ID.
       *
-      * <P>The <CODE>JMSMessageID</CODE> header field contains a value that 
+      * <P>The {@code JMSMessageID} header field contains a value that 
       * uniquely identifies each message sent by a provider.
       *  
-      * <P>When a message is sent, <CODE>JMSMessageID</CODE> can be ignored. 
-      * When the <CODE>send</CODE> or <CODE>publish</CODE> method returns, it 
+      * <P>When a message is sent, {@code JMSMessageID} can be ignored. 
+      * When the {@code send} or {@code publish} method returns, it 
       * contains a provider-assigned value.
       *
-      * <P>A <CODE>JMSMessageID</CODE> is a <CODE>String</CODE> value that 
+      * <P>A {@code JMSMessageID} is a {@code String} value that 
       * should function as a 
       * unique key for identifying messages in a historical repository. 
       * The exact scope of uniqueness is provider-defined. It should at 
@@ -601,8 +601,8 @@ public interface Message {
       * provider, where an installation is some connected set of message 
       * routers.
       *
-      * <P>All <CODE>JMSMessageID</CODE> values must start with the prefix 
-      * <CODE>'ID:'</CODE>. 
+      * <P>All {@code JMSMessageID} values must start with the prefix 
+      * {@code 'ID:'}. 
       * Uniqueness of message ID values across different providers is 
       * not required.
       *
@@ -610,7 +610,7 @@ public interface Message {
       * message's size, some JMS providers may be able to optimize message
       * overhead if they are given a hint that the message ID is not used by
       * an application. By calling the 
-      * <CODE>MessageProducer.setDisableMessageID</CODE> method, a JMS client 
+      * {@code MessageProducer.setDisableMessageID} method, a JMS client 
       * enables this potential optimization for all messages sent by that 
       * message producer. If the JMS provider accepts this
       * hint, these messages must have the message ID set to null; if the 
@@ -651,14 +651,14 @@ public interface Message {
 
     /** Gets the message timestamp.
       *  
-      * <P>The <CODE>JMSTimestamp</CODE> header field contains the time a 
+      * <P>The {@code JMSTimestamp} header field contains the time a 
       * message was 
       * handed off to a provider to be sent. It is not the time the 
       * message was actually transmitted, because the actual send may occur 
       * later due to transactions or other client-side queueing of messages.
       *
-      * <P>When a message is sent, <CODE>JMSTimestamp</CODE> is ignored. When 
-      * the <CODE>send</CODE> or <CODE>publish</CODE>
+      * <P>When a message is sent, {@code JMSTimestamp} is ignored. When 
+      * the {@code send} or {@code publish}
       * method returns, it contains a time value somewhere in the interval 
       * between the call and the return. The value is in the format of a normal 
       * millis time value in the Java programming language.
@@ -667,7 +667,7 @@ public interface Message {
       * message's size, some JMS providers may be able to optimize message 
       * overhead if they are given a hint that the timestamp is not used by an 
       * application. By calling the
-      * <CODE>MessageProducer.setDisableMessageTimestamp</CODE> method, a JMS 
+      * {@code MessageProducer.setDisableMessageTimestamp} method, a JMS 
       * client enables this potential optimization for all messages sent by 
       * that message producer. If the JMS provider accepts this
       * hint, these messages must have the timestamp set to zero; if the 
@@ -709,8 +709,8 @@ public interface Message {
 
     /** Gets the correlation ID as an array of bytes for the message.
       *  
-      * <P>The use of a <CODE>byte[]</CODE> value for 
-      * <CODE>JMSCorrelationID</CODE> is non-portable.
+      * <P>The use of a {@code byte[]} value for 
+      * {@code JMSCorrelationID} is non-portable.
       *
       * @return the correlation ID of a message as an array of bytes
       *
@@ -732,15 +732,15 @@ public interface Message {
       * future modifications to the array will not alter this message header.
       *  
       * <P>If a provider supports the native concept of correlation ID, a 
-      * JMS client may need to assign specific <CODE>JMSCorrelationID</CODE> 
+      * JMS client may need to assign specific {@code JMSCorrelationID} 
       * values to match those expected by native messaging clients. 
       * JMS providers without native correlation ID values are not required to 
       * support this method and its corresponding get method; their 
       * implementation may throw a
-      * <CODE>java.lang.UnsupportedOperationException</CODE>. 
+      * {@code java.lang.UnsupportedOperationException}. 
       *
-      * <P>The use of a <CODE>byte[]</CODE> value for 
-      * <CODE>JMSCorrelationID</CODE> is non-portable.
+      * <P>The use of a {@code byte[]} value for 
+      * {@code JMSCorrelationID} is non-portable.
       *
       * @param correlationID the correlation ID value as an array of bytes
       *  
@@ -758,35 +758,35 @@ public interface Message {
 
     /** Sets the correlation ID for the message.
       *  
-      * <P>A client can use the <CODE>JMSCorrelationID</CODE> header field to 
+      * <P>A client can use the {@code JMSCorrelationID} header field to 
       * link one message with another. A typical use is to link a response 
       * message with its request message.
       *  
-      * <P><CODE>JMSCorrelationID</CODE> can hold one of the following:
+      * <P>{@code JMSCorrelationID} can hold one of the following:
       *    <UL>
       *      <LI>A provider-specific message ID
-      *      <LI>An application-specific <CODE>String</CODE>
-      *      <LI>A provider-native <CODE>byte[]</CODE> value
+      *      <LI>An application-specific {@code String}
+      *      <LI>A provider-native {@code byte[]} value
       *    </UL>
       *  
       * <P>Since each message sent by a JMS provider is assigned a message ID
       * value, it is convenient to link messages via message ID. All message ID
-      * values must start with the <CODE>'ID:'</CODE> prefix.
+      * values must start with the {@code 'ID:'} prefix.
       *  
       * <P>In some cases, an application (made up of several clients) needs to
       * use an application-specific value for linking messages. For instance,
-      * an application may use <CODE>JMSCorrelationID</CODE> to hold a value 
+      * an application may use {@code JMSCorrelationID} to hold a value 
       * referencing some external information. Application-specified values 
-      * must not start with the <CODE>'ID:'</CODE> prefix; this is reserved for 
+      * must not start with the {@code 'ID:'} prefix; this is reserved for 
       * provider-generated message ID values.
       *  
       * <P>If a provider supports the native concept of correlation ID, a JMS
-      * client may need to assign specific <CODE>JMSCorrelationID</CODE> values 
+      * client may need to assign specific {@code JMSCorrelationID} values 
       * to match those expected by clients that do not use the JMS API. A 
-      * <CODE>byte[]</CODE> value is used for this
+      * {@code byte[]} value is used for this
       * purpose. JMS providers without native correlation ID values are not
-      * required to support <CODE>byte[]</CODE> values. The use of a 
-      * <CODE>byte[]</CODE> value for <CODE>JMSCorrelationID</CODE> is 
+      * required to support {@code byte[]} values. The use of a 
+      * {@code byte[]} value for {@code JMSCorrelationID} is 
       * non-portable.
       *  
       * @param correlationID the message ID of a message being referred to
@@ -807,9 +807,9 @@ public interface Message {
       *  
       * <P>This method is used to return correlation ID values that are 
       * either provider-specific message IDs or application-specific 
-      * <CODE>String</CODE> values.
+      * {@code String} values.
       *
-      * @return the correlation ID of a message as a <CODE>String</CODE>
+      * @return the correlation ID of a message as a {@code String}
       *
       * @exception JMSException if the JMS provider fails to get the correlation
       *                         ID due to some internal error.
@@ -823,14 +823,14 @@ public interface Message {
     getJMSCorrelationID() throws JMSException;
 
 
-    /** Gets the <CODE>Destination</CODE> object to which a reply to this 
+    /** Gets the {@code Destination} object to which a reply to this 
       * message should be sent.
       *  
-      * @return <CODE>Destination</CODE> to which to send a response to this 
+      * @return {@code Destination} to which to send a response to this 
       *         message
       *
       * @exception JMSException if the JMS provider fails to get the  
-      *                         <CODE>JMSReplyTo</CODE> destination due to some 
+      *                         {@code JMSReplyTo} destination due to some 
       *                         internal error.
       *
       * @see javax.jms.Message#setJMSReplyTo(Destination)
@@ -840,33 +840,33 @@ public interface Message {
     getJMSReplyTo() throws JMSException;
 
 
-    /** Sets the <CODE>Destination</CODE> object to which a reply to this 
+    /** Sets the {@code Destination} object to which a reply to this 
       * message should be sent.
       *  
-      * <P>The <CODE>JMSReplyTo</CODE> header field contains the destination 
+      * <P>The {@code JMSReplyTo} header field contains the destination 
       * where a reply 
       * to the current message should be sent. If it is null, no reply is 
-      * expected. The destination may be either a <CODE>Queue</CODE> object or
-      * a <CODE>Topic</CODE> object.
+      * expected. The destination may be either a {@code Queue} object or
+      * a {@code Topic} object.
       *
-      * <P>Messages sent with a null <CODE>JMSReplyTo</CODE> value may be a 
+      * <P>Messages sent with a null {@code JMSReplyTo} value may be a 
       * notification of some event, or they may just be some data the sender 
       * thinks is of interest.
       *
-      * <P>Messages with a <CODE>JMSReplyTo</CODE> value typically expect a 
+      * <P>Messages with a {@code JMSReplyTo} value typically expect a 
       * response. A response is optional; it is up to the client to decide.  
       * These messages are called requests. A message sent in response to a 
       * request is called a reply.
       *
       * <P>In some cases a client may wish to match a request it sent earlier 
       * with a reply it has just received. The client can use the 
-      * <CODE>JMSCorrelationID</CODE> header field for this purpose.
+      * {@code JMSCorrelationID} header field for this purpose.
       *
-      * @param replyTo <CODE>Destination</CODE> to which to send a response to 
+      * @param replyTo {@code Destination} to which to send a response to 
       *                this message
       *
       * @exception JMSException if the JMS provider fails to set the  
-      *                         <CODE>JMSReplyTo</CODE> destination due to some 
+      *                         {@code JMSReplyTo} destination due to some 
       *                         internal error.
       *
       * @see javax.jms.Message#getJMSReplyTo()
@@ -876,16 +876,16 @@ public interface Message {
     setJMSReplyTo(Destination replyTo) throws JMSException;
 
 
-    /** Gets the <CODE>Destination</CODE> object for this message.
+    /** Gets the {@code Destination} object for this message.
       *  
-      * <P>The <CODE>JMSDestination</CODE> header field contains the 
+      * <P>The {@code JMSDestination} header field contains the 
       * destination to which the message is being sent.
       *  
       * <P>When a message is sent, this field is ignored. After completion
-      * of the <CODE>send</CODE> or <CODE>publish</CODE> method, the field 
+      * of the {@code send} or {@code publish} method, the field 
       * holds the destination specified by the method.
       *  
-      * <P>When a message is received, its <CODE>JMSDestination</CODE> value 
+      * <P>When a message is received, its {@code JMSDestination} value 
       * must be equivalent to the value assigned when it was sent.
       *
       * @return the destination of this message
@@ -900,7 +900,7 @@ public interface Message {
     getJMSDestination() throws JMSException;
 
 
-    /** Sets the <CODE>Destination</CODE> object for this message.
+    /** Sets the {@code Destination} object for this message.
       *  
      * <P>This method is for use by JMS providers only to set this field 
      * when a message is sent. This message cannot be used by clients 
@@ -920,7 +920,7 @@ public interface Message {
     setJMSDestination(Destination destination) throws JMSException;
 
 
-    /** Gets the <CODE>DeliveryMode</CODE> value specified for this message.
+    /** Gets the {@code DeliveryMode} value specified for this message.
       *  
       * @return the delivery mode for this message
       *  
@@ -935,7 +935,7 @@ public interface Message {
     getJMSDeliveryMode() throws JMSException;
  
  
-    /** Sets the <CODE>DeliveryMode</CODE> value for this message.
+    /** Sets the {@code DeliveryMode} value for this message.
       *  
      * <P>This method is for use by JMS providers only to set this field 
      * when a message is sent. This message cannot be used by clients 
@@ -958,7 +958,7 @@ public interface Message {
 
     /** Gets an indication of whether this message is being redelivered.
       *
-      * <P>If a client receives a message with the <CODE>JMSRedelivered</CODE> 
+      * <P>If a client receives a message with the {@code JMSRedelivered} 
       * field set,
       * it is likely, but not guaranteed, that this message was delivered
       * earlier but that its receipt was not acknowledged
@@ -1015,7 +1015,7 @@ public interface Message {
     /** Sets the message type.
       *
       * <P>Some JMS providers use a message repository that contains the 
-      * definitions of messages sent by applications. The <CODE>JMSType</CODE> 
+      * definitions of messages sent by applications. The {@code JMSType} 
       * header field may reference a message's definition in the provider's
       * repository.
       *
@@ -1025,12 +1025,12 @@ public interface Message {
       * <P>Some messaging systems require that a message type definition for 
       * each application message be created and that each message specify its 
       * type. In order to work with such JMS providers, JMS clients should 
-      * assign a value to <CODE>JMSType</CODE>, whether the application makes 
+      * assign a value to {@code JMSType}, whether the application makes 
       * use of it or not. This ensures that the field is properly set for those 
       * providers that require it.
       *
       * <P>To ensure portability, JMS clients should use symbolic values for 
-      * <CODE>JMSType</CODE> that can be configured at installation time to the 
+      * {@code JMSType} that can be configured at installation time to the 
       * values defined in the current provider's message repository. If string 
       * literals are used, they may not be valid type names for some JMS 
       * providers.
@@ -1047,16 +1047,15 @@ public interface Message {
     setJMSType(String type) throws JMSException;
 
 
-    /** Gets the message's expiration value.
+    /** Gets the message's expiration time.
       *  
-      * <P>When a message is sent, the <CODE>JMSExpiration</CODE> header field 
-      * is left unassigned. After completion of the <CODE>send</CODE> or 
-      * <CODE>publish</CODE> method, it holds the expiration time of the
-      * message. This is the sum of the time-to-live value specified by the
-      * client and the GMT at the time of the <CODE>send</CODE> or 
-      * <CODE>publish</CODE>.
+      * <P>When a message is sent, the {@code JMSExpiration} header field 
+      * is left unassigned. After completion of the {@code send} or 
+      * {@code publish} method, it holds the expiration time of the
+      * message. This is the the difference, measured in milliseconds, 
+      * between the expiration time and midnight, January 1, 1970 UTC.
       *
-      * <P>If the time-to-live is specified as zero, <CODE>JMSExpiration</CODE> 
+      * <P>If the time-to-live is specified as zero, {@code JMSExpiration} 
       * is set to zero to indicate that the message does not expire.
       *
       * <P>When a message's expiration time is reached, a provider should
@@ -1066,9 +1065,7 @@ public interface Message {
       * <P>Clients should not receive messages that have expired; however,
       * the JMS API does not guarantee that this will not happen.
       *
-      * @return the time the message expires, which is the sum of the
-      * time-to-live value specified by the client and the GMT at the
-      * time of the send
+      * @return the message's expiration time value
       *  
       * @exception JMSException if the JMS provider fails to get the message 
       *                         expiration due to some internal error.
@@ -1103,12 +1100,11 @@ public interface Message {
 	 * Gets the message's delivery time value.
 	 * 
 	 * <P>
-	 * When a message is sent, the <CODE>JMSDeliveryTime</CODE> header field is
-	 * left unassigned. After completion of the <CODE>send</CODE> or
-	 * <CODE>publish</CODE> method, it holds the delivery time of the message.
-	 * This is the sum of the <code>deliveryDelay</code> value specified by the
-	 * client and the GMT at the time of the <CODE>send</CODE> or
-     * <CODE>publish</CODE>.
+	 * When a message is sent, the {@code JMSDeliveryTime} header field is
+	 * left unassigned. After completion of the {@code send} or
+	 * {@code publish} method, it holds the delivery time of the message.
+	 * This is the the difference, measured in milliseconds, 
+     * between the delivery time and midnight, January 1, 1970 UTC.
 	 * <p>
 	 * A message's delivery time is the earliest time when a JMS provider may
 	 * deliver the message to a consumer. The provider must not deliver messages
@@ -1119,11 +1115,11 @@ public interface Message {
 	 * @exception JMSException
 	 *                if the JMS provider fails to get the delivery time due to
 	 *                some internal error.
-     * 
-     * @see javax.jms.Message#setJMSDeliveryTime(long)
-     * 
-     * @since 2.0
-     */ 
+	 * 
+	 * @see javax.jms.Message#setJMSDeliveryTime(long)
+	 * 
+	 * @since 2.0
+	 */ 
    long getJMSDeliveryTime() throws JMSException;
 
    	/**
@@ -1143,9 +1139,9 @@ public interface Message {
 	 *                some internal error.
 	 * 
 	 * @see javax.jms.Message#getJMSDeliveryTime()
-     * 
-     * @since 2.0
-     */ 
+	 * 
+	 * @since 2.0
+	 */ 
    void setJMSDeliveryTime(long deliveryTime) throws JMSException;    
 
 
@@ -1220,12 +1216,12 @@ public interface Message {
     propertyExists(String name) throws JMSException;
 
 
-    /** Returns the value of the <CODE>boolean</CODE> property with the  
+    /** Returns the value of the {@code boolean} property with the  
       * specified name.
       *  
-      * @param name the name of the <CODE>boolean</CODE> property
+      * @param name the name of the {@code boolean} property
       *  
-      * @return the <CODE>boolean</CODE> property value for the specified name
+      * @return the {@code boolean} property value for the specified name
       *  
       * @exception JMSException if the JMS provider fails to get the property
       *                         value due to some internal error.
@@ -1236,12 +1232,12 @@ public interface Message {
     getBooleanProperty(String name) throws JMSException;
 
 
-    /** Returns the value of the <CODE>byte</CODE> property with the specified 
+    /** Returns the value of the {@code byte} property with the specified 
       * name.
       *  
-      * @param name the name of the <CODE>byte</CODE> property
+      * @param name the name of the {@code byte} property
       *  
-      * @return the <CODE>byte</CODE> property value for the specified name
+      * @return the {@code byte} property value for the specified name
       *  
       * @exception JMSException if the JMS provider fails to get the property
       *                         value due to some internal error.
@@ -1252,12 +1248,12 @@ public interface Message {
     getByteProperty(String name) throws JMSException;
 
 
-    /** Returns the value of the <CODE>short</CODE> property with the specified 
+    /** Returns the value of the {@code short} property with the specified 
       * name.
       *
-      * @param name the name of the <CODE>short</CODE> property
+      * @param name the name of the {@code short} property
       *
-      * @return the <CODE>short</CODE> property value for the specified name
+      * @return the {@code short} property value for the specified name
       *
       * @exception JMSException if the JMS provider fails to get the property
       *                         value due to some internal error.
@@ -1268,12 +1264,12 @@ public interface Message {
     getShortProperty(String name) throws JMSException;
  
  
-    /** Returns the value of the <CODE>int</CODE> property with the specified 
+    /** Returns the value of the {@code int} property with the specified 
       * name.
       *  
-      * @param name the name of the <CODE>int</CODE> property
+      * @param name the name of the {@code int} property
       *  
-      * @return the <CODE>int</CODE> property value for the specified name
+      * @return the {@code int} property value for the specified name
       *  
       * @exception JMSException if the JMS provider fails to get the property
       *                         value due to some internal error.
@@ -1284,12 +1280,12 @@ public interface Message {
     getIntProperty(String name) throws JMSException;
 
 
-    /** Returns the value of the <CODE>long</CODE> property with the specified 
+    /** Returns the value of the {@code long} property with the specified 
       * name.
       *  
-      * @param name the name of the <CODE>long</CODE> property
+      * @param name the name of the {@code long} property
       *  
-      * @return the <CODE>long</CODE> property value for the specified name
+      * @return the {@code long} property value for the specified name
       *  
       * @exception JMSException if the JMS provider fails to get the property
       *                         value due to some internal error.
@@ -1300,12 +1296,12 @@ public interface Message {
     getLongProperty(String name) throws JMSException;
 
 
-    /** Returns the value of the <CODE>float</CODE> property with the specified 
+    /** Returns the value of the {@code float} property with the specified 
       * name.
       *  
-      * @param name the name of the <CODE>float</CODE> property
+      * @param name the name of the {@code float} property
       *  
-      * @return the <CODE>float</CODE> property value for the specified name
+      * @return the {@code float} property value for the specified name
       *  
       * @exception JMSException if the JMS provider fails to get the property
       *                         value due to some internal error.
@@ -1316,12 +1312,12 @@ public interface Message {
     getFloatProperty(String name) throws JMSException;
 
 
-    /** Returns the value of the <CODE>double</CODE> property with the specified
+    /** Returns the value of the {@code double} property with the specified
       * name.
       *  
-      * @param name the name of the <CODE>double</CODE> property
+      * @param name the name of the {@code double} property
       *  
-      * @return the <CODE>double</CODE> property value for the specified name
+      * @return the {@code double} property value for the specified name
       *  
       * @exception JMSException if the JMS provider fails to get the property
       *                         value due to some internal error.
@@ -1332,12 +1328,12 @@ public interface Message {
     getDoubleProperty(String name) throws JMSException;
 
 
-    /** Returns the value of the <CODE>String</CODE> property with the specified
+    /** Returns the value of the {@code String} property with the specified
       * name.
       *  
-      * @param name the name of the <CODE>String</CODE> property
+      * @param name the name of the {@code String} property
       *  
-      * @return the <CODE>String</CODE> property value for the specified name;
+      * @return the {@code String} property value for the specified name;
       * if there is no property by this name, a null value is returned
       *  
       * @exception JMSException if the JMS provider fails to get the property
@@ -1353,14 +1349,14 @@ public interface Message {
       *  
       * <P>This method can be used to return, in objectified format,
       * an object that has been stored as a property in the message with the 
-      * equivalent <CODE>setObjectProperty</CODE> method call, or its equivalent
-      * primitive <CODE>set<I>type</I>Property</CODE> method.
+      * equivalent {@code setObjectProperty} method call, or its equivalent
+      * primitive {@code set<I>type</I>Property} method.
       *  
       * @param name the name of the Java object property
       *  
       * @return the Java object property value with the specified name, in 
       * objectified format (for example, if the property was set as an 
-      * <CODE>int</CODE>, an <CODE>Integer</CODE> is 
+      * {@code int}, an {@code Integer} is 
       * returned); if there is no property by this name, a null value 
       * is returned
       *  
@@ -1372,7 +1368,7 @@ public interface Message {
     getObjectProperty(String name) throws JMSException;
 
 
-    /** Returns an <CODE>Enumeration</CODE> of all the property names.
+    /** Returns an {@code Enumeration} of all the property names.
       *
       * <P>Note that JMS standard header fields are not considered
       * properties and are not returned in this enumeration.
@@ -1387,11 +1383,11 @@ public interface Message {
     getPropertyNames() throws JMSException;
 
 
-    /** Sets a <CODE>boolean</CODE> property value with the specified name into 
+    /** Sets a {@code boolean} property value with the specified name into 
       * the message.
       *
-      * @param name the name of the <CODE>boolean</CODE> property
-      * @param value the <CODE>boolean</CODE> property value to set
+      * @param name the name of the {@code boolean} property
+      * @param value the {@code boolean} property value to set
       *  
       * @exception JMSException if the JMS provider fails to set the property
       *                          due to some internal error.
@@ -1405,11 +1401,11 @@ public interface Message {
                         throws JMSException;
 
 
-    /** Sets a <CODE>byte</CODE> property value with the specified name into 
+    /** Sets a {@code byte} property value with the specified name into 
       * the message.
       *  
-      * @param name the name of the <CODE>byte</CODE> property
-      * @param value the <CODE>byte</CODE> property value to set
+      * @param name the name of the {@code byte} property
+      * @param value the {@code byte} property value to set
       *  
       * @exception JMSException if the JMS provider fails to set the property
       *                          due to some internal error.
@@ -1423,11 +1419,11 @@ public interface Message {
                         throws JMSException;
 
 
-    /** Sets a <CODE>short</CODE> property value with the specified name into
+    /** Sets a {@code short} property value with the specified name into
       * the message.
       *  
-      * @param name the name of the <CODE>short</CODE> property
-      * @param value the <CODE>short</CODE> property value to set
+      * @param name the name of the {@code short} property
+      * @param value the {@code short} property value to set
       *  
       * @exception JMSException if the JMS provider fails to set the property
       *                          due to some internal error.
@@ -1441,11 +1437,11 @@ public interface Message {
                         throws JMSException;
 
 
-    /** Sets an <CODE>int</CODE> property value with the specified name into
+    /** Sets an {@code int} property value with the specified name into
       * the message.
       *  
-      * @param name the name of the <CODE>int</CODE> property
-      * @param value the <CODE>int</CODE> property value to set
+      * @param name the name of the {@code int} property
+      * @param value the {@code int} property value to set
       *  
       * @exception JMSException if the JMS provider fails to set the property
       *                          due to some internal error.
@@ -1459,11 +1455,11 @@ public interface Message {
                         throws JMSException;
 
 
-    /** Sets a <CODE>long</CODE> property value with the specified name into 
+    /** Sets a {@code long} property value with the specified name into 
       * the message.
       *  
-      * @param name the name of the <CODE>long</CODE> property
-      * @param value the <CODE>long</CODE> property value to set
+      * @param name the name of the {@code long} property
+      * @param value the {@code long} property value to set
       *  
       * @exception JMSException if the JMS provider fails to set the property
       *                          due to some internal error.
@@ -1477,11 +1473,11 @@ public interface Message {
                         throws JMSException;
 
 
-    /** Sets a <CODE>float</CODE> property value with the specified name into 
+    /** Sets a {@code float} property value with the specified name into 
       * the message.
       *  
-      * @param name the name of the <CODE>float</CODE> property
-      * @param value the <CODE>float</CODE> property value to set
+      * @param name the name of the {@code float} property
+      * @param value the {@code float} property value to set
       *  
       * @exception JMSException if the JMS provider fails to set the property
       *                          due to some internal error.
@@ -1495,11 +1491,11 @@ public interface Message {
                         throws JMSException;
 
 
-    /** Sets a <CODE>double</CODE> property value with the specified name into 
+    /** Sets a {@code double} property value with the specified name into 
       * the message.
       *  
-      * @param name the name of the <CODE>double</CODE> property
-      * @param value the <CODE>double</CODE> property value to set
+      * @param name the name of the {@code double} property
+      * @param value the {@code double} property value to set
       *  
       * @exception JMSException if the JMS provider fails to set the property
       *                          due to some internal error.
@@ -1513,11 +1509,11 @@ public interface Message {
                         throws JMSException;
 
 
-    /** Sets a <CODE>String</CODE> property value with the specified name into 
+    /** Sets a {@code String} property value with the specified name into 
       * the message.
       *
-      * @param name the name of the <CODE>String</CODE> property
-      * @param value the <CODE>String</CODE> property value to set
+      * @param name the name of the {@code String} property
+      * @param value the {@code String} property value to set
       *  
       * @exception JMSException if the JMS provider fails to set the property
       *                          due to some internal error.
@@ -1535,8 +1531,8 @@ public interface Message {
       * message.
       *  
       * <P>Note that this method works only for the objectified primitive
-      * object types (<CODE>Integer</CODE>, <CODE>Double</CODE>, 
-      * <CODE>Long</CODE> ...) and <CODE>String</CODE> objects.
+      * object types ({@code Integer}, {@code Double}, 
+      * {@code Long} ...) and {@code String} objects.
       *  
       * @param name the name of the Java object property
       * @param value the Java object property value to set
@@ -1557,13 +1553,13 @@ public interface Message {
     /** Acknowledges all consumed messages of the session of this consumed 
       * message.
       *  
-      * <P>All consumed JMS messages support the <CODE>acknowledge</CODE> 
+      * <P>All consumed JMS messages support the {@code acknowledge} 
       * method for use when a client has specified that its JMS session's 
       * consumed messages are to be explicitly acknowledged.  By invoking 
-      * <CODE>acknowledge</CODE> on a consumed message, a client acknowledges 
+      * {@code acknowledge} on a consumed message, a client acknowledges 
       * all messages consumed by the session that the message was delivered to.
       * 
-      * <P>Calls to <CODE>acknowledge</CODE> are ignored for both transacted 
+      * <P>Calls to {@code acknowledge} are ignored for both transacted 
       * sessions and sessions specified to use implicit acknowledgement modes.
       *
       * <P>A client may individually acknowledge each message as it is consumed,
@@ -1599,4 +1595,5 @@ public interface Message {
 
     void
     clearBody() throws JMSException;
+    
 }

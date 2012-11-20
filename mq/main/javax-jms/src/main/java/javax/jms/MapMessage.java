@@ -42,33 +42,33 @@ package javax.jms;
 
 import java.util.Enumeration;
 
-/** A <CODE>MapMessage</CODE> object is used to send a set of name-value pairs.
-  * The names are <CODE>String</CODE> objects, and the values are primitive 
+/** A {@code MapMessage} object is used to send a set of name-value pairs.
+  * The names are {@code String} objects, and the values are primitive 
   * data types in the Java programming language. The names must have a value that
   * is not null, and not an empty string. The entries can be accessed 
   * sequentially or randomly by name. The order of the entries is undefined. 
-  * <CODE>MapMessage</CODE> inherits from the <CODE>Message</CODE> interface
+  * {@code MapMessage} inherits from the {@code Message} interface
   * and adds a message body that contains a Map.
   *
   * <P>The primitive types can be read or written explicitly using methods
   * for each type. They may also be read or written generically as objects.
-  * For instance, a call to <CODE>MapMessage.setInt("foo", 6)</CODE> is 
-  * equivalent to <CODE>MapMessage.setObject("foo", new Integer(6))</CODE>.
+  * For instance, a call to {@code MapMessage.setInt("foo", 6)} is 
+  * equivalent to {@code MapMessage.setObject("foo", new Integer(6))}.
   * Both forms are provided, because the explicit form is convenient for
   * static programming, and the object form is needed when types are not known
   * at compile time.
   *
-  * <P>When a client receives a <CODE>MapMessage</CODE>, it is in read-only 
+  * <P>When a client receives a {@code MapMessage}, it is in read-only 
   * mode. If a client attempts to write to the message at this point, a 
-  * <CODE>MessageNotWriteableException</CODE> is thrown. If 
-  * <CODE>clearBody</CODE> is called, the message can now be both read from and 
+  * {@code MessageNotWriteableException} is thrown. If 
+  * {@code clearBody} is called, the message can now be both read from and 
   * written to.
   *
-  * <P><CODE>MapMessage</CODE> objects support the following conversion table. 
+  * <P>{@code MapMessage} objects support the following conversion table. 
   * The marked cases must be supported. The unmarked cases must throw a 
-  * <CODE>JMSException</CODE>. The <CODE>String</CODE>-to-primitive conversions 
-  * may throw a runtime exception if the primitive's <CODE>valueOf()</CODE> 
-  * method does not accept it as a valid <CODE>String</CODE> representation of 
+  * {@code JMSException}. The {@code String}-to-primitive conversions 
+  * may throw a runtime exception if the primitive's {@code valueOf()} 
+  * method does not accept it as a valid {@code String} representation of 
   * the primitive.
   *
   * <P>A value written as the row type can be read as the column type.
@@ -90,10 +90,10 @@ import java.util.Enumeration;
   * </PRE>
   *
   * <P>Attempting to read a null value as a primitive type must be treated
-  * as calling the primitive's corresponding <code>valueOf(String)</code> 
-  * conversion method with a null value. Since <code>char</code> does not 
-  * support a <code>String</code> conversion, attempting to read a null value 
-  * as a <code>char</code> must throw a <code>NullPointerException</code>.
+  * as calling the primitive's corresponding {@code valueOf(String)} 
+  * conversion method with a null value. Since {@code char} does not 
+  * support a {@code String} conversion, attempting to read a null value 
+  * as a {@code char} must throw a {@code NullPointerException}.
   *
   * @version     1.1 February 2, 002
   * @author      Mark Hapner
@@ -110,11 +110,11 @@ import java.util.Enumeration;
 public interface MapMessage extends Message { 
 
 
-    /** Returns the <CODE>boolean</CODE> value with the specified name.
+    /** Returns the {@code boolean} value with the specified name.
       *
-      * @param name the name of the <CODE>boolean</CODE>
+      * @param name the name of the {@code boolean}
       *
-      * @return the <CODE>boolean</CODE> value with the specified name
+      * @return the {@code boolean} value with the specified name
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -125,11 +125,11 @@ public interface MapMessage extends Message {
     getBoolean(String name) throws JMSException;
 
 
-    /** Returns the <CODE>byte</CODE> value with the specified name.
+    /** Returns the {@code byte} value with the specified name.
       *
-      * @param name the name of the <CODE>byte</CODE>
+      * @param name the name of the {@code byte}
       *
-      * @return the <CODE>byte</CODE> value with the specified name
+      * @return the {@code byte} value with the specified name
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -140,11 +140,11 @@ public interface MapMessage extends Message {
     getByte(String name) throws JMSException;
 
 
-    /** Returns the <CODE>short</CODE> value with the specified name.
+    /** Returns the {@code short} value with the specified name.
       *
-      * @param name the name of the <CODE>short</CODE>
+      * @param name the name of the {@code short}
       *
-      * @return the <CODE>short</CODE> value with the specified name
+      * @return the {@code short} value with the specified name
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -170,11 +170,11 @@ public interface MapMessage extends Message {
     getChar(String name) throws JMSException;
 
 
-    /** Returns the <CODE>int</CODE> value with the specified name.
+    /** Returns the {@code int} value with the specified name.
       *
-      * @param name the name of the <CODE>int</CODE>
+      * @param name the name of the {@code int}
       *
-      * @return the <CODE>int</CODE> value with the specified name
+      * @return the {@code int} value with the specified name
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -185,11 +185,11 @@ public interface MapMessage extends Message {
     getInt(String name) throws JMSException;
 
 
-    /** Returns the <CODE>long</CODE> value with the specified name.
+    /** Returns the {@code long} value with the specified name.
       *
-      * @param name the name of the <CODE>long</CODE>
+      * @param name the name of the {@code long}
       *
-      * @return the <CODE>long</CODE> value with the specified name
+      * @return the {@code long} value with the specified name
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -200,11 +200,11 @@ public interface MapMessage extends Message {
     getLong(String name) throws JMSException;
 
 
-    /** Returns the <CODE>float</CODE> value with the specified name.
+    /** Returns the {@code float} value with the specified name.
       *
-      * @param name the name of the <CODE>float</CODE>
+      * @param name the name of the {@code float}
       *
-      * @return the <CODE>float</CODE> value with the specified name
+      * @return the {@code float} value with the specified name
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -215,11 +215,11 @@ public interface MapMessage extends Message {
     getFloat(String name) throws JMSException;
 
 
-    /** Returns the <CODE>double</CODE> value with the specified name.
+    /** Returns the {@code double} value with the specified name.
       *
-      * @param name the name of the <CODE>double</CODE>
+      * @param name the name of the {@code double}
       *
-      * @return the <CODE>double</CODE> value with the specified name
+      * @return the {@code double} value with the specified name
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -230,11 +230,11 @@ public interface MapMessage extends Message {
     getDouble(String name) throws JMSException;
 
 
-    /** Returns the <CODE>String</CODE> value with the specified name.
+    /** Returns the {@code String} value with the specified name.
       *
-      * @param name the name of the <CODE>String</CODE>
+      * @param name the name of the {@code String}
       *
-      * @return the <CODE>String</CODE> value with the specified name; if there 
+      * @return the {@code String} value with the specified name; if there 
       * is no item by this name, a null value is returned
       *
       * @exception JMSException if the JMS provider fails to read the message
@@ -268,17 +268,17 @@ public interface MapMessage extends Message {
       * <P>This method can be used to return, in objectified format,
       * an object in the Java programming language ("Java object") that had 
       * been stored in the Map with the equivalent
-      * <CODE>setObject</CODE> method call, or its equivalent primitive
-      * <CODE>set<I>type</I></CODE> method.
+      * {@code setObject} method call, or its equivalent primitive
+      * {@code set<I>type</I>} method.
       *
-      * <P>Note that byte values are returned as <CODE>byte[]</CODE>, not 
-      * <CODE>Byte[]</CODE>.
+      * <P>Note that byte values are returned as {@code byte[]}, not 
+      * {@code Byte[]}.
       *
       * @param name the name of the Java object
       *
       * @return a copy of the Java object value with the specified name, in 
       * objectified format (for example, if the object was set as an 
-      * <CODE>int</CODE>, an <CODE>Integer</CODE> is returned); if there is no 
+      * {@code int}, an {@code Integer} is returned); if there is no 
       * item by this name, a null value is returned
       *
       * @exception JMSException if the JMS provider fails to read the message
@@ -290,10 +290,10 @@ public interface MapMessage extends Message {
 
 
 
-    /** Returns an <CODE>Enumeration</CODE> of all the names in the 
-      * <CODE>MapMessage</CODE> object.
+    /** Returns an {@code Enumeration} of all the names in the 
+      * {@code MapMessage} object.
       *
-      * @return an enumeration of all the names in this <CODE>MapMessage</CODE>
+      * @return an enumeration of all the names in this {@code MapMessage}
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -303,10 +303,10 @@ public interface MapMessage extends Message {
     getMapNames() throws JMSException;
 
 
-    /** Sets a <CODE>boolean</CODE> value with the specified name into the Map.
+    /** Sets a {@code boolean} value with the specified name into the Map.
       *
-      * @param name the name of the <CODE>boolean</CODE>
-      * @param value the <CODE>boolean</CODE> value to set in the Map
+      * @param name the name of the {@code boolean}
+      * @param value the {@code boolean} value to set in the Map
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -320,10 +320,10 @@ public interface MapMessage extends Message {
     setBoolean(String name, boolean value) throws JMSException;
 
 
-    /** Sets a <CODE>byte</CODE> value with the specified name into the Map.
+    /** Sets a {@code byte} value with the specified name into the Map.
       *
-      * @param name the name of the <CODE>byte</CODE>
-      * @param value the <CODE>byte</CODE> value to set in the Map
+      * @param name the name of the {@code byte}
+      * @param value the {@code byte} value to set in the Map
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -338,10 +338,10 @@ public interface MapMessage extends Message {
 			throws JMSException;
 
 
-    /** Sets a <CODE>short</CODE> value with the specified name into the Map.
+    /** Sets a {@code short} value with the specified name into the Map.
       *
-      * @param name the name of the <CODE>short</CODE>
-      * @param value the <CODE>short</CODE> value to set in the Map
+      * @param name the name of the {@code short}
+      * @param value the {@code short} value to set in the Map
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -374,10 +374,10 @@ public interface MapMessage extends Message {
 			throws JMSException;
 
 
-    /** Sets an <CODE>int</CODE> value with the specified name into the Map.
+    /** Sets an {@code int} value with the specified name into the Map.
       *
-      * @param name the name of the <CODE>int</CODE>
-      * @param value the <CODE>int</CODE> value to set in the Map
+      * @param name the name of the {@code int}
+      * @param value the {@code int} value to set in the Map
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -392,10 +392,10 @@ public interface MapMessage extends Message {
 			throws JMSException;
 
 
-    /** Sets a <CODE>long</CODE> value with the specified name into the Map.
+    /** Sets a {@code long} value with the specified name into the Map.
       *
-      * @param name the name of the <CODE>long</CODE>
-      * @param value the <CODE>long</CODE> value to set in the Map
+      * @param name the name of the {@code long}
+      * @param value the {@code long} value to set in the Map
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -410,10 +410,10 @@ public interface MapMessage extends Message {
 			throws JMSException;
 
 
-    /** Sets a <CODE>float</CODE> value with the specified name into the Map.
+    /** Sets a {@code float} value with the specified name into the Map.
       *
-      * @param name the name of the <CODE>float</CODE>
-      * @param value the <CODE>float</CODE> value to set in the Map
+      * @param name the name of the {@code float}
+      * @param value the {@code float} value to set in the Map
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -428,10 +428,10 @@ public interface MapMessage extends Message {
 			throws JMSException;
 
 
-    /** Sets a <CODE>double</CODE> value with the specified name into the Map.
+    /** Sets a {@code double} value with the specified name into the Map.
       *
-      * @param name the name of the <CODE>double</CODE>
-      * @param value the <CODE>double</CODE> value to set in the Map
+      * @param name the name of the {@code double}
+      * @param value the {@code double} value to set in the Map
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -446,10 +446,10 @@ public interface MapMessage extends Message {
 			throws JMSException;
 
 
-    /** Sets a <CODE>String</CODE> value with the specified name into the Map.
+    /** Sets a {@code String} value with the specified name into the Map.
       *
-      * @param name the name of the <CODE>String</CODE>
-      * @param value the <CODE>String</CODE> value to set in the Map
+      * @param name the name of the {@code String}
+      * @param value the {@code String} value to set in the Map
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -468,7 +468,7 @@ public interface MapMessage extends Message {
       *
       * @param name the name of the byte array
       * @param value the byte array value to set in the Map; the array
-      *              is copied so that the value for <CODE>name</CODE> will
+      *              is copied so that the value for {@code name} will
       *              not be altered by future modifications
       *
       * @exception JMSException if the JMS provider fails to write the message
@@ -509,8 +509,8 @@ public interface MapMessage extends Message {
     /** Sets an object value with the specified name into the Map.
       *
       * <P>This method works only for the objectified primitive
-      * object types (<code>Integer</code>, <code>Double</code>, 
-      * <code>Long</code>&nbsp;...), <code>String</code> objects, and byte 
+      * object types ({@code Integer}, {@code Double}, 
+      * {@code Long}&nbsp;...), {@code String} objects, and byte 
       * arrays.
       *
       * @param name the name of the Java object
@@ -530,7 +530,7 @@ public interface MapMessage extends Message {
 			throws JMSException;
 
 
-    /** Indicates whether an item exists in this <CODE>MapMessage</CODE> object.
+    /** Indicates whether an item exists in this {@code MapMessage} object.
       *
       * @param name the name of the item to test
       *

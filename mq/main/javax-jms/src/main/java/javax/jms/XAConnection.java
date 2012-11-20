@@ -40,10 +40,10 @@
 
 package javax.jms;
 
-/** The <CODE>XAConnection</CODE> interface extends the capability of 
-  * <CODE>Connection</CODE> by providing an <CODE>XASession</CODE> (optional).
+/** The {@code XAConnection} interface extends the capability of 
+  * {@code Connection} by providing an {@code XASession} (optional).
   *
-  *<P>The <CODE>XAConnection</CODE> interface is optional. JMS providers 
+  *<P>The {@code XAConnection} interface is optional. JMS providers 
   * are not required to support this interface. This interface is for 
   * use by JMS providers to support transactional environments. 
   * Client programs are strongly encouraged to use the transactional support
@@ -61,12 +61,12 @@ package javax.jms;
 
 public interface XAConnection extends Connection{
     
-    /** Creates an <CODE>XASession</CODE> object.
+    /** Creates an {@code XASession} object.
       *  
-      * @return a newly created <CODE>XASession</CODE>
+      * @return a newly created {@code XASession}
       *  
-      * @exception JMSException if the <CODE>XAConnection</CODE> object 
-      *                         fails to create an <CODE>XASession</CODE> due to
+      * @exception JMSException if the {@code XAConnection} object 
+      *                         fails to create an {@code XASession} due to
       *                         some internal error.
       *
       * @since 1.1
@@ -75,15 +75,15 @@ public interface XAConnection extends Connection{
     XASession
     createXASession() throws JMSException;
 
-    /** Creates an <CODE>Session</CODE> object.
+    /** Creates an {@code Session} object.
       *
       * @param transacted       usage undefined
       * @param acknowledgeMode  usage undefined
       *  
-      * @return a <CODE>Session</CODE> object
+      * @return a {@code Session} object
       *  
-      * @exception JMSException if the <CODE>XAConnection</CODE> object 
-      *                         fails to create an <CODE>Session</CODE> due to
+      * @exception JMSException if the {@code XAConnection} object 
+      *                         fails to create an {@code Session} due to
       *                         some internal error.
       *
       * @since 1.1

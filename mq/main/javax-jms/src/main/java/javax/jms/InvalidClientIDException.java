@@ -51,7 +51,7 @@ package javax.jms;
 
 public class InvalidClientIDException extends JMSException {
 
-  /** Constructs an <CODE>InvalidClientIDException</CODE> with the specified 
+  /** Constructs an {@code InvalidClientIDException} with the specified 
    *  reason and error code.
    *
    *  @param  reason        a description of the exception
@@ -64,7 +64,7 @@ public class InvalidClientIDException extends JMSException {
     super(reason, errorCode);
   }
 
-  /** Constructs an <CODE>InvalidClientIDException</CODE> with the specified 
+  /** Constructs an {@code InvalidClientIDException} with the specified 
    *  reason. The error code defaults to null.
    *
    *  @param  reason        a description of the exception

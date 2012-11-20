@@ -101,6 +101,9 @@ MessageConsumer::MessageConsumer(Session * const sessionArg,
     this->noLocal = PR_FALSE;
   } else {
     this->noLocal = noLocalArg;
+    CNDCHK( (this->durableName != NULL && this->noLocal == PR_TRUE && 
+             this->session->getConnection()->getClientID() == NULL), 
+            MQ_NOLOCAL_DURABLE_CONSUMER_WITHOUT_CLIENTID );
   }
 
   this->messageListener = messageListenerArg;

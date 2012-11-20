@@ -692,7 +692,7 @@ public class Transaction extends Object {
      */
     protected void releaseBrokerResource() throws JMSException {
         //Local transactions only
-        protocolHandler.rollback (transactionID);
+        protocolHandler.rollback (transactionID, true);
     }
 
     /**

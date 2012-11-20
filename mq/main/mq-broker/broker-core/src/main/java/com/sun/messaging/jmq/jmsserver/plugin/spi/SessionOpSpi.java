@@ -115,11 +115,12 @@ public abstract class SessionOpSpi
      * @param cuid the consumer the message was delivered
      * @param id the message id
      * @param tuid the transaction id
+     * @param deliverCnt if > 0, update redelivery count 
      * @return an object specific its handler
      * @throw BrokerException
      */
     public abstract Object ackInTransaction(ConsumerUID cuid, SysMessageID id,
-                                            TransactionUID tuid) 
+                                            TransactionUID tuid, int deliverCnt) 
                                             throws BrokerException;
 
     /**
@@ -133,11 +134,15 @@ public abstract class SessionOpSpi
      *
      * @param con the consumer the message was delivered to
      * @param id  the message id
+     * @param deliverCnt 
+     * @param updateDeliveryCntOnly  
      * @return an object specific to its handler 
      * @throw BrokerException
      */
-    public abstract Object handleUndeliverable(ConsumerSpi con, SysMessageID id)
-    throws BrokerException;
+    public abstract Object handleUndeliverable(
+                               ConsumerSpi con, SysMessageID id, 
+                               int deliverCnt, boolean updateDeliveryCntOnly)
+                               throws BrokerException;
 
     /**
      * Handles undeliverable dead message. 

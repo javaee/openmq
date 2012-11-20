@@ -880,7 +880,7 @@
 
 	   <include name="com/sun/messaging/*.class"/>   
            <include name="com/sun/messaging/*.properties"/>   
-           <include name="com/sun/messaging/jmq/DestinationMame.class"/>   
+           <include name="com/sun/messaging/jmq/DestinationName.class"/>   
            <include name="com/sun/messaging/jmq/ClientConstants.class"/>   
            <include name="com/sun/messaging/jms/**/**"/>   
            <include name="com/sun/messaging/jmq/jmsserver/*.class"/>   
@@ -929,7 +929,7 @@
 
            <include name="com/sun/messaging/*.class"/>
            <include name="com/sun/messaging/*.properties"/>
-           <include name="com/sun/messaging/jmq/DestinationMame.class"/>
+           <include name="com/sun/messaging/jmq/DestinationName.class"/>
            <include name="com/sun/messaging/jmq/ClientConstants.class"/>
            <include name="com/sun/messaging/jms/**/**"/>
            <include name="com/sun/messaging/jmq/jmsserver/*.class"/>

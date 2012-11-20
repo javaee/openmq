@@ -46,12 +46,12 @@ package javax.jms;
  *     read data in a message as the wrong type. It must also be thrown when 
  *     equivalent type errors are made with message property values. For 
  *     example, this exception must be thrown if 
- *     <CODE>StreamMessage.writeObject</CODE> is given an unsupported class or 
- *     if <CODE>StreamMessage.readShort</CODE> is used to read a 
- *     <CODE>boolean</CODE> value. Note that the special case of a failure 
- *     caused by an attempt to read improperly formatted <CODE>String</CODE> 
+ *     {@code StreamMessage.writeObject} is given an unsupported class or 
+ *     if {@code StreamMessage.readShort} is used to read a 
+ *     {@code boolean} value. Note that the special case of a failure 
+ *     caused by an attempt to read improperly formatted {@code String} 
  *     data as numeric values must throw the 
- *     <CODE>java.lang.NumberFormatException</CODE>.
+ *     {@code java.lang.NumberFormatException}.
  *
  * @version     26 August 1998
  * @author      Rahul Sharma
@@ -59,7 +59,7 @@ package javax.jms;
 
 public class MessageFormatException extends JMSException {
 
-  /** Constructs a <CODE>MessageFormatException</CODE> with the specified 
+  /** Constructs a {@code MessageFormatException} with the specified 
    *  reason and error code.
    *
    *  @param  reason        a description of the exception
@@ -72,7 +72,7 @@ public class MessageFormatException extends JMSException {
     super(reason, errorCode);
   }
 
-  /** Constructs a <CODE>MessageFormatException</CODE> with the specified 
+  /** Constructs a {@code MessageFormatException} with the specified 
    *  reason. The error code defaults to null.
    *
    *  @param  reason        a description of the exception

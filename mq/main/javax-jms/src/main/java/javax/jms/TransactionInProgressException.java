@@ -43,9 +43,9 @@ package javax.jms;
 /**
  * <P> This exception is thrown when an 
  *     operation is invalid because a transaction is in progress. 
- *     For instance, an attempt to call <CODE>Session.commit</CODE> when a 
+ *     For instance, an attempt to call {@code Session.commit} when a 
  *     session is part of a distributed transaction should throw a 
- *     <CODE>TransactionInProgressException</CODE>.
+ *     {@code TransactionInProgressException}.
  *
  * @version     26 August 1998
  * @author      Rahul Sharma
@@ -53,7 +53,7 @@ package javax.jms;
 
 public class TransactionInProgressException extends JMSException {
 
-  /** Constructs a <CODE>TransactionInProgressException</CODE> with the 
+  /** Constructs a {@code TransactionInProgressException} with the 
    *  specified reason and error code.
    *
    *  @param  reason        a description of the exception
@@ -66,7 +66,7 @@ public class TransactionInProgressException extends JMSException {
     super(reason, errorCode);
   }
 
-  /** Constructs a <CODE>TransactionInProgressException</CODE> with the 
+  /** Constructs a {@code TransactionInProgressException} with the 
    *  specified reason. The error code defaults to null.
    *
    *  @param  reason        a description of the exception

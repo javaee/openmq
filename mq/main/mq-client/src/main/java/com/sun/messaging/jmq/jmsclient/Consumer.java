@@ -74,6 +74,7 @@ abstract class Consumer {
     protected Destination destination = null;
     private String destName = null; //for logging/error reporting only
     protected String durableName = null;
+    protected String sharedSubscriptionName = null;
 
     protected boolean debug = Debug.debug;
 
@@ -314,6 +315,14 @@ abstract class Consumer {
         return durableName;
     }
 
+    protected void setSharedSubscriptionName (String name) {
+        sharedSubscriptionName = name;
+    }
+
+    protected String getSharedSubscriptionName() {
+        return sharedSubscriptionName;
+    }
+
     protected ConnectionImpl getConnection() {
         return connection;
     }
@@ -377,6 +386,9 @@ abstract class Consumer {
         if ( durable ) {
             ps.println ("durableName: " + durableName);
         }
+        if ( sharedSubscriptionName != null ) {
+            ps.println ("sharedSubscriptionName: " + sharedSubscriptionName);
+        }
 
         ps.println ("is registered: " + isRegistered);
         ps.println ("destination: " + destination);
@@ -399,6 +411,9 @@ abstract class Consumer {
         ht.put("durable", String.valueOf(durable));
         if (durable)
             ht.put("durableName", String.valueOf(durableName));
+        if (sharedSubscriptionName != null) {
+            ht.put("sharedSubscriptionName", String.valueOf(sharedSubscriptionName));
+        }
 
         ht.put("isRegistered", String.valueOf(isRegistered));
         ht.put("isClosed", String.valueOf(isClosed));

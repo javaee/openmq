@@ -407,6 +407,9 @@ public class ClusterMessageAckInfo
                 buf.append("\n\t\tConsumerUID = ").append(intids[i]);
             }
         }
+        if (optionalProps != null) {
+            buf.append("\n\tOptional Props = ").append(""+optionalProps);
+        }
         buf.append("\n");
         return buf.toString();
     }

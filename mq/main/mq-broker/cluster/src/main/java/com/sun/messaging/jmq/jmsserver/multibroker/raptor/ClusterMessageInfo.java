@@ -68,8 +68,13 @@ public class ClusterMessageInfo
 {
     protected Logger logger = Globals.getLogger();
 
+    private static final String PROP_PREFIX_CUID_DCT = "CUID-DCT:";
+    private static final String PROP_REDELIVERED = "redelivered";
+
     private PacketReference ref = null;
-    private ArrayList consumers =  null; 
+    private ArrayList<Consumer> consumers =  null; 
+    private ArrayList<Integer> deliveryCnts =  null; 
+    private boolean redelivered =  false; 
     private boolean sendMessageDeliveredAck = false;
     private Cluster c = null;
 
@@ -77,10 +82,14 @@ public class ClusterMessageInfo
     private DataInputStream dis = null;
 
     private ClusterMessageInfo(PacketReference ref, 
-                               ArrayList consumers,
+                               ArrayList<Consumer> consumers,
+                               ArrayList<Integer> deliveryCnts,
+                               boolean redelivered,
                                boolean sendMessageDeliveredAck, Cluster c) {
         this.ref = ref;
         this.consumers = consumers;
+        this.deliveryCnts = deliveryCnts;
+        this.redelivered = redelivered;
         this.sendMessageDeliveredAck = sendMessageDeliveredAck;
         this.c = c;
     }
@@ -96,11 +105,14 @@ public class ClusterMessageInfo
      * @param d The Destination to be marshaled to GPacket
      */
     public static ClusterMessageInfo newInstance(
-                                           PacketReference ref,
-                                           ArrayList consumers,
-                                           boolean sendMessageDeliveredAck,
-                                           Cluster c) {
-        return new ClusterMessageInfo(ref, consumers, sendMessageDeliveredAck, c);
+        PacketReference ref,
+        ArrayList<Consumer> consumers, 
+        ArrayList<Integer> deliveryCnts,
+        boolean redelivered,
+        boolean sendMessageDeliveredAck, Cluster c) {
+
+        return new ClusterMessageInfo(ref, consumers, deliveryCnts,
+                          redelivered, sendMessageDeliveredAck, c);
     }
 
     /**
@@ -119,7 +131,7 @@ public class ClusterMessageInfo
         GPacket gp = GPacket.getInstance();
         gp.setType(ProtocolGlobals.G_MESSAGE_DATA);
         gp.putProp("D", Boolean.valueOf(sendMessageDeliveredAck));
-        gp.putProp("C", new Integer(consumers.size()));
+        gp.putProp("C", Integer.valueOf(consumers.size()));
         if (Globals.getDestinationList().isPartitionMode()) {
             gp.putProp("partitionID", Long.valueOf(
                 ref.getPartitionedStore().getPartitionID().longValue()));
@@ -133,8 +145,13 @@ public class ClusterMessageInfo
         Packet roPkt = null;
         try {
             for (int i = 0; i < consumers.size(); i++) {
-                ConsumerUID intid = ((Consumer) consumers.get(i)).getConsumerUID();
+                ConsumerUID intid = consumers.get(i).getConsumerUID();
                 ClusterConsumerInfo.writeConsumerUID(intid, dos);
+                gp.putProp(PROP_PREFIX_CUID_DCT+intid.longValue(),
+                           deliveryCnts.get(i));
+            }
+            if (redelivered) {
+                gp.putProp(PROP_REDELIVERED, Boolean.valueOf(redelivered));
             }
             if (roPkt == null) {
                 roPkt = ref.getPacket();
@@ -199,6 +216,19 @@ public class ClusterMessageInfo
         return ((Integer) pkt.getProp("C")).intValue();
     }
 
+    private Boolean getRedelivered() {
+        assert (pkt != null);
+        return (Boolean)pkt.getProp(PROP_REDELIVERED);
+    }
+
+    /**
+     * @return null if not found
+     */
+    public Integer getDeliveryCount(ConsumerUID cuid) {
+        assert (pkt != null);
+        return (Integer)pkt.getProp(PROP_PREFIX_CUID_DCT+cuid.longValue());
+    }
+
     /**
      * must called in the following order: 
      *
@@ -225,6 +255,10 @@ public class ClusterMessageInfo
         roPkt.generateTimestamp(false);
         roPkt.generateSequenceNumber(false);
         roPkt.readPacket(dis);
+        Boolean b = getRedelivered();
+        if (b != null) {
+            roPkt.setRedelivered(b.booleanValue());
+        }
         return roPkt;
     }
 

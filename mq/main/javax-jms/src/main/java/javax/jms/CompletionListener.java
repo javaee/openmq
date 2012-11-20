@@ -41,14 +41,14 @@
 package javax.jms;
 
 /**
- * A <code>CompletionListener</code> is implemented by the application and may
+ * A {@code CompletionListener} is implemented by the application and may
  * be specified when a message is sent asynchronously.
  * <p>
  * When the sending of the message is complete, the JMS provider notifies the
- * application by calling the <code>onCompletion(Message)</code> method of the
+ * application by calling the {@code onCompletion(Message)} method of the
  * specified completion listener. If the sending if the message fails for any
- * reason, and an exception cannot be thrown by the <code>send</code> method,
- * then the JMS provider calls the <code>onException(Exception)</code> method of
+ * reason, and an exception cannot be thrown by the {@code send} method,
+ * then the JMS provider calls the {@code onException(Exception)} method of
  * the specified completion listener.
  * 
  * @version 2.0
@@ -73,7 +73,8 @@ public interface CompletionListener {
 
 	/**
 	 * Notifies user that the specified exception was thrown while attempting to
-	 * send the specified message
+	 * send the specified message. If an exception occurs it is undefined
+	 * whether or not the message was successfully sent.
 	 * 
 	 * @param message
 	 *            the message that was sent.

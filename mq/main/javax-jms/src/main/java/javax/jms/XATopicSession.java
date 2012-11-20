@@ -40,11 +40,11 @@
 
 package javax.jms;
 
-/** An <CODE>XATopicSession</CODE> provides a regular <CODE>TopicSession</CODE>.
-  * which can be used to create <CODE>TopicSubscriber</CODE> and 
-  * <CODE>TopicPublisher</CODE> objects (optional).
+/** An {@code XATopicSession} provides a regular {@code TopicSession}.
+  * which can be used to create {@code TopicSubscriber} and 
+  * {@code TopicPublisher} objects (optional).
   *
-  * <P>The <CODE>XATopicSession</CODE> interface is optional.  JMS providers 
+  * <P>The {@code XATopicSession} interface is optional.  JMS providers 
   * are not required to support this interface. This interface is for 
   * use by JMS providers to support transactional environments. 
   * Client programs are strongly encouraged to use the transactional support
@@ -62,7 +62,7 @@ package javax.jms;
 
 public interface XATopicSession extends XASession {
 
-    /** Gets the topic session associated with this <CODE>XATopicSession</CODE>.
+    /** Gets the topic session associated with this {@code XATopicSession}.
       *   
       * @return the topic session object
       *   

@@ -40,45 +40,45 @@
 
 package javax.jms;
 
-/** A <CODE>StreamMessage</CODE> object is used to send a stream of primitive
+/** A {@code StreamMessage} object is used to send a stream of primitive
   * types in the Java programming language. It is filled and read sequentially.
-  * It inherits from the <CODE>Message</CODE> interface
+  * It inherits from the {@code Message} interface
   * and adds a stream message body. Its methods are based largely on those
-  * found in <CODE>java.io.DataInputStream</CODE> and
-  * <CODE>java.io.DataOutputStream</CODE>.
+  * found in {@code java.io.DataInputStream} and
+  * {@code java.io.DataOutputStream}.
   *
   * <P>The primitive types can be read or written explicitly using methods
   * for each type. They may also be read or written generically as objects.
-  * For instance, a call to <CODE>StreamMessage.writeInt(6)</CODE> is
-  * equivalent to <CODE>StreamMessage.writeObject(new Integer(6))</CODE>.
+  * For instance, a call to {@code StreamMessage.writeInt(6)} is
+  * equivalent to {@code StreamMessage.writeObject(new Integer(6))}.
   * Both forms are provided, because the explicit form is convenient for
   * static programming, and the object form is needed when types are not known
   * at compile time.
   *
-  * <P>When the message is first created, and when <CODE>clearBody</CODE>
+  * <P>When the message is first created, and when {@code clearBody}
   * is called, the body of the message is in write-only mode. After the 
-  * first call to <CODE>reset</CODE> has been made, the message body is in 
+  * first call to {@code reset} has been made, the message body is in 
   * read-only mode. 
   * After a message has been sent, the client that sent it can retain and 
   * modify it without affecting the message that has been sent. The same message
   * object can be sent multiple times.
   * When a message has been received, the provider has called 
-  * <CODE>reset</CODE> so that the message body is in read-only mode for the client.
+  * {@code reset} so that the message body is in read-only mode for the client.
   * 
-  * <P>If <CODE>clearBody</CODE> is called on a message in read-only mode, 
+  * <P>If {@code clearBody} is called on a message in read-only mode, 
   * the message body is cleared and the message body is in write-only mode.
   * 
   * <P>If a client attempts to read a message in write-only mode, a 
-  * <CODE>MessageNotReadableException</CODE> is thrown.
+  * {@code MessageNotReadableException} is thrown.
   * 
   * <P>If a client attempts to write a message in read-only mode, a 
-  * <CODE>MessageNotWriteableException</CODE> is thrown.
+  * {@code MessageNotWriteableException} is thrown.
   *
-  * <P><CODE>StreamMessage</CODE> objects support the following conversion 
+  * <P>{@code StreamMessage} objects support the following conversion 
   * table. The marked cases must be supported. The unmarked cases must throw a 
-  * <CODE>JMSException</CODE>. The <CODE>String</CODE>-to-primitive conversions 
-  * may throw a runtime exception if the primitive's <CODE>valueOf()</CODE> 
-  * method does not accept it as a valid <CODE>String</CODE> representation of 
+  * {@code JMSException}. The {@code String}-to-primitive conversions 
+  * may throw a runtime exception if the primitive's {@code valueOf()} 
+  * method does not accept it as a valid {@code String} representation of 
   * the primitive.
   *
   * <P>A value written as the row type can be read as the column type.
@@ -100,10 +100,10 @@ package javax.jms;
   * </PRE>
   *
   * <P>Attempting to read a null value as a primitive type must be treated
-  * as calling the primitive's corresponding <code>valueOf(String)</code> 
-  * conversion method with a null value. Since <code>char</code> does not 
-  * support a <code>String</code> conversion, attempting to read a null value 
-  * as a <code>char</code> must throw a <code>NullPointerException</code>.
+  * as calling the primitive's corresponding {@code valueOf(String)} 
+  * conversion method with a null value. Since {@code char} does not 
+  * support a {@code String} conversion, attempting to read a null value 
+  * as a {@code char} must throw a {@code NullPointerException}.
   *
   * @version     1.0 - 6 August 1998
   * @author      Mark Hapner
@@ -120,9 +120,9 @@ package javax.jms;
 public interface StreamMessage extends Message {
 
 
-    /** Reads a <code>boolean</code> from the stream message.
+    /** Reads a {@code boolean} from the stream message.
       *
-      * @return the <code>boolean</code> value read
+      * @return the {@code boolean} value read
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -137,10 +137,10 @@ public interface StreamMessage extends Message {
     readBoolean() throws JMSException;
 
 
-    /** Reads a <code>byte</code> value from the stream message.
+    /** Reads a {@code byte} value from the stream message.
       *
       * @return the next byte from the stream message as a 8-bit
-      * <code>byte</code>
+      * {@code byte}
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -192,7 +192,7 @@ public interface StreamMessage extends Message {
     /** Reads a 32-bit integer from the stream message.
       *
       * @return a 32-bit integer value from the stream message, interpreted
-      * as an <code>int</code>
+      * as an {@code int}
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -210,7 +210,7 @@ public interface StreamMessage extends Message {
     /** Reads a 64-bit integer from the stream message.
       *
       * @return a 64-bit integer value from the stream message, interpreted as
-      * a <code>long</code>
+      * a {@code long}
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -225,9 +225,9 @@ public interface StreamMessage extends Message {
     readLong() throws JMSException;
 
 
-    /** Reads a <code>float</code> from the stream message.
+    /** Reads a {@code float} from the stream message.
       *
-      * @return a <code>float</code> value from the stream message
+      * @return a {@code float} value from the stream message
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -242,9 +242,9 @@ public interface StreamMessage extends Message {
     readFloat() throws JMSException;
 
 
-    /** Reads a <code>double</code> from the stream message.
+    /** Reads a {@code double} from the stream message.
       *
-      * @return a <code>double</code> value from the stream message
+      * @return a {@code double} value from the stream message
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -259,7 +259,7 @@ public interface StreamMessage extends Message {
     readDouble() throws JMSException;
 
 
-    /** Reads a <CODE>String</CODE> from the stream message.
+    /** Reads a {@code String} from the stream message.
       *
       * @return a Unicode string from the stream message
       *
@@ -277,32 +277,32 @@ public interface StreamMessage extends Message {
 
 
     /** Reads a byte array field from the stream message into the 
-      * specified <CODE>byte[]</CODE> object (the read buffer). 
+      * specified {@code byte[]} object (the read buffer). 
       * 
-      * <P>To read the field value, <CODE>readBytes</CODE> should be 
+      * <P>To read the field value, {@code readBytes} should be 
       * successively called 
       * until it returns a value less than the length of the read buffer.
       * The value of the bytes in the buffer following the last byte 
       * read is undefined.
       * 
-      * <P>If <CODE>readBytes</CODE> returns a value equal to the length of the 
-      * buffer, a subsequent <CODE>readBytes</CODE> call must be made. If there 
+      * <P>If {@code readBytes} returns a value equal to the length of the 
+      * buffer, a subsequent {@code readBytes} call must be made. If there 
       * are no more bytes to be read, this call returns -1.
       * 
-      * <P>If the byte array field value is null, <CODE>readBytes</CODE> 
+      * <P>If the byte array field value is null, {@code readBytes} 
       * returns -1.
       *
-      * <P>If the byte array field value is empty, <CODE>readBytes</CODE> 
+      * <P>If the byte array field value is empty, {@code readBytes} 
       * returns 0.
       * 
-      * <P>Once the first <CODE>readBytes</CODE> call on a <CODE>byte[]</CODE>
+      * <P>Once the first {@code readBytes} call on a {@code byte[]}
       * field value has been made,
       * the full value of the field must be read before it is valid to read 
       * the next field. An attempt to read the next field before that has 
-      * been done will throw a <CODE>MessageFormatException</CODE>.
+      * been done will throw a {@code MessageFormatException}.
       * 
-      * <P>To read the byte field value into a new <CODE>byte[]</CODE> object, 
-      * use the <CODE>readObject</CODE> method.
+      * <P>To read the byte field value into a new {@code byte[]} object, 
+      * use the {@code readObject} method.
       *
       * @param value the buffer into which the data is read
       *
@@ -330,20 +330,20 @@ public interface StreamMessage extends Message {
       * <P>This method can be used to return, in objectified format,
       * an object in the Java programming language ("Java object") that has 
       * been written to the stream with the equivalent
-      * <CODE>writeObject</CODE> method call, or its equivalent primitive
-      * <CODE>write<I>type</I></CODE> method.
+      * {@code writeObject} method call, or its equivalent primitive
+      * {@code write<I>type</I>} method.
       *  
-      * <P>Note that byte values are returned as <CODE>byte[]</CODE>, not 
-      * <CODE>Byte[]</CODE>.
+      * <P>Note that byte values are returned as {@code byte[]}, not 
+      * {@code Byte[]}.
       *
-      * <P>An attempt to call <CODE>readObject</CODE> to read a byte field 
-      * value into a new <CODE>byte[]</CODE> object before the full value of the
+      * <P>An attempt to call {@code readObject} to read a byte field 
+      * value into a new {@code byte[]} object before the full value of the
       * byte field has been read will throw a 
-      * <CODE>MessageFormatException</CODE>.
+      * {@code MessageFormatException}.
       *
       * @return a Java object from the stream message, in objectified
-      * format (for example, if the object was written as an <CODE>int</CODE>, 
-      * an <CODE>Integer</CODE> is returned)
+      * format (for example, if the object was written as an {@code int}, 
+      * an {@code Integer} is returned)
       *
       * @exception JMSException if the JMS provider fails to read the message
       *                         due to some internal error.
@@ -361,12 +361,12 @@ public interface StreamMessage extends Message {
 
 
 
-    /** Writes a <code>boolean</code> to the stream message.
-      * The value <code>true</code> is written as the value 
-      * <code>(byte)1</code>; the value <code>false</code> is written as 
-      * the value <code>(byte)0</code>.
+    /** Writes a {@code boolean} to the stream message.
+      * The value {@code true} is written as the value 
+      * {@code (byte)1}; the value {@code false} is written as 
+      * the value {@code (byte)0}.
       *
-      * @param value the <code>boolean</code> value to be written
+      * @param value the {@code boolean} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -379,9 +379,9 @@ public interface StreamMessage extends Message {
 			throws JMSException;
 
 
-    /** Writes a <code>byte</code> to the stream message.
+    /** Writes a {@code byte} to the stream message.
       *
-      * @param value the <code>byte</code> value to be written
+      * @param value the {@code byte} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -393,9 +393,9 @@ public interface StreamMessage extends Message {
     writeByte(byte value) throws JMSException;
 
 
-    /** Writes a <code>short</code> to the stream message.
+    /** Writes a {@code short} to the stream message.
       *
-      * @param value the <code>short</code> value to be written
+      * @param value the {@code short} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -407,9 +407,9 @@ public interface StreamMessage extends Message {
     writeShort(short value) throws JMSException;
 
 
-    /** Writes a <code>char</code> to the stream message.
+    /** Writes a {@code char} to the stream message.
       *
-      * @param value the <code>char</code> value to be written
+      * @param value the {@code char} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -421,9 +421,9 @@ public interface StreamMessage extends Message {
     writeChar(char value) throws JMSException;
 
 
-    /** Writes an <code>int</code> to the stream message.
+    /** Writes an {@code int} to the stream message.
       *
-      * @param value the <code>int</code> value to be written
+      * @param value the {@code int} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -435,9 +435,9 @@ public interface StreamMessage extends Message {
     writeInt(int value) throws JMSException;
 
 
-    /** Writes a <code>long</code> to the stream message.
+    /** Writes a {@code long} to the stream message.
       *
-      * @param value the <code>long</code> value to be written
+      * @param value the {@code long} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -449,9 +449,9 @@ public interface StreamMessage extends Message {
     writeLong(long value) throws JMSException;
 
 
-    /** Writes a <code>float</code> to the stream message.
+    /** Writes a {@code float} to the stream message.
       *
-      * @param value the <code>float</code> value to be written
+      * @param value the {@code float} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -463,9 +463,9 @@ public interface StreamMessage extends Message {
     writeFloat(float value) throws JMSException;
 
 
-    /** Writes a <code>double</code> to the stream message.
+    /** Writes a {@code double} to the stream message.
       *
-      * @param value the <code>double</code> value to be written
+      * @param value the {@code double} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -477,9 +477,9 @@ public interface StreamMessage extends Message {
     writeDouble(double value) throws JMSException;
 
 
-    /** Writes a <code>String</code> to the stream message.
+    /** Writes a {@code String} to the stream message.
       *
-      * @param value the <code>String</code> value to be written
+      * @param value the {@code String} value to be written
       *
       * @exception JMSException if the JMS provider fails to write the message
       *                         due to some internal error.
@@ -493,7 +493,7 @@ public interface StreamMessage extends Message {
 
     /** Writes a byte array field to the stream message.
       *
-      * <P>The byte array <code>value</code> is written to the message
+      * <P>The byte array {@code value} is written to the message
       * as a byte array field. Consecutively written byte array fields are 
       * treated as two distinct fields when the fields are read.
       * 
@@ -512,7 +512,7 @@ public interface StreamMessage extends Message {
     /** Writes a portion of a byte array as a byte array field to the stream 
       * message.
       *  
-      * <P>The a portion of the byte array <code>value</code> is written to the
+      * <P>The a portion of the byte array {@code value} is written to the
       * message as a byte array field. Consecutively written byte 
       * array fields are treated as two distinct fields when the fields are 
       * read.
@@ -535,8 +535,8 @@ public interface StreamMessage extends Message {
     /** Writes an object to the stream message.
       *
       * <P>This method works only for the objectified primitive
-      * object types (<code>Integer</code>, <code>Double</code>, 
-      * <code>Long</code>&nbsp;...), <code>String</code> objects, and byte 
+      * object types ({@code Integer}, {@code Double}, 
+      * {@code Long}&nbsp;...), {@code String} objects, and byte 
       * arrays.
       *
       * @param value the Java object to be written

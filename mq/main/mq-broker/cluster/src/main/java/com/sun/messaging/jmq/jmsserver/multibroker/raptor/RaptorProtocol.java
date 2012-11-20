@@ -2664,9 +2664,10 @@ public class RaptorProtocol implements Protocol, PartitionListener
      *
      * Constructs and sends ProtocolGlobals.G_MESSAGE_DATA packets.
      */
-    public void sendMessage(PacketReference pkt, Collection targets,
+    public void sendMessage(PacketReference pkt, Collection<Consumer> targets,
                             boolean sendMsgDeliveredAck) {
-        HashMap h = new HashMap();
+        HashMap<BrokerAddress, ArrayList[]> m = 
+            new HashMap<BrokerAddress, ArrayList[]>();
         if (DEBUG) {
             logger.log(Logger.DEBUGMED,
                 "MessageBus: sending message {0} to {1} targets.",
@@ -2675,31 +2676,41 @@ public class RaptorProtocol implements Protocol, PartitionListener
         }
 
         StringBuffer debugString = new StringBuffer("\n");
-
-        Iterator itr = targets.iterator();
+        Boolean redeliverFlag = false;
+        Iterator<Consumer> itr = targets.iterator();
         while (itr.hasNext()) {
             // TBD: Revisit - Send the  ProtocolGlobals.G_MSG_SENT ack
             // instead of calling Interest.messageSent() ???
-            Consumer target = (Consumer)itr.next();
+            Consumer target = itr.next();
             ConsumerUID intid = target.getConsumerUID();
             ConsumerUID storedid = target.getStoredConsumerUID();
+            boolean rflag = pkt.getRedeliverFlag(storedid);
             try {
                 pkt.delivered(intid, storedid, intid.isUnsafeAck(), true);
             } catch (Exception ex) {
                 logger.logStack(Logger.WARNING, BrokerResources.E_INTERNAL_BROKER_ERROR,
                 "saving redeliver flag for " + pkt.getSysMessageID() + " to " + intid, ex);
             }
-
+            int dct = pkt.getRedeliverCount(storedid);
+            if (rflag) {
+                redeliverFlag = true;
+                if (dct < 1) { 
+                    dct = 1;
+                }
+            }
             BrokerAddress baddr =
                 target.getConsumerUID().getBrokerAddress();
 
-            ArrayList v = (ArrayList) h.get(baddr);
+            ArrayList[] v = m.get(baddr);
             if (v == null) {
-                v = new ArrayList();
-                h.put(baddr, v);
+                v = new ArrayList[2];
+                v[0] = new ArrayList();
+                v[1] = new ArrayList();
+                m.put(baddr, v);
             }
-            v.add(target);
-            debugString.append("\t").append(target.toString()).append("\n");
+            v[0].add(target);
+            v[1].add(Integer.valueOf(dct));
+            debugString.append("\t").append(target.toString()).append("#"+dct).append("\n");
         }
 
         if (DEBUG) {
@@ -2711,13 +2722,15 @@ public class RaptorProtocol implements Protocol, PartitionListener
         // list may contain multiple entries with same BrokerAddress,
         // Combine all such entries and send the packet only once.
 
-        Iterator brokers = h.entrySet().iterator();
+        Iterator<Map.Entry<BrokerAddress, ArrayList[]>> brokers = 
+                                          m.entrySet().iterator();
+        Map.Entry<BrokerAddress, ArrayList[]> entry = null;
         while (brokers.hasNext()) {
-            Map.Entry entry = (Map.Entry)brokers.next();
-            BrokerAddress b = (BrokerAddress) entry.getKey();
-            ArrayList v = (ArrayList) entry.getValue();
-            
-            ClusterMessageInfo cmi = ClusterMessageInfo.newInstance(pkt, v, sendMsgDeliveredAck, c);
+            entry = brokers.next();
+            BrokerAddress b = entry.getKey();
+            ArrayList[] v = entry.getValue();
+            ClusterMessageInfo cmi = ClusterMessageInfo.newInstance(
+                pkt, v[0], v[1], redeliverFlag, sendMsgDeliveredAck, c);
             try {
                 synchronized(brokerList) {
                     BrokerInfoEx be = (BrokerInfoEx)brokerList.get(b);
@@ -2735,16 +2748,15 @@ public class RaptorProtocol implements Protocol, PartitionListener
                     logger.log(Logger.DEBUGHIGH,
                         "MessageBus: Broker {0} Targets = {1}", b, debugString + cmi.toString());
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 // This exception means that there is no way to
                 // deliver this message to the target. If there was
                 // an alternate path, the cluster implementation would
                 // have automatically used it...
                 HashMap map = new HashMap();
                 map.put(ClusterBroadcast.MSG_NOT_SENT_TO_REMOTE, "true");
-                for (int i = 0; i < v.size(); i++) {
-                    ConsumerUID intid = ((Consumer) v.get(i)).getConsumerUID();
+                for (int i = 0; i < v[0].size(); i++) {
+                    ConsumerUID intid = ((Consumer)v[0].get(i)).getConsumerUID();
                     try {
                     cb.processRemoteAck(pkt.getSysMessageID(), intid,
                                         ClusterGlobals.MB_MSG_IGNORED, map);
@@ -2840,7 +2852,7 @@ public class RaptorProtocol implements Protocol, PartitionListener
                 synchronized(fi) {
                     if (fi.checkFault(fi.FAULT_MSG_REMOTE_ACK_P_TXNROLLBACK_1_EXCEPTION, null)) {
                         fi.unsetFault(fi.FAULT_MSG_REMOTE_ACK_P_TXNROLLBACK_1_EXCEPTION);
-                        throw new BrokerDownException("FAULT: unreachable message home broker "+msgHome);
+                        throw new BrokerException("FAULT: unreachable message home broker "+msgHome);
                     }
                 }
             }
@@ -2855,8 +2867,8 @@ public class RaptorProtocol implements Protocol, PartitionListener
         ClusterMessageAckInfo cai =  ClusterMessageAckInfo.newInstance(
                                          sysids, cuids, ackType, xid, async, optionalProps, 
                                          txnID, txnStoreSession, msgHome, c, twophase);
-        if (DEBUG) {
-        logger.log(Logger.DEBUGHIGH, "MessageBus: Sending message ack: " + cai.toString());
+        if (DEBUG || DEBUG_CLUSTER_TXN) {
+        logger.log(Logger.INFO, "MessageBus: Sending message ack: " + cai.toString());
         }
 
         try {
@@ -4809,9 +4821,42 @@ public class RaptorProtocol implements Protocol, PartitionListener
         }
     }
 
+    public int getClusterAckWaitTimeout() {
+        return ProtocolGlobals.getAckTimeout();
+    }
+
+    /**
+     * Caller must ensure broker is the transaction home broker
+     */
+    public void sendTransactionInquiry(TransactionUID tid, BrokerAddress broker) {
+        TransactionBroker tb = new TransactionBroker(broker);
+        BrokerAddress to = tb.getCurrentBrokerAddress();
+        ClusterTxnInquiryInfo cii = ClusterTxnInquiryInfo.newInstance(
+                              Long.valueOf(tid.longValue()), to, null);
+        if (DEBUG_CLUSTER_TXN) {
+            logger.log(Logger.INFO, "Sending transaction inquiry: "+cii+" to "+to+"["+broker+"]");
+        }
+        try {
+             c.unicast(to, cii.getGPacket());
+        } catch (Exception e) {
+             logger.log(Logger.WARNING, 
+                 "Sending transaction inquiry " + cii+" to " +to+"["+broker+"] failed");
+        }
+    }
 
     private void sendTransactionInquiries(
         BrokerAddress broker, UID partitionID) {
+        sendPreparedTransactionInquiries(null, broker, partitionID);
+    }
+
+    public void sendPreparedTransactionInquiries(
+        List<TransactionUID> tidsonly, BrokerAddress broker) {
+        sendPreparedTransactionInquiries(tidsonly, broker, null);
+    }
+     
+    private void sendPreparedTransactionInquiries(
+        List<TransactionUID> tidsonly, BrokerAddress broker,
+        UID partitionID) {
 
         TransactionList[] tls = Globals.getDestinationList().getTransactionList(null);
         TransactionList tl = null;
@@ -4825,11 +4870,17 @@ public class RaptorProtocol implements Protocol, PartitionListener
             if (tl == null) {
                 continue;
             }
-            tids = tl.getPreparedRemoteTransactions();
+            tids = tl.getPreparedRemoteTransactions(null);
             Iterator itr = tids.iterator();
             while ( itr.hasNext()) {
                 tid = (TransactionUID)itr.next();
+                if (tidsonly != null && !tidsonly.contains(tid)) {
+                    continue;
+                }
                 txnhome = tl.getRemoteTransactionHomeBroker(tid); 
+                if (broker == null && txnhome == null) {
+                    continue;
+                }
                 txnhomess = null;
                 if (txnhome != null) {
                     txnhomess = txnhome.getBrokerAddress().getStoreSessionUID();
@@ -4841,11 +4892,13 @@ public class RaptorProtocol implements Protocol, PartitionListener
                     if (DEBUG_CLUSTER_TXN) {
                         logger.log(Logger.INFO, "Sending transaction inquiry: " + cii + " to "+broker);
                     }
+                    BrokerAddress tobroker = (broker == null ? 
+                                              txnhome.getCurrentBrokerAddress():broker);
                     try {
-                        c.unicast(broker, cii.getGPacket());
+                        c.unicast(tobroker, cii.getGPacket());
                     } catch (Exception e) {
                         logger.log(Logger.WARNING, 
-                        "Sending transaction inquiry " + cii+" to " +broker +" failed");
+                        "Sending transaction inquiry " + cii+" to " +tobroker +" failed");
                     }
                 }
             }
@@ -5105,11 +5158,16 @@ public class RaptorProtocol implements Protocol, PartitionListener
                     ii.isWaitedfor((selfAddress))) {
 
                     sendRemoteTransactionInfo(tuid, from, null, true);
+                    return;
                 }
             } catch (Exception e) {
                 logger.logStack(logger.WARNING, e.getMessage(), e);
+                return;
             }
-            return;
+            //for rollback pending unprepared 
+            if (s != TransactionState.NULL) {
+                return;
+            }
         }
    
         int type = -1;
@@ -5199,8 +5257,7 @@ public class RaptorProtocol implements Protocol, PartitionListener
         }
         catch (Exception e) {} // Catches NullPointerException too.
 
-        logger.log(Logger.FORCE, br.I_MBUS_DEL_BROKER,
-            broker.toString());
+        logger.log(Logger.FORCE, br.I_MBUS_DEL_BROKER, broker.toString());
 
         cbDispatcher.brokerDown(broker);
 

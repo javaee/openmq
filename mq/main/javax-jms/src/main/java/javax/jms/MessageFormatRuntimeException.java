@@ -44,11 +44,11 @@ package javax.jms;
  * This unchecked exception must be thrown when a JMS application attempts to
  * use a data type not supported by a message or attempts to read data in a
  * message as the wrong type, and the method signature does not permit a
- * <code>MessageFormatException</code> to be thrown. It must also be thrown when
+ * {@code MessageFormatException} to be thrown. It must also be thrown when
  * equivalent type errors are made with message property values. Note that the
  * special case of a failure caused by an attempt to read improperly formatted
- * <code>String</code> data as numeric values must throw the
- * <code>java.lang.NumberFormatException</code>.
+ * {@code String} data as numeric values must throw the
+ * {@code java.lang.NumberFormatException}.
  *
  * @version     2.0
  **/
@@ -56,7 +56,7 @@ package javax.jms;
 public class MessageFormatRuntimeException extends JMSRuntimeException {
 
 	/**
-	 * Constructs a <code>MessageFormatRuntimeException</code> with the specified detail message
+	 * Constructs a {@code MessageFormatRuntimeException} with the specified detail message
 	 * 
 	 * @param detailMessage
 	 *            a description of the exception
@@ -66,7 +66,7 @@ public class MessageFormatRuntimeException extends JMSRuntimeException {
 	}
 	
 	/**
-	 * Constructs a <code>MessageFormatRuntimeException</code> with the specified detail message
+	 * Constructs a {@code MessageFormatRuntimeException} with the specified detail message
 	 * and error code.
 	 * 
 	 * @param detailMessage
@@ -79,7 +79,7 @@ public class MessageFormatRuntimeException extends JMSRuntimeException {
 	}
 
 	/**
-	 * Constructs a <code>MessageFormatRuntimeException</code> with the specified detail message,
+	 * Constructs a {@code MessageFormatRuntimeException} with the specified detail message,
 	 * error code and cause
 	 * 
 	 * @param detailMessage

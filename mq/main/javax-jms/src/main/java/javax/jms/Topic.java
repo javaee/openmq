@@ -41,22 +41,22 @@
 package javax.jms;
 
 
-/** A <CODE>Topic</CODE> object encapsulates a provider-specific topic name. 
+/** A {@code Topic} object encapsulates a provider-specific topic name. 
   * It is the way a client specifies the identity of a topic to JMS API methods.
- * For those methods that use a <CODE>Destination</CODE> as a parameter, a 
-  * <CODE>Topic</CODE> object may used as an argument . For 
-  * example, a Topic can be used to create a <CODE>MessageConsumer</CODE>
-  * and a <CODE>MessageProducer</CODE>
+ * For those methods that use a {@code Destination} as a parameter, a 
+  * {@code Topic} object may used as an argument . For 
+  * example, a Topic can be used to create a {@code MessageConsumer}
+  * and a {@code MessageProducer}
   * by calling:
   *<UL>
-  *<LI> <CODE>Session.CreateConsumer(Destination destination)</CODE>
-  *<LI> <CODE>Session.CreateProducer(Destination destination)</CODE>
+  *<LI> {@code Session.CreateConsumer(Destination destination)}
+  *<LI> {@code Session.CreateProducer(Destination destination)}
   *
   *</UL>
   *
   * <P>Many publish/subscribe (pub/sub) providers group topics into hierarchies 
   * and provide various options for subscribing to parts of the hierarchy. The 
-  * JMS API places no restriction on what a <CODE>Topic</CODE> object 
+  * JMS API places no restriction on what a {@code Topic} object 
   * represents. It may be a leaf in a topic hierarchy, or it may be a larger 
   * part of the hierarchy.
   *
@@ -67,7 +67,7 @@ package javax.jms;
   * takes advantage of a provider-specific topic-grouping mechanism, it 
   * should document this. If the application is installed using a different 
   * provider, it is the job of the administrator to construct an equivalent 
-  * topic architecture and create equivalent <CODE>Topic</CODE> objects.
+  * topic architecture and create equivalent {@code Topic} objects.
   *
   * @version     1.1 - February 2, 2002
   * @author      Mark Hapner
@@ -88,7 +88,7 @@ public interface Topic extends Destination {
       * @return the topic name
       *  
       * @exception JMSException if the JMS provider implementation of 
-      *                         <CODE>Topic</CODE> fails to return the topic
+      *                         {@code Topic} fails to return the topic
       *                         name due to some internal
       *                         error.
       */ 

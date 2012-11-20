@@ -59,8 +59,8 @@
 VERSION_NUM = 1
 
 # general version info
-JMQ_BUILD_NUMBER= 6
-JMQ_BUILD_LETTER= h
+JMQ_BUILD_NUMBER= 7
+JMQ_BUILD_LETTER= f
 
 #
 # Milestone 'label' that follows the version # on the banner

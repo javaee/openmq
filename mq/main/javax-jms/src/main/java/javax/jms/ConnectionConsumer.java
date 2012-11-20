@@ -40,19 +40,19 @@
 
 package javax.jms;
 
-/** For application servers, <CODE>Connection</CODE> objects provide a special 
+/** For application servers, {@code Connection} objects provide a special 
   * facility 
-  * for creating a <CODE>ConnectionConsumer</CODE> (optional). The messages it 
+  * for creating a {@code ConnectionConsumer} (optional). The messages it 
   * is to consume are 
-  * specified by a <CODE>Destination</CODE> and a message selector. In addition,
-  * a <CODE>ConnectionConsumer</CODE> must be given a 
-  * <CODE>ServerSessionPool</CODE> to use for 
+  * specified by a {@code Destination} and a message selector. In addition,
+  * a {@code ConnectionConsumer} must be given a 
+  * {@code ServerSessionPool} to use for 
   * processing its messages.
   *
-  * <P>Normally, when traffic is light, a <CODE>ConnectionConsumer</CODE> gets a
-  * <CODE>ServerSession</CODE> from its pool, loads it with a single message, and
+  * <P>Normally, when traffic is light, a {@code ConnectionConsumer} gets a
+  * {@code ServerSession} from its pool, loads it with a single message, and
   * starts it. As traffic picks up, messages can back up. If this happens, 
-  * a <CODE>ConnectionConsumer</CODE> can load each <CODE>ServerSession</CODE>
+  * a {@code ConnectionConsumer} can load each {@code ServerSession}
   * with more than one 
   * message. This reduces the thread context switches and minimizes resource 
   * use at the expense of some serialization of message processing.

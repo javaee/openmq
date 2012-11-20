@@ -1033,8 +1033,7 @@ public class TransactionList implements ClusterListener, PartitionListener
         return info.checkConsumedMessage(sysid, cuid);
     }
 
-    public boolean isConsumedInTransaction(SysMessageID sysid, ConsumerUID id)
-    {
+    public TransactionUID getConsumedInTransaction(SysMessageID sysid, ConsumerUID id) {
         TransactionInformation info = null;
 
         shareLock.lock();
@@ -1042,13 +1041,17 @@ public class TransactionList implements ClusterListener, PartitionListener
             Iterator itr = translist.values().iterator();
             while (itr.hasNext()) {
                 info = (TransactionInformation)itr.next();
-                if (info == null) continue;
-                if (info.isConsumedMessage(sysid, id)) return true;
+                if (info == null) {
+                    continue;
+                }
+                if (info.isConsumedMessage(sysid, id)) {
+                    return info.getTID();
+                }
             }
         } finally {
             shareLock.unlock();
         }
-        return false;
+        return null;
     }
 
     /**
@@ -2625,7 +2628,7 @@ public class TransactionList implements ClusterListener, PartitionListener
         return rti.getTransactionHomeBroker();
 }
 
-    public ArrayList getPreparedRemoteTransactions() {
+    public ArrayList getPreparedRemoteTransactions(Long timeout) {
         ArrayList tids = new ArrayList();
         TransactionUID tid = null;
         TransactionState ts = null;
@@ -2641,7 +2644,10 @@ public class TransactionList implements ClusterListener, PartitionListener
                 if (rti == null) continue;
                 ts = rti.getState();
                 if (ts != null && ts.getState() == TransactionState.PREPARED) {
-                    tids.add(tid);
+                    if (timeout == null || 
+                        rti.isPendingTimeout(timeout.longValue())) {
+                        tids.add(tid);
+                    }
                 }
             }
         } finally {
@@ -2649,6 +2655,25 @@ public class TransactionList implements ClusterListener, PartitionListener
         }
 
         return tids;
+    }
+
+    public void pendingStartedForRemotePreparedTransaction(TransactionUID id) {
+        RemoteTransactionInformation rti = null;
+        TransactionState ts = null;
+
+        shareLock.lock();
+        try {
+            rti = (RemoteTransactionInformation)remoteTranslist.get(id);
+            if (rti != null) {
+                ts = rti.getState();
+                if (ts != null && ts.getState() == TransactionState.PREPARED) {
+                    rti.pendingStarted();
+                }
+            }
+            return;
+        } finally {
+            shareLock.unlock();
+        }
     }
 
     public void removeAcknowledgement(TransactionUID tid,
@@ -3262,6 +3287,7 @@ class RemoteTransactionInformation extends TransactionInformation
     RemoteTransactionAckEntry txnAckEntry = null;
     ArrayList recoveryTxnAckEntrys = new ArrayList();
     TransactionBroker txnhome = null;
+    long pendingStartTime = 0L;
 
     public RemoteTransactionInformation(TransactionUID tid, TransactionState state, 
                                         TransactionAcknowledgement[] acks,
@@ -3275,6 +3301,14 @@ class RemoteTransactionInformation extends TransactionInformation
         } else {
             this.txnAckEntry = new RemoteTransactionAckEntry(acks, localremote);
         }
+    }
+
+    public void pendingStarted() {
+        pendingStartTime = System.currentTimeMillis();
+    }
+
+    public boolean isPendingTimeout(long timeout) {
+        return ((System.currentTimeMillis() - pendingStartTime) >= timeout);
     }
 
     public synchronized String toString() {

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,6 +48,7 @@ import java.util.*;
 import java.io.*;
 import com.sun.messaging.jmq.util.UID;
 import com.sun.messaging.jmq.jmsserver.core.*;
+import com.sun.messaging.jmq.jmsserver.data.TransactionUID;
 import com.sun.messaging.jmq.jmsserver.util.BrokerException;
 import com.sun.messaging.jmq.util.selector.SelectorFormatException;
 import com.sun.messaging.jmq.jmsserver.service.ConnectionUID;
@@ -65,8 +66,8 @@ public interface ClusterRouter
        throws BrokerException, IOException, SelectorFormatException;
 
     public void removeConsumer(com.sun.messaging.jmq.jmsserver.core.ConsumerUID c,
-                               Set pendingMsgs, boolean cleanup)
-       throws BrokerException, IOException;
+        Map<TransactionUID, LinkedHashMap<SysMessageID, Integer>> pendingMsgs, boolean cleanup)
+        throws BrokerException, IOException;
 
     public void removeConsumers(ConnectionUID uid)
        throws BrokerException, IOException;
@@ -80,7 +81,8 @@ public interface ClusterRouter
      * END REPACEMENT
      */
 
-    public void handleJMSMsg(Packet p, List consumers, BrokerAddress sender,
+    public void handleJMSMsg(Packet p, Map<ConsumerUID, Integer> consumers,
+                             BrokerAddress sender,
                              boolean sendMsgRedeliver)
                              throws BrokerException;
 

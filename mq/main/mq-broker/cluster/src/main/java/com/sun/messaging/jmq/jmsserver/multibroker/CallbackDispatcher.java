@@ -369,8 +369,11 @@ public class CallbackDispatcher extends Thread {
      * Interest removal notification. This method is called when
      * any local / remote interest is removed. USED by Falcon only
      */
-    public void interestRemoved(Consumer intr, Set pendingMsgs, boolean cleanup) {
-        CallbackEvent cbe = new InterestRemovedCallbackEvent(intr, pendingMsgs, cleanup);
+    public void interestRemoved(Consumer intr, 
+        Map<TransactionUID, LinkedHashMap<SysMessageID, Integer>> pendingMsgs,
+        boolean cleanup) {
+        CallbackEvent cbe = new InterestRemovedCallbackEvent(
+                                    intr, pendingMsgs, cleanup);
 
         synchronized (eventQ) {
             eventQ.add(cbe);
@@ -761,17 +764,19 @@ class InterestCreatedCallbackEvent extends CallbackEvent {
 
 class InterestRemovedCallbackEvent extends CallbackEvent {
     private Consumer intr;
-    private Set pendingMsgs = null;
+    private Map<TransactionUID, LinkedHashMap<SysMessageID, Integer>> pendingMsgs = null;
     private boolean cleanup = false;
 
-    public InterestRemovedCallbackEvent(Consumer intr, Set pendingMsgs, boolean cleanup) {
+    public InterestRemovedCallbackEvent(Consumer intr, 
+        Map<TransactionUID, LinkedHashMap<SysMessageID, Integer>> pendingMsgs,
+        boolean cleanup) {
         this.intr = intr;
         this.pendingMsgs = pendingMsgs;
         this.cleanup = cleanup;
     }
 
     public void dispatch(MessageBusCallback cb) {
-        cb.interestRemoved(intr, pendingMsgs,  cleanup);
+        cb.interestRemoved(intr, pendingMsgs, cleanup);
     }
 
     public String toString() {

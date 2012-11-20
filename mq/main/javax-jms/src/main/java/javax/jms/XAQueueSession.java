@@ -40,12 +40,12 @@
 
 package javax.jms;
 
-/** An <CODE>XAQueueSession</CODE> provides a regular <CODE>QueueSession</CODE>,
+/** An {@code XAQueueSession} provides a regular {@code QueueSession},
   * which can be used to
-  * create <CODE>QueueReceiver</CODE>, <CODE>QueueSender</CODE>, and 
-  *<CODE>QueueBrowser</CODE> objects (optional).
+  * create {@code QueueReceiver}, {@code QueueSender}, and 
+  *{@code QueueBrowser} objects (optional).
   *
-  * <P>The <CODE>XAQueueSession</CODE> interface is optional. JMS providers 
+  * <P>The {@code XAQueueSession} interface is optional. JMS providers 
   * are not required to support this interface. This interface is for 
   * use by JMS providers to support transactional environments. 
   * Client programs are strongly encouraged to use the transactional support
@@ -62,7 +62,7 @@ package javax.jms;
 
 public interface XAQueueSession extends XASession {
 
-    /** Gets the queue session associated with this <CODE>XAQueueSession</CODE>.
+    /** Gets the queue session associated with this {@code XAQueueSession}.
       *  
       * @return the queue session object
       *  

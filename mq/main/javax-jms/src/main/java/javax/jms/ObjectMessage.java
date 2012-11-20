@@ -42,19 +42,19 @@ package javax.jms;
 
 import java.io.Serializable;
 
-/** An <CODE>ObjectMessage</CODE> object is used to send a message that contains
+/** An {@code ObjectMessage} object is used to send a message that contains
   * a serializable object in the Java programming language ("Java object").
-  * It inherits from the <CODE>Message</CODE> interface and adds a body
-  * containing a single reference to an object. Only <CODE>Serializable</CODE> 
+  * It inherits from the {@code Message} interface and adds a body
+  * containing a single reference to an object. Only {@code Serializable} 
   * Java objects can be used.
   *
   * <P>If a collection of Java objects must be sent, one of the 
-  * <CODE>Collection</CODE> classes provided since JDK 1.2 can be used.
+  * {@code Collection} classes provided since JDK 1.2 can be used.
   *
-  * <P>When a client receives an <CODE>ObjectMessage</CODE>, it is in read-only 
+  * <P>When a client receives an {@code ObjectMessage}, it is in read-only 
   * mode. If a client attempts to write to the message at this point, a 
-  * <CODE>MessageNotWriteableException</CODE> is thrown. If 
-  * <CODE>clearBody</CODE> is called, the message can now be both read from and 
+  * {@code MessageNotWriteableException} is thrown. If 
+  * {@code clearBody} is called, the message can now be both read from and 
   * written to.
   *
   * @version     1.0 - 6 August 1998
@@ -73,10 +73,10 @@ import java.io.Serializable;
 public interface ObjectMessage extends Message {
 
     /** Sets the serializable object containing this message's data.
-      * It is important to note that an <CODE>ObjectMessage</CODE>
-      * contains a snapshot of the object at the time <CODE>setObject()</CODE>
+      * It is important to note that an {@code ObjectMessage}
+      * contains a snapshot of the object at the time {@code setObject()}
       * is called; subsequent modifications of the object will have no 
-      * effect on the <CODE>ObjectMessage</CODE> body.
+      * effect on the {@code ObjectMessage} body.
       *
       * @param object the message's data
       *  

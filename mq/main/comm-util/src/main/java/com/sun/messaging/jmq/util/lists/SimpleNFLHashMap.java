@@ -526,6 +526,15 @@ public class SimpleNFLHashMap extends HashMap implements  EventBroadcaster, Limi
      *	       with the specified key.
      */
     public Object remove(Object key, Reason reason) {
+        return removeWithValue(key, null, null, reason); 
+    }
+
+    /**
+     * @return errValue if expectedValue not null and 
+     *         if to be removed value not null and != expectedValue 
+     */
+    public Object removeWithValue(Object key, Object expectedValue, 
+                                  Object errValue, Reason reason) {
 
         Object value =  null;
 
@@ -540,9 +549,17 @@ public class SimpleNFLHashMap extends HashMap implements  EventBroadcaster, Limi
         long objsize = 0;
 
         synchronized (this) {
+            if (expectedValue != null) {
+                value = super.get(key);
+                if (value != null && value != expectedValue) {
+                    return errValue;
+                }
+            }
             value = super.remove(key);
 
-        if (value == null) return null;
+        if (value == null) {
+            return null;
+        }
 
         if (value instanceof Sized) {
             objsize = ((Sized)value).byteSize();

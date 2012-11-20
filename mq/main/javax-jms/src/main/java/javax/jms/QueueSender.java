@@ -40,22 +40,22 @@
 
 package javax.jms;
 
-/** A client uses a <CODE>QueueSender</CODE> object to send messages to a queue.
+/** A client uses a {@code QueueSender} object to send messages to a queue.
   * 
-  * <P>Normally, the <CODE>Queue</CODE> is specified when a 
-  * <CODE>QueueSender</CODE> is created.  In this case, an attempt to use
-  * the <CODE>send</CODE> methods for an unidentified 
-  * <CODE>QueueSender</CODE> will throw a 
-  * <CODE>java.lang.UnsupportedOperationException</CODE>.
+  * <P>Normally, the {@code Queue} is specified when a 
+  * {@code QueueSender} is created.  In this case, an attempt to use
+  * the {@code send} methods for an unidentified 
+  * {@code QueueSender} will throw a 
+  * {@code java.lang.UnsupportedOperationException}.
   * 
-  * <P>If the <CODE>QueueSender</CODE> is created with an unidentified 
-  * <CODE>Queue</CODE>, an attempt to use the <CODE>send</CODE> methods that 
-  * assume that the <CODE>Queue</CODE> has been identified will throw a
-  * <CODE>java.lang.UnsupportedOperationException</CODE>.
+  * <P>If the {@code QueueSender} is created with an unidentified 
+  * {@code Queue}, an attempt to use the {@code send} methods that 
+  * assume that the {@code Queue} has been identified will throw a
+  * {@code java.lang.UnsupportedOperationException}.
   *
-  * <P>During the execution of its <CODE>send</CODE> method, a message 
+  * <P>During the execution of its {@code send} method, a message 
   * must not be changed by other threads within the client. 
-  * If the message is modified, the result of the <CODE>send</CODE> is 
+  * If the message is modified, the result of the {@code send} is 
   * undefined.
   * 
   * <P>After sending a message, a client may retain and modify it
@@ -63,21 +63,21 @@ package javax.jms;
   * object may be sent multiple times.
   * 
   * <P>The following message headers are set as part of sending a 
-  * message: <code>JMSDestination</code>, <code>JMSDeliveryMode</code>, 
-  * <code>JMSExpiration</code>, <code>JMSPriority</code>, 
-  * <code>JMSMessageID</code> and <code>JMSTimeStamp</code>.
+  * message: {@code JMSDestination}, {@code JMSDeliveryMode}, 
+  * {@code JMSExpiration}, {@code JMSPriority}, 
+  * {@code JMSMessageID} and {@code JMSTimeStamp}.
   * When the message is sent, the values of these headers are ignored. 
-  * After the completion of the <CODE>send</CODE>, the headers hold the values 
+  * After the completion of the {@code send}, the headers hold the values 
   * specified by the method sending the message. It is possible for the 
-  * <code>send</code> method not to set <code>JMSMessageID</code> and 
-  * <code>JMSTimeStamp</code> if the 
+  * {@code send} method not to set {@code JMSMessageID} and 
+  * {@code JMSTimeStamp} if the 
   * setting of these headers is explicitly disabled by the 
-  * <code>MessageProducer.setDisableMessageID</code> or
-  * <code>MessageProducer.setDisableMessageTimestamp</code> method.
+  * {@code MessageProducer.setDisableMessageID} or
+  * {@code MessageProducer.setDisableMessageTimestamp} method.
   *
-  * <P>Creating a <CODE>MessageProducer</CODE> provides the same features as
-  * creating a <CODE>QueueSender</CODE>. A <CODE>MessageProducer</CODE> object is 
-  * recommended when creating new code. The  <CODE>QueueSender</CODE> is
+  * <P>Creating a {@code MessageProducer} provides the same features as
+  * creating a {@code QueueSender}. A {@code MessageProducer} object is 
+  * recommended when creating new code. The  {@code QueueSender} is
   * provided to support existing code.
   *
   *
@@ -93,12 +93,12 @@ package javax.jms;
 
 public interface QueueSender extends MessageProducer {
 
-    /** Gets the queue associated with this <CODE>QueueSender</CODE>.
+    /** Gets the queue associated with this {@code QueueSender}.
       *  
       * @return this sender's queue 
       *  
       * @exception JMSException if the JMS provider fails to get the queue for
-      *                         this <CODE>QueueSender</CODE>
+      *                         this {@code QueueSender}
       *                         due to some internal error.
       */ 
  
@@ -106,7 +106,7 @@ public interface QueueSender extends MessageProducer {
     getQueue() throws JMSException;
 
 
-    /** Sends a message to the queue. Uses the <CODE>QueueSender</CODE>'s 
+    /** Sends a message to the queue. Uses the {@code QueueSender}'s 
       * default delivery mode, priority, and time to live.
       *
       * @param message the message to send 
@@ -115,10 +115,10 @@ public interface QueueSender extends MessageProducer {
       *                         due to some internal error.
       * @exception MessageFormatException if an invalid message is specified.
       * @exception InvalidDestinationException if a client uses
-      *                         this method with a <CODE>QueueSender</CODE> with
+      *                         this method with a {@code QueueSender} with
       *                         an invalid queue.
       * @exception java.lang.UnsupportedOperationException if a client uses this
-      *                         method with a <CODE>QueueSender</CODE> that did
+      *                         method with a {@code QueueSender} that did
       *                         not specify a queue at creation time.
       * 
       * @see javax.jms.MessageProducer#getDeliveryMode()
@@ -142,10 +142,10 @@ public interface QueueSender extends MessageProducer {
       *                         due to some internal error.
       * @exception MessageFormatException if an invalid message is specified.
       * @exception InvalidDestinationException if a client uses
-      *                         this method with a <CODE>QueueSender</CODE> with
+      *                         this method with a {@code QueueSender} with
       *                         an invalid queue.
       * @exception java.lang.UnsupportedOperationException if a client uses this
-      *                         method with a <CODE>QueueSender</CODE> that did
+      *                         method with a {@code QueueSender} that did
       *                         not specify a queue at creation time.
       */
 
@@ -157,7 +157,7 @@ public interface QueueSender extends MessageProducer {
 
 
     /** Sends a message to a queue for an unidentified message producer.
-      * Uses the <CODE>QueueSender</CODE>'s default delivery mode, priority,
+      * Uses the {@code QueueSender}'s default delivery mode, priority,
       * and time to live.
       *
       * <P>Typically, a message producer is assigned a queue at creation 

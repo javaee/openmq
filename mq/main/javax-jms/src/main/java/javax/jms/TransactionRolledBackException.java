@@ -42,7 +42,7 @@ package javax.jms;
 
 /**
  * <P> This exception must be thrown when a 
- *     call to <CODE>Session.commit</CODE> results in a rollback of the current 
+ *     call to {@code Session.commit} results in a rollback of the current 
  *     transaction.
  *
  * @version     26 August 1998
@@ -51,7 +51,7 @@ package javax.jms;
 
 public class TransactionRolledBackException extends JMSException {
 
-  /** Constructs a <CODE>TransactionRolledBackException</CODE> with the 
+  /** Constructs a {@code TransactionRolledBackException} with the 
    *  specified reason and error code.
    *
    *  @param  reason        a description of the exception
@@ -64,7 +64,7 @@ public class TransactionRolledBackException extends JMSException {
     super(reason, errorCode);
   }
 
-  /** Constructs a <CODE>TransactionRolledBackException</CODE> with the 
+  /** Constructs a {@code TransactionRolledBackException} with the 
    *  specified reason. The error code defaults to null.
    *
    *  @param  reason        a description of the exception

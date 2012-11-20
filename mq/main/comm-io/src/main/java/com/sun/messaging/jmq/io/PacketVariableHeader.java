@@ -62,10 +62,12 @@ public class PacketVariableHeader {
     protected boolean bufferParsed = false;
 
     // The variable portion of the packet contains primarily strings
-    // Currently transactionID, producerID and deliveryTime are the only exception.
+    // Currently transactionID, producerID, deliveryTime 
+    // and deliverycount are the only exception.
     protected long      transactionID      = 0L;
     protected long      producerID         = 0L;
     protected long      deliveryTime       = 0L;
+    protected int       deliveryCount      = 0;
     protected String[]  stringItems = new String[PacketString.LAST];
 
     static {
@@ -153,7 +155,7 @@ public class PacketVariableHeader {
     /**
      * Get the string value for 'field' from the buffer
      */
-    public synchronized String getStringField(int field) {
+    protected synchronized String getStringField(int field) {
 
         if (!bufferParsed) {
             parseBuffer();
@@ -171,7 +173,7 @@ public class PacketVariableHeader {
      * Get the long value for 'field' from the variable header portion of
      * the packet.
      */
-    public synchronized long getLongField(int field) {
+    protected synchronized long getLongField(int field) {
 
         if (!bufferParsed) {
             parseBuffer();
@@ -190,7 +192,7 @@ public class PacketVariableHeader {
         }
     }
 
-    public synchronized void setStringField(int field, String value) {
+    protected synchronized void setStringField(int field, String value) {
 
         // We must do this so we don't loose other field values if
         // updateBuffer is called.
@@ -204,7 +206,7 @@ public class PacketVariableHeader {
         }
     }
 
-    public synchronized void setLongField(int field, long value) {
+    protected synchronized void setLongField(int field, long value) {
 
         // We must do this so we don't loose other field values if
         // updateBuffer is called.
@@ -232,6 +234,45 @@ public class PacketVariableHeader {
     }
 
     /**
+     * Get the int value for 'field' from the variable header portion of
+     * the packet.
+     */
+    protected synchronized int getIntField(int field) {
+
+        if (!bufferParsed) {
+            parseBuffer();
+        }
+
+        switch (field) {
+
+        case PacketString.DELIVERY_COUNT:
+            return deliveryCount;
+        default:
+            return 0;
+        }
+    }
+
+    protected synchronized void setIntField(int field, int value) {
+
+        // We must do this so we don't loose other field values if
+        // updateBuffer is called.
+        if (!bufferParsed) {
+            parseBuffer();
+        }
+
+        switch (field) {
+
+	case PacketString.DELIVERY_COUNT:
+            deliveryCount = value;
+            bufferDirty = true;
+            break;
+	default:
+            break;
+	}
+    }
+
+
+    /**
      * Reset packet to initial values
      */
     protected void reset() {
@@ -241,6 +282,7 @@ public class PacketVariableHeader {
         transactionID = 0L;
         producerID    = 0L;
         deliveryTime = 0L;
+        deliveryCount = 0;
 
         //buffer = null;
         if (buffer != null) {
@@ -284,6 +326,12 @@ public class PacketVariableHeader {
                 // Skip length. deliveryTime is a long
                 len = buffer.getShort();
                 deliveryTime = buffer.getLong();
+                break;
+
+            case PacketString.DELIVERY_COUNT:
+                // Skip length. deliveryCount is a int 
+                len = buffer.getShort();
+                deliveryCount = buffer.getInt();
                 break;
 
             case PacketString.DESTINATION:
@@ -354,6 +402,10 @@ public class PacketVariableHeader {
             writeLong(dos, PacketString.DELIVERY_TIME, deliveryTime);
 	}
 
+	if (deliveryCount > 0) {
+            writeInt(dos, PacketString.DELIVERY_COUNT, deliveryCount);
+	}
+
         // Write string values to buffer. DESTINATION should be first
         for (int n = 0; n < PacketString.LAST; n++) {
             if (stringItems[n] != null) {
@@ -402,6 +454,16 @@ public class PacketVariableHeader {
 	dos.writeShort(type);
         dos.writeShort(8);
 	dos.writeLong(value);
+    }
+
+    /**
+     * Write a int field to the variable portion of the packet
+     */
+    private void writeInt(DataOutputStream dos, int type, int value)
+	throws IOException {
+	dos.writeShort(type);
+        dos.writeShort(8);
+	dos.writeInt(value);
     }
 
 }

@@ -4,7 +4,7 @@ Build Requirements
 To build this Message Queue source bundle, you will need:
 
 1. Maven 3.0.3  (http://maven.apache.org/download.html)
-2. JDK 1.6.0 Update 31 or a later JDK6.  (http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+2. JDK 1.7.0 Update 9 or a later JDK7.  (http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
 
 Message Queue Build Instructions

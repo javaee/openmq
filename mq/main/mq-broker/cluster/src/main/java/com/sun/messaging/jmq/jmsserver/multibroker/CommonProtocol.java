@@ -53,6 +53,7 @@ import com.sun.messaging.jmq.util.UID;
 import com.sun.messaging.jmq.util.log.*;
 import com.sun.messaging.jmq.jmsserver.resources.*;
 import com.sun.messaging.jmq.jmsserver.core.*;
+import com.sun.messaging.jmq.jmsserver.data.TransactionUID;
 import com.sun.messaging.jmq.io.*;
 import com.sun.messaging.jmq.util.*;
 import com.sun.messaging.jmq.jmsserver.util.BrokerException;
@@ -414,6 +415,29 @@ public class CommonProtocol implements Protocol
             return;
         }
         realProtocol.sendClusterTransactionInfo(tid, to);
+    }
+
+    public void sendTransactionInquiry(TransactionUID tid,
+                com.sun.messaging.jmq.jmsserver.core.BrokerAddress to) {
+        if (!getProtocolInitComplete()) {
+            return;
+        }
+        realProtocol.sendTransactionInquiry(tid, to);
+    }
+
+    public void sendPreparedTransactionInquiries(List<TransactionUID> tids,
+                com.sun.messaging.jmq.jmsserver.core.BrokerAddress to) {
+        if (!getProtocolInitComplete()) {
+            return;
+        }
+        realProtocol.sendPreparedTransactionInquiries(tids, to);
+    }
+
+    public int getClusterAckWaitTimeout() {
+        if (!getProtocolInitComplete()) {
+            return ProtocolGlobals.getAckTimeout();
+        }
+        return realProtocol.getClusterAckWaitTimeout();
     }
 
     public com.sun.messaging.jmq.jmsserver.core.BrokerAddress lookupBrokerAddress(String brokerid) {

@@ -41,15 +41,15 @@
 package javax.jms;
 
 
-/** A <CODE>Queue</CODE> object encapsulates a provider-specific queue name. 
+/** A {@code Queue} object encapsulates a provider-specific queue name. 
   * It is the way a client specifies the identity of a queue to JMS API methods.
-  * For those methods that use a <CODE>Destination</CODE> as a parameter, a 
-  * <CODE>Queue</CODE> object used as an argument. For example, a queue can
-  * be used  to create a <CODE>MessageConsumer</CODE> and a 
-  * <CODE>MessageProducer</CODE>  by calling:
+  * For those methods that use a {@code Destination} as a parameter, a 
+  * {@code Queue} object used as an argument. For example, a queue can
+  * be used  to create a {@code MessageConsumer} and a 
+  * {@code MessageProducer}  by calling:
   *<UL>
-  *<LI> <CODE>Session.CreateConsumer(Destination destination)</CODE>
-  *<LI> <CODE>Session.CreateProducer(Destination destination)</CODE>
+  *<LI> {@code Session.CreateConsumer(Destination destination)}
+  *<LI> {@code Session.CreateProducer(Destination destination)}
   *
   *</UL>
   *
@@ -78,7 +78,7 @@ public interface Queue extends Destination {
       * @return the queue name
       *  
       * @exception JMSException if the JMS provider implementation of 
-      *                         <CODE>Queue</CODE> fails to return the queue
+      *                         {@code Queue} fails to return the queue
       *                         name due to some internal
       *                         error.
       */ 

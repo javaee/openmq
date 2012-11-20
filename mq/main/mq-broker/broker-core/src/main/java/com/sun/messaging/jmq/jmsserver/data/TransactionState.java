@@ -435,7 +435,7 @@ public class TransactionState implements Externalizable, Serializable {
             if (failFromState == STARTED &&
                 pktType == PacketType.END_TRANSACTION) {
                 status = Status.NOT_MODIFIED;
-                throw new BrokerException(Globals.getBrokerResources().getString(
+                throw new BrokerException(Globals.getBrokerResources().getKString(
                 BrokerResources.X_END_ON_FAILED_STATE, args), status);
             }
             throw new BrokerException(Globals.getBrokerResources().getString(

@@ -40,23 +40,23 @@
 
 package javax.jms;
 
-/** A <CODE>Destination</CODE> object encapsulates a provider-specific 
+/** A {@code Destination} object encapsulates a provider-specific 
   * address.
   * The JMS API does not define a standard address syntax. Although a standard
   * address syntax was considered, it was decided that the differences in 
   * address semantics between existing message-oriented middleware (MOM) 
   * products were too wide to bridge with a single syntax. 
   *
-  * <P>Since <CODE>Destination</CODE> is an administered object, it may 
+  * <P>Since {@code Destination} is an administered object, it may 
   * contain 
   * provider-specific configuration information in addition to its address.
   *
   * <P>The JMS API also supports a client's use of provider-specific address 
   * names.
   *
-  * <P><CODE>Destination</CODE> objects support concurrent use.
+  * <P>{@code Destination} objects support concurrent use.
   *
-  * <P>A <CODE>Destination</CODE> object is a JMS administered object.
+  * <P>A {@code Destination} object is a JMS administered object.
   *
   * <P>JMS administered objects are objects containing configuration 
   * information that are created by an administrator and later used by 
@@ -74,8 +74,8 @@ package javax.jms;
   * <P>It is expected that JMS providers will provide the tools an
   * administrator needs to create and configure administered objects in a
   * JNDI namespace. JMS provider implementations of administered objects
-  * should implement the <CODE>javax.naming.Referenceable</CODE> and
-  * <CODE>java.io.Serializable</CODE> interfaces so that they can be stored in 
+  * should implement the {@code javax.naming.Referenceable} and
+  * {@code java.io.Serializable} interfaces so that they can be stored in 
   * all JNDI naming contexts. In addition, it is recommended that these
   * implementations follow the JavaBeans<SUP><FONT SIZE="-2">TM</FONT></SUP> 
   * design patterns.

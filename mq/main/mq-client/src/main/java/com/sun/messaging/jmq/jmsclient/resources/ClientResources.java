@@ -348,7 +348,9 @@ public class ClientResources extends MQResourceBundle {
     final public static String X_PRODUCER_CLOSING                   = "C4313";
     final public static String X_ASYNC_SEND_COMPLETION_WAIT_TIMEOUT = "C4314";
     final public static String X_NO_ASYNC_SEND_LISTENER_PROCESSOR_THREAD = "C4315";
-
+    final public static String X_INVALID_SHARED_SUBSCRIPTION_NAME        = "C4316";
+    final public static String X_NO_CLIENTID_FOR_NOLOCAL_DURA      = "C4317";
+    final public static String X_NO_CLIENTID_FOR_NOLOCAL_SHARE     = "C4318";
 
     //MQ event codes
 

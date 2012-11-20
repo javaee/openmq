@@ -44,7 +44,7 @@ package javax.jms;
  * This unchecked exception must be thrown when a provider rejects a user
  * name/password submitted by a client, or for any case where a security
  * restriction prevents a method from completing, and the method signature does
- * not permit a <code>JMSSecurityException</code> to be thrown.
+ * not permit a {@code JMSSecurityException} to be thrown.
  *
  * @version     2.0
  **/
@@ -52,7 +52,7 @@ package javax.jms;
 public class JMSSecurityRuntimeException extends JMSRuntimeException {
 	
 	/**
-	 * Constructs a <code>JMSSecurityRuntimeException</code> with the specified detail message
+	 * Constructs a {@code JMSSecurityRuntimeException} with the specified detail message
 	 * 
 	 * @param detailMessage
 	 *            a description of the exception
@@ -62,7 +62,7 @@ public class JMSSecurityRuntimeException extends JMSRuntimeException {
 	}
 
 	/**
-	 * Constructs a <code>JMSSecurityRuntimeException</code> with the specified detail message
+	 * Constructs a {@code JMSSecurityRuntimeException} with the specified detail message
 	 * and error code.
 	 * 
 	 * @param detailMessage
@@ -76,7 +76,7 @@ public class JMSSecurityRuntimeException extends JMSRuntimeException {
 
 
 	/**
-	 * Constructs a <code>JMSSecurityRuntimeException</code> with the specified detail message,
+	 * Constructs a {@code JMSSecurityRuntimeException} with the specified detail message,
 	 * error code and cause
 	 * 
 	 * @param detailMessage

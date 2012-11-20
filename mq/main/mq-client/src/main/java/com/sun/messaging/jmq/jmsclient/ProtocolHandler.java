@@ -2308,11 +2308,13 @@ public class ProtocolHandler {
         //set durable flag
         if (consumer.getDurable() == true) {
             props.put("JMQDurableName", consumer.getDurableName());
-            props.put("JMQShare",
-                            Boolean.valueOf (connection.imqEnableSharedClientID));
+            props.put("JMQShare", Boolean.valueOf(
+                 connection.imqEnableSharedClientID));
         } else {
-            props.put("JMQShare",
-                          Boolean.valueOf (connection.imqEnableSharedSubscriptions && (!dest.isTemporary())));
+            props.put("JMQShare", Boolean.valueOf (
+                (consumer.getSharedSubscriptionName() != null ||
+                 connection.imqEnableSharedSubscriptions) && 
+                (!dest.isTemporary())));
         }
 
         props.put("JMQDestination", dest.getName());
@@ -3668,12 +3670,20 @@ public class ProtocolHandler {
      */
     public void
         rollback(long transactionID) throws JMSException {
-        ReadWritePacket pkt = new ReadWritePacket();
+        rollback(transactionID, false);
+    }
 
+    public void
+        rollback(long transactionID, boolean updateConsumed) throws JMSException {
+
+        ReadWritePacket pkt = new ReadWritePacket();
         pkt.setPacketType(PacketType.ROLLBACK_TRANSACTION);
 
         Hashtable ht = new Hashtable(1);
         ht.put("JMQTransactionID", new Long(transactionID));
+        if (updateConsumed) {
+            ht.put("JMQUpdateConsumed", Boolean.valueOf(true));
+        }
         pkt.setProperties(ht);
 
         //pkt.setTransactionID(transactionID);

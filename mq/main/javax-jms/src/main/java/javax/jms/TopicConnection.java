@@ -40,19 +40,19 @@
 
 package javax.jms;
 
-/** A <CODE>TopicConnection</CODE> object is an active connection to a 
-  * publish/subscribe JMS provider. A client uses a <CODE>TopicConnection</CODE> 
-  * object to create one or more <CODE>TopicSession</CODE> objects
+/** A {@code TopicConnection} object is an active connection to a 
+  * publish/subscribe JMS provider. A client uses a {@code TopicConnection} 
+  * object to create one or more {@code TopicSession} objects
   * for producing and consuming messages.
   *
-  *<P>A <CODE>TopicConnection</CODE> can be used to create a 
-  *<CODE>TopicSession</CODE>, from which
+  *<P>A {@code TopicConnection} can be used to create a 
+  *{@code TopicSession}, from which
   * specialized topic-related objects can be created. 
   * A more general, and recommended approach is to use the 
-  * <CODE>Connection</CODE> object. 
+  * {@code Connection} object. 
   *
   *
-  * <P>The <CODE>TopicConnection</CODE> object
+  * <P>The {@code TopicConnection} object
   * should be used to support existing code.
   *
   * @version     1.1 - February 2, 2002
@@ -67,18 +67,18 @@ package javax.jms;
 
 public interface TopicConnection extends Connection {
 
-    /** Creates a <CODE>TopicSession</CODE> object.
+    /** Creates a {@code TopicSession} object.
       *
       * @param transacted indicates whether the session is transacted
       * @param acknowledgeMode indicates whether the consumer or the
       * client will acknowledge any messages it receives; ignored if the session
-      * is transacted. Legal values are <code>Session.AUTO_ACKNOWLEDGE</code>, 
-      * <code>Session.CLIENT_ACKNOWLEDGE</code>, and 
-      * <code>Session.DUPS_OK_ACKNOWLEDGE</code>. 
+      * is transacted. Legal values are {@code Session.AUTO_ACKNOWLEDGE}, 
+      * {@code Session.CLIENT_ACKNOWLEDGE}, and 
+      * {@code Session.DUPS_OK_ACKNOWLEDGE}. 
       *  
       * @return a newly created topic session
       *  
-      * @exception JMSException if the <CODE>TopicConnection</CODE> object fails
+      * @exception JMSException if the {@code TopicConnection} object fails
       *                         to create a session due to some internal error or
       *                         lack of support for the specific transaction
       *                         and acknowledgement mode.
@@ -108,11 +108,11 @@ public interface TopicConnection extends Connection {
       *
       * @return the connection consumer
       *
-      * @exception JMSException if the <CODE>TopicConnection</CODE> object fails
+      * @exception JMSException if the {@code TopicConnection} object fails
       *                         to create a connection consumer due to some
       *                         internal error or invalid arguments for 
-      *                         <CODE>sessionPool</CODE> and 
-      *                         <CODE>messageSelector</CODE>.
+      *                         {@code sessionPool} and 
+      *                         {@code messageSelector}.
       * @exception InvalidDestinationException if an invalid topic is specified.
       * @exception InvalidSelectorException if the message selector is invalid.
       * @see javax.jms.ConnectionConsumer
@@ -142,11 +142,11 @@ public interface TopicConnection extends Connection {
       *
       * @return the durable connection consumer
       *  
-      * @exception JMSException if the <CODE>TopicConnection</CODE> object fails
+      * @exception JMSException if the {@code TopicConnection} object fails
       *                         to create a connection consumer due to some
       *                         internal error or invalid arguments for 
-      *                         <CODE>sessionPool</CODE> and 
-      *                         <CODE>messageSelector</CODE>.
+      *                         {@code sessionPool} and 
+      *                         {@code messageSelector}.
       * @exception InvalidDestinationException if an invalid topic is specified.
       * @exception InvalidSelectorException if the message selector is invalid.
       * @see javax.jms.ConnectionConsumer

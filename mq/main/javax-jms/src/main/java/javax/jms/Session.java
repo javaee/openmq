@@ -42,7 +42,7 @@ package javax.jms;
 
 import java.io.Serializable;
 
-/** <P>A <CODE>Session</CODE> object is a single-threaded context for producing and consuming 
+/** <P>A {@code Session} object is a single-threaded context for producing and consuming 
   * messages. Although it may allocate provider resources outside the Java 
   * virtual machine (JVM), it is considered a lightweight JMS object.
   *
@@ -51,9 +51,9 @@ import java.io.Serializable;
   * <UL>
   *   <LI>It is a factory for its message producers and consumers.
   *   <LI>It supplies provider-optimized message factories.
-  *   <LI>It is a factory for <CODE>TemporaryTopics</CODE> and 
-  *        <CODE>TemporaryQueues</CODE>. 
-  *   <LI> It provides a way to create <CODE>Queue</CODE> or <CODE>Topic</CODE>
+  *   <LI>It is a factory for {@code TemporaryTopics} and 
+  *        {@code TemporaryQueues}. 
+  *   <LI> It provides a way to create {@code Queue} or {@code Topic}
   *      objects for those clients that need to dynamically manipulate 
   *      provider-specific destination names.
   *   <LI>It supports a single series of transactions that combine work 
@@ -64,15 +64,15 @@ import java.io.Serializable;
   *       acknowledged.
   *   <LI>It serializes execution of message listeners registered with 
   *       its message consumers.
-  *   <LI> It is a factory for <CODE>QueueBrowsers</CODE>.
+  *   <LI> It is a factory for {@code QueueBrowsers}.
   * </UL>
   *
   * <P>A session can create and service multiple message producers and 
   * consumers.
   *
   * <P>One typical use is to have a thread block on a synchronous 
-  * <CODE>MessageConsumer</CODE> until a message arrives. The thread may then
-  * use one or more of the <CODE>Session</CODE>'s <CODE>MessageProducer</CODE>s.
+  * {@code MessageConsumer} until a message arrives. The thread may then
+  * use one or more of the {@code Session}'s {@code MessageProducer}s.
   *
   * <P>If a client desires to have one thread produce messages while others 
   * consume them, the client should use a separate session for its producing 
@@ -83,13 +83,13 @@ import java.io.Serializable;
   * delivers messages to it. It is erroneous for client code to use this session
   * or any of its constituent objects from another thread of control. The
   * only exception to this rule is the use of the session or connection 
-  * <CODE>close</CODE> method.
+  * {@code close} method.
   *
   * <P>It should be easy for most clients to partition their work naturally
   * into sessions. This model allows clients to start simply and incrementally
   * add message processing complexity as their need for concurrency grows.
   *
-  * <P>The <CODE>close</CODE> method is the only session method that can be 
+  * <P>The {@code close} method is the only session method that can be 
   * called while some other session method is being executed in another thread.
   *
   * <P>A session may be specified as transacted. Each transacted 
@@ -106,8 +106,8 @@ import java.io.Serializable;
   * messages that have been produced and consumed within the session's current 
   * transaction.
   *
-  * <P>A transaction is completed using either its session's <CODE>commit</CODE>
-  * method or its session's <CODE>rollback</CODE> method. The completion of a
+  * <P>A transaction is completed using either its session's {@code commit}
+  * method or its session's {@code rollback} method. The completion of a
   * session's current transaction automatically begins the next. The result is
   * that a transacted session always has a current transaction within which its 
   * work is done.  
@@ -116,7 +116,7 @@ import java.io.Serializable;
   * be used to combine a session's transaction with transactions on other 
   * resources (databases, other JMS sessions, etc.). Since Java distributed 
   * transactions are controlled via the Java Transaction API (JTA), use of the 
-  * session's <CODE>commit</CODE> and <CODE>rollback</CODE> methods in 
+  * session's {@code commit} and {@code rollback} methods in 
   * this context is prohibited.
   *
   * <P>The JMS API does not require support for JTA; however, it does define 
@@ -134,11 +134,11 @@ import java.io.Serializable;
   * @see         javax.jms.XASession
   */ 
  
-public interface Session extends Runnable {
+public interface Session extends Runnable, AutoCloseable {
 
     /** With this acknowledgment mode, the session automatically acknowledges
       * a client's receipt of a message either when the session has successfully 
-      * returned from a call to <CODE>receive</CODE> or when the message 
+      * returned from a call to {@code receive} or when the message 
       * listener the session has called to process the message successfully 
       * returns.
       */ 
@@ -146,7 +146,7 @@ public interface Session extends Runnable {
     static final int AUTO_ACKNOWLEDGE = 1;
 
     /** With this acknowledgment mode, the client acknowledges a consumed 
-      * message by calling the message's <CODE>acknowledge</CODE> method. 
+      * message by calling the message's {@code acknowledge} method. 
       * Acknowledging a consumed message acknowledges all messages that the 
       * session has consumed.
       *
@@ -173,24 +173,24 @@ public interface Session extends Runnable {
     static final int DUPS_OK_ACKNOWLEDGE = 3;
     
     /** This value may be passed as the argument to the 
-     * method <code>createSession(int sessionMode)</code>
-     * on the <code>Connection</code> object
+     * method {@code createSession(int sessionMode)}
+     * on the {@code Connection} object
      * to specify that the session should use a local transaction.
      * <p>
      * This value is returned from the method 
-     * <CODE>getAcknowledgeMode</CODE> if the session is using a local transaction,
+     * {@code getAcknowledgeMode} if the session is using a local transaction,
      * irrespective of whether the session was created by calling the
-     * method <code>createSession(int sessionMode)</code> or the 
-     * method <code>createSession(boolean transacted, int acknowledgeMode)</code>.
+     * method {@code createSession(int sessionMode)} or the 
+     * method {@code createSession(boolean transacted, int acknowledgeMode)}.
      */
     static final int SESSION_TRANSACTED = 0;
 
-    /** Creates a <CODE>BytesMessage</CODE> object. A <CODE>BytesMessage</CODE> 
+    /** Creates a {@code BytesMessage} object. A {@code BytesMessage} 
       * object is used to send a message containing a stream of uninterpreted 
       * bytes.
       * <p>
-      * The message object returned may be sent using any <code>Session</code> or <code>JMSContext</code>. 
-      * It is not restricted to being sent using the <code>JMSContext</code> used to create it.
+      * The message object returned may be sent using any {@code Session} or {@code JMSContext}. 
+      * It is not restricted to being sent using the {@code JMSContext} used to create it.
       * <p>
       * The message object returned may be optimised for use with the JMS provider
       * used to create it. However it can be sent using any JMS provider, not just the 
@@ -203,13 +203,13 @@ public interface Session extends Runnable {
     createBytesMessage() throws JMSException; 
 
  
-    /** Creates a <CODE>MapMessage</CODE> object. A <CODE>MapMessage</CODE> 
+    /** Creates a {@code MapMessage} object. A {@code MapMessage} 
       * object is used to send a self-defining set of name-value pairs, where 
-      * names are <CODE>String</CODE> objects and values are primitive values 
+      * names are {@code String} objects and values are primitive values 
       * in the Java programming language.
       * <p>
-      * The message object returned may be sent using any <code>Session</code> or <code>JMSContext</code>. 
-      * It is not restricted to being sent using the <code>JMSContext</code> used to create it.
+      * The message object returned may be sent using any {@code Session} or {@code JMSContext}. 
+      * It is not restricted to being sent using the {@code JMSContext} used to create it.
       * <p>
       * The message object returned may be optimised for use with the JMS provider
       * used to create it. However it can be sent using any JMS provider, not just the 
@@ -223,14 +223,14 @@ public interface Session extends Runnable {
     createMapMessage() throws JMSException; 
 
  
-    /** Creates a <CODE>Message</CODE> object. The <CODE>Message</CODE> 
+    /** Creates a {@code Message} object. The {@code Message} 
       * interface is the root interface of all JMS messages. A 
-      * <CODE>Message</CODE> object holds all the 
+      * {@code Message} object holds all the 
       * standard message header information. It can be sent when a message 
       * containing only header information is sufficient.
       * <p>
-      * The message object returned may be sent using any <code>Session</code> or <code>JMSContext</code>. 
-      * It is not restricted to being sent using the <code>JMSContext</code> used to create it.
+      * The message object returned may be sent using any {@code Session} or {@code JMSContext}. 
+      * It is not restricted to being sent using the {@code JMSContext} used to create it.
       * <p>
       * The message object returned may be optimised for use with the JMS provider
       * used to create it. However it can be sent using any JMS provider, not just the 
@@ -244,12 +244,12 @@ public interface Session extends Runnable {
     createMessage() throws JMSException;
 
 
-    /** Creates an <CODE>ObjectMessage</CODE> object. An 
-      * <CODE>ObjectMessage</CODE> object is used to send a message 
+    /** Creates an {@code ObjectMessage} object. An 
+      * {@code ObjectMessage} object is used to send a message 
       * that contains a serializable Java object.
       * <p>
-      * The message object returned may be sent using any <code>Session</code> or <code>JMSContext</code>. 
-      * It is not restricted to being sent using the <code>JMSContext</code> used to create it.
+      * The message object returned may be sent using any {@code Session} or {@code JMSContext}. 
+      * It is not restricted to being sent using the {@code JMSContext} used to create it.
       * <p>
       * The message object returned may be optimised for use with the JMS provider
       * used to create it. However it can be sent using any JMS provider, not just the 
@@ -263,12 +263,12 @@ public interface Session extends Runnable {
     createObjectMessage() throws JMSException; 
 
 
-    /** Creates an initialized <CODE>ObjectMessage</CODE> object. An 
-      * <CODE>ObjectMessage</CODE> object is used 
+    /** Creates an initialized {@code ObjectMessage} object. An 
+      * {@code ObjectMessage} object is used 
       * to send a message that contains a serializable Java object.
       * <p>
-      * The message object returned may be sent using any <code>Session</code> or <code>JMSContext</code>. 
-      * It is not restricted to being sent using the <code>JMSContext</code> used to create it.
+      * The message object returned may be sent using any {@code Session} or {@code JMSContext}. 
+      * It is not restricted to being sent using the {@code JMSContext} used to create it.
       * <p>
       * The message object returned may be optimised for use with the JMS provider
       * used to create it. However it can be sent using any JMS provider, not just the 
@@ -284,13 +284,13 @@ public interface Session extends Runnable {
     createObjectMessage(Serializable object) throws JMSException;
 
  
-    /** Creates a <CODE>StreamMessage</CODE> object. A 
-      * <CODE>StreamMessage</CODE> object is used to send a 
+    /** Creates a {@code StreamMessage} object. A 
+      * {@code StreamMessage} object is used to send a 
       * self-defining stream of primitive values in the Java programming 
       * language.
       * <p>
-      * The message object returned may be sent using any <code>Session</code> or <code>JMSContext</code>. 
-      * It is not restricted to being sent using the <code>JMSContext</code> used to create it.
+      * The message object returned may be sent using any {@code Session} or {@code JMSContext}. 
+      * It is not restricted to being sent using the {@code JMSContext} used to create it.
       * <p>
       * The message object returned may be optimised for use with the JMS provider
       * used to create it. However it can be sent using any JMS provider, not just the 
@@ -304,12 +304,12 @@ public interface Session extends Runnable {
     createStreamMessage() throws JMSException;  
 
  
-    /** Creates a <CODE>TextMessage</CODE> object. A <CODE>TextMessage</CODE> 
-      * object is used to send a message containing a <CODE>String</CODE>
+    /** Creates a {@code TextMessage} object. A {@code TextMessage} 
+      * object is used to send a message containing a {@code String}
       * object.
       * <p>
-      * The message object returned may be sent using any <code>Session</code> or <code>JMSContext</code>. 
-      * It is not restricted to being sent using the <code>JMSContext</code> used to create it.
+      * The message object returned may be sent using any {@code Session} or {@code JMSContext}. 
+      * It is not restricted to being sent using the {@code JMSContext} used to create it.
       * <p>
       * The message object returned may be optimised for use with the JMS provider
       * used to create it. However it can be sent using any JMS provider, not just the 
@@ -323,12 +323,12 @@ public interface Session extends Runnable {
     createTextMessage() throws JMSException; 
 
 
-    /** Creates an initialized <CODE>TextMessage</CODE> object. A 
-      * <CODE>TextMessage</CODE> object is used to send 
-      * a message containing a <CODE>String</CODE>.
+    /** Creates an initialized {@code TextMessage} object. A 
+      * {@code TextMessage} object is used to send 
+      * a message containing a {@code String}.
       * <p>
-      * The message object returned may be sent using any <code>Session</code> or <code>JMSContext</code>. 
-      * It is not restricted to being sent using the <code>JMSContext</code> used to create it.
+      * The message object returned may be sent using any {@code Session} or {@code JMSContext}. 
+      * It is not restricted to being sent using the {@code JMSContext} used to create it.
       * <p>
       * The message object returned may be optimised for use with the JMS provider
       * used to create it. However it can be sent using any JMS provider, not just the 
@@ -374,17 +374,32 @@ public interface Session extends Runnable {
     getAcknowledgeMode() throws JMSException;
 
 
-    /** Commits all messages done in this transaction and releases any locks
-      * currently held.
-      *
-      * @exception JMSException if the JMS provider fails to commit the
-      *                         transaction due to some internal error.
-      * @exception TransactionRolledBackException if the transaction
-      *                         is rolled back due to some internal error
-      *                         during commit.
-      * @exception IllegalStateException if the method is not called by a 
-      *                         transacted session.
-      */
+    /**
+	 * Commits all messages done in this transaction and releases any locks
+	 * currently held.
+	 * <p>
+	 * This method must not return until any incomplete asynchronous send
+	 * operations for this <tt>Session</tt> have been completed and any
+	 * <tt>CompletionListener</tt> callbacks have returned. Incomplete sends
+	 * should be allowed to complete normally unless an error occurs.
+	 * <p>
+	 * A <tt>CompletionListener</tt> callback method must not call
+	 * <tt>commit</tt> on its own <tt>Session</tt>. Doing so will cause an
+	 * <tt>IllegalStateException</tt> to be thrown.
+	 * <p>
+	 * 
+	 * @exception IllegalStateException
+	 *                <ul>
+	 *                <li>the session is not using a local transaction
+	 *                <li>this method has been called by a <tt>CompletionListener</tt> callback method on its own <tt>Session</tt></li>
+	 *                </ul>
+	 * @exception JMSException
+	 *                if the JMS provider fails to commit the transaction due to
+	 *                some internal error.
+	 * @exception TransactionRolledBackException
+	 *                if the transaction is rolled back due to some internal
+	 *                error during commit.
+	 */
 
     void
     commit() throws JMSException;
@@ -392,11 +407,24 @@ public interface Session extends Runnable {
 
     /** Rolls back any messages done in this transaction and releases any locks 
       * currently held.
-      *
+	 * <p>
+	 * This method must not return until any incomplete asynchronous send
+	 * operations for this <tt>Session</tt> have been completed and any
+	 * <tt>CompletionListener</tt> callbacks have returned. Incomplete sends
+	 * should be allowed to complete normally unless an error occurs.
+	 * <p>
+	  * A <tt>CompletionListener</tt> callback method must not call
+	  * <tt>commit</tt> on its own <tt>Session</tt>. Doing so will cause an
+	  * <tt>IllegalStateException</tt> to be thrown.
+	  * <p>
+	  * 
+	  * @exception IllegalStateException
+	  *                <ul>
+	  *                <li>the session is not using a local transaction
+	  *                <li>this method has been called by a <tt>CompletionListener</tt> callback method on its own <tt>Session</tt></li>
+	  *                </ul>
       * @exception JMSException if the JMS provider fails to roll back the
       *                         transaction due to some internal error.
-      * @exception IllegalStateException if the method is not called by a 
-      *                         transacted session.
       *                                     
       */
 
@@ -404,45 +432,67 @@ public interface Session extends Runnable {
     rollback() throws JMSException;
 
 
-    /** Closes the session.
-      *
-      * <P>Since a provider may allocate some resources on behalf of a session 
-      * outside the JVM, clients should close the resources when they are not 
-      * needed. 
-      * Relying on garbage collection to eventually reclaim these resources 
-      * may not be timely enough.
-      *
-      * <P>There is no need to close the producers and consumers
-      * of a closed session. 
-      *
-      * <P> This call will block until a <CODE>receive</CODE> call or message 
-      * listener in progress has completed. A blocked message consumer
-      * <CODE>receive</CODE> call returns <CODE>null</CODE> when this session 
-      * is closed.
-      * <p>
-      * A message listener must not attempt to close its own session as this 
-      * would lead to deadlock. The JMS provider must detect this and throw a 
-      * javax.jms.IllegalStateException.
-      * <p>
-      * For the avoidance of doubt, if an exception listener for this session's connection 
-      * is running when <code>close</code> is invoked, there is no requirement for 
-      * the <code>close</code> call to wait until the exception listener has returned
-      * before it may return. 
-      * 
-      * <P>Closing a transacted session must roll back the transaction
-      * in progress.
-      * 
-      * <P>This method is the only <CODE>Session</CODE> method that can 
-      * be called concurrently. 
-      *
-      * <P>Invoking any other <CODE>Session</CODE> method on a closed session 
-      * must throw a <CODE>JMSException.IllegalStateException</CODE>. Closing a 
-      * closed session must <I>not</I> throw an exception.
-      * 
-      * @exception JMSException if the JMS provider fails to close the
-      *                         session due to some internal error.
-      *                         
-      */
+    /**
+	 * Closes the session.
+	 * 
+	 * <P>
+	 * Since a provider may allocate some resources on behalf of a session
+	 * outside the JVM, clients should close the resources when they are not
+	 * needed. Relying on garbage collection to eventually reclaim these
+	 * resources may not be timely enough.
+	 * 
+	 * <P>
+	 * There is no need to close the producers and consumers of a closed
+	 * session.
+	 * 
+	 * <P>
+	 * This call will block until a {@code receive} call or message
+	 * listener in progress has completed. A blocked message consumer
+	 * {@code receive} call returns {@code null} when this session is
+	 * closed.
+	 * <p>
+	 * This method must not return until any incomplete asynchronous send
+	 * operations for this <tt>Session</tt> have been completed and any
+	 * <tt>CompletionListener</tt> callbacks have returned. Incomplete sends
+	 * should be allowed to complete normally unless an error occurs.
+	 * <p>
+	 * For the avoidance of doubt, if an exception listener for this session's
+	 * connection is running when {@code close} is invoked, there is no
+	 * requirement for the {@code close} call to wait until the exception
+	 * listener has returned before it may return.
+	 * 
+	 * <P>
+	 * Closing a transacted session must roll back the transaction in progress.
+	 * 
+	 * <P>
+	 * This method is the only {@code Session} method that can be called
+	 * concurrently.
+	 * <p>
+	 * A <tt>MessageListener</tt> must not attempt to close its own
+	 * <tt>Session</tt> as this would lead to deadlock. The JMS provider must
+	 * detect this and throw a <tt>IllegalStateException</tt>.
+	 * <p>
+	 * A <tt>CompletionListener</tt> callback method must not call
+	 * <tt>close</tt> on its own <tt>Session</tt>. Doing so will cause an
+	 * <tt>IllegalStateException</tt> to be thrown.
+	 * <p>
+	 * Invoking any other {@code Session} method on a closed session must
+	 * throw a {@code IllegalStateException}. Closing a closed
+	 * session must <I>not</I> throw an exception.
+	 * 
+	 * @exception IllegalStateException
+	 *                <ul>
+	 *                <li>this method has been called by a <tt>MessageListener
+	 *                </tt> on its own <tt>Session</tt></li> 
+	 *                <li>this method has
+	 *                been called by a <tt>CompletionListener</tt> callback
+	 *                method on its own <tt>Session</tt></li>
+	 *                </ul>
+	 * @exception JMSException
+	 *                if the JMS provider fails to close the session due to some
+	 *                internal error.
+	 * 
+	 */
 
     void
     close() throws JMSException;
@@ -480,7 +530,7 @@ public interface Session extends Runnable {
     /** Returns the session's distinguished message listener (optional).
      * <p>
      * This method must not be used in a Java EE web or EJB application. 
-     * Doing so may cause a <code>JMSException</code> to be thrown though this is not guaranteed.
+     * Doing so may cause a {@code JMSException} to be thrown though this is not guaranteed.
       * 
       * @return the distinguished message listener associated with this session
       *
@@ -507,7 +557,7 @@ public interface Session extends Runnable {
      * <P>This is an expert facility not used by ordinary JMS clients.
      * <p>
      * This method must not be used in a Java EE web or EJB application. 
-     * Doing so may cause a <code>JMSException</code> to be thrown though this is not guaranteed.
+     * Doing so may cause a {@code JMSException} to be thrown though this is not guaranteed.
      * 
      * @param listener the message listener to associate with this session
      *
@@ -530,7 +580,7 @@ public interface Session extends Runnable {
      * not by ordinary JMS clients.
      * <p>
      * This method must not be used in a Java EE web or EJB application. 
-     * Doing so may cause a <code>JMSRuntimeException</code> to be thrown though this is not guaranteed.
+     * Doing so may cause a {@code JMSRuntimeException} to be thrown though this is not guaranteed.
      * 
       * @exception JMSRuntimeException if this method has been called in a Java EE web or EJB application 
       *                         (though it is not guaranteed that an exception is thrown in this case)
@@ -539,15 +589,15 @@ public interface Session extends Runnable {
      */
     public void run();
     
-    /** Creates a <CODE>MessageProducer</CODE> to send messages to the specified 
+    /** Creates a {@code MessageProducer} to send messages to the specified 
       * destination.
       *
-      * <P>A client uses a <CODE>MessageProducer</CODE> object to send 
-      * messages to a destination. Since <CODE>Queue</CODE> and <CODE>Topic</CODE> 
-      * both inherit from <CODE>Destination</CODE>, they can be used in
-      * the destination parameter to create a <CODE>MessageProducer</CODE> object.
+      * <P>A client uses a {@code MessageProducer} object to send 
+      * messages to a destination. Since {@code Queue} and {@code Topic} 
+      * both inherit from {@code Destination}, they can be used in
+      * the destination parameter to create a {@code MessageProducer} object.
       * 
-      * @param destination the <CODE>Destination</CODE> to send to, 
+      * @param destination the {@code Destination} to send to, 
       * or null if this is a producer which does not have a specified 
       * destination.
       *
@@ -564,12 +614,12 @@ public interface Session extends Runnable {
     createProducer(Destination destination) throws JMSException;
     
     
-       /** Creates a <CODE>MessageConsumer</CODE> for the specified destination.
-      * Since <CODE>Queue</CODE> and <CODE>Topic</CODE> 
-      * both inherit from <CODE>Destination</CODE>, they can be used in
-      * the destination parameter to create a <CODE>MessageConsumer</CODE>.
+       /** Creates a {@code MessageConsumer} for the specified destination.
+      * Since {@code Queue} and {@code Topic} 
+      * both inherit from {@code Destination}, they can be used in
+      * the destination parameter to create a {@code MessageConsumer}.
       *
-      * @param destination the <CODE>Destination</CODE> to access. 
+      * @param destination the {@code Destination} to access. 
       *
       * @exception JMSException if the session fails to create a consumer
       *                         due to some internal error.
@@ -582,17 +632,17 @@ public interface Session extends Runnable {
     MessageConsumer
     createConsumer(Destination destination) throws JMSException;
 
-       /** Creates a <CODE>MessageConsumer</CODE> for the specified destination, 
+       /** Creates a {@code MessageConsumer} for the specified destination, 
       * using a message selector. 
-      * Since <CODE>Queue</CODE> and <CODE>Topic</CODE> 
-      * both inherit from <CODE>Destination</CODE>, they can be used in
-      * the destination parameter to create a <CODE>MessageConsumer</CODE>.
+      * Since {@code Queue} and {@code Topic} 
+      * both inherit from {@code Destination}, they can be used in
+      * the destination parameter to create a {@code MessageConsumer}.
       *
-      * <P>A client uses a <CODE>MessageConsumer</CODE> object to receive 
+      * <P>A client uses a {@code MessageConsumer} object to receive 
       * messages that have been sent to a destination.
       *  
       *       
-      * @param destination the <CODE>Destination</CODE> to access
+      * @param destination the {@code Destination} to access
       * @param messageSelector only messages with properties matching the
       * message selector expression are delivered. A value of null or
       * an empty string indicates that there is no message selector 
@@ -613,31 +663,31 @@ public interface Session extends Runnable {
     throws JMSException;
     
     
-     /** Creates <CODE>MessageConsumer</CODE> for the specified destination, specifying a
-      * message selector and the <code>noLocal</code> parameter.
-      *<P> Since <CODE>Queue</CODE> and <CODE>Topic</CODE> 
-      * both inherit from <CODE>Destination</CODE>, they can be used in
-      * the destination parameter to create a <CODE>MessageConsumer</CODE>.
-      * <P>A client uses a <CODE>MessageConsumer</CODE> object to receive 
+     /** Creates {@code MessageConsumer} for the specified destination, specifying a
+      * message selector and the {@code noLocal} parameter.
+      *<P> Since {@code Queue} and {@code Topic} 
+      * both inherit from {@code Destination}, they can be used in
+      * the destination parameter to create a {@code MessageConsumer}.
+      * <P>A client uses a {@code MessageConsumer} object to receive 
       * messages that have been published to a destination. 
       *               
-      * <P>The <code>noLocal</code> argument is for use when the
+      * <P>The {@code noLocal} argument is for use when the
       * destination is a topic and the session's connection 
       * is also being used to publish messages to that topic. 
-      * If <code>noLocal</code> is set to true then the 
-      * <code>MessageConsumer</code> will not receive messages published
+      * If {@code noLocal} is set to true then the 
+      * {@code MessageConsumer} will not receive messages published
       * to the topic by its own connection. The default value of this 
       * argument is false. If the destination is a queue
-      * then the effect of setting <code>noLocal</code>
+      * then the effect of setting {@code noLocal}
       * to true is not specified.
       *
-      * @param destination the <CODE>Destination</CODE> to access 
+      * @param destination the {@code Destination} to access 
       * @param messageSelector only messages with properties matching the
       * message selector expression are delivered. A value of null or
       * an empty string indicates that there is no message selector 
       * for the message consumer.
       * @param noLocal  - if true, and the destination is a topic,
-      *                   then the <code>MessageConsumer</code> will 
+      *                   then the {@code MessageConsumer} will 
       *                   not receive messages published to the topic
       *                   by its own connection. 
       * 
@@ -657,12 +707,13 @@ public interface Session extends Runnable {
     
 	/**
 	 * Creates a shared non-durable subscription with the specified name on the
-	 * specified topic, and creates a <code>MessageConsumer</code> on that
+	 * specified topic, and creates a {@code MessageConsumer} on that
 	 * subscription.
 	 * <p>
 	 * If a shared non-durable subscription already exists with the same name
-	 * and the same topic, and without a message selector, then this method
-	 * creates a <code>MessageConsumer</code> on the existing subscription.
+	 * and client identifier (if set) and the same topic, and without a message
+	 * selector, then this method creates a {@code MessageConsumer} on the
+	 * existing subscription.
 	 * <p>
 	 * A non-durable shared subscription is used by a client which needs to be
 	 * able to share the work of receiving messages from a topic subscription
@@ -674,28 +725,35 @@ public interface Session extends Runnable {
 	 * it.
 	 * <p>
 	 * A consumer may be created on a non-durable shared subscription using the
-	 * <code>createSharedConsumer</code> methods on <code>JMSContext</code>,
-	 * <code>Session</code> or <code>TopicSession</code>.
+	 * {@code createSharedConsumer} methods on {@code JMSContext},
+	 * {@code Session} or {@code TopicSession}.
+     * <p>
+     * A shared non-durable subscription is identified by a name specified by the client
+     * and by the client identifier if set. If the client identifier was set
+     * when the shared non-durable subscription was first created then a client which 
+     * subsequently wishes to create a consumer 
+     * on that shared non-durable subscription must use the same client identifier.
 	 * <p>
 	 * If there is an active consumer on the non-durable shared subscription (or
 	 * a consumed message from that subscription is still part of a pending
 	 * transaction or is not yet acknowledged in the session), and an attempt is
-	 * made to create an additional consumer, specifying the same name but a
-	 * different topic or message selector, then a <code>JMSException</code>
-	 * will be thrown.
+	 * made to create an additional consumer, specifying the same name and
+	 * client identifier (if set) but a different topic or message selector, or,
+	 * if the client identifier is set, a different noLocal value, then a
+	 * {@code JMSException} will be thrown.
 	 * <p>
 	 * There is no restriction to prevent a shared non-durable subscription and
 	 * a durable subscription having the same name. Such subscriptions would be
 	 * completely separate.
 	 * 
 	 * @param topic
-	 *            the <code>Topic</code> to subscribe to
+	 *            the {@code Topic} to subscribe to
 	 * @param sharedSubscriptionName
 	 *            the name used to identify the shared non-durable subscription
 	 * 
 	 * @throws JMSException
 	 *             if the session fails to create the shared non-durable
-	 *             subscription and <code>MessageConsumer</code> due to some
+	 *             subscription and {@code MessageConsumer} due to some
 	 *             internal error.
 	 * @throws InvalidDestinationException
 	 *             if an invalid topic is specified.
@@ -709,11 +767,12 @@ public interface Session extends Runnable {
 	/**
 	 * Creates a shared non-durable subscription with the specified name on the
 	 * specified topic, specifying a message selector, and creates a
-	 * <code>MessageConsumer</code> on that subscription.
+	 * {@code MessageConsumer} on that subscription.
 	 * <p>
 	 * If a shared non-durable subscription already exists with the same name
+	 * and client identifier (if set)
 	 * and the same topic and message selector then this method creates a
-	 * <code>MessageConsumer</code> on the existing subscription.
+	 * {@code MessageConsumer} on the existing subscription.
 	 * <p>
 	 * A non-durable shared subscription is used by a client which needs to be
 	 * able to share the work of receiving messages from a topic subscription
@@ -725,22 +784,29 @@ public interface Session extends Runnable {
 	 * it.
 	 * <p>
 	 * A consumer may be created on a non-durable shared subscription using the
-	 * <code>createSharedConsumer</code> methods on <code>JMSContext</code>,
-	 * <code>Session</code> or <code>TopicSession</code>.
+	 * {@code createSharedConsumer} methods on {@code JMSContext},
+	 * {@code Session} or {@code TopicSession}.
+     * <p>
+     * A shared non-durable subscription is identified by a name specified by the client
+     * and by the client identifier if set. If the client identifier was set
+     * when the shared non-durable subscription was first created then a client which 
+     * subsequently wishes to create a consumer 
+     * on that shared non-durable subscription must use the same client identifier.
 	 * <p>
 	 * If there is an active consumer on the non-durable shared subscription (or
 	 * a consumed message from that subscription is still part of a pending
 	 * transaction or is not yet acknowledged in the session), and an attempt is
-	 * made to create an additional consumer, specifying the same name but a
-	 * different topic or message selector, then a <code>JMSException</code>
-	 * will be thrown.
+	 * made to create an additional consumer, specifying the same name and
+	 * client identifier (if set) but a different topic or message selector, or,
+	 * if the client identifier is set, a different noLocal value, then a
+	 * {@code JMSException} will be thrown.
 	 * <p>
 	 * There is no restriction to prevent a shared non-durable subscription and
 	 * a durable subscription having the same name. Such subscriptions would be
 	 * completely separate.
 	 * 
 	 * @param topic
-	 *            the <code>Topic</code> to subscribe to
+	 *            the {@code Topic} to subscribe to
 	 * @param sharedSubscriptionName
 	 *            the name used to identify the shared non-durable subscription
 	 * @param messageSelector
@@ -751,7 +817,7 @@ public interface Session extends Runnable {
 	 * 
 	 * @throws JMSException
 	 *             if the session fails to create the shared non-durable
-	 *             subscription and <code>MessageConsumer</code> due to some
+	 *             subscription and {@code MessageConsumer} due to some
 	 *             internal error.
 	 * @throws InvalidDestinationException
 	 *             if an invalid topic is specified.
@@ -766,12 +832,13 @@ public interface Session extends Runnable {
 	/**
 	 * Creates a shared non-durable subscription with the specified name on the
 	 * specified topic, specifying a message selector and the
-	 * <code>noLocal</code> parameter, and creates a
-	 * <code>MessageConsumer</code> on that subscription,
+	 * {@code noLocal} parameter, and creates a
+	 * {@code MessageConsumer} on that subscription,
 	 * <p>
 	 * If a shared non-durable subscription already exists with the same name
+	 * and client identifier (if set)
 	 * and the same topic and message selector then this method creates a
-	 * <code>MessageConsumer</code> on the existing subscription.
+	 * {@code MessageConsumer} on the existing subscription.
 	 * <p>
 	 * A non-durable shared subscription is used by a client which needs to be
 	 * able to share the work of receiving messages from a topic subscription
@@ -783,26 +850,36 @@ public interface Session extends Runnable {
 	 * it.
 	 * <p>
 	 * A consumer may be created on a non-durable shared subscription using the
-	 * <code>createSharedConsumer</code> methods on <code>JMSContext</code>,
-	 * <code>Session</code> or <code>TopicSession</code>.
+	 * {@code createSharedConsumer} methods on {@code JMSContext},
+	 * {@code Session} or {@code TopicSession}.
+     * <p>
+     * A shared non-durable subscription is identified by a name specified by the client
+     * and by the client identifier if set. If the client identifier was set
+     * when the shared non-durable subscription was first created then a client which 
+     * subsequently wishes to create a consumer 
+     * on that shared non-durable subscription must use the same client identifier.
+	 * <p>
+	 * If {@code noLocal} is set to true, and the client identifier is set,
+	 * then any messages published to the topic using this session's connection,
+	 * or any other connection with the same client
+	 * identifier, will not be added to the shared non-durable subscription. If the client
+	 * identifier is unset then setting {@code noLocal} to true will cause
+	 * an {@code IllegalStateException} to be thrown. 
 	 * <p>
 	 * If there is an active consumer on the non-durable shared subscription (or
 	 * a consumed message from that subscription is still part of a pending
 	 * transaction or is not yet acknowledged in the session), and an attempt is
-	 * made to create an additional consumer, specifying the same name but a
-	 * different topic or message selector, then a <code>JMSException</code>
-	 * will be thrown.
-	 * <p>
-	 * If <code>noLocal</code> is set to true then messages published to the
-	 * topic by its own connection will not be added to the shared non-durable
-	 * subscription. The default value of this argument is false.
+	 * made to create an additional consumer, specifying the same name and
+	 * client identifier (if set) but a different topic or message selector, or,
+	 * if the client identifier is set, a different noLocal value, then a
+	 * {@code JMSException} will be thrown.
 	 * <p>
 	 * There is no restriction to prevent a shared non-durable subscription and
 	 * a durable subscription having the same name. Such subscriptions would be
 	 * completely separate.
 	 * 
 	 * @param topic
-	 *            the <code>Topic</code> to subscribe to
+	 *            the {@code Topic} to subscribe to
 	 * @param sharedSubscriptionName
 	 *            the name used to identify the shared non-durable subscription
 	 * @param messageSelector
@@ -811,31 +888,37 @@ public interface Session extends Runnable {
 	 *            value of null or an empty string indicates that there is no
 	 *            message selector for the non-durable subscription.
 	 * @param noLocal
-	 *            if true, messages published by its own connection will not be
-	 *            added to the shared non-durable subscription.
+	 *            if true, and the client identifier is set, then any messages
+	 *            published to the topic using this session's connection, or any
+	 *            other connection with the same
+	 *            client identifier, will not be added to the shared non-durable
+	 *            subscription.
 	 * 
 	 * @throws JMSException
 	 *             if the session fails to create the shared non-durable
-	 *             subscription and <code>MessageConsumer</code> due to some
+	 *             subscription and {@code MessageConsumer} due to some
 	 *             internal error.
 	 * @throws InvalidDestinationException
 	 *             if an invalid topic is specified.
 	 * @throws InvalidSelectorException
 	 *             if the message selector is invalid.
-	 * 
+	 * @throws IllegalStateException
+	 *             if {@code noLocal} is set to {@code true} but
+	 *             the client identifier is unset
+	 *                
 	 * @since 2.0
 	 */ 
 	MessageConsumer createSharedConsumer(Topic topic, String sharedSubscriptionName, java.lang.String messageSelector,
 			boolean noLocal) throws JMSException;   
     
 	/**
-	 * Creates a <code>Queue</code> object which encapsulates a specified
+	 * Creates a {@code Queue} object which encapsulates a specified
 	 * provider-specific queue name.
 	 * <p>
 	 * The use of provider-specific queue names in an application may render the
 	 * application non-portable. Portable applications are recommended to not
 	 * use this method but instead look up an administratively-defined
-	 * <code>Queue</code> object using JNDI.
+	 * {@code Queue} object using JNDI.
 	 * <p>
 	 * Note that this method simply creates an object that encapsulates the name
 	 * of a queue. It does not create the physical queue in the JMS provider.
@@ -844,7 +927,7 @@ public interface Session extends Runnable {
 	 * provider-specific and is typically an administrative task performed by an 
 	 * administrator, though some providers may create them automatically when
 	 * needed. The one exception to this is the creation of a temporary queue,
-	 * which is done using the <code>createTemporaryQueue</code> method.
+	 * which is done using the {@code createTemporaryQueue} method.
 	 * 
 	 * @param queueName
 	 *            A provider-specific queue name
@@ -856,13 +939,13 @@ public interface Session extends Runnable {
 	Queue createQueue(String queueName) throws JMSException;
 
 	/**
-	 * Creates a <code>Topic</code> object which encapsulates a specified
+	 * Creates a {@code Topic} object which encapsulates a specified
 	 * provider-specific topic name.
 	 * <p>
 	 * The use of provider-specific topic names in an application may render the
 	 * application non-portable. Portable applications are recommended to not
 	 * use this method but instead look up an administratively-defined
-	 * <code>Topic</code> object using JNDI.
+	 * {@code Topic} object using JNDI.
 	 * <p>
 	 * Note that this method simply creates an object that encapsulates the name
 	 * of a topic. It does not create the physical topic in the JMS provider.
@@ -871,7 +954,7 @@ public interface Session extends Runnable {
 	 * provider-specific and is typically an administrative task performed by an
 	 * administrator, though some providers may create them automatically when
 	 * needed. The one exception to this is the creation of a temporary topic,
-	 * which is done using the <code>createTemporaryTopic</code> method.
+	 * which is done using the {@code createTemporaryTopic} method.
 	 * 
 	 * @param topicName
 	 *            A provider-specific topic name
@@ -883,10 +966,10 @@ public interface Session extends Runnable {
 	 */
 	Topic createTopic(String topicName) throws JMSException;
 
-     /** Creates a <CODE>QueueBrowser</CODE> object to peek at the messages on 
+     /** Creates a {@code QueueBrowser} object to peek at the messages on 
       * the specified queue.
       *
-      * @param queue the <CODE>queue</CODE> to access
+      * @param queue the {@code queue} to access
       *
       * @exception InvalidDestinationException if an invalid destination
       *                         is specified 
@@ -895,17 +978,17 @@ public interface Session extends Runnable {
       */
     
     /** Creates a durable subscription with the specified name on the
-     * specified topic, and creates a <code>TopicSubscriber</code> 
+     * specified topic, and creates a {@code TopicSubscriber} 
      * on that durable subscription.
      * <p>
-     * This method is identical to the corresponding <code>createDurableConsumer</code>
-     * method except that it returns a <code>TopicSubscriber</code> rather than a
-     * <code>MessageConsumer</code>.    
-     * The term "consumer" applies to both <code>TopicSubscriber</code> and <code>MessageConsumer</code> objects.
+     * This method is identical to the corresponding {@code createDurableConsumer}
+     * method except that it returns a {@code TopicSubscriber} rather than a
+     * {@code MessageConsumer}.    
+     * The term "consumer" applies to both {@code TopicSubscriber} and {@code MessageConsumer} objects.
      * <p>
      * If a durable subscription already exists with the same name 
      * and client identifier (if set) and the same topic, and without a message selector,
-     * then this method creates a <code>TopicSubscriber</code> on the existing durable
+     * then this method creates a {@code TopicSubscriber} on the existing durable
      * subscription.
      * <p>
      * A durable subscription is used by a client which needs to receive
@@ -918,12 +1001,12 @@ public interface Session extends Runnable {
      * or until they have expired.
      * <p>
      * A durable subscription will continue to accumulate messages 
-     * until it is deleted using the <code>unsubscribe</code> method. 
+     * until it is deleted using the {@code unsubscribe} method. 
      * <p>
      * A consumer may be created on a durable subscription using the
-     * <code>createDurableConsumer</code> methods on <code>JMSContext</code>,
-     * or the <code>createDurableConsumer</code> and <code>createDurableSubscriber</code>
-     * methods on <code>Session</code> or <code>TopicSession</code>.
+     * {@code createDurableConsumer} methods on {@code JMSContext},
+     * or the {@code createDurableConsumer} and {@code createDurableSubscriber}
+     * methods on {@code Session} or {@code TopicSession}.
      * A durable subscription which has a consumer
      * associated with it is described as being active. 
      * A durable subscription which has no consumer
@@ -939,28 +1022,35 @@ public interface Session extends Runnable {
      * subsequently wishes to create a consumer 
      * on that durable subscription must use the same client identifier.
 	 * <p>
+	 * This method creates the durable subscription without a message selector 
+	 * and with a {@code noLocal} value of {@code false}. 
+	 * <p>
 	 * If there are no active consumers on the durable subscription (and no
 	 * consumed messages from that subscription are still part of a pending
 	 * transaction or are not yet acknowledged in the session), and this method
 	 * is used to create a new consumer on that durable subscription, specifying
 	 * the same name and client identifier (if set) but a different topic or
-	 * message selector, or, if the client identifier is set, a different
-	 * noLocal argument, then the durable subscription will be deleted and a new
-	 * one created. 
+	 * message selector or, if the client identifier is set, a different
+	 * {@code noLocal} value, then the durable subscription will be deleted
+	 * and a new one created.
 	 * <p>
-	 * However if there is an active consumer on the durable
-	 * subscription (or a consumed message from that subscription is still part
-	 * of a pending transaction or is not yet acknowledged in the session), and
-	 * an attempt is made to create an additional consumer, specifying the same
-	 * name and client identifier (if set) but a different topic or message
-	 * selector, or, if the client identifier is set, a different noLocal
-	 * argument, then a <code>JMSException</code> will be thrown.
+	 * However if there is an active consumer on the durable subscription (or a
+	 * consumed message from that subscription is still part of a pending
+	 * transaction or is not yet acknowledged in the session), and an attempt is
+	 * made to create an additional consumer, specifying the same name and
+	 * client identifier (if set) but a different topic or message selector or,
+	 * if the client identifier is set, a different {@code noLocal} value,
+	 * then a {@code JMSException} will be thrown.
+	 * <p>
+	 * There is no restriction to prevent a durable subscription and
+	 * a shared non-durable subscription having the same name. Such subscriptions
+	 * would be completely separate.
      *
-     * @param topic the non-temporary <CODE>Topic</CODE> to subscribe to
+     * @param topic the non-temporary {@code Topic} to subscribe to
      * @param name the name used to identify this subscription
      *  
      * @exception JMSException if the session fails to create the durable subscription 
-     *            and <code>TopicSubscriber</code> due to some internal error.
+     *            and {@code TopicSubscriber} due to some internal error.
      * @exception InvalidDestinationException if an invalid topic is specified.
      *
      * @since 1.1
@@ -972,19 +1062,19 @@ public interface Session extends Runnable {
     /**
 	 * Creates a durable subscription with the specified name on the specified
 	 * topic (if one does not already exist), specifying a message selector and
-	 * the <code>noLocal</code> parameter, and creates a
-	 * <code>TopicSubscriber</code> on that durable subscription.
+	 * the {@code noLocal} parameter, and creates a
+	 * {@code TopicSubscriber} on that durable subscription.
 	 * <p>
 	 * <p>
 	 * This method is identical to the corresponding
-	 * <code>createDurableConsumer</code> method except that it returns a
-	 * <code>TopicSubscriber</code> rather than a <code>MessageConsumer</code>.
-	 * The term "consumer" applies to both <code>TopicSubscriber</code> and
-	 * <code>MessageConsumer</code> objects.
+	 * {@code createDurableConsumer} method except that it returns a
+	 * {@code TopicSubscriber} rather than a {@code MessageConsumer}.
+	 * The term "consumer" applies to both {@code TopicSubscriber} and
+	 * {@code MessageConsumer} objects.
 	 * <p>
 	 * If a durable subscription already exists with the same name and client
 	 * identifier (if set) and the same topic and message selector then this
-	 * method creates a <code>TopicSubscriber</code> on the existing durable
+	 * method creates a {@code TopicSubscriber} on the existing durable
 	 * subscription.
 	 * <p>
 	 * A durable subscription is used by a client which needs to receive all the
@@ -995,13 +1085,13 @@ public interface Session extends Runnable {
 	 * a consumer on this durable subscription or until they have expired.
 	 * <p>
 	 * A durable subscription will continue to accumulate messages until it is
-	 * deleted using the <code>unsubscribe</code> method.
+	 * deleted using the {@code unsubscribe} method.
 	 * <p>
 	 * A consumer may be created on a durable subscription using the
-	 * <code>createDurableConsumer</code> methods on <code>JMSContext</code>, or
-	 * the <code>createDurableConsumer</code> and
-	 * <code>createDurableSubscriber</code> methods on <code>Session</code> or
-	 * <code>TopicSession</code>. A durable subscription which has a consumer
+	 * {@code createDurableConsumer} methods on {@code JMSContext}, or
+	 * the {@code createDurableConsumer} and
+	 * {@code createDurableSubscriber} methods on {@code Session} or
+	 * {@code TopicSession}. A durable subscription which has a consumer
 	 * associated with it is described as being active. A durable subscription
 	 * which has no consumer associated with it is described as being inactive.
 	 * <p>
@@ -1015,33 +1105,36 @@ public interface Session extends Runnable {
 	 * subsequently wishes to create a consumer on that durable subscription
 	 * must use the same client identifier.
 	 * <p>
+	 * If {@code noLocal} is set to true, and the client identifier is set,
+	 * then any messages published to the topic using this session's connection,
+	 * or any other connection with the same client
+	 * identifier, will not be added to the durable subscription. If the client
+	 * identifier is unset then setting {@code noLocal} to true will cause
+	 * an {@code IllegalStateException} to be thrown.
+	 * <p>
 	 * If there are no active consumers on the durable subscription (and no
 	 * consumed messages from that subscription are still part of a pending
 	 * transaction or are not yet acknowledged in the session), and this method
 	 * is used to create a new consumer on that durable subscription, specifying
 	 * the same name and client identifier (if set) but a different topic or
-	 * message selector, or, if the client identifier is set, a different
-	 * noLocal argument, then the durable subscription will be deleted and a new
-	 * one created. 
+	 * message selector or, if the client identifier is set, a different
+	 * {@code noLocal} value, then the durable subscription will be deleted
+	 * and a new one created.
 	 * <p>
-	 * However if there is an active consumer on the durable
-	 * subscription (or a consumed message from that subscription is still part
-	 * of a pending transaction or is not yet acknowledged in the session), and
-	 * an attempt is made to create an additional consumer, specifying the same
-	 * name and client identifier (if set) but a different topic or message
-	 * selector, or, if the client identifier is set, a different noLocal
-	 * argument, then a <code>JMSException</code> will be thrown.
-	 * <P>
-	 * If <code>noLocal</code> is set to true, and the client identifier is set,
-	 * then any messages published to the topic using this session's connection,
-	 * or any other connection or <code>JMSContext</code> with the same client
-	 * identifier, will not be added to the durable subscription. If the client
-	 * identifier is unset then setting <code>noLocal</code> to true will cause a
-	 * <code>IllegalStateException</code> to be thrown. 
-	 * The default value of  <code>noLocal</code> is false.
+	 * However if there is an active consumer on the durable subscription (or a
+	 * consumed message from that subscription is still part of a pending
+	 * transaction or is not yet acknowledged in the session), and an attempt is
+	 * made to create an additional consumer, specifying the same name and
+	 * client identifier (if set) but a different topic or message selector or,
+	 * if the client identifier is set, a different {@code noLocal} value,
+	 * then a {@code JMSException} will be thrown.
+	 * <p>
+	 * There is no restriction to prevent a durable subscription and
+	 * a shared non-durable subscription having the same name. Such subscriptions
+	 * would be completely separate.
 	 * 
 	 * @param topic
-	 *            the non-temporary <CODE>Topic</CODE> to subscribe to
+	 *            the non-temporary {@code Topic} to subscribe to
 	 * @param name
 	 *            the name used to identify this subscription
 	 * @param messageSelector
@@ -1052,105 +1145,35 @@ public interface Session extends Runnable {
 	 * @param noLocal
 	 *            if true, and the client identifier is set, then any messages
 	 *            published to the topic using this session's connection, or any
-	 *            other connection or <code>JMSContext</code> with the same
+	 *            other connection with the same
 	 *            client identifier, will not be added to the durable
 	 *            subscription.
 	 * @exception JMSException
 	 *                if the session fails to create the durable subscription
-	 *                and <code>TopicSubscriber</code> due to some internal
+	 *                and {@code TopicSubscriber} due to some internal
 	 *                error.
 	 * @exception InvalidDestinationException
 	 *                if an invalid topic is specified.
 	 * @exception InvalidSelectorException
 	 *                if the message selector is invalid.
 	 * @exception IllegalStateException
-	 *                if <code>noLocal</code> is set to <code>true</code>
-	 *                but the client identifier is unset
+	 *                if {@code noLocal} is set to {@code true} but
+	 *                the client identifier is unset
 	 * 
-	 * @since 1.1
+	 * @since 2.0
 	 */ 
 	TopicSubscriber createDurableSubscriber(Topic topic, String name, String messageSelector, boolean noLocal)
 			throws JMSException;
      
-     /** Creates a durable subscription with the specified name on the
-      * specified topic, and creates a <code>MessageConsumer</code> 
-      * on that durable subscription.
-      * <p>
-      * If a durable subscription already exists with the same name 
-      * and client identifier (if set) and the same topic,
-      * and without a message selector,
-      * then this method creates a <code>MessageConsumer</code> on the existing durable
-      * subscription.
-      * <p>
-      * A durable subscription is used by a client which needs to receive
-      * all the messages published on a topic, including the ones published 
-      * when there is no consumer associated with it. 
-      * The JMS provider retains a record of this durable subscription 
-      * and ensures that all messages from the topic's publishers are retained 
-      * until they are delivered to, and acknowledged by,
-      * a consumer on this durable subscription
-      * or until they have expired.
-      * <p>
-      * A durable subscription will continue to accumulate messages 
-      * until it is deleted using the <code>unsubscribe</code> method. 
-      * <p>
-      * A consumer may be created on a durable subscription using the
-      * <code>createDurableConsumer</code> methods on <code>JMSContext</code>,
-      * or the <code>createDurableConsumer</code> and <code>createDurableSubscriber</code>
-      * methods on <code>Session</code> or <code>TopicSession</code>.
-      * A durable subscription which has a consumer
-      * associated with it is described as being active. 
-      * A durable subscription which has no consumer
-      * associated with it is described as being inactive. 
-      * <p>
-      * A durable subscription may have more than one active consumer
-      * (this was not permitted prior to JMS 2.0).
-      * Each message from the subscription will be delivered to only one of the consumers on that subscription.
-      * <p>
-      * A durable subscription is identified by a name specified by the client
-      * and by the client identifier if set. If the client identifier was set
-      * when the durable subscription was first created then a client which 
-      * subsequently wishes to create a consumer 
-      * on that durable subscription must use the same client identifier.
-	 * <p>
-	 * If there are no active consumers on the durable subscription (and no
-	 * consumed messages from that subscription are still part of a pending
-	 * transaction or are not yet acknowledged in the session), and this method
-	 * is used to create a new consumer on that durable subscription, specifying
-	 * the same name and client identifier (if set) but a different topic or
-	 * message selector, or, if the client identifier is set, a different
-	 * noLocal argument, then the durable subscription will be deleted and a new
-	 * one created. 
-	 * <p>
-	 * However if there is an active consumer on the durable
-	 * subscription (or a consumed message from that subscription is still part
-	 * of a pending transaction or is not yet acknowledged in the session), and
-	 * an attempt is made to create an additional consumer, specifying the same
-	 * name and client identifier (if set) but a different topic or message
-	 * selector, or, if the client identifier is set, a different noLocal
-	 * argument, then a <code>JMSException</code> will be thrown.
-      *
-      * @param topic the non-temporary <CODE>Topic</CODE> to subscribe to
-      * @param name the name used to identify this subscription
-      *  
-      * @exception JMSException if the session fails to create the durable subscription 
-      *            and <code>MessageConsumer</code> due to some internal error.
-      * @exception InvalidDestinationException if an invalid topic is specified.
-      *
-      * @since 2.0
-      */ 
-     MessageConsumer createDurableConsumer(Topic topic, String name) throws JMSException;
-
-	/**
+     /**
 	 * Creates a durable subscription with the specified name on the specified
-	 * topic, specifying a message selector and the <code>noLocal</code>
-	 * parameter, and creates a <code>MessageConsumer</code> on that durable
+	 * topic, and creates a {@code MessageConsumer} on that durable
 	 * subscription.
 	 * <p>
 	 * If a durable subscription already exists with the same name and client
-	 * identifier (if set) and the same topic and message selector then this
-	 * method creates a <code>MessageConsumer</code> on the existing durable
-	 * subscription.
+	 * identifier (if set) and the same topic, and without a message selector,
+	 * then this method creates a {@code MessageConsumer} on the existing
+	 * durable subscription.
 	 * <p>
 	 * A durable subscription is used by a client which needs to receive all the
 	 * messages published on a topic, including the ones published when there is
@@ -1160,13 +1183,13 @@ public interface Session extends Runnable {
 	 * a consumer on this durable subscription or until they have expired.
 	 * <p>
 	 * A durable subscription will continue to accumulate messages until it is
-	 * deleted using the <code>unsubscribe</code> method.
+	 * deleted using the {@code unsubscribe} method.
 	 * <p>
 	 * A consumer may be created on a durable subscription using the
-	 * <code>createDurableConsumer</code> methods on <code>JMSContext</code>, or
-	 * the <code>createDurableConsumer</code> and
-	 * <code>createDurableSubscriber</code> methods on <code>Session</code> or
-	 * <code>TopicSession</code>. A durable subscription which has a consumer
+	 * {@code createDurableConsumer} methods on {@code JMSContext}, or
+	 * the {@code createDurableConsumer} and
+	 * {@code createDurableSubscriber} methods on {@code Session} or
+	 * {@code TopicSession}. A durable subscription which has a consumer
 	 * associated with it is described as being active. A durable subscription
 	 * which has no consumer associated with it is described as being inactive.
 	 * <p>
@@ -1180,33 +1203,115 @@ public interface Session extends Runnable {
 	 * subsequently wishes to create a consumer on that durable subscription
 	 * must use the same client identifier.
 	 * <p>
+	 * This method creates the durable subscription without a message selector 
+	 * and with a {@code noLocal} value of {@code false}. 
+	 * <p>
 	 * If there are no active consumers on the durable subscription (and no
 	 * consumed messages from that subscription are still part of a pending
 	 * transaction or are not yet acknowledged in the session), and this method
 	 * is used to create a new consumer on that durable subscription, specifying
 	 * the same name and client identifier (if set) but a different topic or
-	 * message selector, or, if the client identifier is set, a different
-	 * noLocal argument, then the durable subscription will be deleted and a new
-	 * one created. 
+	 * message selector or, if the client identifier is set, a different
+	 * {@code noLocal} value, then the durable subscription will be deleted
+	 * and a new one created.
 	 * <p>
-	 * However if there is an active consumer on the durable
-	 * subscription (or a consumed message from that subscription is still part
-	 * of a pending transaction or is not yet acknowledged in the session), and
-	 * an attempt is made to create an additional consumer, specifying the same
-	 * name and client identifier (if set) but a different topic or message
-	 * selector, or, if the client identifier is set, a different noLocal
-	 * argument, then a <code>JMSException</code> will be thrown.
-	 * <P>
-	 * If <code>noLocal</code> is set to true, and the client identifier is set,
-	 * then any messages published to the topic using this session's connection,
-	 * or any other connection or <code>JMSContext</code> with the same client
-	 * identifier, will not be added to the durable subscription. If the client
-	 * identifier is unset then setting <code>noLocal</code> to true will cause a
-	 * <code>IllegalStateException</code> to be thrown. 
-	 * The default value of  <code>noLocal</code> is false.
+	 * However if there is an active consumer on the durable subscription (or a
+	 * consumed message from that subscription is still part of a pending
+	 * transaction or is not yet acknowledged in the session), and an attempt is
+	 * made to create an additional consumer, specifying the same name and
+	 * client identifier (if set) but a different topic or message selector or,
+	 * if the client identifier is set, a different {@code noLocal} value,
+	 * then a {@code JMSException} will be thrown.
+	 * <p>
+	 * There is no restriction to prevent a durable subscription and
+	 * a shared non-durable subscription having the same name. Such subscriptions
+	 * would be completely separate.
 	 * 
 	 * @param topic
-	 *            the non-temporary <CODE>Topic</CODE> to subscribe to
+	 *            the non-temporary {@code Topic} to subscribe to
+	 * @param name
+	 *            the name used to identify this subscription
+	 * 
+	 * @exception JMSException
+	 *                if the session fails to create the durable subscription
+	 *                and {@code MessageConsumer} due to some internal
+	 *                error.
+	 * @exception InvalidDestinationException
+	 *                if an invalid topic is specified.
+	 * 
+	 * @since 2.0
+	 */ 
+     MessageConsumer createDurableConsumer(Topic topic, String name) throws JMSException;
+
+	/**
+	 * Creates a durable subscription with the specified name on the specified
+	 * topic, specifying a message selector and the {@code noLocal}
+	 * parameter, and creates a {@code MessageConsumer} on that durable
+	 * subscription.
+	 * <p>
+	 * If a durable subscription already exists with the same name and client
+	 * identifier (if set) and the same topic and message selector then this
+	 * method creates a {@code MessageConsumer} on the existing durable
+	 * subscription.
+	 * <p>
+	 * A durable subscription is used by a client which needs to receive all the
+	 * messages published on a topic, including the ones published when there is
+	 * no consumer associated with it. The JMS provider retains a record of this
+	 * durable subscription and ensures that all messages from the topic's
+	 * publishers are retained until they are delivered to, and acknowledged by,
+	 * a consumer on this durable subscription or until they have expired.
+	 * <p>
+	 * A durable subscription will continue to accumulate messages until it is
+	 * deleted using the {@code unsubscribe} method.
+	 * <p>
+	 * A consumer may be created on a durable subscription using the
+	 * {@code createDurableConsumer} methods on {@code JMSContext}, or
+	 * the {@code createDurableConsumer} and
+	 * {@code createDurableSubscriber} methods on {@code Session} or
+	 * {@code TopicSession}. A durable subscription which has a consumer
+	 * associated with it is described as being active. A durable subscription
+	 * which has no consumer associated with it is described as being inactive.
+	 * <p>
+	 * A durable subscription may have more than one active consumer (this was
+	 * not permitted prior to JMS 2.0). Each message from the subscription will
+	 * be delivered to only one of the consumers on that subscription.
+	 * <p>
+	 * A durable subscription is identified by a name specified by the client
+	 * and by the client identifier if set. If the client identifier was set
+	 * when the durable subscription was first created then a client which
+	 * subsequently wishes to create a consumer on that durable subscription
+	 * must use the same client identifier.
+	 * <P>
+	 * If {@code noLocal} is set to true, and the client identifier is set,
+	 * then any messages published to the topic using this session's connection,
+	 * or any other connection with the same client
+	 * identifier, will not be added to the durable subscription. If the client
+	 * identifier is unset then setting {@code noLocal} to true will cause
+	 * an {@code IllegalStateException} to be thrown. 
+	 * <p>
+	 * If there are no active consumers on the durable subscription (and no
+	 * consumed messages from that subscription are still part of a pending
+	 * transaction or are not yet acknowledged in the session), and this method
+	 * is used to create a new consumer on that durable subscription, specifying
+	 * the same name and client identifier (if set) but a different topic or
+	 * message selector or, if the client identifier is set, a different
+	 * {@code noLocal} value, then the durable subscription will be deleted
+	 * and a new one created.
+	 * <p>
+	 * However if there is an active consumer on the durable subscription (or a
+	 * consumed message from that subscription is still part of a pending
+	 * transaction or is not yet acknowledged in the session), and an attempt is
+	 * made to create an additional consumer, specifying the same name and
+	 * client identifier (if set) but a different topic or message selector or,
+	 * if the client identifier is set, a different {@code noLocal} value,
+	 * then a {@code JMSException} will be thrown.
+	 * <p>
+	 * There is no restriction to prevent a durable subscription and
+	 * a shared non-durable subscription having the same name. Such subscriptions
+	 * would be completely separate.
+	 * 
+	 * @param topic
+	 *            the non-temporary {@code Topic} to subscribe to
 	 * @param name
 	 *            the name used to identify this subscription
 	 * @param messageSelector
@@ -1217,29 +1322,29 @@ public interface Session extends Runnable {
 	 * @param noLocal
 	 *            if true, and the client identifier is set, then any messages
 	 *            published to the topic using this session's connection, or any
-	 *            other connection or <code>JMSContext</code> with the same
+	 *            other connection with the same
 	 *            client identifier, will not be added to the durable
 	 *            subscription.
 	 * @exception JMSException
 	 *                if the session fails to create the durable subscription
-	 *                and <code>MessageConsumer</code> due to some internal
+	 *                and {@code MessageConsumer} due to some internal
 	 *                error.
 	 * @exception InvalidDestinationException
 	 *                if an invalid topic is specified
 	 * @exception InvalidSelectorException
 	 *                if the message selector is invalid
 	 * @exception IllegalStateException
-	 *                if <code>noLocal</code> is set to <code>true</code>
-	 *                but the client identifier is unset
+	 *                if {@code noLocal} is set to {@code true} but
+	 *                the client identifier is unset
 	 * 
 	 * @since 2.0
 	 */ 
       MessageConsumer createDurableConsumer(Topic topic, String name, String messageSelector, boolean noLocal) throws JMSException;     
     
-  /** Creates a <CODE>QueueBrowser</CODE> object to peek at the messages on 
+  /** Creates a {@code QueueBrowser} object to peek at the messages on 
       * the specified queue.
       *  
-      * @param queue the <CODE>queue</CODE> to access
+      * @param queue the {@code queue} to access
       *
       *  
       * @exception JMSException if the session fails to create a browser
@@ -1253,10 +1358,10 @@ public interface Session extends Runnable {
     createBrowser(Queue queue) throws JMSException;
 
 
-    /** Creates a <CODE>QueueBrowser</CODE> object to peek at the messages on 
+    /** Creates a {@code QueueBrowser} object to peek at the messages on 
       * the specified queue using a message selector.
       *  
-      * @param queue the <CODE>queue</CODE> to access
+      * @param queue the {@code queue} to access
       *
       * @param messageSelector only messages with properties matching the
       * message selector expression are delivered. A value of null or
@@ -1277,8 +1382,8 @@ public interface Session extends Runnable {
 		  String messageSelector) throws JMSException;
 
     
-     /** Creates a <CODE>TemporaryQueue</CODE> object. Its lifetime will be that 
-      * of the <CODE>Connection</CODE> unless it is deleted earlier.
+     /** Creates a {@code TemporaryQueue} object. Its lifetime will be that 
+      * of the {@code Connection} unless it is deleted earlier.
       *
       * @return a temporary queue identity
       *
@@ -1292,8 +1397,8 @@ public interface Session extends Runnable {
     createTemporaryQueue() throws JMSException;
    
 
-     /** Creates a <CODE>TemporaryTopic</CODE> object. Its lifetime will be that 
-      * of the <CODE>Connection</CODE> unless it is deleted earlier.
+     /** Creates a {@code TemporaryTopic} object. Its lifetime will be that 
+      * of the {@code Connection} unless it is deleted earlier.
       *
       * @return a temporary topic identity
       *
@@ -1319,8 +1424,8 @@ public interface Session extends Runnable {
       * delete a durable subscription must use the same client identifier.
       *
       * <P>It is erroneous for a client to delete a durable subscription
-      * while there is an active <CODE>MessageConsumer</CODE>
-      * or <CODE>TopicSubscriber</CODE> for the 
+      * while there is an active {@code MessageConsumer}
+      * or {@code TopicSubscriber} for the 
       * subscription, or while a consumed message is part of a pending 
       * transaction or has not been acknowledged in the session.
       *

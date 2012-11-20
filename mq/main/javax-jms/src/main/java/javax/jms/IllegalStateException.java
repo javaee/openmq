@@ -44,10 +44,10 @@ package javax.jms;
  * <P> This exception is thrown when a method is 
  *     invoked at an illegal or inappropriate time or if the provider is 
  *     not in an appropriate state for the requested operation. For example, 
- *     this exception must be thrown if <CODE>Session.commit</CODE> is 
+ *     this exception must be thrown if {@code Session.commit} is 
  *     called on a non-transacted session. This exception is also called when
  *     a domain inappropriate method is called, such as calling 
- *     <CODE>TopicSession.CreateQueueBrowser</CODE>.
+ *     {@code TopicSession.CreateQueueBrowser}.
  *
  * @version     April 9, 2002
  * @author      Rahul Sharma
@@ -56,7 +56,7 @@ package javax.jms;
 
 public class IllegalStateException extends JMSException {
 
-  /** Constructs an <CODE>IllegalStateException</CODE> with the specified reason
+  /** Constructs an {@code IllegalStateException} with the specified reason
    *  and error code.
    *
    *  @param  reason        a description of the exception
@@ -69,7 +69,7 @@ public class IllegalStateException extends JMSException {
     super(reason, errorCode);
   }
 
-  /** Constructs an <CODE>IllegalStateException</CODE> with the specified 
+  /** Constructs an {@code IllegalStateException} with the specified 
    *  reason. The error code defaults to null.
    *
    *  @param  reason        a description of the exception

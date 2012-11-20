@@ -991,9 +991,21 @@ public interface JMSService {
      *          to acknowledge the message.
      *
      *  @param  ackType The MessageAckType for this message acknowledgement
+     *              0 ACKNOWLEDGE_REQUEST
+     *              1 UNDELIVERABLE_REQUEST
+     *              2 DEAD_REQUEST
      *
      *  @return The JMSServiceReply which contains status and information
      *          about the acknowledge request.
+     *
+     *  @param  retryCnt retry count of client runtime in delivery the message
+     *                   applicable to ackType
+     *                   DEAD_REQUEST
+     *                   UNDELIVERABLE_REQUEST
+     *                   or non-null transactionId
+     *                   should be 0 otherwise
+     *  @param  deadComment if ackType is DEAD_REQUEST
+     *  @param  deadThr if ackType is DEAD_REQUEST
      *
      *  @throws JMSServiceException If the Status returned for the
      *          acknowledgeMessage method is not
@@ -1004,10 +1016,21 @@ public interface JMSService {
      *          {@link JMSServiceReply.Status}
      *
      */
-    public JMSServiceReply acknowledgeMessage(long connectionId, long sessionId,
-            long consumerId, SysMessageID sysMessageID, long transactionId,
-            MessageAckType ackType)
-    throws JMSServiceException;
+    public JMSServiceReply acknowledgeMessage(long connectionId, 
+        long sessionId, long consumerId, SysMessageID sysMessageID,
+        long transactionId, MessageAckType ackType)
+        throws JMSServiceException;
+
+    public JMSServiceReply acknowledgeMessage(long connectionId, 
+         long sessionId, long consumerId, SysMessageID sysMessageID,
+         long transactionId, MessageAckType ackType, int retryCnt)
+         throws JMSServiceException;
+
+    public JMSServiceReply acknowledgeMessage(long connectionId, 
+         long sessionId, long consumerId, SysMessageID sysMessageID,
+         long transactionId, MessageAckType ackType, int retryCnt,
+         String deadComment, Throwable deadThr)
+         throws JMSServiceException;
 
     /**
      *  Fetch the messages for a browser.<p> All the messages that match the

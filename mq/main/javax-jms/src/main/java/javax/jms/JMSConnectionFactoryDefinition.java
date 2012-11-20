@@ -46,12 +46,12 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation used to define a Java Message Service (JMS) connection factory and
- * be registered with JNDI. The <code>JMSConnectionFactory</code> may be
+ * be registered with JNDI. The {@code JMSConnectionFactory} may be
  * configured by setting the annotation elements for commonly used
- * <code>JMSConnectionFactory</code> properties. Additional standard and
- * vendor-specific properties may be specified using the <code>properties
- *  </code> element. Once defined, a connection factory may be referenced by a
- * component using the <code>lookup</code> element of the <code>Resource</code>
+ * {@code JMSConnectionFactory} properties. Additional standard and
+ * vendor-specific properties may be specified using the {@code properties
+ *  } element. Once defined, a connection factory may be referenced by a
+ * component using the {@code lookup} element of the {@code Resource}
  * annotation.
  * 
  * @see javax.annotation.Resource
@@ -72,9 +72,9 @@ public @interface JMSConnectionFactoryDefinition {
 
 	/**
 	 * JMS connection factory implementation class name which implements:
-	 * <code>javax.jms.ConnectionFactory</code> or
-	 * <code>javax.jms.QueueConnectionFactory</code> or
-	 * <code>javax.jms.TopicConnectionFactory</code>
+	 * {@code javax.jms.ConnectionFactory} or
+	 * {@code javax.jms.QueueConnectionFactory} or
+	 * {@code javax.jms.TopicConnectionFactory}
 	 */
 	String className();
 
@@ -107,7 +107,7 @@ public @interface JMSConnectionFactoryDefinition {
 
 	/**
 	 * JMS connection factory property. This may be a vendor-specific property
-	 * or a less commonly used <code>ConnectionFactory</code> property.
+	 * or a less commonly used {@code ConnectionFactory} property.
 	 * <p>
 	 * Properties are specified using the format:
 	 * <i>propertyName=propertyValue</i> with one property per array element.
@@ -125,7 +125,7 @@ public @interface JMSConnectionFactoryDefinition {
 	int connectionTimeout() default 0;
 
 	/**
-	 * Set to <code>false</code> if connections should not participate in
+	 * Set to {@code false} if connections should not participate in
 	 * transactions.
 	 * <p>
 	 * Default is to enlist in a transaction when one is active or becomes

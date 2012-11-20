@@ -44,7 +44,7 @@ package javax.jms;
  * This is the root class of all unchecked exceptions in the JMS API.
  * <p>
  * In additional to the detailMessage and cause fields inherited from
- * <code>Throwable</code>, this class also allows a provider-specific errorCode
+ * {@code Throwable}, this class also allows a provider-specific errorCode
  * to be set.
  * 
  * @version 2.0
@@ -58,7 +58,7 @@ public class JMSRuntimeException extends RuntimeException {
 	private String errorCode=null;
 
 	/**
-	 * Constructs a <code>JMSRuntimeException</code> with the specified detail message
+	 * Constructs a {@code JMSRuntimeException} with the specified detail message
 	 * and error code.
 	 * 
 	 * @param detailMessage
@@ -72,7 +72,7 @@ public class JMSRuntimeException extends RuntimeException {
 	}
 
 	/**
-	 * Constructs a <code>JMSRuntimeException</code> with the specified detail message
+	 * Constructs a {@code JMSRuntimeException} with the specified detail message
 	 * 
 	 * @param detailMessage
 	 *            a description of the exception
@@ -82,7 +82,7 @@ public class JMSRuntimeException extends RuntimeException {
 	}
 
 	/**
-	 * Constructs a <code>JMSRuntimeException</code> with the specified detail message,
+	 * Constructs a {@code JMSRuntimeException} with the specified detail message,
 	 * error code and cause
 	 * 
 	 * @param detailMessage

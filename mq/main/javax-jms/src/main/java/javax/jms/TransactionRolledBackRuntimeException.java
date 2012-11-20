@@ -41,7 +41,7 @@ package javax.jms;
 
 /**
  * This unchecked exception must be thrown when a call to
- * <code>JMSContext.commit</code> results in a rollback of the current
+ * {@code JMSContext.commit} results in a rollback of the current
  * transaction.
  * 
  * @version 2.0
@@ -49,7 +49,7 @@ package javax.jms;
 public class TransactionRolledBackRuntimeException extends JMSRuntimeException {
 
 	/**
-	 * Constructs a <code>TransactionRolledBackRuntimeException</code> with the
+	 * Constructs a {@code TransactionRolledBackRuntimeException} with the
 	 * specified detail message
 	 * 
 	 * @param detailMessage
@@ -60,7 +60,7 @@ public class TransactionRolledBackRuntimeException extends JMSRuntimeException {
 	}
 
 	/**
-	 * Constructs a <code>TransactionRolledBackRuntimeException</code> with the
+	 * Constructs a {@code TransactionRolledBackRuntimeException} with the
 	 * specified detail message and error code.
 	 * 
 	 * @param detailMessage
@@ -73,7 +73,7 @@ public class TransactionRolledBackRuntimeException extends JMSRuntimeException {
 	}
 	
 	/**
-	 * Constructs a <code>TransactionRolledBackRuntimeException</code> with the
+	 * Constructs a {@code TransactionRolledBackRuntimeException} with the
 	 * specified detail message, error code and cause
 	 * 
 	 * @param detailMessage

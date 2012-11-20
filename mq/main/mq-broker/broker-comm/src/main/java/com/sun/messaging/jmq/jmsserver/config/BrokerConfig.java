@@ -1163,6 +1163,7 @@ public class BrokerConfig extends UpdateProperties
         + "java.util.logging.FileHandler.formatter=com.sun.messaging.jmq.util.log.UniformLogFormatter\n"
         + "java.util.logging.FileHandler.limit=268435456\n"
         + "java.util.logging.FileHandler.pattern=${imq.instanceshome}${/}${imq.instancename}${/}log${/}log.txt\n"
+        + "java.util.logging.FileHandler.append=true\n"
         // Currently not working but it is intended to be used once working
         + "com.sun.enterprise.server.logging.GFFileHandler.file=${imq.instanceshome}${/}${imq.instancename}${/}log${/}log.txt\n)" 
         + "com.sun.enterprise.server.logging.GFFileHandler.formatter=com.sun.messaging.jmq.util.log.UniformLogFormatter\n"

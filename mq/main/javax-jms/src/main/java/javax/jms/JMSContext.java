@@ -43,41 +43,41 @@ package javax.jms;
 import java.io.Serializable;
 
 /**
- * A <code>JMSContext</code> is the main interface in the simplified JMS API
+ * A {@code JMSContext} is the main interface in the simplified JMS API
  * introduced for JMS 2.0. This combines in a single object the functionality of
- * two separate objects from the JMS 1.1 API: a <code>Connection</code> and a
- * <code>Session</code>.
+ * two separate objects from the JMS 1.1 API: a {@code Connection} and a
+ * {@code Session}.
  * <p>
  * When an application needs to send messages it use the
- * <code>createProducer</code> method to create a <code>JMSProducer</code> which
+ * {@code createProducer} method to create a {@code JMSProducer} which
  * provides methods to configure and send messages. Messages may be sent either
  * synchronously or asynchronously.
  * <p>
  * When an application needs to receive messages it uses one of several
- * <code>createConsumer</code> or <code>createDurableConsumer</code> methods to
- * create a <code>JMSConsumer</code> . A <code>JMSConsumer</code> provides
+ * {@code createConsumer} or {@code createDurableConsumer} methods to
+ * create a {@code JMSConsumer} . A {@code JMSConsumer} provides
  * methods to receive messages either synchronously or asynchronously.
  * <p>
- * In terms of the JMS 1.1 API a <code>JMSContext</code> should be thought of as
- * representing both a <code>Connection</code> and a <code>Session</code>.
+ * In terms of the JMS 1.1 API a {@code JMSContext} should be thought of as
+ * representing both a {@code Connection} and a {@code Session}.
  * Although the simplified API removes the need for applications to use those
  * objects, the concepts of connection and session remain important. A
  * connection represents a physical link to the JMS server and a session
  * represents a single-threaded context for sending and receiving messages.
  * <p>
- * A <code>JMSContext</code> may be created by calling one of several
- * <code>createContext</code> methods on a <code>ConnectionFactory</code>. A
- * <code>JMSContext</code> that is created in this way is described as being
- * <i>application-managed</i>. An application-managed <code>JMSContext</code>
- * must be closed when no longer needed by calling its <code>close</code>
+ * A {@code JMSContext} may be created by calling one of several
+ * {@code createContext} methods on a {@code ConnectionFactory}. A
+ * {@code JMSContext} that is created in this way is described as being
+ * <i>application-managed</i>. An application-managed {@code JMSContext}
+ * must be closed when no longer needed by calling its {@code close}
  * method.
  * <p>
  * Applications running in the Java EE web and EJB containers may alternatively
- * inject a <code>JMSContext</code> into their application using the
- * <code>@Inject</code> annotation. A <code>JMSContext</code> that is created in
+ * inject a {@code JMSContext} into their application using the
+ * {@code @Inject} annotation. A {@code JMSContext} that is created in
  * this way is described as being <i>container-managed</i>. An
- * application-managed <code>JMSContext</code> will be closed automatically by
- * the container. Applications must not call its <code>close</code> method.
+ * application-managed {@code JMSContext} will be closed automatically by
+ * the container. Applications must not call its {@code close} method.
  * <p>
  * Applications running in the Java EE web and EJB containers are not permitted
  * to create more than one active session on a connection so combining them in a
@@ -88,58 +88,58 @@ import java.io.Serializable;
  * on the same connection. This allows the same physical connection to be used
  * in multiple threads simultaneously. Such applications which require multiple
  * sessions to be created on the same connection should use one of the
- * <code>createContext</code> methods on the <code>ConnectionFactory</code> to
- * create the first <code>JMSContext</code> and then use the
- * <code>createContext</code> method on <code>JMSContext</code> to create
- * additional <code>JMSContext</code> objects that use the same connection. All
- * these <code>JMSContext</code> objects are application-managed and must be
- * closed when no longer needed by calling their <code>close</code> method.
+ * {@code createContext} methods on the {@code ConnectionFactory} to
+ * create the first {@code JMSContext} and then use the
+ * {@code createContext} method on {@code JMSContext} to create
+ * additional {@code JMSContext} objects that use the same connection. All
+ * these {@code JMSContext} objects are application-managed and must be
+ * closed when no longer needed by calling their {@code close} method.
  * 
  * @version 2.0
  * @since 2.0
  * 
  */
-public interface JMSContext {
+public interface JMSContext extends AutoCloseable {
 
 	/**
-	 * Creates a new <code>JMSContext</code> with the specified session mode
-	 * using the same connection as this <code>JMSContext</code> and creating a
+	 * Creates a new {@code JMSContext} with the specified session mode
+	 * using the same connection as this {@code JMSContext} and creating a
 	 * new session.
 	 * <p>
 	 * This method does not start the connection. If the connection has not
 	 * already been started then it will be automatically started when a
-	 * <code>JMSConsumer</code> is created on any of the <code>JMSContext</code>
+	 * {@code JMSConsumer} is created on any of the {@code JMSContext}
 	 * objects for that connection.
 	 * <p>
 	 * <ul>
-	 * <li>If <code>sessionMode</code> is set to
-	 * <code>JMSContext.SESSION_TRANSACTED</code> then the session will use a
+	 * <li>If {@code sessionMode} is set to
+	 * {@code JMSContext.SESSION_TRANSACTED} then the session will use a
 	 * local transaction which may subsequently be committed or rolled back by
-	 * calling the <code>JMSContext</code>'s <code>commit</code> or
-	 * <code>rollback</code> methods.
-	 * <li>If <code>sessionMode</code> is set to any of
-	 * <code>JMSContext.CLIENT_ACKNOWLEDGE</code>,
-	 * <code>JMSContext.AUTO_ACKNOWLEDGE</code> or
-	 * <code>JMSContext.DUPS_OK_ACKNOWLEDGE</code>. then the session will be
+	 * calling the {@code JMSContext}'s {@code commit} or
+	 * {@code rollback} methods.
+	 * <li>If {@code sessionMode} is set to any of
+	 * {@code JMSContext.CLIENT_ACKNOWLEDGE},
+	 * {@code JMSContext.AUTO_ACKNOWLEDGE} or
+	 * {@code JMSContext.DUPS_OK_ACKNOWLEDGE}. then the session will be
 	 * non-transacted and messages received by this session will be acknowledged
-	 * according to the value of <code>sessionMode</code>. For a definition of
+	 * according to the value of {@code sessionMode}. For a definition of
 	 * the meaning of these acknowledgement modes see the links below.
 	 * </ul>
 	 * <p>
 	 * This method must not be used by applications running in the Java EE web
 	 * or EJB containers because doing so would violate the restriction that
 	 * such an application must not attempt to create more than one active (not
-	 * closed) <code>Session</code> object per connection. If this method is
+	 * closed) {@code Session} object per connection. If this method is
 	 * called in a Java EE web or EJB container then a
-	 * <code>JMSRuntimeException</code> will be thrown.
+	 * {@code JMSRuntimeException} will be thrown.
 	 * 
 	 * @param sessionMode
 	 *            indicates which of four possible session modes will be used.
 	 *            The permitted values are
-	 *            <code>JMSContext.SESSION_TRANSACTED</code>,
-	 *            <code>JMSContext.CLIENT_ACKNOWLEDGE</code>,
-	 *            <code>JMSContext.AUTO_ACKNOWLEDGE</code> and
-	 *            <code>JMSContext.DUPS_OK_ACKNOWLEDGE</code>.
+	 *            {@code JMSContext.SESSION_TRANSACTED},
+	 *            {@code JMSContext.CLIENT_ACKNOWLEDGE},
+	 *            {@code JMSContext.AUTO_ACKNOWLEDGE} and
+	 *            {@code JMSContext.DUPS_OK_ACKNOWLEDGE}.
 	 * 
 	 * @return a newly created JMSContext
 	 * 
@@ -167,10 +167,10 @@ public interface JMSContext {
 	JMSContext createContext(int sessionMode);
 
 	/**
-	 * Creates a new <code>JMSProducer</code> object which can be used to
+	 * Creates a new {@code JMSProducer} object which can be used to
 	 * configure and send messages
 	 * 
-	 * @return A new <code>JMSProducer</code> object
+	 * @return A new {@code JMSProducer} object
 	 * 
 	 * @see javax.jms.JMSProducer
 	 */
@@ -181,8 +181,8 @@ public interface JMSContext {
 	 * 
 	 * <P>
 	 * This value is specific to the JMS provider. It is either preconfigured by
-	 * an administrator in a <CODE>ConnectionFactory</CODE> object or assigned
-	 * dynamically by the application by calling the <code>setClientID</code>
+	 * an administrator in a {@code ConnectionFactory} object or assigned
+	 * dynamically by the application by calling the {@code setClientID}
 	 * method.
 	 * 
 	 * @return the unique client identifier
@@ -199,8 +199,8 @@ public interface JMSContext {
 	 * 
 	 * <P>
 	 * The preferred way to assign a JMS client's client identifier is for it to
-	 * be configured in a client-specific <CODE>ConnectionFactory</CODE> object
-	 * and transparently assigned to the <CODE>Connection</CODE> object it
+	 * be configured in a client-specific {@code ConnectionFactory} object
+	 * and transparently assigned to the {@code Connection} object it
 	 * creates.
 	 * 
 	 * <P>
@@ -210,11 +210,11 @@ public interface JMSContext {
 	 * the identifier that has been administratively configured. It is provided
 	 * for the case where no administratively specified identifier exists. If
 	 * one does exist, an attempt to change it by setting it must throw an
-	 * <CODE>IllegalStateException</CODE>. If a client sets the client
+	 * {@code IllegalStateException}. If a client sets the client
 	 * identifier explicitly, it must do so immediately after it creates the
 	 * JMSContext and before any other action on the JMSContext is taken. After
 	 * this point, setting the client identifier is a programming error that
-	 * should throw an <CODE>IllegalStateException</CODE>.
+	 * should throw an {@code IllegalStateException}.
 	 * 
 	 * <P>
 	 * The purpose of the client identifier is to associate the JMSContext's
@@ -223,17 +223,17 @@ public interface JMSContext {
 	 * that required to support durable subscriptions.
 	 * 
 	 * <P>
-	 * If another connection with the same <code>clientID</code> is already
+	 * If another connection with the same {@code clientID} is already
 	 * running when this method is called, the JMS provider should detect the
-	 * duplicate ID and throw an <CODE>InvalidClientIDException</CODE>.
+	 * duplicate ID and throw an {@code InvalidClientIDException}.
 	 * <p>
 	 * This method must not be used in a Java EE web or EJB application. Doing
-	 * so may cause a <code>JMSRuntimeException</code> to be thrown though this
+	 * so may cause a {@code JMSRuntimeException} to be thrown though this
 	 * is not guaranteed.
 	 * <p>
-	 * This method must not be used if the <code>JMSContext</code> is
+	 * This method must not be used if the {@code JMSContext} is
 	 * container-managed (injected). Doing so will cause a
-	 * <code>JMSRuntimeException</code> to be thrown.
+	 * {@code JMSRuntimeException} to be thrown.
 	 * 
 	 * @param clientID
 	 *            the unique client identifier
@@ -245,7 +245,7 @@ public interface JMSContext {
 	 *                <li>an internal error has occurred or <li>this method has
 	 *                been called in a Java EE web or EJB application (though it
 	 *                is not guaranteed that an exception is thrown in this
-	 *                case) <li>the <code>JMSContext</code> is container-managed
+	 *                case) <li>the {@code JMSContext} is container-managed
 	 *                (injected).
 	 *                </ul>
 	 * 
@@ -274,17 +274,17 @@ public interface JMSContext {
 	ConnectionMetaData getMetaData();
 
 	/**
-	 * Gets the <CODE>ExceptionListener</CODE> object for the JMSContext's
-	 * connection. Not every <CODE>Connection</CODE> has an
-	 * <CODE>ExceptionListener</CODE> associated with it.
+	 * Gets the {@code ExceptionListener} object for the JMSContext's
+	 * connection. Not every {@code Connection} has an
+	 * {@code ExceptionListener} associated with it.
 	 * 
-	 * @return the <CODE>ExceptionListener</CODE> for the JMSContext's
-	 *         connection, or null if no <CODE>ExceptionListener</CODE> is
+	 * @return the {@code ExceptionListener} for the JMSContext's
+	 *         connection, or null if no {@code ExceptionListener} is
 	 *         associated with that connection.
 	 * 
 	 * @throws JMSRuntimeException
 	 *             if the JMS provider fails to get the
-	 *             <CODE>ExceptionListener</CODE> for the JMSContext's
+	 *             {@code ExceptionListener} for the JMSContext's
 	 *             connection.
 	 * @see javax.jms.Connection#setExceptionListener
 	 */
@@ -296,9 +296,9 @@ public interface JMSContext {
 	 * 
 	 * <P>
 	 * If a JMS provider detects a serious problem with a connection, it informs
-	 * the connection's <CODE>ExceptionListener</CODE>, if one has been
+	 * the connection's {@code ExceptionListener}, if one has been
 	 * registered. It does this by calling the listener's
-	 * <CODE>onException</CODE> method, passing it a <CODE>JMSException</CODE>
+	 * {@code onException} method, passing it a {@code JMSException}
 	 * object describing the problem.
 	 * 
 	 * <P>
@@ -307,19 +307,19 @@ public interface JMSContext {
 	 * have no other way to learn their connection has failed.
 	 * 
 	 * <P>
-	 * A connection serializes execution of its <CODE>ExceptionListener</CODE>.
+	 * A connection serializes execution of its {@code ExceptionListener}.
 	 * 
 	 * <P>
 	 * A JMS provider should attempt to resolve connection problems itself
 	 * before it notifies the client of them.
 	 * <p>
 	 * This method must not be used in a Java EE web or EJB application. Doing
-	 * so may cause a <code>JMSRuntimeException</code> to be thrown though this
+	 * so may cause a {@code JMSRuntimeException} to be thrown though this
 	 * is not guaranteed.
 	 * <p>
-	 * This method must not be used if the <code>JMSContext</code> is
+	 * This method must not be used if the {@code JMSContext} is
 	 * container-managed (injected). Doing so will cause a
-	 * <code>JMSRuntimeException</code> to be thrown.
+	 * {@code JMSRuntimeException} to be thrown.
 	 * 
 	 * @param listener
 	 *            the exception listener
@@ -331,7 +331,7 @@ public interface JMSContext {
 	 *                <li>an internal error has occurred or <li>this method has
 	 *                been called in a Java EE web or EJB application (though it
 	 *                is not guaranteed that an exception is thrown in this
-	 *                case) <li>the <code>JMSContext</code> is container-managed
+	 *                case) <li>the {@code JMSContext} is container-managed
 	 *                (injected).
 	 *                </ul>
 	 */
@@ -339,12 +339,12 @@ public interface JMSContext {
 
 	/**
 	 * Starts (or restarts) delivery of incoming messages by the JMSContext's
-	 * connection. A call to <CODE>start</CODE> on a connection that has already
+	 * connection. A call to {@code start} on a connection that has already
 	 * been started is ignored.
 	 * <p>
-	 * This method must not be used if the <code>JMSContext</code> is
+	 * This method must not be used if the {@code JMSContext} is
 	 * container-managed (injected). Doing so will cause a
-	 * <code>JMSRuntimeException</code> to be thrown.
+	 * {@code JMSRuntimeException} to be thrown.
 	 * 
 	 * @exception JMSRuntimeException
 	 *                if the JMS provider fails to start message delivery due to
@@ -353,8 +353,8 @@ public interface JMSContext {
 	 *                if the JMS provider fails to start message delivery due to
 	 *                one of the following reasons:
 	 *                <ul>
-	 *                <li>an internal error has occurred or <li>the <code>
-	 *                JMSContext</code> is container-managed (injected).
+	 *                <li>an internal error has occurred or <li>the {@code 
+	 *                JMSContext} is container-managed (injected).
 	 *                </ul>
 	 * 
 	 * @see javax.jms.JMSContext#stop
@@ -363,7 +363,7 @@ public interface JMSContext {
 
 	/**
 	 * Temporarily stops the delivery of incoming messages by the JMSContext's
-	 * connection. Delivery can be restarted using the <CODE>start</CODE>
+	 * connection. Delivery can be restarted using the {@code start}
 	 * method. When the connection is stopped, delivery to all the connection's
 	 * message consumers is inhibited: synchronous receives block, and messages
 	 * are not delivered to message listeners.
@@ -374,41 +374,44 @@ public interface JMSContext {
 	 * 
 	 * <P>
 	 * Stopping a connection has no effect on its ability to send messages. A
-	 * call to <CODE>stop</CODE> on a connection that has already been stopped
+	 * call to {@code stop} on a connection that has already been stopped
 	 * is ignored.
 	 * 
 	 * <P>
-	 * A call to <CODE>stop</CODE> must not return until delivery of messages
+	 * A call to {@code stop} must not return until delivery of messages
 	 * has paused. This means that a client can rely on the fact that none of
 	 * its message listeners will be called and that all threads of control
-	 * waiting for <CODE>receive</CODE> calls to return will not return with a
+	 * waiting for {@code receive} calls to return will not return with a
 	 * message until the connection is restarted. The receive timers for a
 	 * stopped connection continue to advance, so receives may time out while
 	 * the connection is stopped.
 	 * 
 	 * <P>
-	 * If message listeners are running when <CODE>stop</CODE> is invoked, the
-	 * <CODE>stop</CODE> call must wait until all of them have returned before
+	 * If message listeners are running when {@code stop} is invoked, the
+	 * {@code stop} call must wait until all of them have returned before
 	 * it may return. While these message listeners are completing, they must
 	 * have the full services of the connection available to them.
 	 * <p>
 	 * A message listener must not attempt to stop its own JMSContext as this
 	 * would lead to deadlock. The JMS provider must detect this and throw a
-	 * javax.jms.IllegalStateRuntimeException.
+	 * <tt>IllegalStateRuntimeException</tt>
 	 * <p>
 	 * For the avoidance of doubt, if an exception listener for the JMSContext's
-	 * connection is running when <code>stop</code> is invoked, there is no
-	 * requirement for the <code>stop</code> call to wait until the exception
+	 * connection is running when {@code stop} is invoked, there is no
+	 * requirement for the {@code stop} call to wait until the exception
 	 * listener has returned before it may return.
 	 * <p>
 	 * This method must not be used in a Java EE web or EJB application. Doing
-	 * so may cause a <code>JMSRuntimeException</code> to be thrown though this
+	 * so may cause a {@code JMSRuntimeException} to be thrown though this
 	 * is not guaranteed.
 	 * <p>
-	 * This method must not be used if the <code>JMSContext</code> is
+	 * This method must not be used if the {@code JMSContext} is
 	 * container-managed (injected). Doing so will cause a
-	 * <code>JMSRuntimeException</code> to be thrown.
+	 * {@code JMSRuntimeException} to be thrown.
 	 * 
+	 * @exception IllegalStateRuntimeException
+	 *                this method has been called by a <tt>MessageListener</tt>
+	 *                on its own <tt>JMSContext</tt>
 	 * @exception JMSRuntimeException
 	 *                if the JMS provider fails to stop message delivery for one
 	 *                of the following reasons:
@@ -416,7 +419,7 @@ public interface JMSContext {
 	 *                <li>an internal error has occurred or <li>this method has
 	 *                been called in a Java EE web or EJB application (though it
 	 *                is not guaranteed that an exception is thrown in this
-	 *                case) <li>the <code>JMSContext</code> is container-managed
+	 *                case) <li>the {@code JMSContext} is container-managed
 	 *                (injected)
 	 *                </ul>
 	 * 
@@ -426,22 +429,22 @@ public interface JMSContext {
 
 	/**
 	 * Specifies whether the underlying connection used by this
-	 * <code>JMSContext</code> will be started automatically when a consumer is
+	 * {@code JMSContext} will be started automatically when a consumer is
 	 * created. This is the default behaviour, and it may be disabled by calling
-	 * this method with a value of <code>false</code>.
+	 * this method with a value of {@code false}.
 	 * <p>
 	 * This method does not itself either start or stop the connection.
 	 * <p>
-	 * This method must not be used if the <code>JMSContext</code> is
+	 * This method must not be used if the {@code JMSContext} is
 	 * container-managed (injected). Doing so will cause a
-	 * <code>JMSRuntimeException</code> to be thrown.
+	 * {@code JMSRuntimeException} to be thrown.
 	 * 
 	 * @param autoStart
 	 *            Whether the underlying connection used by this
-	 *            <code>JMSContext</code> will be automatically started when a
+	 *            {@code JMSContext} will be automatically started when a
 	 *            consumer is created.
 	 * @exception JMSRuntimeException
-	 *                the <code>JMSContext</code> is container-managed
+	 *                the {@code JMSContext} is container-managed
 	 *                (injected)
 	 * 
 	 * @see javax.jms.JMSContext#getAutoStart
@@ -450,11 +453,11 @@ public interface JMSContext {
 
 	/**
 	 * Returns whether the underlying connection used by this
-	 * <code>JMSContext</code> will be started automatically when a consumer is
+	 * {@code JMSContext} will be started automatically when a consumer is
 	 * created.
 	 * 
 	 * @return whether the underlying connection used by this
-	 *         <code>JMSContext</code> will be started automatically when a
+	 *         {@code JMSContext} will be started automatically when a
 	 *         consumer is created.
 	 * 
 	 * @see javax.jms.JMSContext#setAutoStart
@@ -487,46 +490,61 @@ public interface JMSContext {
 	 * with a message or with null, depending on whether there was a message
 	 * available at the time of the close. If one or more of the connection's
 	 * sessions' message listeners is processing a message at the time when
-	 * connection <CODE>close</CODE> is invoked, all the facilities of the
+	 * connection {@code close} is invoked, all the facilities of the
 	 * connection and its sessions must remain available to those listeners
 	 * until they return control to the JMS provider.
 	 * <p>
-	 * A message listener must not attempt to close its own JMSContext as this
-	 * would lead to deadlock. The JMS provider must detect this and throw a
-	 * javax.jms.IllegalStateRuntimeException.
+	 * This method must not return until any incomplete asynchronous send
+	 * operations for this <tt>JMSContext</tt> have been completed and any
+	 * <tt>CompletionListener</tt> callbacks have returned. Incomplete sends
+	 * should be allowed to complete normally unless an error occurs.
 	 * <p>
 	 * For the avoidance of doubt, if an exception listener for the JMSContext's
-	 * connection is running when <code>close</code> is invoked, there is no
-	 * requirement for the <code>close</code> call to wait until the exception
+	 * connection is running when {@code close} is invoked, there is no
+	 * requirement for the {@code close} call to wait until the exception
 	 * listener has returned before it may return.
 	 * <P>
 	 * Closing a connection causes any of its sessions' transactions in progress
 	 * to be rolled back. In the case where a session's work is coordinated by
-	 * an external transaction manager, a session's <CODE>commit</CODE> and
-	 * <CODE>rollback</CODE> methods are not used and the result of a closed
+	 * an external transaction manager, a session's {@code commit} and
+	 * {@code rollback} methods are not used and the result of a closed
 	 * session's work is determined later by the transaction manager.
 	 * <p>
 	 * Closing a connection does NOT force an acknowledgment of
 	 * client-acknowledged sessions.
-	 * 
 	 * <P>
-	 * Invoking the <CODE>acknowledge</CODE> method of a received message from a
+	 * Invoking the {@code acknowledge} method of a received message from a
 	 * closed connection's session must throw an
-	 * <CODE>IllegalStateException</CODE>. Closing a closed connection must NOT
+	 * {@code IllegalStateException}. Closing a closed connection must NOT
 	 * throw an exception.
 	 * <p>
-	 * This method must not be used if the <code>JMSContext</code> is
+	 * A <tt>MessageListener</tt> must not attempt to close its own
+	 * <tt>JMSContext</tt> as this would lead to deadlock. The JMS provider must
+	 * detect this and throw a <tt>IllegalStateRuntimeException</tt>.
+	 * <p>
+	 * A <tt>CompletionListener</tt> callback method must not call
+	 * <tt>close</tt> on its own <tt>JMSContext</tt>. Doing so will cause an
+	 * <tt>IllegalStateRuntimeException</tt> to be thrown.
+	 * <p>
+	 * This method must not be used if the {@code JMSContext} is
 	 * container-managed (injected). Doing so will cause a
-	 * <code>JMSRuntimeException</code> to be thrown.
+	 * {@code JMSRuntimeException} to be thrown.
 	 * 
+	 * @exception IllegalStateRuntimeException
+	 *                <ul>
+	 *                <li>this method has been called by a <tt>MessageListener
+	 *                </tt> on its own <tt>JMSContext</tt></li> <li>this method
+	 *                has been called by a <tt>CompletionListener</tt> callback
+	 *                method on its own <tt>JMSContext</tt></li>
+	 *                </ul>
 	 * @exception JMSRuntimeException
 	 *                if the JMS provider fails to close the
-	 *                <code>JMSContext</code> for one of the following reasons:
+	 *                {@code JMSContext} for one of the following reasons:
 	 *                <ul>
 	 *                <li> an internal error has occurred. For example, a
 	 *                failure to release resources or to close a socket
 	 *                connection can cause this exception to be thrown. <li> the
-	 *                <code>JMSContext</code> is container-managed (injected)
+	 *                {@code JMSContext} is container-managed (injected)
 	 *                </ul>
 	 */
 	void close();
@@ -534,7 +552,7 @@ public interface JMSContext {
 	/**
 	 * With this session mode, the JMSContext's session automatically
 	 * acknowledges a client's receipt of a message either when the session has
-	 * successfully returned from a call to <CODE>receive</CODE> or when the
+	 * successfully returned from a call to {@code receive} or when the
 	 * message listener the session has called to process the message
 	 * successfully returns.
 	 */
@@ -543,7 +561,7 @@ public interface JMSContext {
 
 	/**
 	 * With this session mode, the client acknowledges a consumed message by
-	 * calling the message's <CODE>acknowledge</CODE> method. Acknowledging a
+	 * calling the message's {@code acknowledge} method. Acknowledging a
 	 * consumed message acknowledges all messages that the session has consumed.
 	 * 
 	 * <P>
@@ -572,13 +590,13 @@ public interface JMSContext {
 	/**
 	 * This session mode instructs the JMSContext's session to deliver and
 	 * consume messages in a local transaction which will be subsequently
-	 * committed by calling <CODE>commit</CODE> or rolled back by calling
-	 * <CODE>rollback</CODE>.
+	 * committed by calling {@code commit} or rolled back by calling
+	 * {@code rollback}.
 	 */
 	static final int SESSION_TRANSACTED = Session.SESSION_TRANSACTED;
 
 	/**
-	 * Creates a <CODE>BytesMessage</CODE> object. A <CODE>BytesMessage</CODE>
+	 * Creates a {@code BytesMessage} object. A {@code BytesMessage}
 	 * object is used to send a message containing a stream of uninterpreted
 	 * bytes.
 	 * 
@@ -590,14 +608,14 @@ public interface JMSContext {
 	BytesMessage createBytesMessage();
 
 	/**
-	 * Creates a <CODE>MapMessage</CODE> object. A <CODE>MapMessage</CODE>
+	 * Creates a {@code MapMessage} object. A {@code MapMessage}
 	 * object is used to send a self-defining set of name-value pairs, where
-	 * names are <CODE>String</CODE> objects and values are primitive values in
+	 * names are {@code String} objects and values are primitive values in
 	 * the Java programming language.
 	 * <p>
-	 * The message object returned may be sent using any <code>Session</code> or
-	 * <code>JMSContext</code>. It is not restricted to being sent using the
-	 * <code>JMSContext</code> used to create it.
+	 * The message object returned may be sent using any {@code Session} or
+	 * {@code JMSContext}. It is not restricted to being sent using the
+	 * {@code JMSContext} used to create it.
 	 * <p>
 	 * The message object returned may be optimised for use with the JMS
 	 * provider used to create it. However it can be sent using any JMS
@@ -611,14 +629,14 @@ public interface JMSContext {
 	MapMessage createMapMessage();
 
 	/**
-	 * Creates a <CODE>Message</CODE> object. The <CODE>Message</CODE> interface
-	 * is the root interface of all JMS messages. A <CODE>Message</CODE> object
+	 * Creates a {@code Message} object. The {@code Message} interface
+	 * is the root interface of all JMS messages. A {@code Message} object
 	 * holds all the standard message header information. It can be sent when a
 	 * message containing only header information is sufficient.
 	 * <p>
-	 * The message object returned may be sent using any <code>Session</code> or
-	 * <code>JMSContext</code>. It is not restricted to being sent using the
-	 * <code>JMSContext</code> used to create it.
+	 * The message object returned may be sent using any {@code Session} or
+	 * {@code JMSContext}. It is not restricted to being sent using the
+	 * {@code JMSContext} used to create it.
 	 * <p>
 	 * The message object returned may be optimised for use with the JMS
 	 * provider used to create it. However it can be sent using any JMS
@@ -632,13 +650,13 @@ public interface JMSContext {
 	Message createMessage();
 
 	/**
-	 * Creates an <CODE>ObjectMessage</CODE> object. An
-	 * <CODE>ObjectMessage</CODE> object is used to send a message that contains
+	 * Creates an {@code ObjectMessage} object. An
+	 * {@code ObjectMessage} object is used to send a message that contains
 	 * a serializable Java object.
 	 * <p>
-	 * The message object returned may be sent using any <code>Session</code> or
-	 * <code>JMSContext</code>. It is not restricted to being sent using the
-	 * <code>JMSContext</code> used to create it.
+	 * The message object returned may be sent using any {@code Session} or
+	 * {@code JMSContext}. It is not restricted to being sent using the
+	 * {@code JMSContext} used to create it.
 	 * <p>
 	 * The message object returned may be optimised for use with the JMS
 	 * provider used to create it. However it can be sent using any JMS
@@ -652,13 +670,13 @@ public interface JMSContext {
 	ObjectMessage createObjectMessage();
 
 	/**
-	 * Creates an initialized <CODE>ObjectMessage</CODE> object. An
-	 * <CODE>ObjectMessage</CODE> object is used to send a message that contains
+	 * Creates an initialized {@code ObjectMessage} object. An
+	 * {@code ObjectMessage} object is used to send a message that contains
 	 * a serializable Java object.
 	 * <p>
-	 * The message object returned may be sent using any <code>Session</code> or
-	 * <code>JMSContext</code>. It is not restricted to being sent using the
-	 * <code>JMSContext</code> used to create it.
+	 * The message object returned may be sent using any {@code Session} or
+	 * {@code JMSContext}. It is not restricted to being sent using the
+	 * {@code JMSContext} used to create it.
 	 * <p>
 	 * The message object returned may be optimised for use with the JMS
 	 * provider used to create it. However it can be sent using any JMS
@@ -675,13 +693,13 @@ public interface JMSContext {
 	ObjectMessage createObjectMessage(Serializable object);
 
 	/**
-	 * Creates a <CODE>StreamMessage</CODE> object. A <CODE>StreamMessage</CODE>
+	 * Creates a {@code StreamMessage} object. A {@code StreamMessage}
 	 * object is used to send a self-defining stream of primitive values in the
 	 * Java programming language.
 	 * <p>
-	 * The message object returned may be sent using any <code>Session</code> or
-	 * <code>JMSContext</code>. It is not restricted to being sent using the
-	 * <code>JMSContext</code> used to create it.
+	 * The message object returned may be sent using any {@code Session} or
+	 * {@code JMSContext}. It is not restricted to being sent using the
+	 * {@code JMSContext} used to create it.
 	 * <p>
 	 * The message object returned may be optimised for use with the JMS
 	 * provider used to create it. However it can be sent using any JMS
@@ -695,12 +713,12 @@ public interface JMSContext {
 	StreamMessage createStreamMessage();
 
 	/**
-	 * Creates a <CODE>TextMessage</CODE> object. A <CODE>TextMessage</CODE>
-	 * object is used to send a message containing a <CODE>String</CODE> object.
+	 * Creates a {@code TextMessage} object. A {@code TextMessage}
+	 * object is used to send a message containing a {@code String} object.
 	 * <p>
-	 * The message object returned may be sent using any <code>Session</code> or
-	 * <code>JMSContext</code>. It is not restricted to being sent using the
-	 * <code>JMSContext</code> used to create it.
+	 * The message object returned may be sent using any {@code Session} or
+	 * {@code JMSContext}. It is not restricted to being sent using the
+	 * {@code JMSContext} used to create it.
 	 * <p>
 	 * The message object returned may be optimised for use with the JMS
 	 * provider used to create it. However it can be sent using any JMS
@@ -714,13 +732,13 @@ public interface JMSContext {
 	TextMessage createTextMessage();
 
 	/**
-	 * Creates an initialized <CODE>TextMessage</CODE> object. A
-	 * <CODE>TextMessage</CODE> object is used to send a message containing a
-	 * <CODE>String</CODE>.
+	 * Creates an initialized {@code TextMessage} object. A
+	 * {@code TextMessage} object is used to send a message containing a
+	 * {@code String}.
 	 * <p>
-	 * The message object returned may be sent using any <code>Session</code> or
-	 * <code>JMSContext</code>. It is not restricted to being sent using the
-	 * <code>JMSContext</code> used to create it.
+	 * The message object returned may be sent using any {@code Session} or
+	 * {@code JMSContext}. It is not restricted to being sent using the
+	 * {@code JMSContext} used to create it.
 	 * <p>
 	 * The message object returned may be optimised for use with the JMS
 	 * provider used to create it. However it can be sent using any JMS
@@ -772,22 +790,38 @@ public interface JMSContext {
 	 * Commits all messages done in this transaction and releases any locks
 	 * currently held.
 	 * <p>
-	 * This method must not be used if the <code>JMSContext</code> is
+	 * This method must not return until any incomplete asynchronous send
+	 * operations for this <tt>JMSContext</tt> have been completed and any
+	 * <tt>CompletionListener</tt> callbacks have returned. Incomplete sends
+	 * should be allowed to complete normally unless an error occurs.
+	 * <p>
+	 * A <tt>CompletionListener</tt> callback method must not call
+	 * <tt>commit</tt> on its own <tt>JMSContext</tt>. Doing so will cause an
+	 * <tt>IllegalStateRuntimeException</tt> to be thrown.
+	 * <p>
+	 * This method must not be used if the {@code JMSContext} is
 	 * container-managed (injected). Doing so will cause a
-	 * <code>JMSRuntimeException</code> to be thrown.
+	 * {@code JMSRuntimeException} to be thrown.
 	 * 
+	 * @exception IllegalStateRuntimeException
+	 *                <ul>
+	 *                <li>the <tt>JMSContext</tt>'s session is not using a local
+	 *                transaction <li>this method has been called by a <tt>
+	 *                MessageListener</tt> on its own <tt>JMSContext</tt></li>
+	 *                <li>this method has been called by a <tt>
+	 *                CompletionListener</tt> callback method on its own <tt>
+	 *                JMSContext</tt></li>
+	 *                </ul>
 	 * @exception JMSRuntimeException
 	 *                if the JMS provider fails to commit the transaction for
 	 *                one of the following reasons:
 	 *                <ul>
-	 *                <li> an internal error has occurred. <li> the <code>
-	 *                JMSContext</code> is container-managed (injected)
+	 *                <li> an internal error has occurred. <li> the {@code 
+	 *                JMSContext} is container-managed (injected)
 	 *                </ul>
 	 * @exception TransactionRolledBackRuntimeException
 	 *                if the transaction is rolled back due to some internal
 	 *                error during commit.
-	 * @exception IllegalStateRuntimeException
-	 *                if the method is not called by a transacted session.
 	 * 
 	 */
 
@@ -797,19 +831,32 @@ public interface JMSContext {
 	 * Rolls back any messages done in this transaction and releases any locks
 	 * currently held.
 	 * <p>
-	 * This method must not be used if the <code>JMSContext</code> is
+	 * This method must not return until any incomplete asynchronous send
+	 * operations for this <tt>JMSContext</tt> have been completed and any
+	 * <tt>CompletionListener</tt> callbacks have returned. Incomplete sends
+	 * should be allowed to complete normally unless an error occurs.
+	 * <p>
+	 * A <tt>CompletionListener</tt> callback method must not call
+	 * <tt>rollback</tt> on its own <tt>JMSContext</tt>. Doing so will cause an
+	 * <tt>IllegalStateRuntimeException</tt> to be thrown.
+	 * <p>
+	 * This method must not be used if the {@code JMSContext} is
 	 * container-managed (injected). Doing so will cause a
-	 * <code>JMSRuntimeException</code> to be thrown.
+	 * {@code JMSRuntimeException} to be thrown.
 	 * 
+	 * @exception IllegalStateRuntimeException
+	 *                <ul>
+	 *                <li>the <tt>JMSContext</tt>'s session is not using a local transaction
+	 *                <li>this method has been called by a <tt>MessageListener</tt> on its own <tt>JMSContext</tt></li>
+	 *                <li>this method has been called by a <tt>CompletionListener</tt> callback method on its own <tt>JMSContext</tt></li>
+	 *                </ul>
 	 * @exception JMSRuntimeException
 	 *                if the JMS provider fails to roll back the transaction for
 	 *                one of the following reasons:
 	 *                <ul>
-	 *                <li> an internal error has occurred. <li> the <code>
-	 *                JMSContext</code> is container-managed (injected)
+	 *                <li> an internal error has occurred. <li> the {@code 
+	 *                JMSContext} is container-managed (injected)
 	 *                </ul>
-	 * @exception IllegalStateRuntimeException
-	 *                if the method is not called by a transacted session.
 	 * 
 	 */
 	void rollback();
@@ -835,16 +882,16 @@ public interface JMSContext {
 	 * be delivered in exactly their original delivery order.
 	 * </UL>
 	 * <p>
-	 * This method must not be used if the <code>JMSContext</code> is
+	 * This method must not be used if the {@code JMSContext} is
 	 * container-managed (injected). Doing so will cause a
-	 * <code>JMSRuntimeException</code> to be thrown.
+	 * {@code JMSRuntimeException} to be thrown.
 	 * 
 	 * @exception JMSRuntimeException
 	 *                if the JMS provider fails to stop and restart message
 	 *                delivery for one of the following reasons:
 	 *                <ul>
-	 *                <li> an internal error has occurred. <li> the <code>
-	 *                JMSContext</code> is container-managed (injected)
+	 *                <li> an internal error has occurred. <li> the {@code 
+	 *                JMSContext} is container-managed (injected)
 	 *                </ul>
 	 * @exception IllegalStateRuntimeException
 	 *                if the method is called by a transacted session.
@@ -853,17 +900,17 @@ public interface JMSContext {
 	void recover();
 
 	/**
-	 * Creates a <CODE>JMSConsumer</CODE> for the specified destination.
+	 * Creates a {@code JMSConsumer} for the specified destination.
 	 * 
 	 * <P>
-	 * A client uses a <CODE>JMSConsumer</CODE> object to receive messages that
+	 * A client uses a {@code JMSConsumer} object to receive messages that
 	 * have been sent to a destination.
 	 * 
 	 * @param destination
-	 *            the <CODE>Destination</CODE> to access.
+	 *            the {@code Destination} to access.
 	 * 
 	 * @exception JMSRuntimeException
-	 *                if the session fails to create a <CODE>JMSConsumer</CODE>
+	 *                if the session fails to create a {@code JMSConsumer}
 	 *                due to some internal error.
 	 * @exception InvalidDestinationRuntimeException
 	 *                if an invalid destination is specified.
@@ -871,22 +918,22 @@ public interface JMSContext {
 	JMSConsumer createConsumer(Destination destination);
 
 	/**
-	 * Creates a <CODE>JMSConsumer</CODE> for the specified destination, using a
+	 * Creates a {@code JMSConsumer} for the specified destination, using a
 	 * message selector.
 	 * <P>
-	 * A client uses a <CODE>JMSConsumer</CODE> object to receive messages that
+	 * A client uses a {@code JMSConsumer} object to receive messages that
 	 * have been sent to a destination.
 	 * 
 	 * @param destination
-	 *            the <CODE>Destination</CODE> to access
+	 *            the {@code Destination} to access
 	 * @param messageSelector
 	 *            only messages with properties matching the message selector
 	 *            expression are delivered. A value of null or an empty string
 	 *            indicates that there is no message selector for the
-	 *            <code>JMSConsumer</code>.
+	 *            {@code JMSConsumer}.
 	 * 
 	 * @throws JMSRuntimeException
-	 *             if the session fails to create a <code>JMSConsumer</code> due
+	 *             if the session fails to create a {@code JMSConsumer} due
 	 *             to some internal error.
 	 * @throws InvalidDestinationRuntimeException
 	 *             if an invalid destination is specified.
@@ -896,34 +943,34 @@ public interface JMSContext {
 	JMSConsumer createConsumer(Destination destination, java.lang.String messageSelector);
 
 	/**
-	 * Creates a <CODE>JMSConsumer</CODE> for the specified destination,
-	 * specifying a message selector and the <code>noLocal</code> parameter.
+	 * Creates a {@code JMSConsumer} for the specified destination,
+	 * specifying a message selector and the {@code noLocal} parameter.
 	 * <P>
-	 * A client uses a <CODE>JMSConsumer</CODE> object to receive messages that
+	 * A client uses a {@code JMSConsumer} object to receive messages that
 	 * have been sent to a destination.
 	 * <P>
-	 * The <code>noLocal</code> argument is for use when the destination is a
+	 * The {@code noLocal} argument is for use when the destination is a
 	 * topic and the JMSContext's connection is also being used to publish
-	 * messages to that topic. If <code>noLocal</code> is set to true then the
-	 * <code>JMSConsumer</code> will not receive messages published to the topic
+	 * messages to that topic. If {@code noLocal} is set to true then the
+	 * {@code JMSConsumer} will not receive messages published to the topic
 	 * by its own connection. The default value of this argument is false. If
 	 * the destination is a queue then the effect of setting
-	 * <code>noLocal</code> to true is not specified.
+	 * {@code noLocal} to true is not specified.
 	 * 
 	 * @param destination
-	 *            the <CODE>Destination</CODE> to access
+	 *            the {@code Destination} to access
 	 * @param messageSelector
 	 *            only messages with properties matching the message selector
 	 *            expression are delivered. A value of null or an empty string
 	 *            indicates that there is no message selector for the
-	 *            <code>JMSConsumer</code>.
+	 *            {@code JMSConsumer}.
 	 * @param noLocal
 	 *            if true, and the destination is a topic, then the
-	 *            <code>JMSConsumer</code> will not receive messages published
+	 *            {@code JMSConsumer} will not receive messages published
 	 *            to the topic by its own connection
 	 * 
 	 * @throws JMSRuntimeException
-	 *             if the session fails to create a <code>JMSConsumer</code> due
+	 *             if the session fails to create a {@code JMSConsumer} due
 	 *             to some internal error.
 	 * @throws InvalidDestinationRuntimeException
 	 *             if an invalid destination is specified.
@@ -933,13 +980,13 @@ public interface JMSContext {
 	JMSConsumer createConsumer(Destination destination, java.lang.String messageSelector, boolean noLocal);
 
 	/**
-	 * Creates a <code>Queue</code> object which encapsulates a specified
+	 * Creates a {@code Queue} object which encapsulates a specified
 	 * provider-specific queue name.
 	 * <p>
 	 * The use of provider-specific queue names in an application may render the
 	 * application non-portable. Portable applications are recommended to not
 	 * use this method but instead look up an administratively-defined
-	 * <code>Queue</code> object using JNDI.
+	 * {@code Queue} object using JNDI.
 	 * <p>
 	 * Note that this method simply creates an object that encapsulates the name
 	 * of a queue. It does not create the physical queue in the JMS provider.
@@ -948,7 +995,7 @@ public interface JMSContext {
 	 * provider-specific and is typically an administrative task performed by an
 	 * administrator, though some providers may create them automatically when
 	 * needed. The one exception to this is the creation of a temporary queue,
-	 * which is done using the <code>createTemporaryQueue</code> method.
+	 * which is done using the {@code createTemporaryQueue} method.
 	 * 
 	 * @param queueName
 	 *            A provider-specific queue name
@@ -961,13 +1008,13 @@ public interface JMSContext {
 	Queue createQueue(String queueName);
 
 	/**
-	 * Creates a <code>Topic</code> object which encapsulates a specified
+	 * Creates a {@code Topic} object which encapsulates a specified
 	 * provider-specific topic name.
 	 * <p>
 	 * The use of provider-specific topic names in an application may render the
 	 * application non-portable. Portable applications are recommended to not
 	 * use this method but instead look up an administratively-defined
-	 * <code>Topic</code> object using JNDI.
+	 * {@code Topic} object using JNDI.
 	 * <p>
 	 * Note that this method simply creates an object that encapsulates the name
 	 * of a topic. It does not create the physical topic in the JMS provider.
@@ -976,7 +1023,7 @@ public interface JMSContext {
 	 * provider-specific and is typically an administrative task performed by an
 	 * administrator, though some providers may create them automatically when
 	 * needed. The one exception to this is the creation of a temporary topic,
-	 * which is done using the <code>createTemporaryTopic</code> method.
+	 * which is done using the {@code createTemporaryTopic} method.
 	 * 
 	 * @param topicName
 	 *            A provider-specific topic name
@@ -990,12 +1037,12 @@ public interface JMSContext {
 
 	/**
 	 * Creates a durable subscription with the specified name on the specified
-	 * topic, and creates a <code>JMSConsumer</code> on that durable
+	 * topic, and creates a {@code JMSConsumer} on that durable
 	 * subscription.
 	 * <p>
 	 * If a durable subscription already exists with the same name and client
 	 * identifier (if set) and the same topic and message selector then this
-	 * method creates a <code>JMSConsumer</code> on the existing durable
+	 * method creates a {@code JMSConsumer} on the existing durable
 	 * subscription.
 	 * <p>
 	 * A durable subscription is used by a client which needs to receive all the
@@ -1006,13 +1053,13 @@ public interface JMSContext {
 	 * a consumer on this durable subscription or until they have expired.
 	 * <p>
 	 * A durable subscription will continue to accumulate messages until it is
-	 * deleted using the <code>unsubscribe</code> method.
+	 * deleted using the {@code unsubscribe} method.
 	 * <p>
 	 * A consumer may be created on a durable subscription using the
-	 * <code>createDurableConsumer</code> methods on <code>JMSContext</code>, or
-	 * the <code>createDurableConsumer</code> and
-	 * <code>createDurableSubscriber</code> methods on <code>Session</code> or
-	 * <code>TopicSession</code>. A durable subscription which has a consumer
+	 * {@code createDurableConsumer} methods on {@code JMSContext}, or
+	 * the {@code createDurableConsumer} and
+	 * {@code createDurableSubscriber} methods on {@code Session} or
+	 * {@code TopicSession}. A durable subscription which has a consumer
 	 * associated with it is described as being active. A durable subscription
 	 * which has no consumer associated with it is described as being inactive.
 	 * <p>
@@ -1026,31 +1073,38 @@ public interface JMSContext {
 	 * subsequently wishes to create a consumer on that durable subscription
 	 * must use the same client identifier.
 	 * <p>
+	 * This method creates the durable subscription without a message selector 
+	 * and with a {@code noLocal} value of {@code false}. 
+	 * <p>
 	 * If there are no active consumers on the durable subscription (and no
 	 * consumed messages from that subscription are still part of a pending
 	 * transaction or are not yet acknowledged in the session), and this method
 	 * is used to create a new consumer on that durable subscription, specifying
 	 * the same name and client identifier (if set) but a different topic or
-	 * message selector, or, if the client identifier is set, a different
-	 * noLocal argument, then the durable subscription will be deleted and a new
-	 * one created.
+	 * message selector or, if the client identifier is set, a different
+	 * {@code noLocal} value, then the durable subscription will be deleted
+	 * and a new one created.
 	 * <p>
 	 * However if there is an active consumer on the durable subscription (or a
 	 * consumed message from that subscription is still part of a pending
 	 * transaction or is not yet acknowledged in the session), and an attempt is
 	 * made to create an additional consumer, specifying the same name and
-	 * client identifier (if set) but a different topic or message selector, or,
-	 * if the client identifier is set, a different noLocal argument, then a
-	 * <code>JMSException</code> will be thrown.
+	 * client identifier (if set) but a different topic or message selector or,
+	 * if the client identifier is set, a different {@code noLocal} value,
+	 * then a {@code JMSException} will be thrown.
+	 * <p>
+	 * There is no restriction to prevent a durable subscription and
+	 * a shared non-durable subscription having the same name. Such subscriptions
+	 * would be completely separate.
 	 * 
 	 * @param topic
-	 *            the non-temporary <CODE>Topic</CODE> to subscribe to
+	 *            the non-temporary {@code Topic} to subscribe to
 	 * @param name
 	 *            the name used to identify this subscription
 	 * 
 	 * @exception JMSRuntimeException
 	 *                if the session fails to create the durable subscription
-	 *                and <code>JMSConsumer</code> due to some internal error.
+	 *                and {@code JMSConsumer} due to some internal error.
 	 * @exception InvalidDestinationRuntimeException
 	 *                if an invalid topic is specified.
 	 * 
@@ -1059,13 +1113,13 @@ public interface JMSContext {
 
 	/**
 	 * Creates a durable subscription with the specified name on the specified
-	 * topic, specifying a message selector and the <code>noLocal</code>
-	 * parameter, and creates a <code>JMSConsumer</code> on that durable
+	 * topic, specifying a message selector and the {@code noLocal}
+	 * parameter, and creates a {@code JMSConsumer} on that durable
 	 * subscription.
 	 * <p>
 	 * If a durable subscription already exists with the same name and client
 	 * identifier (if set) and the same topic and message selector then this
-	 * method creates a <code>JMSConsumer</code> on the existing durable
+	 * method creates a {@code JMSConsumer} on the existing durable
 	 * subscription.
 	 * <p>
 	 * A durable subscription is used by a client which needs to receive all the
@@ -1076,12 +1130,12 @@ public interface JMSContext {
 	 * a consumer on this durable subscription or until they have expired.
 	 * <p>
 	 * A consumer may be created on a durable subscription using the
-	 * <code>createDurableConsumer</code> methods on <code>JMSContext</code>, or
-	 * the <code>createDurableConsumer</code> and
-	 * <code>createDurableSubscriber</code> methods on <code>Session</code> or
-	 * <code>TopicSession</code>. A durable subscription will continue to
+	 * {@code createDurableConsumer} methods on {@code JMSContext}, or
+	 * the {@code createDurableConsumer} and
+	 * {@code createDurableSubscriber} methods on {@code Session} or
+	 * {@code TopicSession}. A durable subscription will continue to
 	 * accumulate messages until it is deleted using the
-	 * <code>unsubscribe</code> method.
+	 * {@code unsubscribe} method.
 	 * <p>
 	 * A durable subscription which has a consumer associated with it is
 	 * described as being active. A durable subscription which has no consumer
@@ -1097,33 +1151,37 @@ public interface JMSContext {
 	 * subsequently wishes to create a consumer on that durable subscription
 	 * must use the same client identifier.
 	 * <p>
+	 * If {@code noLocal} is set to true, and the client identifier is set,
+	 * then any messages published to the topic using this JMSContext's connection,
+	 * or any other connection or {@code JMSContext} with the same client
+	 * identifier, will not be added to the durable subscription. If the client
+	 * identifier is unset then setting {@code noLocal} to true will cause a
+	 * {@code IllegalStateRuntimeException} to be thrown. 
+	 * The default value of  {@code noLocal} is false.
+	 * <p>
 	 * If there are no active consumers on the durable subscription (and no
 	 * consumed messages from that subscription are still part of a pending
 	 * transaction or are not yet acknowledged in the session), and this method
 	 * is used to create a new consumer on that durable subscription, specifying
 	 * the same name and client identifier (if set) but a different topic or
-	 * message selector, or, if the client identifier is set, a different
-	 * noLocal argument, then the durable subscription will be deleted and a new
-	 * one created.
+	 * message selector or, if the client identifier is set, a different
+	 * {@code noLocal} value, then the durable subscription will be deleted
+	 * and a new one created.
 	 * <p>
 	 * However if there is an active consumer on the durable subscription (or a
 	 * consumed message from that subscription is still part of a pending
 	 * transaction or is not yet acknowledged in the session), and an attempt is
 	 * made to create an additional consumer, specifying the same name and
-	 * client identifier (if set) but a different topic or message selector, or,
-	 * if the client identifier is set, a different noLocal argument, then a
-	 * <code>JMSException</code> will be thrown.
+	 * client identifier (if set) but a different topic or message selector or,
+	 * if the client identifier is set, a different {@code noLocal} value,
+	 * then a {@code JMSException} will be thrown.
 	 * <p>
-	 * If <code>noLocal</code> is set to true, and the client identifier is set,
-	 * then any messages published to the topic using this JMSContext's connection,
-	 * or any other connection or <code>JMSContext</code> with the same client
-	 * identifier, will not be added to the durable subscription. If the client
-	 * identifier is unset then setting <code>noLocal</code> to true will cause a
-	 * <code>IllegalStateException</code> to be thrown. 
-	 * The default value of  <code>noLocal</code> is false.
+	 * There is no restriction to prevent a durable subscription and
+	 * a shared non-durable subscription having the same name. Such subscriptions
+	 * would be completely separate.
 	 * 
 	 * @param topic
-	 *            the non-temporary <CODE>Topic</CODE> to subscribe to
+	 *            the non-temporary {@code Topic} to subscribe to
 	 * @param name
 	 *            the name used to identify this subscription
 	 * @param messageSelector
@@ -1133,19 +1191,19 @@ public interface JMSContext {
 	 *            selector for the durable subscription.
 	 * @param noLocal
 	 *            if true, and the client identifier is set, then any messages
-	 *            published to the topic using this <code>JMSContext</code>, or
-	 *            any other <code>JMSContext</code> or connection with the same
+	 *            published to the topic using this JMSContext's connection, or any
+	 *            other connection with the same
 	 *            client identifier, will not be added to the durable
 	 *            subscription.
 	 * @exception JMSRuntimeException
 	 *                if the session fails to create the durable subscription
-	 *                and <code>JMSConsumer</code> due to some internal error.
+	 *                and {@code JMSConsumer} due to some internal error.
 	 * @exception InvalidDestinationRuntimeException
 	 *                if an invalid topic is specified.
 	 * @exception InvalidSelectorRuntimeException
 	 *                if the message selector is invalid.
 	 * @exception IllegalStateRuntimeException
-	 *                if <code>noLocal</code> is set to <code>true</code>
+	 *                if {@code noLocal} is set to {@code true}
 	 *                but the client identifier is unset
 	 * 
 	 */
@@ -1153,12 +1211,13 @@ public interface JMSContext {
 
 	/**
 	 * Creates a shared non-durable subscription with the specified name on the
-	 * specified topic, and creates a <code>JMSConsumer</code> on that
+	 * specified topic, and creates a {@code JMSConsumer} on that
 	 * subscription.
 	 * <p>
 	 * If a shared non-durable subscription already exists with the same name
+	 * and client identifier (if set)
 	 * and the same topic, and without a message selector, then this method
-	 * creates a <code>JMSConsumer</code> on the existing subscription.
+	 * creates a {@code JMSConsumer} on the existing subscription.
 	 * <p>
 	 * A non-durable shared subscription is used by a client which needs to be
 	 * able to share the work of receiving messages from a topic subscription
@@ -1170,28 +1229,35 @@ public interface JMSContext {
 	 * it.
 	 * <p>
 	 * A consumer may be created on a non-durable shared subscription using the
-	 * <code>createSharedConsumer</code> methods on <code>JMSContext</code>,
-	 * <code>Session</code> or <code>TopicSession</code>.
+	 * {@code createSharedConsumer} methods on {@code JMSContext},
+	 * {@code Session} or {@code TopicSession}.
+     * <p>
+     * A shared non-durable subscription is identified by a name specified by the client
+     * and by the client identifier if set. If the client identifier was set
+     * when the shared non-durable subscription was first created then a client which 
+     * subsequently wishes to create a consumer 
+     * on that shared non-durable subscription must use the same client identifier.
 	 * <p>
 	 * If there is an active consumer on the non-durable shared subscription (or
 	 * a consumed message from that subscription is still part of a pending
 	 * transaction or is not yet acknowledged in the session), and an attempt is
-	 * made to create an additional consumer, specifying the same name but a
-	 * different topic or message selector, then a
-	 * <code>JMSRuntimeException</code> will be thrown.
+	 * made to create an additional consumer, specifying the same name and
+	 * client identifier (if set) but a different topic or message selector, or,
+	 * if the client identifier is set, a different noLocal value, then a
+	 * {@code JMSRuntimeException} will be thrown.
 	 * <p>
 	 * There is no restriction to prevent a shared non-durable subscription and
 	 * a durable subscription having the same name. Such subscriptions would be
 	 * completely separate.
 	 * 
 	 * @param topic
-	 *            the <code>Topic</code> to subscribe to
+	 *            the {@code Topic} to subscribe to
 	 * @param sharedSubscriptionName
 	 *            the name used to identify the shared non-durable subscription
 	 * 
 	 * @throws JMSRuntimeException
 	 *             if the session fails to create the shared non-durable
-	 *             subscription and <code>JMSContext</code> due to some internal
+	 *             subscription and {@code JMSContext} due to some internal
 	 *             error.
 	 * @throws InvalidDestinationRuntimeException
 	 *             if an invalid topic is specified.
@@ -1203,11 +1269,12 @@ public interface JMSContext {
 	/**
 	 * Creates a shared non-durable subscription with the specified name on the
 	 * specified topic, specifying a message selector, and creates a
-	 * <code>JMSConsumer</code> on that subscription
+	 * {@code JMSConsumer} on that subscription
 	 * <p>
 	 * If a shared non-durable subscription already exists with the same name
+	 * and client identifier (if set)
 	 * and the same topic and message selector then this method creates a
-	 * <code>JMSConsumer</code> on the existing subscription.
+	 * {@code JMSConsumer} on the existing subscription.
 	 * <p>
 	 * A non-durable shared subscription is used by a client which needs to be
 	 * able to share the work of receiving messages from a topic subscription
@@ -1219,22 +1286,29 @@ public interface JMSContext {
 	 * it.
 	 * <p>
 	 * A consumer may be created on a non-durable shared subscription using the
-	 * <code>createSharedConsumer</code> methods on <code>JMSContext</code>,
-	 * <code>Session</code> or <code>TopicSession</code>.
+	 * {@code createSharedConsumer} methods on {@code JMSContext},
+	 * {@code Session} or {@code TopicSession}.
+     * <p>
+     * A shared non-durable subscription is identified by a name specified by the client
+     * and by the client identifier if set. If the client identifier was set
+     * when the shared non-durable subscription was first created then a client which 
+     * subsequently wishes to create a consumer 
+     * on that shared non-durable subscription must use the same client identifier.
 	 * <p>
 	 * If there is an active consumer on the non-durable shared subscription (or
 	 * a consumed message from that subscription is still part of a pending
 	 * transaction or is not yet acknowledged in the session), and an attempt is
-	 * made to create an additional consumer, specifying the same name but a
-	 * different topic or message selector, then a
-	 * <code>JMSRuntimeException</code> will be thrown.
+	 * made to create an additional consumer, specifying the same name and
+	 * client identifier (if set) but a different topic or message selector, or,
+	 * if the client identifier is set, a different noLocal value, then a
+	 * {@code JMSRuntimeException} will be thrown.
 	 * <p>
 	 * There is no restriction to prevent a shared non-durable subscription and
 	 * a durable subscription having the same name. Such subscriptions would be
 	 * completely separate.
 	 * 
 	 * @param topic
-	 *            the <code>Topic</code> to subscribe to
+	 *            the {@code Topic} to subscribe to
 	 * @param sharedSubscriptionName
 	 *            the name used to identify the shared non-durable subscription
 	 * @param messageSelector
@@ -1245,7 +1319,7 @@ public interface JMSContext {
 	 * 
 	 * @throws JMSRuntimeException
 	 *             if the session fails to create the shared non-durable
-	 *             subscription and <code>JMSConsumer</code> due to some
+	 *             subscription and {@code JMSConsumer} due to some
 	 *             internal error.
 	 * @throws InvalidDestinationRuntimeException
 	 *             if an invalid topic is specified.
@@ -1257,12 +1331,13 @@ public interface JMSContext {
 	/**
 	 * Creates a shared non-durable subscription with the specified name on the
 	 * specified topic, specifying a message selector and the
-	 * <code>noLocal</code> parameter, and creates a <code>JMSConsumer</code> on
+	 * {@code noLocal} parameter, and creates a {@code JMSConsumer} on
 	 * that subscription.
 	 * <p>
 	 * If a shared non-durable subscription already exists with the same name
+	 * and client identifier (if set)
 	 * and the same topic and message selector then this method creates a
-	 * <code>JMSConsumer</code> on the existing subscription.
+	 * {@code JMSConsumer} on the existing subscription.
 	 * <p>
 	 * A non-durable shared subscription is used by a client which needs to be
 	 * able to share the work of receiving messages from a topic subscription
@@ -1274,26 +1349,36 @@ public interface JMSContext {
 	 * it.
 	 * <p>
 	 * A consumer may be created on a non-durable shared subscription using the
-	 * <code>createSharedConsumer</code> methods on <code>JMSContext</code>,
-	 * <code>Session</code> or <code>TopicSession</code>.
+	 * {@code createSharedConsumer} methods on {@code JMSContext},
+	 * {@code Session} or {@code TopicSession}.
+     * <p>
+     * A shared non-durable subscription is identified by a name specified by the client
+     * and by the client identifier if set. If the client identifier was set
+     * when the shared non-durable subscription was first created then a client which 
+     * subsequently wishes to create a consumer 
+     * on that shared non-durable subscription must use the same client identifier.
+	 * <p>
+	 * If {@code noLocal} is set to true, and the client identifier is set,
+	 * then any messages published to the topic using this JMSContext's connection,
+	 * or any other connection with the same client
+	 * identifier, will not be added to the shared non-durable subscription. If the client
+	 * identifier is unset then setting {@code noLocal} to true will cause
+	 * a {@code IllegalStateException} to be thrown. 
 	 * <p>
 	 * If there is an active consumer on the non-durable shared subscription (or
 	 * a consumed message from that subscription is still part of a pending
 	 * transaction or is not yet acknowledged in the session), and an attempt is
-	 * made to create an additional consumer, specifying the same name but a
-	 * different topic or message selector, then a
-	 * <code>JMSRuntimeException</code> will be thrown.
-	 * <p>
-	 * If <code>noLocal</code> is set to true then messages published to the
-	 * topic by its own connection will not be added to the non-durable shared
-	 * subscription. The default value of this argument is false.
+	 * made to create an additional consumer, specifying the same name and
+	 * client identifier (if set) but a different topic or message selector, or,
+	 * if the client identifier is set, a different noLocal value, then a
+	 * {@code JMSRuntimeException} will be thrown.
 	 * <p>
 	 * There is no restriction to prevent a shared non-durable subscription and
 	 * a durable subscription having the same name. Such subscriptions would be
 	 * completely separate.
 	 * 
 	 * @param topic
-	 *            the <code>Topic</code> to subscribe to
+	 *            the {@code Topic} to subscribe to
 	 * @param sharedSubscriptionName
 	 *            the name used to identify the shared non-durable subscription
 	 * @param messageSelector
@@ -1302,27 +1387,33 @@ public interface JMSContext {
 	 *            value of null or an empty string indicates that there is no
 	 *            message selector for the shared non-durable subscription.
 	 * @param noLocal
-	 *            if true, messages published by its own connection will not be
-	 *            added to the non-durable subscription.
+	 *            if true, and the client identifier is set, then any messages
+	 *            published to the topic using this JMSContext's connection, or any
+	 *            other connection with the same
+	 *            client identifier, will not be added to the shared non-durable
+	 *            subscription.
 	 * 
 	 * @throws JMSRuntimeException
 	 *             if the session fails to create the shared non-durable
-	 *             subscription and <code>JMSConsumer</code> due to some
+	 *             subscription and {@code JMSConsumer} due to some
 	 *             internal error.
 	 * @throws InvalidDestinationRuntimeException
 	 *             if an invalid topic is specified.
 	 * @throws InvalidSelectorRuntimeException
 	 *             if the message selector is invalid.
+	 * @throws IllegalStateException
+	 *             if {@code noLocal} is set to {@code true} but
+	 *             the client identifier is unset
 	 */
 	JMSConsumer createSharedConsumer(Topic topic, String sharedSubscriptionName, java.lang.String messageSelector,
 			boolean noLocal);
 
 	/**
-	 * Creates a <CODE>QueueBrowser</CODE> object to peek at the messages on the
+	 * Creates a {@code QueueBrowser} object to peek at the messages on the
 	 * specified queue.
 	 * 
 	 * @param queue
-	 *            the <CODE>queue</CODE> to access
+	 *            the {@code queue} to access
 	 * 
 	 * 
 	 * @exception JMSRuntimeException
@@ -1335,11 +1426,11 @@ public interface JMSContext {
 	QueueBrowser createBrowser(Queue queue);
 
 	/**
-	 * Creates a <CODE>QueueBrowser</CODE> object to peek at the messages on the
+	 * Creates a {@code QueueBrowser} object to peek at the messages on the
 	 * specified queue using a message selector.
 	 * 
 	 * @param queue
-	 *            the <CODE>queue</CODE> to access
+	 *            the {@code queue} to access
 	 * 
 	 * @param messageSelector
 	 *            only messages with properties matching the message selector
@@ -1360,8 +1451,8 @@ public interface JMSContext {
 	QueueBrowser createBrowser(Queue queue, String messageSelector);
 
 	/**
-	 * Creates a <CODE>TemporaryQueue</CODE> object. Its lifetime will be that
-	 * of the JMSContext's <CODE>Connection</CODE> unless it is deleted earlier.
+	 * Creates a {@code TemporaryQueue} object. Its lifetime will be that
+	 * of the JMSContext's {@code Connection} unless it is deleted earlier.
 	 * 
 	 * @return a temporary queue identity
 	 * 
@@ -1373,8 +1464,8 @@ public interface JMSContext {
 	TemporaryQueue createTemporaryQueue();
 
 	/**
-	 * Creates a <CODE>TemporaryTopic</CODE> object. Its lifetime will be that
-	 * of the JMSContext's <CODE>Connection</CODE> unless it is deleted earlier.
+	 * Creates a {@code TemporaryTopic} object. Its lifetime will be that
+	 * of the JMSContext's {@code Connection} unless it is deleted earlier.
 	 * 
 	 * @return a temporary topic identity
 	 * 
@@ -1405,19 +1496,19 @@ public interface JMSContext {
 	 * is part of a pending transaction or has not been acknowledged in the
 	 * session.
 	 * <P>
-	 * If the active consumer is represented by a <CODE>JMSConsumer</CODE> then
-	 * calling <CODE>close</CODE> on either that object or the
-	 * <CODE>JMSContext</CODE> used to create it will render the consumer
+	 * If the active consumer is represented by a {@code JMSConsumer} then
+	 * calling {@code close} on either that object or the
+	 * {@code JMSContext} used to create it will render the consumer
 	 * inactive and allow the subscription to be deleted.
 	 * <P>
 	 * If the active consumer was created by calling
-	 * <code>setMessageListener</code> on the <CODE>JMSContext</CODE> then
-	 * calling <CODE>close</CODE> on the <CODE>JMSContext</CODE> will render the
+	 * {@code setMessageListener} on the {@code JMSContext} then
+	 * calling {@code close} on the {@code JMSContext} will render the
 	 * consumer inactive and allow the subscription to be deleted.
 	 * <p>
-	 * If the active consumer is represented by a <code>MessageConsumer</code>
-	 * or <code>TopicSubscriber</code> then calling <code>close</code> on that
-	 * object or on the <code>Session</code> or <code>Connection</code> used to
+	 * If the active consumer is represented by a {@code MessageConsumer}
+	 * or {@code TopicSubscriber} then calling {@code close} on that
+	 * object or on the {@code Session} or {@code Connection} used to
 	 * create it will render the consumer inactive and allow the subscription to
 	 * be deleted.
 	 * 
@@ -1443,28 +1534,28 @@ public interface JMSContext {
 	 * acknowledgement mode of AUTO_ACKNOWLEDGE or DUPS_OK_ACKNOWLEDGE calling
 	 * this method has no effect.
 	 * <p>
-	 * This method has identical behaviour to the <code>acknowledge</code>
-	 * method on <code>Message</code>. A client may individually acknowledge
+	 * This method has identical behaviour to the {@code acknowledge}
+	 * method on {@code Message}. A client may individually acknowledge
 	 * each message as it is consumed, or it may choose to acknowledge messages
 	 * as an application-defined group. In both cases it makes no difference
 	 * which of these two methods is used.
 	 * <p>
 	 * Messages that have been received but not acknowledged may be redelivered.
 	 * <p>
-	 * This method must not be used if the <code>JMSContext</code> is
+	 * This method must not be used if the {@code JMSContext} is
 	 * container-managed (injected). Doing so will cause a
-	 * <code>JMSRuntimeException</code> to be thrown.
+	 * {@code JMSRuntimeException} to be thrown.
 	 * 
 	 * @exception JMSRuntimeException
 	 *                if the JMS provider fails to acknowledge the messages for
 	 *                one of the following reasons:
 	 *                <ul>
-	 *                <li> an internal error has occurred. <li> the <code>
-	 *                JMSContext</code> is container-managed (injected)
+	 *                <li> an internal error has occurred. <li> the {@code 
+	 *                JMSContext} is container-managed (injected)
 	 *                </ul>
 	 * 
-	 * @exception IllegalStateException
-	 *                if the <code>JMSContext</code> is closed.
+	 * @exception IllegalStateRuntimeException
+	 *                if the {@code JMSContext} is closed.
 	 * 
 	 * @see javax.jms.Session#CLIENT_ACKNOWLEDGE
 	 * @see javax.jms.Message#acknowledge

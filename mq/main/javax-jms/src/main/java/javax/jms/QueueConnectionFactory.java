@@ -40,15 +40,15 @@
 
 package javax.jms;
 
-/** A client uses a <CODE>QueueConnectionFactory</CODE> object to create 
-  * <CODE>QueueConnection</CODE> objects with a point-to-point JMS provider.
+/** A client uses a {@code QueueConnectionFactory} object to create 
+  * {@code QueueConnection} objects with a point-to-point JMS provider.
   *
-  * <P><CODE>QueueConnectionFactory</CODE> can be used to create a 
-  * <CODE>QueueConnection</CODE>, from which specialized queue-related objects
+  * <P>{@code QueueConnectionFactory} can be used to create a 
+  * {@code QueueConnection}, from which specialized queue-related objects
   * can be  created. A more general, and recommended,  approach 
-  * is to use the <CODE>ConnectionFactory</CODE> object.
+  * is to use the {@code ConnectionFactory} object.
   *
-  *<P> The <CODE>QueueConnectionFactory</CODE> object
+  *<P> The {@code QueueConnectionFactory} object
   * can be used to support existing code that already uses it.
   *
   * @version     1.1 - February 2, 2002
@@ -63,7 +63,7 @@ public interface QueueConnectionFactory extends ConnectionFactory {
 
     /** Creates a queue connection with the default user identity.
       * The connection is created in stopped mode. No messages 
-      * will be delivered until the <code>Connection.start</code> method
+      * will be delivered until the {@code Connection.start} method
       * is explicitly called.
       *
       .
@@ -82,7 +82,7 @@ public interface QueueConnectionFactory extends ConnectionFactory {
 
     /** Creates a queue connection with the specified user identity.
       * The connection is created in stopped mode. No messages 
-      * will be delivered until the <code>Connection.start</code> method
+      * will be delivered until the {@code Connection.start} method
       * is explicitly called.
       *  
       * @param userName the caller's user name

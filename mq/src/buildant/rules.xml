@@ -125,9 +125,14 @@
           description="Builds the MQ product">
   </target>
 
-   <target name="all-ri"
+  <target name="all-ri"
           depends="build-ri, deploy-ri, test"
           description="Builds the MQ RI product">
+  </target>
+
+  <target name="all-mqgf-ri"
+	  depends="build-mqgf-ri, deploy-mqgf-ri"
+	  description="Builds the MQ GF RI product">
   </target>
 
   <target name="build" 
@@ -136,8 +141,13 @@
   </target>
 
  <target name="build-ri"
-          depends="buildprops, buildetc, build_resources, buildimages, buildhelp, buildjars-ri, buildwars-ri, builddocs-ri, buildexamples-ri"
+          depends="buildprops, buildetc, build_resources, buildhelp, buildjars-ri, buildwars-ri, builddocs-ri, buildexamples-ri"
           description="Builds the MQ RI product">
+  </target>
+
+  <target name="build-mqgf-ri"
+	   depends="buildprops, buildetc, build_resources, buildhelp, buildjars-ri, buildwars-ri"
+	   description="Builds the GF MQ RI product">
   </target>
 
   <target name="javadebug" 
@@ -227,6 +237,17 @@
           description="Builds Install Image">
         <echo message="### Calling target install"/>
         <ant antfile="${rulesdir}/distrules.xml" target="install-ri"/>
+        <echo message="### Done install"/>
+        <echo message="### Calling target bundles"/>
+        <ant antfile="${rulesdir}/distrules.xml" target="bundles-ri"/>
+        <echo message="### Done bundles"/>
+  </target>
+
+  <target name="deploy-mqgf-ri"
+          depends="setgrizzlyhome, setjavahelphome, setnucleushome"
+          description="Builds Install Image">
+        <echo message="### Calling target install"/>
+        <ant antfile="${rulesdir}/distrules.xml" target="install-mqgf-ri"/>
         <echo message="### Done install"/>
         <echo message="### Calling target bundles"/>
         <ant antfile="${rulesdir}/distrules.xml" target="bundles-ri"/>

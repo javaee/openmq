@@ -60,6 +60,7 @@ import com.sun.messaging.jmq.jmsserver.core.Destination;
 import com.sun.messaging.jmq.jmsserver.core.ConsumerUID;
 import com.sun.messaging.jmq.jmsserver.core.DestinationUID;
 import com.sun.messaging.jmq.jmsserver.core.BrokerAddress;
+import com.sun.messaging.jmq.jmsserver.data.TransactionUID;
 import com.sun.messaging.jmq.jmsserver.cluster.api.ClusterManager;
 import com.sun.messaging.jmq.jmsserver.service.ConnectionUID;
 import com.sun.messaging.jmq.jmsserver.persist.api.ChangeRecordInfo;
@@ -76,6 +77,11 @@ public class ClusterConsumerInfo
 {
     private Logger logger = Globals.getLogger();
 	private static final long ConsumerVersionUID = 99353142765567461L;
+
+    private static final String PROP_PREFIX_PENDING_TID = "PENDING-TID:"; //4.5.2.2, 4.4u2p8
+    private static final String PROP_PREFIX_PENDING_TID_MID_DCT = "PENDING_TID-MID-DCT:"; //5.0
+    private static final String PROP_PENDING_MESSAGES = "pendingMessages"; // <= 4.5
+    private static final String MID_DCT_SEPARATOR = "#";
 
     private Cluster c;
     private Collection consumers = null;
@@ -142,18 +148,48 @@ public class ClusterConsumerInfo
         gp.setType(protocol);
         gp.putProp("C", new Integer(consumers.size()));
         if (broker != null && pendingMsgs != null && pendingMsgs.size() > 0) {
-            List l = (List)pendingMsgs.get(broker);
-            if (l != null) {
-                StringBuffer sb = new StringBuffer();
-                Iterator itr = l.iterator();
-                while (itr.hasNext()) {
-                    SysMessageID sysid = (SysMessageID)itr.next();
-                    sb.append(sysid).append(" ");
+            TransactionUID tid = null;
+            LinkedHashMap mm = null;
+            SysMessageID sysid = null;
+            StringBuffer sb = null;
+            StringBuffer sb45 = null;
+            StringBuffer oldsb = null;
+            Map m = (Map)pendingMsgs.get(broker);
+            if (m != null) {
+                oldsb = new StringBuffer();
+                Map.Entry pair = null;
+                Iterator itr0 = m.entrySet().iterator();
+                while (itr0.hasNext()) {
+                    pair = (Map.Entry)itr0.next();
+                    tid = (TransactionUID)pair.getKey();
+                    mm = (LinkedHashMap)pair.getValue();
+                    sb = new StringBuffer();
+                    sb45 = new StringBuffer();
+                    Map.Entry entry = null;
+                    Iterator itr = mm.entrySet().iterator();
+                    while (itr.hasNext()) {
+                        entry = (Map.Entry)itr.next();
+                        sysid = (SysMessageID)entry.getKey();
+                        Integer deliverCnt = (Integer)entry.getValue();
+                        sb.append(sysid).append(MID_DCT_SEPARATOR+
+                            (deliverCnt == null ? 0:deliverCnt)).append(" ");
+                        sb45.append(sysid).append(" ");
+                        oldsb.append(sysid).append(" ");
+                    }
+                    if (sb.length() > 0) {
+                        gp.putProp(PROP_PREFIX_PENDING_TID_MID_DCT+
+                           (tid == null ? "":tid), String.valueOf(sb.toString()));
+                        gp.putProp(PROP_PREFIX_PENDING_TID+
+                           (tid == null ? "":tid), String.valueOf(sb45.toString()));
+                    }
                 }
-                gp.putProp("pendingMessages", new String(sb.toString()));
+                //To be removed when clustering the old protocol (< 500) broker no longer supported
+                gp.putProp(PROP_PENDING_MESSAGES, new String(oldsb.toString()));
             }
         }
-        if (cleanup) gp.putProp("cleanup", new Boolean(true));
+        if (cleanup) {
+            gp.putProp("cleanup", new Boolean(true));
+        }
         if (c != null) c.marshalBrokerAddress(c.getSelfAddress(), gp);
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -271,16 +307,108 @@ public class ClusterConsumerInfo
                                                c.unmarshalBrokerAddress(pkt));
     }
 
-    public Set getPendingMessages() {
+    /**
+     * @return null if empty
+     */
+    public Map<TransactionUID, LinkedHashMap<SysMessageID, Integer>> getPendingMessages() {
         assert ( pkt !=  null ); 
-        String sysids = (String)pkt.getProp("pendingMessages");
-        if (sysids == null) return null;
-        LinkedHashSet pms = new LinkedHashSet();
-        StringTokenizer st = new StringTokenizer(sysids, " ", false);
+
+        LinkedHashMap<TransactionUID, LinkedHashMap<SysMessageID, Integer>> m = 
+             new LinkedHashMap<TransactionUID, LinkedHashMap<SysMessageID, Integer>>();
+        String key = null, val = null;
+        String tidstr = null;
+        TransactionUID tid = null;
+        LinkedHashMap<SysMessageID, Integer> sysiddcnts = null;
+        Iterator itr = pkt.propsKeySet().iterator();
+        while (itr.hasNext()) {
+            key = (String)itr.next();
+            tid = null;
+            if (key.startsWith(PROP_PREFIX_PENDING_TID_MID_DCT)) {
+                tidstr = key.substring(PROP_PREFIX_PENDING_TID_MID_DCT.length());
+                if (tidstr.length() > 0) {
+                    tid = new TransactionUID(Long.valueOf(tidstr));
+                } 
+                val = (String)pkt.getProp(key);
+                if (val == null || val.length() == 0) { 
+                    continue;
+                }
+                sysiddcnts = parsePendingMsgs(val);
+                if (m.get(tid) != null) {
+                    throw new RuntimeException("Unexpected "+
+                        PROP_PREFIX_PENDING_TID_MID_DCT+
+                        " content: duplicated entries("+m.get(tid)+
+                        ", "+sysiddcnts+") for "+tid+", "+m);
+                }
+                m.put(tid, sysiddcnts);
+            } 
+        }
+        if (m.size() > 0) {
+            return m;
+        }
+        //check 4.5 patch protocol
+        key = null;
+        val = null;
+        tidstr = null;
+        tid = null;
+        sysiddcnts = null;
+        itr = pkt.propsKeySet().iterator();
+        while (itr.hasNext()) {
+            key = (String)itr.next();
+            tid = null;
+            if (key.startsWith(PROP_PREFIX_PENDING_TID)) {
+                tidstr = key.substring(PROP_PREFIX_PENDING_TID.length());
+                if (tidstr.length() > 0) {
+                    tid = new TransactionUID(Long.valueOf(tidstr));
+                } 
+                val = (String)pkt.getProp(key);
+                if (val == null || val.length() == 0) { 
+                    continue;
+                }
+                sysiddcnts = parsePendingMsgs(val);
+                if (m.get(tid) != null) {
+                    throw new RuntimeException("Unexpected "+
+                        PROP_PREFIX_PENDING_TID+
+                        " content: duplicated entries("+
+                        m.get(tid)+", "+sysiddcnts+") for "+tid+", "+m) ;
+                }
+                m.put(tid, sysiddcnts);
+            }
+        }
+        if (m.size() > 0) {
+            return m;
+        }
+        //check 4.5 protocol
+        val = (String)pkt.getProp(PROP_PENDING_MESSAGES);
+        if (val == null || val.length() == 0) {
+            return null;
+        }
+        sysiddcnts = parsePendingMsgs(val); 
+        m.put(null, sysiddcnts);
+        return m;
+    }
+        
+    private LinkedHashMap<SysMessageID, Integer> parsePendingMsgs(String val) {
+        LinkedHashMap<SysMessageID, Integer> pms = 
+            new LinkedHashMap<SysMessageID, Integer>();
+        StringTokenizer st = new StringTokenizer(val, " ", false);
         while (st.hasMoreTokens()) {
            String s = (String)st.nextToken();
            if (s != null && !s.trim().equals("")) {
-               pms.add(SysMessageID.get(s.trim()));
+               Integer deliverCnt = Integer.valueOf(0);
+               int ind = s.lastIndexOf(MID_DCT_SEPARATOR);
+               if (ind != -1 && s.length() > (ind+1)) {
+                   try {
+                       deliverCnt = Integer.valueOf(s.substring(ind+1));
+                   } catch (Exception e) {
+                       deliverCnt = Integer.valueOf(0);
+                       logger.log(Logger.WARNING, e.toString()+" - "+s);
+                   }
+               } 
+               if (ind == -1) {
+                   pms.put(SysMessageID.get(s), deliverCnt);
+               } else {
+                   pms.put(SysMessageID.get(s.substring(0, ind)), deliverCnt);
+               }
            }
         }
         return pms;
@@ -289,7 +417,9 @@ public class ClusterConsumerInfo
     public boolean isCleanup() {
         assert ( pkt !=  null ); 
         Boolean b = (Boolean)pkt.getProp("cleanup");
-        if (b != null) return b.booleanValue();
+        if (b != null) {
+            return b.booleanValue();
+        }
         return false;
     }
 

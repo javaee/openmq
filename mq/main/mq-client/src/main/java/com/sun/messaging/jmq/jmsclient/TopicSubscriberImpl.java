@@ -139,6 +139,21 @@ public class TopicSubscriberImpl extends MessageConsumerImpl implements TopicSub
         init();
     }
 
+    public TopicSubscriberImpl(SessionImpl session, Topic topic,
+                               String selector, boolean noLocal, 
+                               String sharedSubscriptionName)
+                               throws JMSException {
+
+        super (session, topic);
+        this.topic = topic;
+
+        setMessageSelector (selector);
+        setNoLocal (noLocal);
+        setSharedSubscriptionName( sharedSubscriptionName );
+
+        init();
+    }
+
     /** Get the topic associated with this subscriber.
       *
       * @return this subscriber's topic
