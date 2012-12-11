@@ -306,8 +306,7 @@ public class DirectSession
     public MessageConsumer createConsumer(Destination destination)
     throws JMSException {
         return (MessageConsumer)this._createAndAddConsumer(
-                "createConsumer(Destination)",
-                destination, null, null, false);
+            "createConsumer(Destination)", destination, null, false);
     }
 
     /**
@@ -316,8 +315,8 @@ public class DirectSession
     public MessageConsumer createConsumer(Destination destination, String selector)
     throws JMSException {
         return (MessageConsumer)this._createAndAddConsumer(
-                "createConsumer(Destination, selector)",
-                destination, selector, null, false);
+            "createConsumer(Destination, selector)", 
+            destination, selector, false);
     }
 
     /**
@@ -326,23 +325,22 @@ public class DirectSession
      *  be delivered to it.
      */
     public MessageConsumer createConsumer(Destination destination,
-            String selector, boolean noLocal)
-    throws JMSException {
+        String selector, boolean noLocal)
+        throws JMSException {
         return (MessageConsumer)this._createAndAddConsumer(
                 "createConsumer(Destination, selector, noLocal)",
-                destination, selector, null, noLocal);
+                destination, selector, noLocal);
     }
 
     /**
      *  Create a TopicSubscriber for the specified Topic with the specified
      *  subscription name
      */
-    public TopicSubscriber createDurableSubscriber(Topic topic,
-            String name)
+    public TopicSubscriber createDurableSubscriber(Topic topic, String name)
     throws JMSException {
         return (TopicSubscriber)this._createAndAddConsumer(
                 "createDurableSubscriber(Topic, name)",
-                topic, null, name, false);
+                topic, null, name, true, false, false, false);
     }
 
     /**
@@ -351,57 +349,71 @@ public class DirectSession
      *  by its own connection should be delivered to it.
      */
     public TopicSubscriber createDurableSubscriber(Topic topic,
-            String name, String selector, boolean noLocal)
-    throws JMSException {
+        String name, String selector, boolean noLocal)
+        throws JMSException {
         return (TopicSubscriber)this._createAndAddConsumer(
                 "createDurableSubscriber(Topic, name, selector, noLocal)",
-                topic, selector, name, noLocal);
+                topic, selector, name, true, false, false, noLocal);
     }
     
     /**
      *  Create a TopicSubscriber for the specified Topic with the specified
      *  subscription name
      */
-	@Override
-	public MessageConsumer createDurableConsumer(Topic topic, String name)
-			throws JMSException {
-		return createDurableSubscriber(topic, name);
-	}
+    @Override
+    public MessageConsumer createDurableConsumer(Topic topic, String name)
+    throws JMSException {
+        return createDurableSubscriber(topic, name);
+    }
 
     /**
      *  Create a TopicSubscriber for the specified Topic with the specified
      *  subscription name and selector and specifying whether messages published
      *  by its own connection should be delivered to it.
      */
-	@Override
-	public MessageConsumer createDurableConsumer(Topic topic, String name,
-			String messageSelector, boolean noLocal) throws JMSException {
-		return createDurableSubscriber(topic, name, messageSelector, noLocal);
-	}   
+    @Override
+    public MessageConsumer createDurableConsumer(Topic topic, String name,
+        String messageSelector, boolean noLocal) throws JMSException {
+        return createDurableSubscriber(topic, name, messageSelector, noLocal);
+    }   
     
     
-	@Override
-	public MessageConsumer createSharedConsumer(Topic topic,
-			String sharedSubscriptionName) throws JMSException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("This method is new in JMS 2.0 and is not yet implemented");
-	}
+    @Override
+    public MessageConsumer createSharedConsumer(Topic topic,
+        String sharedSubscriptionName) throws JMSException {
+        return createSharedConsumer(topic, sharedSubscriptionName, null,  false);
+    }
 
-	@Override
-	public MessageConsumer createSharedConsumer(Topic topic,
-			String sharedSubscriptionName, String messageSelector)
-			throws JMSException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("This method is new in JMS 2.0 and is not yet implemented");
-	}
+    @Override
+    public MessageConsumer createSharedConsumer(Topic topic,
+        String sharedSubscriptionName, String messageSelector)
+        throws JMSException {
+        return createSharedConsumer(topic, sharedSubscriptionName, messageSelector,  false);
+    }
 
-	@Override
-	public MessageConsumer createSharedConsumer(Topic topic,
-			String sharedSubscriptionName, String messageSelector,
-			boolean noLocal) throws JMSException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("This method is new in JMS 2.0 and is not yet implemented");
-	}    
+    @Override
+    public MessageConsumer createSharedConsumer(Topic topic,
+        String sharedSubscriptionName, String messageSelector, boolean noLocal) 
+        throws JMSException {
+        return (TopicSubscriber)this._createAndAddConsumer(
+            "createSharedConsumer(Topic, sharedSubscriptionName, messageSelector, noLocal)",
+            topic, messageSelector, sharedSubscriptionName, false, true, true, noLocal);
+    }    
+
+    @Override
+    public MessageConsumer createSharedDurableConsumer(Topic topic, String name)
+    throws JMSException {
+	return createSharedDurableConsumer(topic, name, null, false);
+    }
+
+    @Override
+    public MessageConsumer createSharedDurableConsumer(Topic topic, String name,
+	String messageSelector, boolean noLocal)
+	throws JMSException {
+        return (TopicSubscriber)this._createAndAddConsumer(
+            "createSharedDurableConsumer(Topic, name, messageSelector, noLocal)",
+            topic, messageSelector, name, true, true, true, noLocal);
+    }
 
     /**
      *  Create a MapMessage
@@ -855,8 +867,7 @@ public class DirectSession
     public QueueReceiver createReceiver(Queue queue)
     throws JMSException {
         return (QueueReceiver)this._createAndAddConsumer(
-                "createReceiver(Queue)",
-                queue, null, null, false);
+            "createReceiver(Queue)", queue, null, false);
     }
 
     /**
@@ -866,8 +877,7 @@ public class DirectSession
     public QueueReceiver createReceiver(Queue queue, String selector)
     throws JMSException {
         return (QueueReceiver)this._createAndAddConsumer(
-                "createReceiver(Queue, selector)",
-                queue, selector, null, false);
+            "createReceiver(Queue, selector)", queue, selector, false);
     }
 
     /**
@@ -975,8 +985,7 @@ public class DirectSession
     public TopicSubscriber createSubscriber(Topic topic)
     throws JMSException {
         return (TopicSubscriber)this._createAndAddConsumer(
-                "createSubscriber(Topic)",
-                topic, null, null, false);
+            "createSubscriber(Topic)", topic, null, false);
     }
 
     /**
@@ -984,12 +993,12 @@ public class DirectSession
      *  and specifying whether messages published by its own connection should
      *  be delivered to it.
      */
-    public TopicSubscriber createSubscriber(Topic topic, String selector,
-            boolean noLocal)
-    throws JMSException {
+    public TopicSubscriber createSubscriber(Topic topic, 
+        String selector, boolean noLocal)
+        throws JMSException {
         return (TopicSubscriber)this._createAndAddConsumer(
-                "createSubscriber(Topic, selector, noLocal)",
-                topic, selector, null, noLocal);
+            "createSubscriber(Topic, selector, noLocal)",
+            topic, selector, noLocal);
     }
     /////////////////////////////////////////////////////////////////////////
     //  methods that implement javax.jms.TopicSession
@@ -1596,6 +1605,15 @@ public class DirectSession
         return dp;
     }
 
+    private DirectConsumer _createAndAddConsumer(
+        String methodName, Destination destination,
+        String selector,  boolean noLocal)
+        throws JMSException {
+
+        return _createAndAddConsumer(methodName, 
+            destination, selector, null, false, false, false, noLocal);
+    }
+
     /**
      *  Create a consumerId with the jmsservice and return a MessageConsumer
      *  object that can be returned by the JMS API method.<p>
@@ -1611,7 +1629,20 @@ public class DirectSession
      *  @param  destination The JMS Destination object identifying the
      *          destination on which the consumer is to be created.
      *  @param  selector The JMS Message selector to be used.
-     *  @param  durableName The name to be used if this is a durable consumer.
+     *  @param subscriptionName if dest is Topic and
+     *         if either durable true or share true, the subscription name
+     *  @param durable if dest is Topic, if true, this is a durable subscription
+     *  @param share if dest is Topic, if true, this is a shared subscription
+     *  @param jmsshare if dest is Topic,
+     *         if true and share true, this is a JMS 2.0 Shared Subscription
+     *         if false and share true, this is a MQ Shared Subscription
+     *
+     *         MQ Shared Subscription: messages will be shared with other
+     *         consumers in the same group that have the same
+     *         clientId+DurableName for Shared Durable Subscriptions<p>
+     *         OR<p>
+     *         clientId+TopicName+Selector for Shared Non-Durable Sunscriptions
+     *
      *  @param  noLocal If {@code true} then this consumer does not want to
      *          messages produced on it'sconnection to be delivered to it.
      *
@@ -1619,10 +1650,12 @@ public class DirectSession
      *
      *  @throws JMSException if any JMS error occurred.
      */
-    private DirectConsumer _createAndAddConsumer(String methodName,
-            Destination destination,
-            String selector, String durableName, boolean noLocal)
-    throws JMSException {
+    private DirectConsumer _createAndAddConsumer(
+        String methodName, Destination destination,
+        String selector, String subscriptionName, boolean durable,
+        boolean share, boolean jmsshare, boolean noLocal)
+        throws JMSException {
+
         JMSServiceReply reply;
         long consumerId = 0L;
         com.sun.messaging.jmq.jmsservice.Destination jmsservice_dest;
@@ -1631,20 +1664,30 @@ public class DirectSession
             _loggerJS.fine(_lgrMID_INF + "sessionId=" + this.sessionId +
                     ":" + methodName +
                     ":Destination=" + destination + ":Selector=" + selector +
-                    ":DurableName=" + durableName + ":noLocal=" + noLocal);
+                    ":subscriptionName=" + subscriptionName + 
+                    ":durable="+durable+":share="+share+":jmsshare="+jmsshare+
+                    ":noLocal=" + noLocal);
         }
         this._checkIfClosed(methodName);
 
         jmsservice_dest = this._checkDestinationForConsumer(destination);
+        String duraname = (durable ? subscriptionName:null);
         DirectConsumer consumer = new DirectConsumer(this, jmsservice,
-                destination, jmsservice_dest, noLocal, selector, durableName);
+                destination, jmsservice_dest, noLocal, selector, duraname);
         try {
+            //adjusted for JMS 2.0 
+            reply = jmsservice.addConsumer(connectionId, sessionId,
+                    jmsservice_dest, selector, subscriptionName, durable,
+                    share, jmsshare, this.getConnection()._getClientID(),
+                    noLocal);
+            /*
             reply = jmsservice.addConsumer(connectionId, sessionId,
                     jmsservice_dest, selector, durableName,
                     this.getConnection()._getClientID(),
                     noLocal,
                     //XXX:tharakan:using false for shared temporarily
-                    false);
+                    false, false);
+            */
             try {
                 //Set consumerId right away
                 consumerId = reply.getJMQConsumerID();
@@ -1695,7 +1738,7 @@ public class DirectSession
             throw jmsse;
         }
         this.addConsumer(consumer);
-        if (durableName != null) {
+        if (subscriptionName != null && durable) {
             this.dc.addDurableConsumer(consumer);
         }
         if (destination instanceof TemporaryDestination){
@@ -2044,7 +2087,7 @@ public class DirectSession
         } else {
             transactionId = this.transactionId;
         }
-        this._acknowledgeMessage(msgPkt, consumerId, transactionId, ackType);
+        this._acknowledgeMessage(msgPkt, consumerId, transactionId, ackType, -1);
         //Remove the specific message from the UnackedMsgIDs
         SysMessageID _sysMsgID = msgPkt.getReceivedSysMessageID();
         int index = this.unackedMessageIDs.indexOf(_sysMsgID);
@@ -2057,25 +2100,32 @@ public class DirectSession
      */
     protected void _acknowledgeThisMessageForMDB(DirectPacket msgPkt,
             long consumerId, JMSService.MessageAckType ackType,
-            DirectXAResource dxar)
+            DirectXAResource dxar, int retryCount)
     throws JMSException{
         long transactionId = 0L;
         if (dxar != null && dxar.isEnlisted()){
             transactionId = dxar._getTransactionId();
         }
-        this._acknowledgeMessage(msgPkt, consumerId, transactionId, ackType);
+        this._acknowledgeMessage(msgPkt, consumerId, transactionId, ackType, retryCount);
     }
 
     protected void _acknowledgeMessage(DirectPacket msgPkt, long consumerId,
-            long transactionId, JMSService.MessageAckType ackType)
+            long transactionId, JMSService.MessageAckType ackType, int retryCount)
     throws JMSException {
         JMSServiceReply reply;
         JMSServiceReply.Status status;
         try {
-            reply = jmsservice.acknowledgeMessage(this.connectionId,
-                    this.sessionId, consumerId,
-                    msgPkt.getReceivedSysMessageID(), transactionId,
-                    ackType);
+            if (retryCount > 0) {
+                reply = jmsservice.acknowledgeMessage(this.connectionId,
+                        this.sessionId, consumerId,
+                        msgPkt.getReceivedSysMessageID(), transactionId,
+                        ackType, retryCount);
+            } else {
+                reply = jmsservice.acknowledgeMessage(this.connectionId,
+                        this.sessionId, consumerId,
+                        msgPkt.getReceivedSysMessageID(), transactionId,
+                        ackType);
+            }
         } catch (JMSServiceException jmsse) {
             status = jmsse.getJMSServiceReply().getStatus();
             String failure_cause;

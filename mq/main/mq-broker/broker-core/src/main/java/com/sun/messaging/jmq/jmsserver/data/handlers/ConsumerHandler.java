@@ -223,60 +223,80 @@ public class ConsumerHandler extends PacketHandler
                 if (selector != null && selector.trim().length() == 0) {
                     selector = null;
                 }
-                Boolean nolocal = (Boolean)props.get("JMQNoLocal");
+                boolean mqshare = false; 
+                boolean jmsshare = false; //JMS2.0
+                boolean nolocal = false;
+                Boolean b = (Boolean)props.get("JMQNoLocal");
+                if (b != null && b.booleanValue()) {
+                    nolocal = true;              
+                }
+                b  = (Boolean)props.get("JMQShare");
+                if (b != null && b.booleanValue()) {
+                    mqshare = true;                   
+                }
+                b = (Boolean)props.get("JMQJMSShare"); //JMS2.0
+                if (b != null && b.booleanValue()) {
+                    jmsshare = true;                   
+                }
                 String durablename = (String)props.get("JMQDurableName");
+                String subscriptionName = (String)props.get("JMQSharedSubscriptionName"); //JMS2.0
+
                 String clientid = getClientID(props, con);
                 Boolean reconnect = (Boolean)props.get("JMQReconnect");
-                Boolean share = (Boolean)props.get("JMQShare");
                 Integer size = (Integer)props.get("JMQSize");
+                if (mqshare && jmsshare) {
+                    String emsg = "Client protocol error: both JMQShare and JMQJMSShare set to true";
+                    Globals.getLogger().log(Logger.ERROR, emsg); 
+                    throw new BrokerException(emsg);
+                }
+                boolean shared = (mqshare || jmsshare);
 
-                if (nolocal != null && nolocal.booleanValue()) {
-                    if (queue) {
-                        Globals.getLogger().log(Logger.ERROR, 
-                            BrokerResources.E_INTERNAL_BROKER_ERROR,
-                            "NoLocal is not supported on Queue Receivers");
-                        throw new BrokerException(
-                            "Unsupported property on queues JMQNoLocal "
-                            + "is set to " + nolocal, Status.ERROR);
+                boolean durable = false;
+                if (durablename != null) {
+                    if (subscriptionName != null) {
+                        Object[] args = { Subscription.getDSubLogString(clientid, durablename),
+                                          ""+destination, subscriptionName };
+                        logger.log(Logger.INFO, br.getKString(
+                                   br.I_ADD_CONSUMER_IGNORE_SUBSCRIPTION_NAME, args));
                     }
-                    //JMS 2.0
-                    if (durablename != null && clientid == null) {
-                        String emsg = Globals.getBrokerResources().getKString(
-                            BrokerResources.X_NO_CLIENTID_NOLOCAL_DURA, durablename);
-                        Globals.getLogger().log(Logger.ERROR, emsg); 
+                    subscriptionName = durablename; 
+                    durable = true;
+                }
+
+                if (DestType.isTemporary(type)) { 
+                    if (durable) {
+                        String emsg = br.getKString(br.X_INVALID_DEST_DURA_CONSUMER, 
+                                      ""+destination, ""+subscriptionName);
+                        logger.log(Logger.ERROR, emsg);
                         throw new BrokerException(emsg, Status.PRECONDITION_FAILED);
                     }
-                    /* JMS 2.0 pending
-                    if (share != null && share.booleanValue() && clientid == null) {
-                        String emsg = Globals.getBrokerResources().getKString(
-                            BrokerResources.X_NO_CLIENTID_NOLOCAL_SHARE, sharedSubcriptionName);
-                        Globals.getLogger().log(Logger.ERROR, emsg); 
+                    if (shared) {
+                        String emsg = br.getKString(br.X_INVALID_DEST_SHARE_CONSUMER, 
+                                      ""+destination, ""+subscriptionName);
+                        logger.log(Logger.ERROR, emsg);
+                        throw new BrokerException(emsg, Status.PRECONDITION_FAILED);
                     }
-                    */
                 }
+
+                ConsumerParameters pm = new ConsumerParameters();
+                pm.isqueue = queue;
+                pm.destination = destination;
+                pm.selector = selector;
+                pm.clientid = clientid;
+                pm.subscriptionName = subscriptionName;
+                pm.durable = durable;
+                pm.shared = shared; 
+                pm.jmsshare =jmsshare; 
+                pm.nolocal = nolocal;
+
+                checkSubscriptionName(pm);
+                checkNoLocal(pm);
+                checkClientID(pm);
+
                 if (reconnect != null && reconnect.booleanValue()) {
                     Globals.getLogger().log(Logger.ERROR,
                         BrokerResources.E_INTERNAL_BROKER_ERROR,
                         "JMQReconnect not implemented");
-                }
-
-                // Must have a clientID to add a durable for < JMS 2.0 clients 
-                if (durablename != null) {
-                    if (clientid == null && 
-                        con.getClientProtocolVersion() < con.MQ500_PROTOCOL) {
-                        throw new BrokerException(
-                            Globals.getBrokerResources().getKString(
-                            BrokerResources.X_NO_CLIENTID, durablename),
-                            BrokerResources.X_NO_CLIENTID, null,
-                            Status.PRECONDITION_FAILED);
-                    }
-                    if (clientid != null && clientid.trim().length() == 0) {
-                        throw new BrokerException(
-                            Globals.getBrokerResources().getKString(
-                            BrokerResources.X_INVALID_CLIENTID, clientid),
-                            BrokerResources.X_INVALID_CLIENTID, null,
-                            Status.PRECONDITION_FAILED);
-                    }
                 }
 
                 // see if we are a wildcard destination
@@ -328,23 +348,35 @@ public class ConsumerHandler extends PacketHandler
                     }
                     dest_uid = d.getDestinationUID();
                 }
-    
+
+                if (jmsshare && mqshare) {
+                    Object[] args = { "JMS", 
+                                      (!durable ?
+                                       Subscription.getNDSubLongLogString(clientid, 
+                                          dest_uid, selector, subscriptionName, nolocal):
+                                       Subscription.getDSubLogString(clientid, subscriptionName)),
+                                      ""+destination, "JMQShare" };
+                    logger.log(Logger.INFO, br.getKString(
+                               br.I_ADD_SHARE_CONSUMER_IGNORE_CLIENT_FLAG, args));
+                    mqshare = false;
+                }
+
                 Consumer c = null;
                 
                 try { 
 //LKS
-                    Consumer[] retc = createConsumer( dest_uid,  con,
+                    Consumer[] retc = _createConsumer( dest_uid,  con,
                          session, selector,  clientid, 
-                         durablename,  (nolocal != null && nolocal.booleanValue()),  
+                         subscriptionName, durable, shared, jmsshare, nolocal,
                          (size == null ? -1 : size.intValue()), 
-                         (share != null && share.booleanValue()),  
                          msg.getSysMessageID().toString(),  isIndemp, true);
 
                     c = retc[0];
                     newc = retc[1];
                     sub = (Subscription)retc[2];
-                    if (c.getPrefetch() != -1 || size != null)
+                    if (c.getPrefetch() != -1 || size != null) {
                         hash.put("JMQSize", c.getPrefetch());
+                    }
 
                 } catch (SelectorFormatException ex) {
                       throw new BrokerException(
@@ -624,13 +656,40 @@ public class ConsumerHandler extends PacketHandler
         }
     }
 
-
     public Consumer[] createConsumer(DestinationUID dest_uid, IMQConnection con,
-                        Session session,String selectorstr, String clientid, 
-                        String durablename, boolean nolocal, int size, 
-                        boolean shared, String consumerString, boolean isIndemp, boolean useFlowControl)
-        throws BrokerException, SelectorFormatException, IOException
-    {
+        Session session, String selectorstr, String clientid, 
+        String subscriptionName,  boolean durable, 
+        boolean shared, boolean jmsshare, boolean nolocal,
+        int size, String consumerString, boolean isIndemp, boolean useFlowControl)
+        throws BrokerException, SelectorFormatException, IOException {
+
+        ConsumerParameters pm = new ConsumerParameters();
+        pm.isqueue = dest_uid.isQueue();
+        pm.destination = dest_uid.toString();
+        pm.selector = selectorstr;
+        pm.clientid = clientid;
+        pm.subscriptionName = subscriptionName;
+        pm.durable = durable;
+        pm.shared = shared; 
+        pm.jmsshare = jmsshare; 
+        pm.nolocal = nolocal;
+
+        checkSubscriptionName(pm);
+        checkNoLocal(pm);
+        checkClientID(pm);
+
+        return _createConsumer(dest_uid, con, session, selectorstr, clientid,
+            subscriptionName, durable, shared, jmsshare, nolocal,
+            size, consumerString, isIndemp, useFlowControl);
+    }
+
+    private Consumer[] _createConsumer(DestinationUID dest_uid, IMQConnection con,
+        Session session,String selectorstr, String clientid, 
+        String subscriptionName,  boolean durable, 
+        boolean shared, boolean jmsshare, boolean nolocal,
+        int size, String consumerString, boolean isIndemp, boolean useFlowControl)
+        throws BrokerException, SelectorFormatException, IOException {
+
         Consumer c = null;
         Consumer newc = null;
         Subscription sub = null;
@@ -677,33 +736,24 @@ public class ConsumerHandler extends PacketHandler
             c.setPrefetch(prefetch,useFlowControl);
 
             // actual subscription added to the destination
-            if (durablename != null) {
+            if (subscriptionName != null && durable) {
+                if (!shared) {
+                    logger.log(Logger.INFO,  br.getKString(br.I_CREATE_UNSHARED_DURA,
+                        Subscription.getDSubLogString(clientid, subscriptionName), dest_uid));
+                } else {
+                    logger.log(Logger.INFO,  br.getKString(br.I_CREATE_SHARED_DURA,
+                        Subscription.getDSubLogString(clientid, subscriptionName)+
+                                     (jmsshare ? "jms":"mq"), dest_uid));
+                }
                 // durable
                 // get the subscription ... this may throw
                 // an exception IF we cant 
                 sub = Subscription.
                           findCreateDurableSubscription(clientid,
-                              durablename, dest_uid, selector, nolocal, true);
+                              subscriptionName, shared, jmsshare, dest_uid,
+                              selector, nolocal, true);
+                sub.setCreator(consumerString);
                 sub.pause("Consumer attaching to durable");
-    
-                sub.setShared(shared);
-
-                if (clientid == null && !shared) {
-                    List owners = new ArrayList(2);
-                    owners.add(c.getConsumerUID()); 
-                    owners.add(con.getConnectionUID()); 
-                    if (!Globals.getClusterBroadcast().lockExclusiveResource(
-                         ClusterBroadcast.ACTIVE_DURA_SUB_EXCLUSIVE_LOCK_PREFIX+
-                         Subscription.getDSubKey(clientid, durablename), owners)) {
-                         String args[] = { Subscription.getDSubLogString(clientid, durablename),
-                                           dest_uid.toString() };
-                         throw new BrokerException(
-                             br.getKString(br.E_CLUSTER_LOCK_ACTIVE_DURA_SUB, args),
-                             BrokerResources.E_CLUSTER_LOCK_ACTIVE_DURA_SUB,
-                             (Throwable) null,
-                             Status.CONFLICT);
-                    }
-                }
 
                 // add the consumer .. this may throw an
                 // exception IF
@@ -735,23 +785,14 @@ public class ConsumerHandler extends PacketHandler
                 }
                 sub.sendCreateSubscriptionNotification(c);
             } else if ((wildcard || !d.isQueue()) && shared) {
-            	// non-durable
-                if (clientid == null) {
-                    throw new BrokerException(
-                        Globals.getBrokerResources().getKString(
-                        BrokerResources.X_NON_DURABLE_SHARED_NO_CLIENTID,d.toString()),
-                        BrokerResources.X_NON_DURABLE_SHARED_NO_CLIENTID,
-                        null,
-                        Status.PRECONDITION_FAILED);
-                }
-                // shared
-                logger.log(Logger.DEBUG,"Creating shared non-durable "
-                            + c);
-                sub = Subscription.createAttachNonDurableSub(c, con);
+                logger.log(Logger.INFO,  br.getKString(br.I_CREATE_SHARED_NONDURA_SUB,
+                           Subscription.getNDSubLongLogString(clientid, dest_uid, 
+                           selectorstr, subscriptionName, nolocal), ""+dest_uid));
+                sub = Subscription.createAttachNonDurableSub(c, con,
+                                   subscriptionName, shared, jmsshare);
                 c.localConsumerCreationReady();
                 if (sub != null) {
                     sub.pause("Consumer: attaching to nondurable");
-                    sub.setShared(true);
                     Map<PartitionedStore, LinkedHashSet<Destination>> dmap = 
                         DL.findMatchingDestinationMap(null, dest_uid);
                     LinkedHashSet dset = null;
@@ -816,8 +857,11 @@ public class ConsumerHandler extends PacketHandler
         retc[2]=sub;
         return retc;
     } catch (Exception e) {
-        Object[] args = { (durablename == null ? "":
-                           Subscription.getDSubLogString(clientid, durablename)),
+        Object[] args = { (durable ?
+                           Subscription.getDSubLogString(clientid, 
+                                                  subscriptionName):
+                           (shared ? Subscription.getNDSubLongLogString(clientid, 
+                                     dest_uid, selector, subscriptionName, nolocal):"")),
                            con, dest_uid };
         String emsg = Globals.getBrokerResources().getKString(
                           BrokerResources.W_ADD_AUTO_CONSUMER_FAILED, args);
@@ -863,10 +907,14 @@ public class ConsumerHandler extends PacketHandler
                     sub.releaseConsumer(c.getConsumerUID());
                 }
             } catch (Exception e1) {}
-            if (durablename != null) {
-                try {
-                    Subscription.unsubscribe(durablename, clientid);
-                } catch (Exception e1) { }
+
+            if (subscriptionName != null && durable) {
+                if (sub != null && sub.getCreator() != null && 
+                    sub.getCreator().equals(consumerString)) {
+                    try {
+                        Subscription.unsubscribe(subscriptionName, clientid);
+                    } catch (Exception e1) { }
+                }
             }
         } catch (Exception e3) {}
 
@@ -881,6 +929,110 @@ public class ConsumerHandler extends PacketHandler
         }
         throw new BrokerException(emsg, e);
     }
+    }
 
+    private static class ConsumerParameters {
+        boolean isqueue = true;
+        String destination = null;
+        String selector = null;
+        String clientid = null;
+        String subscriptionName = null;
+        boolean durable = true;
+        boolean shared = true;
+        boolean jmsshare = true;
+        boolean nolocal = true;
+    }
+
+    private void checkNoLocal(ConsumerParameters pm)
+        throws BrokerException {
+
+        if (!pm.nolocal) {
+            return;
+        }
+        if (pm.isqueue) {
+            Globals.getLogger().log(Logger.ERROR, 
+                BrokerResources.E_INTERNAL_BROKER_ERROR,
+                "NoLocal is not supported on Queue Receivers");
+            throw new BrokerException(
+                "Unsupported property on queues JMQNoLocal "+
+                 "is set to " + pm.nolocal, Status.ERROR);
+        }
+        if (pm.clientid == null) { //JMS 2.0
+            if (pm.durable) {
+                String emsg = Globals.getBrokerResources().getKString(
+                              BrokerResources.X_NO_CLIENTID_NOLOCAL_DURA, 
+                              ""+pm.subscriptionName);
+                Globals.getLogger().log(Logger.ERROR, emsg); 
+                throw new BrokerException(emsg, Status.PRECONDITION_FAILED);
+            }
+            if (pm.shared) {
+                String emsg = Globals.getBrokerResources().getKString(
+                              BrokerResources.X_NO_CLIENTID_NOLOCAL_SHARE, 
+               "["+pm.clientid+":"+pm.destination+":"+pm.selector+":"+pm.subscriptionName+"]");
+                Globals.getLogger().log(Logger.ERROR, emsg); 
+                throw new BrokerException(emsg, Status.PRECONDITION_FAILED);
+            }
+        }
+    }
+
+    private void checkSubscriptionName(ConsumerParameters pm)
+        throws BrokerException {
+        if (pm.isqueue && pm.subscriptionName != null) {
+            String emsg = "Protocol error: Unexpected subscription name for Queue";
+            Globals.getLogger().log(Logger.ERROR, emsg);
+            throw new BrokerException(emsg);
+        }
+        if (pm.durable && 
+            (pm.subscriptionName == null || pm.subscriptionName.trim().equals(""))) {
+            throw new BrokerException(
+                Globals.getBrokerResources().getKString(
+                    BrokerResources.X_INVALID_SUBSCRIPTION_NAME_DURA, 
+                    ""+pm.subscriptionName, ""+pm.destination),
+                    BrokerResources.X_INVALID_SUBSCRIPTION_NAME_DURA, null,
+                    Status.PRECONDITION_FAILED);
+             
+        }
+
+        if (pm.shared && pm.jmsshare &&
+            (pm.subscriptionName == null || pm.subscriptionName.trim().equals(""))) {
+            throw new BrokerException(
+                Globals.getBrokerResources().getKString(
+                    BrokerResources.X_INVALID_SUBSCRIPTION_NAME_SHARE, 
+                    ""+pm.subscriptionName, ""+pm.destination),
+                    BrokerResources.X_INVALID_SUBSCRIPTION_NAME_SHARE, null,
+                    Status.PRECONDITION_FAILED);
+             
+        }
+    }
+
+    private void checkClientID(ConsumerParameters pm)
+        throws BrokerException {
+        if (pm.isqueue) {
+            return;
+        }
+        if (pm.durable && !pm.jmsshare && pm.clientid == null) {
+            throw new BrokerException(
+                Globals.getBrokerResources().getKString(
+                    BrokerResources.X_NO_CLIENTID, ""+pm.subscriptionName),
+                    BrokerResources.X_NO_CLIENTID, null,
+                    Status.PRECONDITION_FAILED);
+        }
+        if (!pm.durable && pm.shared && 
+            !pm.jmsshare && pm.clientid == null) {
+            throw new BrokerException(
+                Globals.getBrokerResources().getKString(
+                    BrokerResources.X_NON_DURABLE_SHARED_NO_CLIENTID, ""+pm.destination),
+                    BrokerResources.X_NON_DURABLE_SHARED_NO_CLIENTID, null,
+                    Status.PRECONDITION_FAILED);
+        }
+        if (pm.durable || pm.shared) {
+            if (pm.clientid != null && pm.clientid.trim().length() == 0) {
+               throw new BrokerException(
+                   Globals.getBrokerResources().getKString(
+                       BrokerResources.X_INVALID_CLIENTID, pm.clientid),
+                       BrokerResources.X_INVALID_CLIENTID, null,
+                       Status.PRECONDITION_FAILED);
+            }
+        }
     }
 }

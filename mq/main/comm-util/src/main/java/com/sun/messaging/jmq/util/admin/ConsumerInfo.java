@@ -56,10 +56,25 @@ import com.sun.messaging.jmq.util.DestType;
  */
 public class ConsumerInfo extends AdminInfo implements java.io.Serializable {
 
+    static final long serialVersionUID = -3322006453099714245L;
+
     /**
      * Broker internal consumer ID
      */
     public byte[]	id;
+
+    /**
+     */
+    public String uidString = null;
+
+    /**
+     * The subscription ID if there is one 
+     */
+    public String subuidString = null;
+
+    /**
+     */
+    public String brokerAddressShortString = null;
 
     /**
      * Destination the consumer is registered on
@@ -97,6 +112,9 @@ public class ConsumerInfo extends AdminInfo implements java.io.Serializable {
         destination = null;
         selector = null;
 	connection = null;
+        uidString = null;
+        subuidString = null;
+        brokerAddressShortString = null;
     }
 
     /**

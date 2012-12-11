@@ -61,6 +61,7 @@ FOR /f "tokens=1,2* delims= " %%a IN ("%args_list%") DO (
   if "%%a" == "-varhome"	( set JVM_ARGS=%JVM_ARGS% -Dimq.varhome=%%b&set args_list=%%c&goto :processArgs )
   if "%%a" == "-imqvarhome"	( set JVM_ARGS=%JVM_ARGS% -Dimq.varhome=%%b&set args_list=%%c&goto :processArgs )
   if "%%a" == "-vmargs"		( set JVM_ARGS=%JVM_ARGS% %%b&set args_list=%%c&goto :processArgs )
+  if "%%a" == "-managed"	( set args_list=%%b&goto :processArgs )
   if "!arg:~0,2!" == "-D"	( set JVM_ARGS=%JVM_ARGS% %%a&set args_list=%%b %%c&goto :processArgs )
 
   set BKR_ARGS=%BKR_ARGS% %%a

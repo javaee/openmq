@@ -74,6 +74,7 @@ public class ConnectionMetaDataImpl implements ConnectionMetaData {
     public static final String JMSXProducerTXID = "JMSXProducerTXID";
     public static final String JMSXRcvTimestamp = "JMSXRcvTimestamp";
     public static final String JMSXUserID = "JMSXUserID";
+    public static final String JMSXDeliveryCount = "JMSXDeliveryCount";
 
     protected boolean setJMSXAppID = false;
     protected boolean setJMSXConsumerTXID = false;
@@ -94,10 +95,15 @@ public class ConnectionMetaDataImpl implements ConnectionMetaData {
     private void init() {
         String tmp = null;
 
-        //the following two properties are supported by default.
-        //They are set by client apps if needed.
-        supportedProperties.addElement(JMSXGroupID);
-        supportedProperties.addElement(JMSXGroupSeq);
+        /* 
+         * the following three properties are supported by default.
+         */ 
+        //set by client apps (optional)
+        supportedProperties.addElement(JMSXGroupID); 
+        //set by client apps (optional)
+        supportedProperties.addElement(JMSXGroupSeq); 
+        //set by JMS provider (JMS2.0 mandatory)
+        supportedProperties.addElement(JMSXDeliveryCount); 
 
         //test if set app id requested
         tmp = connection.getProperty(ConnectionConfiguration.imqSetJMSXAppID);

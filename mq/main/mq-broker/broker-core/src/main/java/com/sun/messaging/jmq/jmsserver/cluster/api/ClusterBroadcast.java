@@ -100,7 +100,6 @@ public interface ClusterBroadcast {
     public static final String Q_CONSUMER_EXCLUSIVE_LOCK_PREFIX = "queue:";
     public static final String DESTINATION_EXCLUSIVE_LOCK_PREFIX = "destCreate:";
     public static final String TAKEOVER_EXCLUSIVE_LOCK_PREFIX = "takeover:";
-    public static final String ACTIVE_DURA_SUB_EXCLUSIVE_LOCK_PREFIX = "activedurasub:";
 
     /**
      * Cluster protocol pkt # for RESET_PERSISTENCE

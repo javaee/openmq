@@ -85,7 +85,7 @@ public class HeartbeatService implements HeartbeatCallback, ClusterListener, Con
     public static final String HEARTBEAT_INTERVAL_PROP = Globals.IMQ+".cluster.heartbeat.interval";
     public static final String HEARTBEAT_THRESHOLD_PROP = Globals.IMQ+".cluster.heartbeat.threshold";
 
-    private static final int HEARTBEAT_INTERVAL_DEFAULT =  2; //2 seconds
+    private static final int HEARTBEAT_INTERVAL_DEFAULT =  5; //5 seconds
     private static final int HEARTBEAT_THRESHOLD_DEFAULT = 3; //3 times interval
 
     private Logger logger = Globals.getLogger();
@@ -122,16 +122,19 @@ public class HeartbeatService implements HeartbeatCallback, ClusterListener, Con
         Class c = Class.forName(cs);
         hb = (Heartbeat)c.newInstance();
 
-        hb.setHeartbeatInterval(Globals.getConfig().getIntProperty(HEARTBEAT_INTERVAL_PROP,
-                                                                   HEARTBEAT_INTERVAL_DEFAULT));
-        hb.setTimeoutThreshold(Globals.getConfig().getIntProperty(HEARTBEAT_THRESHOLD_PROP,
-                                                                  HEARTBEAT_THRESHOLD_DEFAULT));
+        hb.setHeartbeatInterval(Globals.getConfig().
+            getIntProperty(HEARTBEAT_INTERVAL_PROP, HEARTBEAT_INTERVAL_DEFAULT));
+        hb.setTimeoutThreshold(Globals.getConfig().
+            getIntProperty(HEARTBEAT_THRESHOLD_PROP, HEARTBEAT_THRESHOLD_DEFAULT));
 
         int p = Globals.getConfig().getIntProperty(HEARTBEAT_PORT_PROP, 
-                                                    clsmgr.getMQAddress().getPort());
+                                       clsmgr.getMQAddress().getPort());
         String  h = Globals.getConfig().getProperty(HEARTBEAT_HOST_PROP);
-        if (h == null) h = Globals.getBrokerHostName(); 
-        InetSocketAddress bindEndpoint = new InetSocketAddress(InetAddress.getByName(h), p);
+        if (h == null) {
+            h = Globals.getBrokerHostName(); 
+        }
+        InetSocketAddress bindEndpoint = 
+            new InetSocketAddress(InetAddress.getByName(h), p);
 
         hb.init(bindEndpoint, this);
 
@@ -146,9 +149,9 @@ public class HeartbeatService implements HeartbeatCallback, ClusterListener, Con
         Globals.getPortMapper().addService(SERVICE_NAME, hb.getProtocol(), 
                                            SERVICE_TYPE, p, m);
         */
-        Object[] args = {SERVICE_NAME + (hb.getName() == null ? "":" ["+hb.getName()+"]"),
-                         hb.getProtocol() +" ( " + bindEndpoint + " )",
-                         new Integer(1), new Integer(1)};
+        Object[] args = { SERVICE_NAME + (hb.getName() == null ? "":" ["+hb.getName()+"]"),
+                          hb.getProtocol() +" ( " + bindEndpoint + " )",
+                          Integer.valueOf(1), Integer.valueOf(1) };
         logger.log(Logger.INFO, BrokerResources.I_SERVICE_START, args);
     }
 

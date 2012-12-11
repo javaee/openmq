@@ -1377,10 +1377,19 @@ ProtocolHandler::registerMessageConsumer(MessageConsumer * consumer)
   
   // If the consumer is durable, set its durable name 
   if (consumer->getIsDurable()) {
-    ASSERT( consumer->getDurableName() != NULL );
-    CNDCHK( consumer->getDurableName() == NULL, IMQ_CONSUMER_NO_DURABLE_NAME );
+    ASSERT( consumer->getSubscriptionName() != NULL );
+    CNDCHK( consumer->getSubscriptionName() == NULL, MQ_CONSUMER_NO_DURABLE_NAME );
     ERRCHK( packetProps->setStringProperty(IMQ_DURABLE_NAME_PROPERTY,
-                                           consumer->getDurableName()->getCharStr()) );
+                         consumer->getSubscriptionName()->getCharStr()) );
+  }
+  if (consumer->getIsShared()) {
+    ASSERT( consumer->getSubscriptionName() != NULL );
+    CNDCHK( consumer->getSubscriptionName() == NULL, MQ_CONSUMER_NO_SUBSCRIPTION_NAME );
+    ERRCHK( packetProps->setBooleanProperty(IMQ_JMS_SHARED_PROPERTY, consumer->getIsShared()) );
+    if (consumer->getIsDurable() == PR_FALSE) {
+      ERRCHK( packetProps->setStringProperty(IMQ_SHARED_SUBSCRIPTION_NAME_PROPERTY,
+                           consumer->getSubscriptionName()->getCharStr()) );
+    }
   }
 
   // Set the other properties
@@ -1527,7 +1536,7 @@ ProtocolHandler::unsubscribeDurableConsumer(const UTF8String * const durableName
                                          durableName->getCharStr()) );
   {
   const UTF8String * clientID = this->connection->getClientID();
-  if (clientID != NULL) {
+  if ( clientID != NULL ) {
     ERRCHK( packetProps->setStringProperty(IMQ_CLIENTID_PROPERTY, clientID->getCharStr()) );
   }
   }

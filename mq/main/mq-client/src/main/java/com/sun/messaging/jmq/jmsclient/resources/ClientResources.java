@@ -341,7 +341,7 @@ public class ClientResources extends MQResourceBundle {
     final public static String X_FORBIDDEN_IN_JAVAEE_WEB_EJB        = "C4306";
     final public static String X_JMSCONTEXT_CLOSED	                = "C4307";
     final public static String X_JMSCONSUMER_CLOSED	                = "C4308";
-    final public static String X_PAYLOAD_CLASS_UNSUPPORTED          = "C4309";
+    final public static String X_UNUSED                             = "C4309";
     final public static String X_MESSAGE_IS_NULL                    = "C4310";
     final public static String X_ASYNC_SEND_XA_TXN                  = "C4311";
     final public static String X_CONNECTION_FAILOVER                = "C4312";
@@ -349,8 +349,12 @@ public class ClientResources extends MQResourceBundle {
     final public static String X_ASYNC_SEND_COMPLETION_WAIT_TIMEOUT = "C4314";
     final public static String X_NO_ASYNC_SEND_LISTENER_PROCESSOR_THREAD = "C4315";
     final public static String X_INVALID_SHARED_SUBSCRIPTION_NAME        = "C4316";
-    final public static String X_NO_CLIENTID_FOR_NOLOCAL_DURA      = "C4317";
-    final public static String X_NO_CLIENTID_FOR_NOLOCAL_SHARE     = "C4318";
+    final public static String X_NO_CLIENTID_FOR_NOLOCAL_DURA        = "C4317";
+    final public static String X_NO_CLIENTID_FOR_NOLOCAL_DURA_SHARE  = "C4318";
+    final public static String X_NO_CLIENTID_FOR_NOLOCAL_SHARE       = "C4319";
+    final public static String X_MESSAGE_HAS_NO_BODY               = "C4320";
+    final public static String X_BODY_CLASS_INVALID                = "C4321";
+    final public static String X_MESSAGE_TYPE_NOT_SUPPORTED        = "C4322";
 
     //MQ event codes
 

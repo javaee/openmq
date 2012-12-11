@@ -162,7 +162,10 @@ public class ClusterSubscriptionInfo
             } 
             String clientID = subscription.getClientID();
             gp.putProp("I", (clientID == null ? "":clientID));
-
+            String ndsubname = subscription.getNDSubscriptionName();
+            if (ndsubname != null) {
+                gp.putProp("NDN", ndsubname);
+            }
             ClusterManager cm = Globals.getClusterManager();
             int csize = 1;
             if (cm != null) {
@@ -284,6 +287,11 @@ public class ClusterSubscriptionInfo
             return null;
         }
         return clientID;
+    }
+
+    public String getNDSubscriptionName() {
+        assert ( pkt != null );
+        return (String)pkt.getProp("NDN");
     }
 
     public Boolean allowsNonDurable() { 

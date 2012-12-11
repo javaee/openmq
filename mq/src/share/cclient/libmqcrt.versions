@@ -38,6 +38,7 @@
 # holder.
 #
 sparc {
+    SUNW_1.5: {SUNW_1.4};
     SUNW_1.4: {SUNW_1.3};
     SUNW_1.3: {SUNW_1.2};
     SUNW_1.2: {SUNW_1.1};
@@ -45,6 +46,7 @@ sparc {
     SUNWprivate;
 }
 sparcv9 {
+    SUNW_1.5: {SUNW_1.4};
     SUNW_1.4: {SUNW_1.3};
     SUNW_1.3: {SUNW_1.2};
     SUNW_1.2: {SUNW_1.1};
@@ -52,6 +54,7 @@ sparcv9 {
     SUNWprivate;
 }
 i386 {
+    SUNW_1.5: {SUNW_1.4};
     SUNW_1.4: {SUNW_1.3};
     SUNW_1.3: {SUNW_1.2};
     SUNW_1.2: {SUNW_1.1};
@@ -59,6 +62,7 @@ i386 {
     SUNWprivate;
 }
 amd64 {
+    SUNW_1.5: {SUNW_1.4};
     SUNW_1.4: {SUNW_1.3};
     SUNW_1.3: {SUNW_1.2};
     SUNW_1.2: {SUNW_1.1};

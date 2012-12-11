@@ -86,7 +86,7 @@ import java.util.Map;
  */
 
 public interface JMSProducer {
-
+	
 	/**
 	 * Sends a message to the specified destination, using any send options,
 	 * message properties and message headers that have been defined on this
@@ -97,107 +97,107 @@ public interface JMSProducer {
 	 * @param message
 	 *            the message to send
 	 * @return this {@code JMSProducer}
-	 * @throws JMSRuntimeException
-	 *             if the JMS provider fails to send the message due to some
-	 *             internal error.
 	 * @throws MessageFormatRuntimeException
 	 *             if an invalid message is specified.
 	 * @throws InvalidDestinationRuntimeException
 	 *             if a client uses this method with an invalid destination.
-	 * @throws MessageNotWriteableException
+	 * @throws MessageNotWriteableRuntimeException
 	 *             if this {@code JMSProducer} has been configured to set a
 	 *             message property, but the message's properties are read-only
+	 * @throws JMSRuntimeException
+	 *             if the JMS provider fails to send the message due to some
+	 *             internal error.
 	 */
 	JMSProducer send(Destination destination, Message message);
 
 	/**
-	 * Send a {@code TextMessage} with the specified payload to the
+	 * Send a {@code TextMessage} with the specified body to the
 	 * specified destination, using any send options, message properties and
 	 * message headers that have been defined on this {@code JMSProducer}.
 	 * 
 	 * @param destination
 	 *            the destination to send this message to
-	 * @param payload
-	 *            the payload of the {@code TextMessage} that will be sent. 
+	 * @param body
+	 *            the body of the {@code TextMessage} that will be sent. 
 	 *            If a null value is specified then a {@code TextMessage} 
-	 *            with no payload will be sent.
+	 *            with no body will be sent.
 	 * @return this {@code JMSProducer}
-	 * @throws JMSRuntimeException
-	 *             if the JMS provider fails to send the message due to some
-	 *             internal error.
 	 * @throws MessageFormatRuntimeException
 	 *             if an invalid message is specified.
 	 * @throws InvalidDestinationRuntimeException
 	 *             if a client uses this method with an invalid destination.
+	 * @throws JMSRuntimeException
+	 *             if the JMS provider fails to send the message due to some
+	 *             internal error.
 	 */
-	JMSProducer send(Destination destination, String payload);
+	JMSProducer send(Destination destination, String body);
 
 	/**
-	 * Send a {@code MapMessage} with the specified payload to the
+	 * Send a {@code MapMessage} with the specified body to the
 	 * specified destination, using any send options, message properties and
 	 * message headers that have been defined on this {@code JMSProducer}.
 	 * 
 	 * @param destination
 	 *            the destination to send this message to
-	 * @param payload
-	 *            the payload of the {@code MapMessage} that will be sent.
+	 * @param body
+	 *            the body of the {@code MapMessage} that will be sent.
 	 *            If a null value is specified then a {@code MapMessage} 
 	 *            with no map entries will be sent.
 	 * @return this {@code JMSProducer}
-	 * @throws JMSRuntimeException
-	 *             if the JMS provider fails to send the message due to some
-	 *             internal error.
 	 * @throws MessageFormatRuntimeException
 	 *             if an invalid message is specified.
 	 * @throws InvalidDestinationRuntimeException
 	 *             if a client uses this method with an invalid destination.
+	 * @throws JMSRuntimeException
+	 *             if the JMS provider fails to send the message due to some
+	 *             internal error.
 	 */
-	JMSProducer send(Destination destination, Map<String, Object> payload);
+	JMSProducer send(Destination destination, Map<String, Object> body);
 
 	/**
-	 * Send a {@code BytesMessage} with the specified payload to the
+	 * Send a {@code BytesMessage} with the specified body to the
 	 * specified destination, using any send options, message properties and
 	 * message headers that have been defined on this {@code JMSProducer}.
 	 * 
 	 * @param destination
 	 *            the destination to send this message to
-	 * @param payload
-	 *            the payload of the {@code BytesMessage} that will be
+	 * @param body
+	 *            the body of the {@code BytesMessage} that will be
 	 *            sent.
 	 *            If a null value is specified then a {@code BytesMessage} 
-	 *            with no payload will be sent.
+	 *            with no body will be sent.
 	 * @return this {@code JMSProducer}
-	 * @throws JMSRuntimeException
-	 *             if the JMS provider fails to send the message due to some
-	 *             internal error.
 	 * @throws MessageFormatRuntimeException
 	 *             if an invalid message is specified.
 	 * @throws InvalidDestinationRuntimeException
 	 *             if a client uses this method with an invalid destination.
+	 * @throws JMSRuntimeException
+	 *             if the JMS provider fails to send the message due to some
+	 *             internal error.
 	 */
-	JMSProducer send(Destination destination, byte[] payload);
+	JMSProducer send(Destination destination, byte[] body);
 
 	/**
-	 * Send an {@code ObjectMessage} with the specified payload to the
+	 * Send an {@code ObjectMessage} with the specified body to the
 	 * specified destination, using any send options, message properties and
 	 * message headers that have been defined on this {@code JMSProducer}.
 	 * 
 	 * @param destination
 	 *            the destination to send this message to
-	 * @param payload
-	 *            the payload of the ObjectMessage that will be sent.
+	 * @param body
+	 *            the body of the ObjectMessage that will be sent.
 	 *            If a null value is specified then an {@code ObjectMessage} 
-	 *            with no payload will be sent.
+	 *            with no body will be sent.
 	 * @return this {@code JMSProducer}
+	 * @throws MessageFormatRuntimeException
+	 *             if an invalid message is specified.
+	 * @throws InvalidDestinationRuntimeException
+	 *             if a client uses this method with an invalid destination.
 	 * @throws JMSRuntimeException
 	 *             if JMS provider fails to send the message due to some
 	 *             internal error.
-	 * @throws MessageFormatRuntimeException
-	 *             if an invalid message is specified.
-	 * @throws InvalidDestinationRuntimeException
-	 *             if a client uses this method with an invalid destination.
 	 */
-	JMSProducer send(Destination destination, Serializable payload);
+	JMSProducer send(Destination destination, Serializable body);
 
 	/**
 	 * Specifies whether message IDs may be disabled for messages that are sent
@@ -572,7 +572,7 @@ public interface JMSProducer {
 	 * of control at a time and does not support concurrent use.
 	 * <p>
 	 * After the <tt>send</tt> method has returned, the application must not
-	 * attempt to read the headers, properties or payload of the
+	 * attempt to read the headers, properties or body of the
 	 * <tt>Message</tt> object until the <tt>CompletionListener</tt>'s
 	 * <tt>onCompletion</tt> or <tt>onException</tt> method has been called.
 	 * This is because the JMS provider may be modifying the <tt>Message</tt>

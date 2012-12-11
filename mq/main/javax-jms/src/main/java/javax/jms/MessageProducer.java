@@ -603,7 +603,7 @@ public interface MessageProducer extends AutoCloseable {
 	 * of control at a time and does not support concurrent use.
 	 * <p>
 	 * After the <tt>send</tt> method has returned, the application must not
-	 * attempt to read the headers, properties or payload of the
+	 * attempt to read the headers, properties or body of the
 	 * <tt>Message</tt> object until the <tt>CompletionListener</tt>'s
 	 * <tt>onCompletion</tt> or <tt>onException</tt> method has been called.
 	 * This is because the JMS provider may be modifying the <tt>Message</tt>
@@ -768,7 +768,7 @@ public interface MessageProducer extends AutoCloseable {
 	 * of control at a time and does not support concurrent use.
 	 * <p>
 	 * After the <tt>send</tt> method has returned, the application must not
-	 * attempt to read the headers, properties or payload of the
+	 * attempt to read the headers, properties or body of the
 	 * <tt>Message</tt> object until the <tt>CompletionListener</tt>'s
 	 * <tt>onCompletion</tt> or <tt>onException</tt> method has been called.
 	 * This is because the JMS provider may be modifying the <tt>Message</tt>
@@ -946,7 +946,7 @@ public interface MessageProducer extends AutoCloseable {
 	 * of control at a time and does not support concurrent use.
 	 * <p>
 	 * After the <tt>send</tt> method has returned, the application must not
-	 * attempt to read the headers, properties or payload of the
+	 * attempt to read the headers, properties or body of the
 	 * <tt>Message</tt> object until the <tt>CompletionListener</tt>'s
 	 * <tt>onCompletion</tt> or <tt>onException</tt> method has been called.
 	 * This is because the JMS provider may be modifying the <tt>Message</tt>
@@ -1117,7 +1117,7 @@ public interface MessageProducer extends AutoCloseable {
 	 * of control at a time and does not support concurrent use.
 	 * <p>
 	 * After the <tt>send</tt> method has returned, the application must not
-	 * attempt to read the headers, properties or payload of the
+	 * attempt to read the headers, properties or body of the
 	 * <tt>Message</tt> object until the <tt>CompletionListener</tt>'s
 	 * <tt>onCompletion</tt> or <tt>onException</tt> method has been called.
 	 * This is because the JMS provider may be modifying the <tt>Message</tt>

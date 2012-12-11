@@ -42,9 +42,15 @@ package com.sun.messaging.bridge.service.jms;
 
 import java.util.Properties;
 import javax.jms.JMSException;
+import javax.jms.JMSRuntimeException;
 import javax.jms.XAConnection;
 import javax.jms.XAConnectionFactory;
+import javax.jms.XAJMSContext;
+
 import com.sun.messaging.bridge.api.BridgeContext;
+import com.sun.messaging.jmq.jmsclient.ContainerType;
+import com.sun.messaging.jmq.jmsclient.XAJMSContextImpl;
+import com.sun.messaging.jms.MQRuntimeException;
 
 /**
  * @author amyk
@@ -116,6 +122,38 @@ public class XAConnectionFactoryImpl implements XAConnectionFactory, Refable  {
     }
     return _cf.createXAConnection(userName, password);
     }
+    
+	@Override
+	public XAJMSContext createXAContext() {
+	    if (_bc != null) {
+	        XAConnectionFactory cf = null;
+	        try {
+	            cf = _bc.getXAConnectionFactory(_jmsprop);
+	        } catch (Exception e) {
+	        	JMSRuntimeException jmse = new MQRuntimeException(e.getMessage(),
+	                JMSBridge.getJMSBridgeResources().E_EXCEPTION_CREATE_CF,e);
+	            throw jmse;
+	        }
+	        return cf.createXAContext();
+	    }
+	    return _cf.createXAContext();
+	}
+
+	@Override
+    public XAJMSContext createXAContext(String userName, String password) {
+    if (_bc != null) {
+        XAConnectionFactory cf = null;
+        try {
+            cf = _bc.getXAConnectionFactory(_jmsprop);
+        } catch (Exception e) {
+        	JMSRuntimeException jmse = new MQRuntimeException(e.getMessage(),
+                JMSBridge.getJMSBridgeResources().E_EXCEPTION_CREATE_CF,e);
+            throw jmse;
+        }
+        return cf.createXAContext(userName, password);
+    }
+    return _cf.createXAContext(userName, password);
+    }
 
     public String getRef() {
         return _ref;
@@ -144,4 +182,5 @@ public class XAConnectionFactoryImpl implements XAConnectionFactory, Refable  {
         }
         return s;
     }
+    
 }

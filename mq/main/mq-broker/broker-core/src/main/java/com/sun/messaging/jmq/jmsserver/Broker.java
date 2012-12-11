@@ -1324,7 +1324,7 @@ public class Broker implements GlobalErrorHandler, CommBroker {
                 logger.logStack(Logger.ERROR,  e.getMessage(), e);
                 }
             } else {
-                logger.log(Logger.ERROR, rb.I_MBUS_PAUSING);
+                logger.log(Logger.WARNING, rb.I_MBUS_PAUSING);
             }
         } else {
             sm.updateServiceList(sm.getAllActiveServiceNames(),
@@ -1516,10 +1516,10 @@ public class Broker implements GlobalErrorHandler, CommBroker {
     }
  
     } catch (OutOfMemoryError err) {
-          Globals.handleGlobalError(err,
-                                    rb.getKString(rb.M_LOW_MEMORY_STARTUP));
-          return (1);
-      }
+        Globals.handleGlobalError(err,
+            rb.getKString(rb.M_LOW_MEMORY_STARTUP), Integer.valueOf(1));
+        return (1);
+    }
 
       if (diagInterval > 0) {
           MQTimer timer = Globals.getTimer();
@@ -2552,21 +2552,26 @@ public class Broker implements GlobalErrorHandler, CommBroker {
     // HANDLE THINGS LIKE OUT OF MEMORY ERRORS
 
     public boolean handleGlobalError(Throwable ex, String reason) {
+        return handleGlobalError(ex, reason, null);
+    }
+    public boolean handleGlobalError(Throwable ex, String reason, Integer exitCode) {
         logger.logStack(logger.ERROR, ex.toString()+"["+ reason + "]", ex);
         int exit = Globals.getBrokerStateHandler().getRestartCode();
+        if (exitCode != null) {
+            exit = exitCode.intValue();
+        }
         if (ex instanceof OutOfMemoryError) {
             Broker.getBroker().exit(exit, 
                    "Received Out Of Memory Error ["
-                    + reason + "]", BrokerEvent.Type.ERROR,
-                   ex);
-            if (!runningInProcess)
+                    + reason + "]", BrokerEvent.Type.ERROR, ex);
+            if (!runningInProcess) {
                 Globals.getMemManager().forceRedState();
+            }
             return true; // dont sidplay internal error warning
         } else {
             Broker.getBroker().exit(exit, 
                    "Unexpected Exception " + reason,
-                    BrokerEvent.Type.EXCEPTION,
-                   ex);
+                    BrokerEvent.Type.EXCEPTION, ex);
         }
         return false;
     }

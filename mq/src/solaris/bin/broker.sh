@@ -89,6 +89,7 @@ while [ $# != 0 ]; do
     -jrehome) shift; javahome=$1; shift;;
     -vm) shift; jvm_args="$jvm_args $1"; shift ;;
     -vmargs) shift; jvm_args="$jvm_args $1"; shift ;;
+    -managed) shift ;; #ignore JMSRA testing
     *)  args="$args $1"; shift  ;;
   esac
 done

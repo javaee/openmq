@@ -97,28 +97,36 @@ public class ConnectionConsumerImpl extends Consumer
     private Long interestIdToBeRecreated = null;
     private List seenSessions = Collections.synchronizedList(new ArrayList());
 
-/*
-    public ConnectionConsumerImpl(ConnectionImpl connection,
-           Destination d, String messageSelector,
-           ServerSessionPool sessionPool,
-           //int maxMessages, boolean isTopic) throws JMSException {
-
-        //super(connection, d, messageSelector, isTopic, false);
-        this.serverSessionPool = sessionPool;
-        this.maxMessages = maxMessages;
-        init();
-    }
-*/
     public ConnectionConsumerImpl(ConnectionImpl connection, Destination d,
            String messageSelector, ServerSessionPool sessionPool,
-           int maxMessages, String durablename)
+           int maxMessages, String subscriptionName, boolean durable, boolean share)
            throws JMSException {
 
         super(connection, d, messageSelector, false);
-        if (durablename != null) {
+        if (durable) {
+            if (!share && connection.clientID == null) {
+                String errorString =
+                AdministeredObject.cr.getKString(AdministeredObject.cr.X_INVALID_CLIENT_ID, "\"\"");
+                throw new JMSException (errorString, AdministeredObject.cr.X_INVALID_CLIENT_ID);
+            }
+
             setDurable(true);
-            setDurableName (durablename);
+            setDurableName (subscriptionName);
         }
+        if (share) {
+            setShared(true);
+            if (!durable) {
+                setSharedSubscriptionName(subscriptionName);
+            }
+        }
+        if (durable || share) {
+            if (connection.clientID != null) {
+                if (connection.getProtocolHandler().isClientIDsent() == false) {
+                    connection.getProtocolHandler().setClientID(connection.clientID);
+                }
+            }
+        }
+        
         this.serverSessionPool = sessionPool;
         this.maxMessages = maxMessages;
         init();

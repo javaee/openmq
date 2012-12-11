@@ -892,12 +892,14 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
         }
 
         public long runTask() {
+            sessionLogger.log(Level.FINEST, "asyncSendCBProcessor start runTask["+SessionImpl.this.toString()+"]");
             long ret = 0L; //wait for next wakeup
 
             AsyncSendCallback cb = null;
             ArrayList<AsyncSendCallback> calls = new ArrayList<AsyncSendCallback>();
             synchronized(asyncSendLock) {
                 if (asyncSends.size() == 0) {
+                    sessionLogger.log(Level.FINEST, "asyncSendCBProcessor end runTask["+SessionImpl.this.toString()+"] ret=0L");
                     return 0L;
                 }
                 Iterator<AsyncSendCallback> itr = asyncSends.iterator();
@@ -930,6 +932,7 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
                 cb.callCompletionListener();
             } 
             calls.clear();
+            sessionLogger.log(Level.FINEST, "asyncSendCBProcessor end runTask["+SessionImpl.this.toString()+"] ret="+ret);
             return ret;
         }
     }
@@ -1299,8 +1302,8 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
             String errorString = AdministeredObject.cr.getKString(ClientResources.X_ILLEGAL_STATE);
 
             javax.jms.IllegalStateException jmse =
-            new javax.jms.IllegalStateException
-                      (errorString, ClientResources.X_ILLEGAL_STATE);
+            new javax.jms.IllegalStateException(
+                errorString, ClientResources.X_ILLEGAL_STATE);
 
             ExceptionHandler.throwJMSException(jmse);
         }
@@ -1309,13 +1312,12 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
 
     protected void
     checkPermissionForAsyncSend() throws JMSException {
-
         if (asyncSendCBProcessor != null && 
             asyncSendCBProcessor.isTimerThread(Thread.currentThread())) {
             String errorString = AdministeredObject.cr.getKString(ClientResources.X_ILLEGAL_STATE);
             javax.jms.IllegalStateException jmse =
-            new javax.jms.IllegalStateException
-                      (errorString, ClientResources.X_ILLEGAL_STATE);
+            new javax.jms.IllegalStateException(
+                errorString, ClientResources.X_ILLEGAL_STATE);
             ExceptionHandler.throwJMSException(jmse);
         }
     }
@@ -1418,6 +1420,7 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
             TEST_rxCount++;
 
             boolean requiresAckFromBroker = true;
+            Hashtable originalProps = null;
             try {
                 setInSyncState();
 
@@ -1458,10 +1461,22 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
                     }
                 }
                 writeMessageID (message);
+
+                if (message.getClientRetries() > 0) {
+                    try {
+                        originalProps = ackPkt.getProperties();
+                    } catch (Exception e) {}
+                    Hashtable props = new Hashtable();
+                    props.put(ConnectionMetaDataImpl.JMSXDeliveryCount, Integer.valueOf(message.getClientRetries()));
+                    ackPkt.setProperties(props);
+                }
+
                 doAcknowledge(requiresAckFromBroker);
                 //System.out.println("\t\tSessionImpl:doAcknowledge...done:bkrSessionId="+brokerSessionID);
 
             } finally {
+                if (originalProps != null)
+                    ackPkt.setProperties(originalProps);
                 releaseInSyncState();
             }
         }
@@ -1775,7 +1790,7 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
      */
     protected void
     transactedAcknowledge (MessageImpl message) throws JMSException {
-    	
+        Hashtable originalProps = null;
     	try {
 			// put on ack list in case we have to rollback.
 			boolean isAddedToList = prepareTransactedAcknowledge(message);
@@ -1803,6 +1818,9 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
 			
 			//re-throw exception
 			throw jmse;
+		} finally {
+		    if (originalProps != null)
+		        ackPkt.setProperties(originalProps);
 		}
 
     }

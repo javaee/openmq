@@ -306,8 +306,7 @@ public:
    * Sets the clientID of this connection to the one set in
    * connectionProperties, or the dotted IP address if there is
    * property.  */
-  MQError setClientID();
-
+  MQError setClientID(PRBool ifnotNULL);
 
 private:
 

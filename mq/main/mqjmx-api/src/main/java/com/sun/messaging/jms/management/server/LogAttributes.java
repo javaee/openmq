@@ -54,6 +54,16 @@ public class LogAttributes {
     public static final String		LEVEL = "Level";
 
     /** 
+     * Log directory
+     */
+    public static final String		LOG_DIRECTORY = "LogDirectory";
+    
+    /** 
+     * Log file Name
+     */
+    public static final String		LOG_FILE_NAME = "LogFileName";
+    
+    /** 
      * Roll over bytes
      */
     public static final String		ROLL_OVER_BYTES = "RolloverBytes";

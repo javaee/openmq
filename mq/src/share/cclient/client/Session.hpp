@@ -250,7 +250,8 @@ public:
    *
    * @param destination the Destinatino to consume from
    * @param isDurable true iff this is a durable consumer
-   * @param durableName if isDurable, then this is the name of the durable consumer
+   * @param isShared true iff this is a shared consumer
+   * @param subscriptionName if isDurable or isShared, then this is subscription name
    * @param messageSelector
    * @param noLocal true iff the consumer should not receive messages produced
    *        by this connection
@@ -260,7 +261,8 @@ public:
    * @return IMQ_SUCCESS if successful and an error otherwise */
   iMQError createConsumer(Destination * const destination,
                           const PRBool isDurable,
-                          const UTF8String * const durableName,
+                          const PRBool isShared,
+                          const UTF8String * const subscriptionName,
                           const UTF8String * const messageSelector,
                           const PRBool noLocal,
                           MQMessageListenerFunc messageListener,

@@ -268,9 +268,7 @@ Cleanup:
   RETURN_STATUS( errorCode );
 }
 
-
 /*
- *
  */
 EXPORTED_SYMBOL MQStatus
 MQCreateMessageConsumer(const MQSessionHandle     sessionHandle,
@@ -305,10 +303,10 @@ MQCreateMessageConsumer(const MQSessionHandle     sessionHandle,
   if (messageSelector != NULL) {
     UTF8String messageSelectorStr(messageSelector);
     CNDCHK( STRCMP( messageSelectorStr.toString(), messageSelector ) != 0, MQ_OUT_OF_MEMORY );
-    ERRCHK( session->createConsumer(destination, PR_FALSE, NULL, 
+    ERRCHK( session->createConsumer(destination, PR_FALSE, PR_FALSE, NULL, 
                                     &messageSelectorStr, noLocal, NULL, NULL, &consumer) );
   } else {
-    ERRCHK( session->createConsumer(destination, PR_FALSE, NULL,
+    ERRCHK( session->createConsumer(destination, PR_FALSE, PR_FALSE, NULL,
                                     NULL, noLocal, NULL, NULL, &consumer) );
   } 
 
@@ -327,6 +325,71 @@ Cleanup:
   RETURN_STATUS( errorCode );
 }
 
+/*
+ *
+ */
+EXPORTED_SYMBOL MQStatus
+MQCreateSharedMessageConsumer(const MQSessionHandle     sessionHandle,
+                        const MQDestinationHandle destinationHandle,
+                        ConstMQString             subscriptionName,
+                        ConstMQString             messageSelector,
+                        MQBool                    noLocal,
+                        MQConsumerHandle *        consumerHandle)
+{
+  static const char FUNCNAME[] = "MQCreateSharedMessageConsumer";
+  MQError errorCode = MQ_SUCCESS;
+  MessageConsumer * consumer = NULL;
+  Session * session = NULL;
+  Destination * destination = NULL;
+
+  CLEAR_ERROR_TRACE( PR_FALSE );
+
+  CNDCHK( subscriptionName == NULL, MQ_NULL_PTR_ARG );
+    
+  CNDCHK( consumerHandle == NULL, MQ_NULL_PTR_ARG );
+  consumerHandle->handle = (MQInt32)HANDLED_OBJECT_INVALID_HANDLE;
+
+  // Convert sessionHandle to a Session pointer
+  session = (Session*)getHandledObject(sessionHandle.handle,
+                                       SESSION_OBJECT);
+  CNDCHK( session == NULL, MQ_STATUS_INVALID_HANDLE ); 
+  CNDCHK( session->getReceiveMode() != SESSION_SYNC_RECEIVE, MQ_NOT_SYNC_RECEIVE_MODE );
+
+  // Convert destinationHandle to a Destination pointer
+  destination = (Destination*)getHandledObject(destinationHandle.handle,
+                                               DESTINATION_OBJECT);
+  CNDCHK( destination == NULL, MQ_STATUS_INVALID_HANDLE ); 
+
+  {
+  UTF8String subscriptionNameStr(subscriptionName);
+  CNDCHK( STRCMP( subscriptionNameStr.toString(), subscriptionName ) != 0, MQ_OUT_OF_MEMORY );
+  
+  // Create the consumer
+  if (messageSelector != NULL) {
+    UTF8String messageSelectorStr(messageSelector);
+    CNDCHK( STRCMP( messageSelectorStr.toString(), messageSelector ) != 0, MQ_OUT_OF_MEMORY );
+    ERRCHK( session->createConsumer(destination, PR_FALSE, PR_TRUE, &subscriptionNameStr,
+                                    &messageSelectorStr, noLocal, NULL, NULL, &consumer) );
+  } else {
+    ERRCHK( session->createConsumer(destination, PR_FALSE, PR_TRUE, &subscriptionNameStr,
+                                    NULL, noLocal, NULL, NULL, &consumer) );
+  } 
+  }
+
+  // Make the consumer a valid handle
+  consumer->setIsExported(PR_TRUE);
+  consumerHandle->handle = consumer->getHandle();
+
+  releaseHandledObject(destination);
+  releaseHandledObject(session);
+  RETURN_STATUS( MQ_SUCCESS );
+Cleanup:
+  ASSERT( consumer == NULL );
+  releaseHandledObject(destination);
+  releaseHandledObject(session);
+  MQ_ERROR_TRACE(FUNCNAME, errorCode);
+  RETURN_STATUS( errorCode );
+}
 
 /*
  *
@@ -368,11 +431,11 @@ MQCreateAsyncMessageConsumer(const MQSessionHandle     sessionHandle,
   if (messageSelector != NULL) {
     UTF8String messageSelectorStr(messageSelector);
     CNDCHK( STRCMP( messageSelectorStr.toString(), messageSelector ) != 0, MQ_OUT_OF_MEMORY );
-    ERRCHK( session->createConsumer(destination, PR_FALSE, NULL,
+    ERRCHK( session->createConsumer(destination, PR_FALSE, PR_FALSE, NULL,
                                     &messageSelectorStr, noLocal, messageListener,
                                     messageListenerCallbackData, &consumer) );
   } else {
-    ERRCHK( session->createConsumer(destination, PR_FALSE, NULL,
+    ERRCHK( session->createConsumer(destination, PR_FALSE, PR_FALSE, NULL,
                                     NULL, noLocal, messageListener, 
                                     messageListenerCallbackData, &consumer) );
   }
@@ -393,6 +456,77 @@ Cleanup:
 
 }
 
+/*
+ *
+ */
+EXPORTED_SYMBOL MQStatus
+MQCreateAsyncSharedMessageConsumer(const MQSessionHandle     sessionHandle,
+                             const MQDestinationHandle destinationHandle,
+                             ConstMQString             subscriptionName,
+                             ConstMQString             messageSelector,
+                             MQBool                    noLocal,
+                             MQMessageListenerFunc     messageListener,
+                             void *                    messageListenerCallbackData,
+                             MQConsumerHandle *        consumerHandle)
+{
+
+  static const char FUNCNAME[] = "MQCreateAsyncSharedMessageConsumer";
+  MQError errorCode = MQ_SUCCESS;
+  MessageConsumer * consumer = NULL;
+  Session * session = NULL;
+  Destination * destination = NULL;
+ 
+  CLEAR_ERROR_TRACE(PR_FALSE);
+
+  CNDCHK( subscriptionName == NULL, MQ_NULL_PTR_ARG );
+
+  CNDCHK( consumerHandle == NULL, MQ_NULL_PTR_ARG );
+  CNDCHK( messageListener == NULL, MQ_NULL_PTR_ARG );
+  consumerHandle->handle = (MQInt32)HANDLED_OBJECT_INVALID_HANDLE;
+
+  // Convert sessionHandle to a Session pointer
+  session = (Session*)getHandledObject(sessionHandle.handle,
+                                       SESSION_OBJECT);
+  CNDCHK( session == NULL, MQ_STATUS_INVALID_HANDLE );
+  CNDCHK( session->getReceiveMode() != SESSION_ASYNC_RECEIVE, MQ_NOT_ASYNC_RECEIVE_MODE );
+
+  // Convert destinationHandle to a Destination pointer
+  destination = (Destination*)getHandledObject(destinationHandle.handle,
+                                               DESTINATION_OBJECT);
+  CNDCHK( destination == NULL, MQ_STATUS_INVALID_HANDLE );
+
+  {
+  UTF8String subscriptionNameStr(subscriptionName);
+  CNDCHK( STRCMP( subscriptionNameStr.toString(), subscriptionName ) != 0, MQ_OUT_OF_MEMORY );
+
+  // Create the consumer
+  if (messageSelector != NULL) {
+    UTF8String messageSelectorStr(messageSelector);
+    CNDCHK( STRCMP( messageSelectorStr.toString(), messageSelector ) != 0, MQ_OUT_OF_MEMORY );
+    ERRCHK( session->createConsumer(destination, PR_FALSE, PR_TRUE, &subscriptionNameStr,
+                                    &messageSelectorStr, noLocal, messageListener,
+                                    messageListenerCallbackData, &consumer) );
+  } else {
+    ERRCHK( session->createConsumer(destination, PR_FALSE, PR_TRUE, &subscriptionNameStr,
+                                    NULL, noLocal, messageListener, 
+                                    messageListenerCallbackData, &consumer) );
+  }
+  }
+
+  // Make the consumer a valid handle
+  consumer->setIsExported(PR_TRUE);
+  consumerHandle->handle = consumer->getHandle();
+
+  releaseHandledObject(destination);
+  releaseHandledObject(session);
+  RETURN_STATUS( MQ_SUCCESS );
+Cleanup:
+  ASSERT( consumer == NULL );
+  releaseHandledObject(destination);
+  releaseHandledObject(session);
+  MQ_ERROR_TRACE(FUNCNAME, errorCode);
+  RETURN_STATUS( errorCode );
+}
 
 /*
  *
@@ -437,10 +571,10 @@ MQCreateDurableMessageConsumer(const MQSessionHandle     sessionHandle,
     if (messageSelector != NULL) {
       UTF8String messageSelectorStr(messageSelector);
       CNDCHK( STRCMP( messageSelectorStr.toString(), messageSelector ) != 0, MQ_OUT_OF_MEMORY );
-      ERRCHK( session->createConsumer(destination, PR_TRUE, &durableNameStr, 
+      ERRCHK( session->createConsumer(destination, PR_TRUE, PR_FALSE, &durableNameStr, 
                                       &messageSelectorStr, noLocal, NULL, NULL, &consumer) );
     } else {
-      ERRCHK( session->createConsumer(destination, PR_TRUE, &durableNameStr, 
+      ERRCHK( session->createConsumer(destination, PR_TRUE, PR_FALSE, &durableNameStr, 
                                       NULL, noLocal, NULL, NULL, &consumer) );
     }
   }
@@ -463,6 +597,74 @@ Cleanup:
   RETURN_STATUS( errorCode );
 }
 
+/*
+ *
+ */
+EXPORTED_SYMBOL MQStatus
+MQCreateSharedDurableMessageConsumer(const MQSessionHandle     sessionHandle,
+                               const MQDestinationHandle destinationHandle,
+                               ConstMQString             durableName,
+                               ConstMQString             messageSelector,
+                               MQBool                    noLocal, 
+                               MQConsumerHandle *        consumerHandle)
+{
+  static const char FUNCNAME[] = "MQCreateSharedDurableMessageConsumer";
+  MQError errorCode = MQ_SUCCESS;
+  MessageConsumer * consumer = NULL;
+  Destination * destination = NULL;
+  Session * session = NULL;
+
+  CLEAR_ERROR_TRACE( PR_FALSE );
+  
+  CNDCHK( consumerHandle == NULL, MQ_NULL_PTR_ARG );
+  consumerHandle->handle = (MQInt32)HANDLED_OBJECT_INVALID_HANDLE;
+
+  CNDCHK( durableName == NULL, MQ_NULL_PTR_ARG );
+
+  // Convert sessionHandle to a Session pointer
+  session = (Session*)getHandledObject(sessionHandle.handle,
+                                       SESSION_OBJECT);
+  CNDCHK( session == NULL, MQ_STATUS_INVALID_HANDLE ); 
+  CNDCHK( session->getReceiveMode() != SESSION_SYNC_RECEIVE, MQ_NOT_SYNC_RECEIVE_MODE );
+
+  // Convert destinationHandle to a Destination pointer
+  destination = (Destination*)getHandledObject(destinationHandle.handle,
+                                               DESTINATION_OBJECT);
+  CNDCHK( destination == NULL, MQ_STATUS_INVALID_HANDLE ); 
+  
+  // Create the consumer
+  {
+    UTF8String durableNameStr(durableName);
+    CNDCHK( STRCMP( durableNameStr.toString(), durableName ) != 0, MQ_OUT_OF_MEMORY );
+
+    if (messageSelector != NULL) {
+      UTF8String messageSelectorStr(messageSelector);
+      CNDCHK( STRCMP( messageSelectorStr.toString(), messageSelector ) != 0, MQ_OUT_OF_MEMORY );
+      ERRCHK( session->createConsumer(destination, PR_TRUE, PR_TRUE, &durableNameStr, 
+                                      &messageSelectorStr, noLocal, NULL, NULL, &consumer) );
+    } else {
+      ERRCHK( session->createConsumer(destination, PR_TRUE, PR_TRUE, &durableNameStr, 
+                                      NULL, noLocal, NULL, NULL, &consumer) );
+    }
+  }
+
+  // session->createConsumer should enforce this 
+  ASSERT( !destination->getIsQueue() );
+
+  // Make the consumer a valid handle
+  consumer->setIsExported(PR_TRUE);
+  consumerHandle->handle = consumer->getHandle();
+
+  releaseHandledObject(destination);
+  releaseHandledObject(session);
+  RETURN_STATUS( MQ_SUCCESS );
+Cleanup:
+  ASSERT( consumer == NULL );
+  releaseHandledObject(destination);
+  releaseHandledObject(session);
+  MQ_ERROR_TRACE(FUNCNAME, errorCode);
+  RETURN_STATUS( errorCode );
+}
 
 
 /*
@@ -511,11 +713,11 @@ MQCreateAsyncDurableMessageConsumer(const MQSessionHandle     sessionHandle,
     if (messageSelector != NULL) {
       UTF8String messageSelectorStr(messageSelector);
       CNDCHK( STRCMP( messageSelectorStr.toString(), messageSelector ) != 0, MQ_OUT_OF_MEMORY );
-      ERRCHK( session->createConsumer(destination, PR_TRUE, &durableNameStr,
+      ERRCHK( session->createConsumer(destination, PR_TRUE, PR_FALSE, &durableNameStr,
                                       &messageSelectorStr, noLocal, messageListener,
                                       messageListenerCallbackData, &consumer) );
     } else {
-      ERRCHK( session->createConsumer(destination, PR_TRUE, &durableNameStr,
+      ERRCHK( session->createConsumer(destination, PR_TRUE, PR_FALSE, &durableNameStr,
                                       NULL, noLocal, messageListener,
                                       messageListenerCallbackData, &consumer) );
     }
@@ -540,6 +742,80 @@ Cleanup:
 
 }
 
+/*
+ *
+ */
+EXPORTED_SYMBOL MQStatus
+MQCreateAsyncSharedDurableMessageConsumer(const MQSessionHandle     sessionHandle,
+                                    const MQDestinationHandle destinationHandle,
+                                    ConstMQString             durableName,
+                                    ConstMQString             messageSelector,
+                                    MQBool                    noLocal,
+                                    MQMessageListenerFunc     messageListener,
+                                    void *                    messageListenerCallbackData,
+                                    MQConsumerHandle *        consumerHandle)
+{
+  static const char FUNCNAME[] = "MQCreateAsyncSharedDurableMessageConsumer";
+  MQError errorCode = MQ_SUCCESS;
+  MessageConsumer * consumer = NULL;
+  Destination * destination = NULL;
+  Session * session = NULL;
+
+  CLEAR_ERROR_TRACE(PR_FALSE);
+ 
+  CNDCHK( consumerHandle == NULL, MQ_NULL_PTR_ARG );
+  CNDCHK( messageListener == NULL, MQ_NULL_PTR_ARG );
+  consumerHandle->handle = (MQInt32)HANDLED_OBJECT_INVALID_HANDLE;
+
+  CNDCHK( durableName == NULL, MQ_NULL_PTR_ARG );
+
+  // Convert sessionHandle to a Session pointer
+  session = (Session*)getHandledObject(sessionHandle.handle,
+                                       SESSION_OBJECT);
+  CNDCHK( session == NULL, MQ_STATUS_INVALID_HANDLE );
+  CNDCHK( session->getReceiveMode() != SESSION_ASYNC_RECEIVE, MQ_NOT_ASYNC_RECEIVE_MODE );
+
+  // Convert destinationHandle to a Destination pointer
+  destination = (Destination*)getHandledObject(destinationHandle.handle,
+                                               DESTINATION_OBJECT);
+  CNDCHK( destination == NULL, MQ_STATUS_INVALID_HANDLE );
+ 
+  // Create the consumer
+  {
+    UTF8String durableNameStr(durableName);
+    CNDCHK( STRCMP( durableNameStr.toString(), durableName ) != 0, MQ_OUT_OF_MEMORY );
+
+    if (messageSelector != NULL) {
+      UTF8String messageSelectorStr(messageSelector);
+      CNDCHK( STRCMP( messageSelectorStr.toString(), messageSelector ) != 0, MQ_OUT_OF_MEMORY );
+      ERRCHK( session->createConsumer(destination, PR_TRUE, PR_TRUE, &durableNameStr,
+                                      &messageSelectorStr, noLocal, messageListener,
+                                      messageListenerCallbackData, &consumer) );
+    } else {
+      ERRCHK( session->createConsumer(destination, PR_TRUE, PR_TRUE, &durableNameStr,
+                                      NULL, noLocal, messageListener,
+                                      messageListenerCallbackData, &consumer) );
+    }
+  }
+
+  // session->createConsumer should enforce this
+  ASSERT( !destination->getIsQueue() );
+
+  // Make the consumer a valid handle
+  consumer->setIsExported(PR_TRUE);
+  consumerHandle->handle = consumer->getHandle();
+
+  releaseHandledObject(destination);
+  releaseHandledObject(session);
+  RETURN_STATUS( MQ_SUCCESS );
+Cleanup:
+  ASSERT( consumer == NULL );
+  releaseHandledObject(destination);
+  releaseHandledObject(session);
+  MQ_ERROR_TRACE(FUNCNAME, errorCode);
+  RETURN_STATUS( errorCode );
+
+}
 
 /*
  *

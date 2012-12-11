@@ -56,6 +56,8 @@ import com.sun.messaging.jmq.io.ReadOnlyPacket;
 import com.sun.messaging.jmq.io.SysMessageID;
 
 import com.sun.messaging.jmq.jmsclient.resources.ClientResources;
+import com.sun.messaging.jms.MQMessageFormatRuntimeException;
+import com.sun.messaging.jms.MQRuntimeException;
 
 /** A client uses a message consumer to receive messages from a Destination.
   * It is created by passing a Destination to a create message consumer method
@@ -87,7 +89,7 @@ import com.sun.messaging.jmq.jmsclient.resources.ClientResources;
   */
 
 public class MessageConsumerImpl extends Consumer
-                 implements MessageConsumer, Traceable {
+                 implements MQMessageConsumer, Traceable {
 
     protected MessageListener messageListener = null;
 
@@ -348,6 +350,7 @@ public class MessageConsumerImpl extends Consumer
         // bug 6469383, 6469397
         this.session.sessionReader.setCurrentMessage(message);
 
+        int retryCount = 0;
         try {
             session.setIsMessageListenerThread(true);
             if (!isDMQConsumer && message._isExpired()) {
@@ -360,6 +363,8 @@ public class MessageConsumerImpl extends Consumer
 
                 // let the client know they are doing something wrong
                 Debug.printStackTrace(e);
+
+                int redeliveryCount = message.getIntProperty(ConnectionMetaDataImpl.JMSXDeliveryCount);;
                 // for non-transacted, auto-acknowledge session
                 if (session.getTransacted() == false && session.acknowledgeMode != Session.CLIENT_ACKNOWLEDGE) {
                     message.doAcknowledge = false;
@@ -367,6 +372,10 @@ public class MessageConsumerImpl extends Consumer
                     message.setJMSRedelivered(true);
                     // redeliver to the listener
                     try {
+                        redeliveryCount++;
+                        message.updateDeliveryCount(redeliveryCount);
+                        retryCount++;
+                        message.setClientRetries(retryCount);
                         messageListener.onMessage(message);
                         message.doAcknowledge = true;
                     } catch (Exception e1) {
@@ -384,6 +393,10 @@ public class MessageConsumerImpl extends Consumer
                                     }
                                 }
                                 try {
+                                     redeliveryCount++;
+                                     message.updateDeliveryCount(redeliveryCount);
+                                     retryCount++;
+                                     message.setClientRetries(retryCount);
                                      messageListener.onMessage(message);
                                      message.doAcknowledge = true;
                                      break;
@@ -507,8 +520,7 @@ public class MessageConsumerImpl extends Consumer
 
     /** Receive the next message that arrives within the specified
       * timeout interval.
-      *
-      * <P>This call blocks until a message arrives, the
+      * <>This call blocks until a message arrives, the
       * timeout expires, or this message consumer is closed.
       * A timeout of zero never expires and the call blocks indefinitely.
       *
@@ -520,77 +532,145 @@ public class MessageConsumerImpl extends Consumer
       * return null if timeout expires or message consumer concurrently closed.
       */
 
-    public Message
-    receive(long timeout) throws JMSException {
-        MessageImpl message = null;
+	public Message receive(long timeout) throws JMSException {
+		MessageImpl message = null;
 
-        while (true) {
-
-        checkReceive();
-
-        try {
-            if (noprefetch && pendingPrefetch) {
-                session.doPrefetch(this);
-                pendingPrefetch = false;
-            }
-
-            message = (MessageImpl) receiveQueue.dequeueWait(timeout);
-
-            if ( message != null) {
-                if (!isDMQConsumer && message._isExpired()) {
-                    if (noprefetch) {
-                        pendingPrefetch = true;
-                        session.acknowledgeExpired(message, false);
-                    } else {
-                        session.acknowledgeExpired(message, true);
-                    }
-                    continue;
-                }
-                if (!session.getTransacted() || !connection.isAppTransactedAck()) {
-                    if (noprefetch) {
-                        pendingPrefetch = true;
-                        session.acknowledge(message, false);
-                    } else {
-                        session.acknowledge (message, true);
-                    }
-                }
-
-                //XXX PROTOCOL3.5
-                // Remember the last delivered message id.
-                lastDeliveredID = message.getMessageID();
-            } else {
-				// if message is null and the connection is broken, throws a
-				// JMSException
-				// so that the MessageConsumer knows that this is caused by the
-				// MQ internal error -
-				// bug 6485924- consumer.receive() returns null instead of
-				// throwing an exception.
-				if (this.session.connection.connectionIsBroken) {
-
-						String errorString = AdministeredObject.cr
-								.getKString(ClientResources.X_CONSUMER_CLOSED);
+		while (true) {
+			checkReceive();
+			try {
+				if (noprefetch && pendingPrefetch) {
+					session.doPrefetch(this);
+					pendingPrefetch = false;
+				}
+				message = (MessageImpl) receiveQueue.dequeueWait(timeout);
+				if (message != null) {
+					if (!isDMQConsumer && message._isExpired()) {
+						if (noprefetch) {
+							pendingPrefetch = true;
+							session.acknowledgeExpired(message, false);
+						} else {
+							session.acknowledgeExpired(message, true);
+						}
+						continue;
+					}
+					if (!session.getTransacted() || !connection.isAppTransactedAck()) {
+						if (noprefetch) {
+							pendingPrefetch = true;
+							session.acknowledge(message, false);
+						} else {
+							session.acknowledge(message, true);
+						}
+					}
+					// XXX PROTOCOL3.5
+					// Remember the last delivered message id.
+					lastDeliveredID = message.getMessageID();
+				} else {
+					// if message is null and the connection is broken, throws a JMSException 
+					// so that the MessageConsumer knows that this is caused by a MQ internal error  
+					// (bug 6485924 - consumer.receive() returns null instead of throwing an exception)
+					if (this.session.connection.connectionIsBroken) {
+						String errorString = AdministeredObject.cr.getKString(ClientResources.X_CONSUMER_CLOSED);
 						// construct JMSException
 						JMSException jmse = new com.sun.messaging.jms.JMSException(errorString,
 								ClientResources.X_CONSUMER_CLOSED);
-					
 						if (session.connection.readChannel.savedJMSException != null) {
 							jmse.setLinkedException(session.connection.readChannel.savedJMSException);
 						}
-
-					ExceptionHandler.throwJMSException(jmse);
+						ExceptionHandler.throwJMSException(jmse);
+					}
 				}
-				
+				break;
+			} finally {
+				receiveQueue.setReceiveInProcess(false);
 			}
-            break;
-            
-		} finally {
-			receiveQueue.setReceiveInProcess(false);
+		}  
+		return message;
+	}
+	
+	@Override
+	public <T> T receiveBody(Class<T> c, long timeout) throws JMSException {
+		MessageImpl message = null;
+		T body = null;
+		MessageFormatException e = null;
+		while (true) {
+			checkReceive();
+			try {
+				if (noprefetch && pendingPrefetch) {
+					session.doPrefetch(this);
+					pendingPrefetch = false;
+				}
+				message = (MessageImpl) receiveQueue.dequeueWait(timeout);
+				if (message != null) {
+					try {
+						body = message.getBody(c);
+						if (body==null){
+							// must be a Message
+							// this doesn't have a payload, and we can't return null because this would clash with the "no message received" case,
+							// so we throw an exception
+							// "Message has no body and so cannot be returned using this method" 
+							String errorString = AdministeredObject.cr.getKString(ClientResources.X_MESSAGE_HAS_NO_BODY);
+							JMSException jmse = new javax.jms.MessageFormatException(errorString, ClientResources.X_MESSAGE_HAS_NO_BODY);
+							ExceptionHandler.throwJMSException(jmse);
+						}
+					} catch (MessageFormatException mfe) {
+						// message could not be converted
+						if (session.getAcknowledgeMode()==Session.AUTO_ACKNOWLEDGE || session.getAcknowledgeMode()==Session.DUPS_OK_ACKNOWLEDGE){
+							// put the message back on the queue
+							receiveQueue.enqueueFirst(message);
+							// throw now before we acknowledge it
+							throw mfe;
+						} else {
+							// throw at end of method
+							e=mfe;
+						}
+					}
+					if (!isDMQConsumer && message._isExpired()) {
+						if (noprefetch) {
+							pendingPrefetch = true;
+							session.acknowledgeExpired(message, false);
+						} else {
+							session.acknowledgeExpired(message, true);
+						}
+						continue;
+					}
+					if (!session.getTransacted() || !connection.isAppTransactedAck()) {
+						if (noprefetch) {
+							pendingPrefetch = true;
+							session.acknowledge(message, false);
+						} else {
+							session.acknowledge(message, true);
+						}
+					}
+					// XXX PROTOCOL3.5
+					// Remember the last delivered message id.
+					lastDeliveredID = message.getMessageID();
+				} else {
+					body = null;
+					// if message is null and the connection is broken, throws a
+					// JMSException
+					// so that the MessageConsumer knows that this is caused by
+					// a MQ internal error
+					// (bug 6485924 - consumer.receive() returns null instead of
+					// throwing an exception)
+					if (this.session.connection.connectionIsBroken) {
+						String errorString = AdministeredObject.cr.getKString(ClientResources.X_CONSUMER_CLOSED);
+						// construct JMSException
+						JMSException jmse = new com.sun.messaging.jms.JMSException(errorString,
+								ClientResources.X_CONSUMER_CLOSED);
+						if (session.connection.readChannel.savedJMSException != null) {
+							jmse.setLinkedException(session.connection.readChannel.savedJMSException);
+						}
+						ExceptionHandler.throwJMSException(jmse);
+					}
+				}
+				break;
+			} finally {
+				receiveQueue.setReceiveInProcess(false);
+			}
 		}
-
-        } //while
-
-        return message;
-    }
+		if (e!=null) throw e;
+		return body;
+	}
 
 
     /**
@@ -657,7 +737,95 @@ public class MessageConsumerImpl extends Consumer
 
         return message;
     }
+    
+	public <T> T receiveBodyNoWait(Class<T> c) throws JMSException {
+		MessageImpl message = null;
+		T body = null;
+		MessageFormatException e = null;
+		while (true) {
+			checkReceive();
+			try {
+				// if the queue is locked/Connection.stop() is called,
+				// no messages should be received.
+				if (receiveQueue.getIsLocked()) {
+					return null;
+				}
+				receiveQueue.setReceiveInProcess(true);
+				if (noprefetch && pendingPrefetch) {
+					session.doPrefetch(this);
+					pendingPrefetch = false;
+				}
+				message = (MessageImpl) receiveQueue.dequeue();
+				if (message != null) {
+					try {
+						body = message.getBody(c);
+						if (body==null){
+							// must be a Message
+							// this doesn't have a payload, and we can't return null because this would clash with the "no message received" case,
+							// so we throw an exception
+							// "Message has no body and so cannot be returned using this method" 
+							String errorString = AdministeredObject.cr.getKString(ClientResources.X_MESSAGE_HAS_NO_BODY);
+							JMSException jmse = new javax.jms.MessageFormatException(errorString, ClientResources.X_MESSAGE_HAS_NO_BODY);
+							ExceptionHandler.throwJMSException(jmse);
+						}
+					} catch (MessageFormatException mfe) {
+						// message could not be converted
+						if (session.getAcknowledgeMode()==Session.AUTO_ACKNOWLEDGE || session.getAcknowledgeMode()==Session.DUPS_OK_ACKNOWLEDGE){
+							// put the message back on the queue
+							receiveQueue.enqueueFirst(message);
+							// throw now before we acknowledge it
+							throw mfe;
+						} else {
+							// throw at end of method
+							e=mfe;
+						}
+					}
+					if (!isDMQConsumer && message._isExpired()) {
+						if (noprefetch) {
+							pendingPrefetch = true;
+							session.acknowledgeExpired(message, false);
+						} else {
+							session.acknowledgeExpired(message, true);
+						}
+						continue;
+					}
+					if (noprefetch) {
+						pendingPrefetch = true;
+						session.acknowledge(message, false);
+					} else {
+						session.acknowledge(message, true);
+					}
+					// XXX PROTOCOL3.5
+					// Remember the last delivered message id.
+					lastDeliveredID = message.getMessageID();
+				}
+				break;
+			} finally {
+				receiveQueue.setReceiveInProcess(false);
+			}
+		} 
+		if (e!=null) throw e;
+		return body;
+	}
 
+	@Override
+	public <T> T receiveBody(Class<T> c) throws JMSException {
+		return receiveBody(c,0);
+	}
+		
+	private <T> T returnPayload(Message message, Class<T> c) throws JMSException {
+		T body = message.getBody(c);
+		if (body==null){
+			// must be a Message
+			// this doesn't have a payload, and we can't return null because this would clash with the "no message received" case,
+			// so we throw an exception
+			// "Message has no body and so cannot be returned using this method" 
+			String errorString = AdministeredObject.cr.getKString(ClientResources.X_MESSAGE_HAS_NO_BODY);
+			JMSException jmse = new javax.jms.MessageFormatException(errorString, ClientResources.X_MESSAGE_HAS_NO_BODY);
+			ExceptionHandler.throwJMSException(jmse);
+		}
+		return body;
+	}
 
     /** Since a provider may allocate some resources on behalf of a
       * MessageConsumer outside the JVM, clients should close them when they
@@ -895,5 +1063,7 @@ public class MessageConsumerImpl extends Consumer
              ", ConsumerID=" + getInterestId() +
              ", DestName=" + destName;
     }
+
+
 }
 

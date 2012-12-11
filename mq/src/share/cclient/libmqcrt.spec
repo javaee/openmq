@@ -186,6 +186,19 @@ arch            all
 version         SUNW_1.1
 end
 
+function        MQCreateSharedDurableMessageConsumer
+declaration     MQStatus \
+                MQCreateSharedDurableMessageConsumer(const MQSessionHandle     sessionHandle, \
+                                               const MQDestinationHandle destinationHandle, \
+                                               ConstMQString             durableName, \
+                                               ConstMQString             messageSelector, \
+                                               MQBool                    noLocal, \
+                                               MQConsumerHandle *        consumerHandle)
+include         "mqcrt.h"
+arch            all
+version         SUNW_1.5
+end
+
 
 function        MQCreateMessageConsumer
 declaration     MQStatus \
@@ -197,6 +210,19 @@ declaration     MQStatus \
 include         "mqcrt.h"
 arch            all
 version         SUNW_1.1
+end
+
+function        MQCreateSharedMessageConsumer
+declaration     MQStatus \
+                MQCreateSharedMessageConsumer(const MQSessionHandle     sessionHandle, \
+                                        const MQDestinationHandle destinationHandle, \
+                                        ConstMQString             subscriptionName, \
+                                        ConstMQString             messageSelector, \
+                                        MQBool                    noLocal, \
+                                        MQConsumerHandle *        consumerHandle)
+include         "mqcrt.h"
+arch            all
+version         SUNW_1.5
 end
 
 
@@ -215,6 +241,20 @@ arch            all
 version         SUNW_1.1
 end
 
+function        MQCreateAsyncSharedDurableMessageConsumer
+declaration     MQStatus \
+                MQCreateAsyncSharedDurableMessageConsumer(const MQSessionHandle     sessionHandle, \
+                                                    const MQDestinationHandle destinationHandle, \
+                                                    ConstMQString             durableName, \
+                                                    ConstMQString             messageSelector, \
+                                                    MQBool                    noLocal, \
+                                                    MQMessageListenerFunc     messageListener, \
+                                                    void *                    listenerCallbackData, \
+                                                    MQConsumerHandle *        consumerHandle)
+include         "mqcrt.h"
+arch            all
+version         SUNW_1.5
+end
 
 function        MQCreateAsyncMessageConsumer
 declaration     MQStatus \
@@ -230,6 +270,20 @@ arch            all
 version         SUNW_1.1
 end
 
+function        MQCreateAsyncSharedMessageConsumer
+declaration     MQStatus \
+                MQCreateAsyncSharedMessageConsumer(const MQSessionHandle     sessionHandle, \
+                                             const MQDestinationHandle destinationHandle, \
+                                             ConstMQString             subscriptionName, \
+                                             ConstMQString             messageSelector, \
+                                             MQBool                    noLocal, \
+                                             MQMessageListenerFunc     messageListener,\
+                                             void *                    listenerCallbackData, \
+                                             MQConsumerHandle *        consumerHandle)
+include         "mqcrt.h"
+arch            all
+version         SUNW_1.5
+end
 
 function        MQCreateMessageProducer
 declaration     MQStatus \

@@ -453,12 +453,18 @@ public class ClusterConsumerInfo
         boolean setMaxCnt = false;
         int position = consumer.getLockPosition();;
         int maxcnt = 1;
+        boolean jmsshare = false;
+        String ndsubname = null;
  
         if (consumer instanceof Subscription ) {
             Subscription s = (Subscription)consumer;
             maxcnt = s.getMaxNumActiveConsumers();
             setMaxCnt = true;
+            jmsshare = s.getJMSShared();
             durableName = s.getDurableName();
+            if (jmsshare && durableName == null) {
+                ndsubname = s.getNDSubscriptionName();
+            }
             clientID = s.getClientID();
             if (! s.isActive()) {
                 isReady = false;
@@ -489,6 +495,11 @@ public class ClusterConsumerInfo
         if (setMaxCnt)
             dos.writeInt(maxcnt);
         dos.writeInt(position);
+        dos.writeBoolean(jmsshare);
+        dos.writeBoolean(ndsubname != null);
+        if (ndsubname != null) {
+            dos.writeUTF(ndsubname);
+        }
     }
 
     public static Consumer readConsumer(DataInputStream dis) throws IOException
@@ -550,24 +561,33 @@ public class ClusterConsumerInfo
             // do nothing prevents failures with old brokers
         }
 
+        //5.0
+        boolean jmsshare = false;
+        String ndsubname = null; 
+        try {
+            jmsshare = dis.readBoolean(); 
+            boolean hasndsubname = dis.readBoolean();
+            if (hasndsubname) {
+                ndsubname = dis.readUTF();
+            }
+        } catch (Exception ex) {
+            // do nothing prevents failures with old brokers
+        }
 
         try {
             DestinationUID dest = DestinationUID.getUID(destName, isQueue);
             if (durableName != null) {
-                Subscription sub = Subscription.findCreateDurableSubscription
-                                       (clientID,durableName, dest, selstr, 
-                                        noLocalDelivery, false,  id);
-                if (sub != null) {
-                    sub.setMaxNumActiveConsumers(sharedcnt);
-                }
+                Subscription sub = Subscription.findCreateDurableSubscription(
+                                       clientID, durableName, (sharedcnt != 1),
+                                       jmsshare, dest, selstr, noLocalDelivery, 
+                                       false,  id, Integer.valueOf(sharedcnt));
                 return sub;
             } else {
                 if (sharedSet) { /* non-durable subscriber */
                     Subscription sub = Subscription.findCreateNonDurableSubscription(
-                              clientID, selstr, dest, noLocalDelivery, id ); 
-                    if (sub != null) {
-                        sub.setMaxNumActiveConsumers(sharedcnt);
-                    }
+                                         clientID, selstr, ndsubname, (sharedcnt != 1),
+                                         jmsshare, dest, noLocalDelivery, id, 
+                                         Integer.valueOf(sharedcnt)); 
                     return sub;
                 } else {
                     Consumer c = Consumer.newConsumer(dest, selstr, noLocalDelivery, id);

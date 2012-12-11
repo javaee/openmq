@@ -114,6 +114,12 @@
         <Field name="DEBUG"/>
         <Bug pattern="MS_SHOULD_BE_FINAL"/>
     </Match>            
+
+     <Match>
+        <Class name="com.sun.messaging.jmq.jmsserver.core.Subscription"/>
+        <Field name="DEBUG"/>
+        <Bug pattern="MS_SHOULD_BE_FINAL"/>
+    </Match>            
     
     <Match>
 	<Class name="com.sun.messaging.jmq.jmsserver.core.MessageDeliveryTimeTimer"/>

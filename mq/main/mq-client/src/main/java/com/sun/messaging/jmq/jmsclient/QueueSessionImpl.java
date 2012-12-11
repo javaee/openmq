@@ -163,4 +163,77 @@ public class QueueSessionImpl extends UnifiedSessionImpl implements QueueSession
         throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
     }
 
+    @Override
+    public MessageConsumer createSharedConsumer(Topic topic,
+        String sharedSubscriptionName) throws JMSException {
+        String errorString = AdministeredObject.cr.getKString(
+                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
+                   "createSharedConsumer");
+        throw new javax.jms.IllegalStateException(errorString, 
+            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+    }
+
+    @Override
+    public MessageConsumer createSharedConsumer(Topic topic,
+        String sharedSubscriptionName, String messageSelector)
+        throws JMSException {
+        String errorString = AdministeredObject.cr.getKString(
+                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
+                   "createSharedConsumer");
+        throw new javax.jms.IllegalStateException(errorString, 
+            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+    }
+
+    @Override
+    public MessageConsumer createSharedConsumer(Topic topic,
+        String sharedSubscriptionName, String messageSelector,
+        boolean noLocal) throws JMSException {
+        String errorString = AdministeredObject.cr.getKString(
+                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
+                   "createSharedConsumer");
+        throw new javax.jms.IllegalStateException(errorString, 
+            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+    }
+
+    @Override
+    public MessageConsumer createDurableConsumer(Topic topic, String name)
+    throws JMSException {
+        String errorString = AdministeredObject.cr.getKString(
+                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
+                   "createDurableConsumer");
+        throw new javax.jms.IllegalStateException(errorString, 
+            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+    }
+
+    @Override
+    public MessageConsumer createDurableConsumer(Topic topic, String name,
+        String messageSelector, boolean noLocal) throws JMSException {
+        String errorString = AdministeredObject.cr.getKString(
+                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
+                   "createDurableConsumer");
+        throw new javax.jms.IllegalStateException(errorString, 
+            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+    }
+
+    @Override
+    public MessageConsumer createSharedDurableConsumer(Topic topic, String name)
+    throws JMSException {
+        String errorString = AdministeredObject.cr.getKString(
+                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
+                   "createSharedDurableConsumer");
+        throw new javax.jms.IllegalStateException(errorString, 
+            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+    }
+
+    @Override
+    public MessageConsumer createSharedDurableConsumer(Topic topic, String name,
+         String messageSelector, boolean noLocal)
+         throws JMSException {
+        String errorString = AdministeredObject.cr.getKString(
+                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
+                   "createSharedDurableConsumer");
+        throw new javax.jms.IllegalStateException(errorString, 
+            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+    }
+
 }

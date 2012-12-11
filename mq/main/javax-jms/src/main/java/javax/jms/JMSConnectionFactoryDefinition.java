@@ -45,13 +45,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to define a Java Message Service (JMS) connection factory and
- * be registered with JNDI. The {@code JMSConnectionFactory} may be
- * configured by setting the annotation elements for commonly used
- * {@code JMSConnectionFactory} properties. Additional standard and
- * vendor-specific properties may be specified using the {@code properties
- *  } element. Once defined, a connection factory may be referenced by a
- * component using the {@code lookup} element of the {@code Resource}
+ * An application may use this annotation to specify a JMS {@code 
+ * ConnectionFactory} resource that it requires in its operational 
+ * environment. This provides information that can be used at the 
+ * application's deployment to provision the required resource
+ * and allows an application to be deployed into a Java EE environment 
+ * with more minimal administrative configuration.
+ * <p>
+ * The {@code ConnectionFactory} resource may be configured by 
+ * setting the annotation elements for commonly used properties. 
+ * Additional properties may be specified using the {@code properties}
+ * element. Once defined, a {@code ConnectionFactory} resource may be referenced by a
+ * component in the same way as any other {@code ConnectionFactory} resource,
+ * for example by using the {@code lookup} element of the {@code Resource}
  * annotation.
  * 
  * @see javax.annotation.Resource
@@ -99,13 +105,6 @@ public @interface JMSConnectionFactoryDefinition {
 	String clientId() default "";
 
 	/**
-	 * Opaque string which defines how to connect to the JMS provider. Whether
-	 * this property is used, and what it should be set to, is defined by the
-	 * JMS provider
-	 */
-	String url() default "";
-
-	/**
 	 * JMS connection factory property. This may be a vendor-specific property
 	 * or a less commonly used {@code ConnectionFactory} property.
 	 * <p>
@@ -113,16 +112,6 @@ public @interface JMSConnectionFactoryDefinition {
 	 * <i>propertyName=propertyValue</i> with one property per array element.
 	 */
 	String[] properties() default {};
-
-	/**
-	 * Sets the maximum time in seconds that to wait while attempting to connect
-	 * to the resource. A value of zero specifies that the timeout is the
-	 * default system timeout if there is one; otherwise, it specifies that
-	 * there is no timeout.
-	 * <p>
-	 * Default is vendor-specific.
-	 */
-	int connectionTimeout() default 0;
 
 	/**
 	 * Set to {@code false} if connections should not participate in

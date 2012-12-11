@@ -155,4 +155,15 @@ public class SequentialQueue implements MessageQueue {
         return queue.remove(obj);
     }
 
+    /**
+     * Adds the specified object to the front of the queue.
+     * @param nobj new object to be added to the front of the queue
+     */
+	@Override
+	public void enqueueFirst(Object nobj) {
+		// This method was added for PriorityQueue, not for SequentialQueue
+		// so has not been implemented   
+		throw new RuntimeException("This method is not yet implemented");
+	}
+
 }

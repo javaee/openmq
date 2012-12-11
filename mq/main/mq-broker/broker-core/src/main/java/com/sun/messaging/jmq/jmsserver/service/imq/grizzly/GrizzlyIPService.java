@@ -52,6 +52,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.glassfish.grizzly.Grizzly;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport; 
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
@@ -355,7 +356,8 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
                               getProtocol().toString(), 
                               String.valueOf(getMinThreadpool()),
                               String.valueOf(getMaxThreadpool()) };
-            logger.log(Logger.INFO, BrokerResources.I_SERVICE_START, args);
+            String msg = br.getKString(BrokerResources.I_SERVICE_START, args);
+            logger.log(Logger.INFO, msg+"[Grizzly "+Grizzly.getDotedVersion()+"]");
             try {
             logger.log(Logger.INFO, BrokerResources.I_SERVICE_USER_REPOSITORY,
                        AccessController.getInstance(
@@ -693,9 +695,12 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
                     try {
                          c.handleWriteException(t);
                     } catch (Throwable e) {
-                         logger.logStack(logger.WARNING,
-                             "Exception in writing data to connection "+
-                              c+" for service "+getName(), e);
+                        int loglevel = (c.isValid() ? Logger.WARNING:Logger.INFO);
+                        if (c.getDEBUG() || loglevel == logger.WARNING) {
+                            logger.logStack(loglevel,
+                                "Exception in writing data to connection "+
+                                c+" for service "+getName(), e);
+                        }
                     }
                 } finally {
                     c.assignWriteThread(false);

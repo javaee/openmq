@@ -49,8 +49,8 @@ import java.util.Properties;
   *
   * <P>Most message-oriented middleware (MOM) products treat messages as 
   * lightweight entities that consist
-  * of a header and a payload. The header contains fields used for message
-  * routing and identification; the payload contains the application data
+  * of a header and a body. The header contains fields used for message
+  * routing and identification; the body contains the application data
   * being sent.
   *
   * <P>Within this general form, the definition of a message varies
@@ -1596,4 +1596,98 @@ public interface Message {
     void
     clearBody() throws JMSException;
     
+	/**
+	 * Returns the message body as an object of the specified type. 
+	 * This method may be called on any type of message except for
+	 * <tt>StreamMessage</tt>. The message
+	 * body must be capable of being assigned to the specified type. This means
+	 * that the specified class or interface must be either the same as, or a
+	 * superclass or superinterface of, the class of the message body. 
+	 * If the message has no body then any type may be specified and null is returned.
+	 * <p>
+	 * 
+	 * @param c
+	 *            The type to which the message body will be assigned. <br/>
+	 *            If the message is a {@code TextMessage} then this parameter must 
+	 *            be set to {@code String.class} or another type to which
+	 *            a {@code String} is assignable. <br/>
+	 *            If the message is a {@code ObjectMessage} then parameter must 
+	 *            must be set to {@code java.io.Serializable.class} or
+	 *            another type to which the body is assignable. <br/>
+	 *            If the message is a {@code MapMessage} then this parameter must 
+	 *            be set to {@code java.util.Map.class} (or {@code java.lang.Object.class}). <br/>
+	 *            If the message is a {@code BytesMessage} then this parameter must 
+	 *            be set to {@code byte[].class} (or {@code java.lang.Object.class}). This method
+	 *            will reset the {@code BytesMessage} before and after use.<br/>
+	 *            If the message is a 
+	 *            {@code TextMessage}, {@code ObjectMessage}, {@code MapMessage} 
+	 *            or {@code BytesMessage} and the message has no body, 
+	 *            then the above does not apply and this parameter may be set to any type;
+	 *            the returned value will always be null.<br/>
+	 *            If the message is a {@code Message} (but not one of its subtypes)
+	 *            then this parameter may be set to any type;
+	 *            the returned value will always be null.
+	 * 
+	 * @return the message body
+	 * 
+	 * @exception MessageFormatException
+	 * 				  <ul>
+	 *                <li>if the message is a {@code StreamMessage}
+	 *                <li> if the message body cannot be assigned to 
+	 *                the specified type 
+	 *                <li> if the message is an {@code ObjectMessage} and object
+	 *                deserialization fails.
+	 *                </ul>
+	 *                
+	 * @exception JMSException
+	 *                if the JMS provider fails to get the message body due to
+	 *                some internal error.
+	 */
+	<T> T getBody(Class<T> c) throws JMSException;
+
+	/**
+	 * Returns whether the message body is capable of being assigned to the
+	 * specified type. If this method returns true then a subsequent call to the
+	 * method {@code getBody} on the same message with the same type argument would not throw a
+	 * MessageFormatException.
+	 * <p>
+	 * If the message is a {@code StreamMessage} then false is always returned. 
+	 * If the message is a {@code ObjectMessage} and object deserialization
+	 * fails then false is returned. If the message has no body then any type may be specified and true is
+	 * returned.
+	 * 
+	 * @param c
+	 *            The specified type <br/>
+	 *            If the message is a {@code TextMessage} then this method will
+	 *            only return true if this parameter is set to
+	 *            {@code String.class} or another type to which a {@code String}
+	 *            is assignable. <br/>
+	 *            If the message is a {@code ObjectMessage} then this
+	 *            method will only return true if this parameter is set to
+	 *            {@code java.io.Serializable.class} or another class to
+	 *            which the body is assignable. <br/>
+	 *            If the message is a {@code MapMessage} then this method
+	 *            will only return true if this parameter is set to
+	 *            {@code java.util.Map.class} (or {@code java.lang.Object.class}). <br/>
+	 *            If the message is a {@code BytesMessage} then this this
+	 *            method will only return true if this parameter is set to
+	 *            {@code byte[].class} (or {@code java.lang.Object.class}). <br/>
+	 *            If the message is a 
+	 *            {@code TextMessage}, {@code ObjectMessage}, {@code MapMessage} 
+	 *            or {@code BytesMessage} and the message has no body, 
+	 *            then the above does not apply and this method will return true
+	 *            irrespective of the value of this parameter.<br/>
+	 *            If the message is a 
+	 *            {@code Message} (but not one of its subtypes)
+	 *            then this method will return true
+	 *            irrespective of the value of this parameter.          
+	 * 
+	 * @return whether the message body is capable of being assigned to the
+	 *         specified type
+	 * 
+	 * @exception JMSException
+	 *                if the JMS provider fails to return a value due to some
+	 *                internal error.
+	 */
+	boolean isBodyAssignableTo(Class c) throws JMSException;    
 }

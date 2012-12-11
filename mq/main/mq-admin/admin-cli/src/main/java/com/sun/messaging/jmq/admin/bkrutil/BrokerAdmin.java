@@ -2860,6 +2860,7 @@ public class BrokerAdmin extends BrokerAdminConn  {
         Globals.stdOutPrintln("\tDurableInfo:");
         Globals.stdOutPrintln("\t  name=" + durInfo.name);
         Globals.stdOutPrintln("\t  clientID=" + durInfo.clientID);
+        Globals.stdOutPrintln("\t  isDurable=" + durInfo.isDurable);
         Globals.stdOutPrintln("\t  nMessages=" + durInfo.nMessages);
         Globals.stdOutPrintln("\t  isActive=" + durInfo.isActive);
         Globals.stdOutPrintln("\t  ConsumerInfo=" + durInfo.consumer);

@@ -63,7 +63,8 @@ static const UTF8String DMQ("mq.sys.dmq");
 MessageConsumer::MessageConsumer(Session * const sessionArg,
                                  Destination * const destinationArg,
                                  const PRBool isDurableArg,
-                                 const UTF8String * const durableNameArg,
+                                 const PRBool isSharedArg,
+                                 const UTF8String * const subscriptionNameArg,
                                  const UTF8String * const messageSelectorArg,
                                  const PRBool noLocalArg,
                                  MQMessageListenerFunc messageListenerArg,
@@ -74,22 +75,25 @@ MessageConsumer::MessageConsumer(Session * const sessionArg,
   MQError errorCode = MQ_SUCCESS;
   ASSERT( sessionArg != NULL );
   ASSERT( destinationArg != NULL );
-  ASSERT( isDurableArg == (durableNameArg != NULL) );
 
   init();
   NULLCHK( sessionArg );
   NULLCHK( destinationArg );
-  if (isDurableArg == PR_TRUE && durableNameArg == NULL) {
+  if (isDurableArg == PR_TRUE && subscriptionNameArg == NULL) {
     ERRCHK( MQ_CONSUMER_NO_DURABLE_NAME );
+  }
+  if (isSharedArg == PR_TRUE && subscriptionNameArg == NULL) {
+    ERRCHK( MQ_CONSUMER_NO_SUBSCRIPTION_NAME );
   }
   
   // Set member variables to parameters
   this->session = sessionArg;
   this->isDurable = isDurableArg;
-  if (durableNameArg != NULL) {
-    this->durableName = (UTF8String*)durableNameArg->clone();
+  this->isShared = isSharedArg;
+  if (subscriptionNameArg != NULL) {
+    this->subscriptionName = (UTF8String*)subscriptionNameArg->clone();
   } else {
-    this->durableName = NULL;
+    this->subscriptionName = NULL;
   }
   if (messageSelectorArg != NULL) {
     this->messageSelector = (UTF8String*)messageSelectorArg->clone();
@@ -101,9 +105,14 @@ MessageConsumer::MessageConsumer(Session * const sessionArg,
     this->noLocal = PR_FALSE;
   } else {
     this->noLocal = noLocalArg;
-    CNDCHK( (this->durableName != NULL && this->noLocal == PR_TRUE && 
-             this->session->getConnection()->getClientID() == NULL), 
-            MQ_NOLOCAL_DURABLE_CONSUMER_WITHOUT_CLIENTID );
+    CNDCHK( (this->isDurable && 
+              this->noLocal == PR_TRUE && 
+              this->session->getConnection()->getClientID() == NULL), 
+            MQ_NOLOCAL_DURABLE_CONSUMER_NO_CLIENTID );
+    CNDCHK( (this->isShared && 
+              this->noLocal == PR_TRUE && 
+              this->session->getConnection()->getClientID() == NULL), 
+            MQ_NOLOCAL_SHARED_SUBSCRIPTION_NO_CLIENTID );
   }
 
   this->messageListener = messageListenerArg;
@@ -151,7 +160,7 @@ Cleanup:
 
   // Have connection delete the receive queues through session.
   DELETE( this->receiveQueue );
-  DELETE( this->durableName );
+  DELETE( this->subscriptionName );
   DELETE( this->messageSelector );
 
   this->isInitialized = PR_FALSE;
@@ -170,7 +179,7 @@ MessageConsumer::~MessageConsumer()
 
   this->close();
   DELETE( this->receiveQueue );
-  DELETE( this->durableName );
+  DELETE( this->subscriptionName );
   DELETE( this->messageSelector );
   this->isInitialized = PR_FALSE;
 
@@ -189,8 +198,9 @@ MessageConsumer::init()
   this->session       = NULL;
   this->destination   = NULL;
   this->isDurable     = PR_FALSE;
+  this->isShared      = PR_FALSE;
   this->isTopic       = PR_FALSE;
-  this->durableName   = NULL;
+  this->subscriptionName   = NULL;
   this->messageSelector  = NULL;
   this->noLocal       = PR_FALSE;
   this->consumerID    = LL_Zero();
@@ -329,6 +339,17 @@ MessageConsumer::getIsDurable() const
  *
  */
 PRBool
+MessageConsumer::getIsShared() const
+{
+  CHECK_OBJECT_VALIDITY();
+
+  return this->isShared;
+}
+
+/*
+ *
+ */
+PRBool
 MessageConsumer::getNoLocal() const
 {
   CHECK_OBJECT_VALIDITY();
@@ -340,11 +361,11 @@ MessageConsumer::getNoLocal() const
  *
  */
 const UTF8String *
-MessageConsumer::getDurableName() const
+MessageConsumer::getSubscriptionName() const
 {
   CHECK_OBJECT_VALIDITY();
 
-  return this->durableName;
+  return this->subscriptionName;
 }
 
 const UTF8String *

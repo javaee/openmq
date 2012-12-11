@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -50,6 +50,8 @@ import javax.resource.spi.work.*;
 import javax.resource.spi.endpoint.*;
 
 import java.lang.reflect.Method;
+import com.sun.messaging.jmq.jmsclient.ConnectionMetaDataImpl;
+import com.sun.messaging.jmq.jmsclient.MessageImpl;
 import com.sun.messaging.jms.ra.api.JMSRAOnMessageRunner;
 
 /**
@@ -241,6 +243,18 @@ public class OnMessageRunner implements Work, JMSRAOnMessageRunner {
         int exRedeliveryInterval = spec.getEndpointExceptionRedeliveryInterval();
         //Deliver message to msgEndpoint
         boolean redeliver = true;
+        int msgRedeliveryCount = 0;
+        int retryCount = 0;
+        try {
+            if (this.useDirect) {
+                msgRedeliveryCount = dpMsg.getIntProperty(ConnectionMetaDataImpl.JMSXDeliveryCount);
+                dpMsg.setClientRetries(0);
+            } else {
+                msgRedeliveryCount = mqmsg.getIntProperty(ConnectionMetaDataImpl.JMSXDeliveryCount);
+                mqmsg.setClientRetries(0);
+            }
+        } catch (JMSException e) {}
+        int redeliveryCount = (msgRedeliveryCount > 1) ? (msgRedeliveryCount - 1) : 0;
         while (redeliver == true) {
             try {
                 if (transactedDelivery) {
@@ -258,15 +272,27 @@ public class OnMessageRunner implements Work, JMSRAOnMessageRunner {
                         }
                     }
                     //System.err.println("MQRA:OMR:run:Deliver Msg:JMSRedeliver="+message.getJMSRedelivered()+" Msg="+message.toString());
+                    redeliveryCount++;
+                    if (redeliveryCount > 1) {
+                        if (this.useDirect) {
+                            ((DirectPacket) message).updateDeliveryCount(redeliveryCount);
+                        } else {
+                            ((MessageImpl) message).updateDeliveryCount(redeliveryCount);
+                        }
+                    }
                     ((javax.jms.MessageListener)msgEndpoint).onMessage(message);
                     redeliver = false;
                     //System.err.println("MQRA:OMR:run:Delivered successfully-Msg="+message.toString());
                     try {
                         if (this.useDirect) {
+                            if (redeliveryCount > 1)
+                                dpMsg.updateDeliveryCount(redeliveryCount);
                             //Acknowledge direct message
                             this.dpMsg._acknowledgeThisMessageForMDB(this.dxar);
                             this.dxar.setRollback(false, null);
                         } else {
+                            if (redeliveryCount > 1)
+                                mqmsg.updateDeliveryCount(redeliveryCount);
                             mqsess.acknowledgeFromRAEndpoint(mqmsg, xar);
                             //System.err.println("MQRA:OMR:run:Acknowledged successfully");
                             //System.err.println("MQRA:OMR:run:omrId="+omrId+" msg acknowledged-msg="+mqmsg.toString());
@@ -283,6 +309,12 @@ public class OnMessageRunner implements Work, JMSRAOnMessageRunner {
                 } catch (Exception rte) {
                 	_loggerIM.log(Level.WARNING,_lgrMID_WRN +"run:Caught Exception from onMessage():Redelivering:",rte);
                     try {
+                        retryCount++;
+                        if (this.useDirect) {
+                            dpMsg.setClientRetries(retryCount);
+                        } else {
+                            mqmsg.setClientRetries(retryCount);
+                        }
                         message.setJMSRedelivered(true);
                         if(message instanceof BytesMessage){
                         	((BytesMessage)message).reset();

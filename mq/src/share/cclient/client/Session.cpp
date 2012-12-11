@@ -630,7 +630,8 @@ Cleanup:
 iMQError 
 Session::createConsumer(Destination * const destination, 
                         const PRBool isDurable,
-                        const UTF8String * const durableName, 
+                        const PRBool isShared,
+                        const UTF8String * const subscriptionName, 
                         const UTF8String * const messageSelector, 
                         const PRBool noLocal,
                         MQMessageListenerFunc messageListener,
@@ -649,21 +650,31 @@ Session::createConsumer(Destination * const destination,
 
   ERRCHK( checkSessionState() );
 
-  // You can only have durable topics.  And isDurable is true iff durableName is not NULL
+  // You can only have durable or shared subscription on topics.
   CNDCHK( isDurable && destination->getIsQueue(), MQ_QUEUE_CONSUMER_CANNOT_BE_DURABLE );
-  if (isDurable) {
-    if (durableName == NULL) {
-      ERRCHK( MQ_CONSUMER_NO_DURABLE_NAME );
+  CNDCHK( isShared && destination->getIsQueue(), MQ_SHARED_SUBSCRIPTION_NOT_TOPIC );
+  if (isDurable || isShared) {
+    if (subscriptionName == NULL) {
+        if (isDurable) {
+          ERRCHK( MQ_CONSUMER_NO_DURABLE_NAME );
+        }
+        if (isShared) {
+          ERRCHK( MQ_CONSUMER_NO_SUBSCRIPTION_NAME );
+        }
     }
-    ERRCHK( connection->setClientID() ); 
+    if (isDurable && !isShared) {  
+      ERRCHK( connection->setClientID(PR_FALSE) ); 
+    } else {
+      ERRCHK( connection->setClientID(PR_TRUE) ); 
+    }
   }
 
   // Create the consumer
-  MEMCHK( *consumer = new MessageConsumer(this, destination, isDurable, durableName,
-                                          messageSelector, noLocal, messageListener, messageListenerCallbackData) );
-  CNDCHK( isDurable && !durableName->equals((*consumer)->getDurableName()), IMQ_OUT_OF_MEMORY );
-  CNDCHK( messageSelector != NULL && !messageSelector->equals((*consumer)->getMessageSelector()), IMQ_OUT_OF_MEMORY );
+  MEMCHK( *consumer = new MessageConsumer(this, destination, isDurable, isShared, subscriptionName,
+                          messageSelector, noLocal, messageListener, messageListenerCallbackData) );
   MQ_ERRCHK_TRACE( (*consumer)->getInitializationError(), FUNCNAME );
+  CNDCHK( (isDurable || isShared) && !subscriptionName->equals((*consumer)->getSubscriptionName()), IMQ_OUT_OF_MEMORY );
+  CNDCHK( messageSelector != NULL && !messageSelector->equals((*consumer)->getMessageSelector()), IMQ_OUT_OF_MEMORY );
 
   ERRCHK( sessionMutex.trylock(&lockedByMe) );
   ERRCHK( checkSessionState() );
@@ -1061,7 +1072,7 @@ Session::unsubscribeDurableConsumer(const UTF8String * const durableName)
   // Make sure that no active consumer on this session has this durable name
   ERRCHK( consumerTable.operationAll(MessageConsumerTable::UNSUBSCRIBE_DURABLE, durableName) );
 
-  ERRCHK( connection->setClientID() );
+  ERRCHK( connection->setClientID(PR_TRUE) );
   ERRCHK( connection->unsubscribeDurableConsumer(durableName) );
 
   return MQ_SUCCESS;
@@ -1571,7 +1582,7 @@ Session::testDurableConsumer(Connection * const connection)
   // Create a producer and consumer
   //  ERRCHK( pubSession->createProducer(pubDestination, &producer) );
   ERRCHK( pubSession->createProducer(&producer) );
-  ERRCHK( subSession->createConsumer(subDestination, PR_TRUE, &durableName, 
+  ERRCHK( subSession->createConsumer(subDestination, PR_TRUE, PR_FALSE, &durableName, 
                                        NULL, PR_FALSE, NULL, NULL, &consumer) );
   ASSERT( consumer->getIsInitialized() );
 
@@ -1613,7 +1624,7 @@ Session::testDurableConsumer(Connection * const connection)
   
   // Bring the durable consumer back up, and receive the rest of the messages
   ERRCHK( subSession->createDestination(&destinationName, PR_FALSE, &subDestination) );
-  ERRCHK( subSession->createConsumer(subDestination, PR_TRUE, &durableName, 
+  ERRCHK( subSession->createConsumer(subDestination, PR_TRUE, PR_FALSE, &durableName, 
                                        NULL, PR_FALSE, NULL, NULL, &consumer) );
   ASSERT( consumer->getIsInitialized() );
   // Receive TOTAL_MESSAGES_DURSUB messages and acknowledge the last one
@@ -1734,7 +1745,7 @@ Session::test(Session * const session)
   // Create a producer and consumer
   //ERRCHK( session->createProducer(pubDestination, &producer) );
   ERRCHK( session->createProducer(pubDestination, &producer) );
-  ERRCHK( session->createConsumer(subDestination, PR_FALSE, NULL, 
+  ERRCHK( session->createConsumer(subDestination, PR_FALSE, PR_FALSE, NULL, 
                                  NULL, PR_FALSE, NULL, NULL, &consumer) );
   ASSERT( consumer->getIsInitialized() );
 

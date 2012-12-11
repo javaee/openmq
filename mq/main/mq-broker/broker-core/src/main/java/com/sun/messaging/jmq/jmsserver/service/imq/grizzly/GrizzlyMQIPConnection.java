@@ -136,9 +136,13 @@ public class GrizzlyMQIPConnection extends IMQIPConnection implements Runnable
             return;
         }
         try {
+            if (getDEBUG() || getDumpPacket() || getDumpOutPacket()) {
+                dumpControlPacket(msg);
+            }
             grizzlyConn.write(msg);
         } catch (Exception e) {
-            logger.logStack(logger.WARNING, "Failed to send control message ", e);
+            logger.logStack(logger.WARNING, 
+            "Failed to send control packet "+msg+" to "+grizzlyConn, e);
         }
     }
 
@@ -165,7 +169,7 @@ public class GrizzlyMQIPConnection extends IMQIPConnection implements Runnable
     @Override
     protected boolean writeOutPacket(Packet p) throws IOException {
         if (DEBUG) {
-            logger.log(Logger.INFO, "GrizzlyMQIPConnection:writeOutPacket: "+p);
+            logger.log(Logger.INFO, "GrizzlyMQIPConnection:writeOutPacket("+p+") to "+grizzlyConn);
         }
         grizzlyConn.write(p);
         return true; //XXX

@@ -144,6 +144,28 @@ class PriorityQueue implements MessageQueue {
         qsize ++;
 
     }
+    
+    /**
+     * Add an object to the front of the queue based on the priority of the obj.
+     * The priority of nobj is obtained from ReadOnlyPacket or MessageImpl.
+     * @param nobj new object to be added to the front of the queue.
+     *
+     * @see getPriority
+     */
+    public synchronized void
+    enqueueFirst(Object nobj) {
+
+        int priority = getPriority(nobj);
+
+        if ( qlist [priority] == null ) {
+            qlist [priority] = new LinkedList ();
+        }
+
+        qlist [priority].addFirst(nobj);
+
+        qsize ++;
+
+    }
 
     /**
      * get JMS message priority.

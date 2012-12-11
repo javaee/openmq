@@ -809,9 +809,10 @@ public class Topic extends Destination
         m.put(SHARED_PREFETCH, new Integer(sharedPrefetch));
     }
 
+    @Override
     public void setDestinationProperties(Map m) 
-        throws BrokerException
-    {
+    throws BrokerException {
+
         super.setDestinationProperties(m);
         if (m.get(MAX_SHARE_CONSUMERS) != null) {
            try {
@@ -840,6 +841,7 @@ public class Topic extends Destination
     }
 
     
+    @Override
     public void setMaxSharedConsumers(int max) {
        maxSharedConsumers = max;
     }
@@ -847,6 +849,7 @@ public class Topic extends Destination
        sharedPrefetch = prefetch;
     }
 
+    @Override
     public int getMaxNumSharedConsumers() {
         return maxSharedConsumers;
     }

@@ -52,6 +52,8 @@ import com.sun.messaging.AdministeredObject;
 import com.sun.messaging.DestinationConfiguration;
 
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Hashtable;
 import java.io.*;
@@ -523,6 +525,8 @@ public class MessageImpl
 
   protected boolean shouldCompress = false;
 
+  protected int clientRetries = 0;
+
   public static final String JMS_SUN_COMPRESS = "JMS_SUN_COMPRESS";
 
   //public static final String JMS_SUN_COMPRESS_LEVEL = "JMS_SUN_COMPRESS_LEVEL";
@@ -835,7 +839,7 @@ public class MessageImpl
 			// This is OK
 		} else {
 			String errorString = AdministeredObject.cr.getKString(ClientResources.X_BAD_PROPERTY_OBJECT_TYPE, name);
-			JMSException jmse = new MessageFormatException(errorString, ClientResources.X_BAD_PROPERTY_OBJECT_TYPE);
+			JMSException jmse = new com.sun.messaging.jms.MessageFormatException(errorString, ClientResources.X_BAD_PROPERTY_OBJECT_TYPE);
 			ExceptionHandler.throwJMSException(jmse);
 		}
 	}
@@ -2310,16 +2314,115 @@ public class MessageImpl
     return temp;
   }
 
-  /*  protected Object clone () {
-        //XXX BUG chiaming: properties must be cloned.
-        MessageImpl message = null;
-        try {
-            message = (MessageImpl) super.clone();
-            message.pkt = (ReadWritePacket) pkt.clone();
-        } catch ( CloneNotSupportedException e ) {
-            e.printStackTrace();
-        }
+	@Override
+	public <T> T getBody(Class<T> c) throws JMSException {
+		return _getBody(this,c);
+	}
+  
+	public static <T> T _getBody(Message message, Class<T> c) throws JMSException {
 
-        return message;
-    }  */
+		if (message instanceof TextMessage) {
+			TextMessage textMessage = (TextMessage) message;
+			String payload = textMessage.getText();
+			if (payload == null) {
+				return null;
+			}
+			if (c.isAssignableFrom(String.class)) {
+				return (T) payload;
+			} else {
+				// "Message body is a {0} and cannot be assigned to the specified class {1}"
+				String errorString = AdministeredObject.cr.getKString(ClientResources.X_BODY_CLASS_INVALID, String.class, c);
+				MessageFormatException mfre = new com.sun.messaging.jms.MessageFormatException(errorString, ClientResources.X_BODY_CLASS_INVALID);
+				ExceptionHandler.throwJMSException(mfre);
+			}
+		} else if (message instanceof ObjectMessage) {
+			ObjectMessage objectMessage = (ObjectMessage) message;
+			Serializable payload = objectMessage.getObject();
+			if (payload == null) {
+				return null;
+			}
+			if (c.isAssignableFrom(payload.getClass())) {
+				return (T) payload;
+			} else {
+				// "Message body is a {0} and cannot be assigned to the specified class {1}"
+				String errorString = AdministeredObject.cr.getKString(ClientResources.X_BODY_CLASS_INVALID, payload.getClass(), c);
+				MessageFormatException mfre = new com.sun.messaging.jms.MessageFormatException(errorString, ClientResources.X_BODY_CLASS_INVALID);
+				ExceptionHandler.throwJMSException(mfre);
+			}
+		} else if (message instanceof BytesMessage) {
+			BytesMessage bytesMessage = (BytesMessage) message;
+			bytesMessage.reset();
+			long numBytes = bytesMessage.getBodyLength();
+			if (numBytes==0) {
+				return null;
+			}
+			byte[] payload = new byte[(int) numBytes];
+			bytesMessage.readBytes(payload);
+			bytesMessage.reset();
+			if (c.isAssignableFrom(byte[].class)) {
+				return (T) payload;
+			} else {
+				// "Message body is a {0} and cannot be assigned to the specified class {1}"
+				String errorString = AdministeredObject.cr.getKString(ClientResources.X_BODY_CLASS_INVALID, byte[].class, c);
+				MessageFormatException mfre = new com.sun.messaging.jms.MessageFormatException(errorString, ClientResources.X_BODY_CLASS_INVALID);
+				ExceptionHandler.throwJMSException(mfre);
+			}
+		} else if (message instanceof MapMessage) {
+			MapMessage mapMessage = (MapMessage) message;
+			if (!mapMessage.getMapNames().hasMoreElements()){
+				return null;
+			}
+			Map<String, Object> payload = new HashMap<String, Object>();
+			for (Enumeration<String> mapNamesEnum = mapMessage.getMapNames(); mapNamesEnum.hasMoreElements();) {
+				String thisName = mapNamesEnum.nextElement();
+				payload.put(thisName, mapMessage.getObject(thisName));
+			}
+			if (c.isAssignableFrom(Map.class)) {
+				return (T) payload;
+			} else {
+				// "Message body is a {0} and cannot be assigned to the specified class {1}"
+				String errorString = AdministeredObject.cr.getKString(ClientResources.X_BODY_CLASS_INVALID, Map.class, c);
+				MessageFormatException mfre = new com.sun.messaging.jms.MessageFormatException(errorString, ClientResources.X_BODY_CLASS_INVALID);
+				ExceptionHandler.throwJMSException(mfre);
+			}
+		} else if (message instanceof StreamMessage) {
+			// "The body of a StreamMessage cannot be returned using this method"
+			String errorString = AdministeredObject.cr.getKString(ClientResources.X_MESSAGE_TYPE_NOT_SUPPORTED);
+			MessageFormatException mfre = new com.sun.messaging.jms.MessageFormatException(errorString, ClientResources.X_MESSAGE_TYPE_NOT_SUPPORTED);
+			ExceptionHandler.throwJMSException(mfre);
+		} else {
+			// must be a Message
+			// this doesn't have a payload
+			return null;
+
+		}
+		// never reached but needed to keep compiler happy
+		return null;
+	}
+	
+	@Override
+	public boolean isBodyAssignableTo(Class c) throws JMSException {
+		return _isBodyAssignableTo(this, c);
+	}
+
+	public static boolean _isBodyAssignableTo(Message message, Class c) throws JMSException {
+		try {
+			message.getBody(c);
+		} catch (MessageFormatException mfe){
+			return false;
+		}
+		return true;
+	}
+
+    public void updateDeliveryCount(int newDeliveryCount) {
+        setProperty(ConnectionMetaDataImpl.JMSXDeliveryCount, Integer.valueOf(newDeliveryCount));
+    }
+
+    public int getClientRetries() {
+        return clientRetries;
+    }
+
+    public void setClientRetries(int retryCount) {
+        clientRetries = retryCount;
+    }
 }

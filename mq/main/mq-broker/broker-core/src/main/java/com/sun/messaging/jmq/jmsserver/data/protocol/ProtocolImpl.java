@@ -120,6 +120,9 @@ public class ProtocolImpl implements Protocol
     PacketRouter pr = null; 
     private DestinationList DL = Globals.getDestinationList();
 
+    Logger logger = Globals.getLogger();
+    BrokerResources br = Globals.getBrokerResources();
+
     public ProtocolImpl(PacketRouter router)
     {
         pr = router;
@@ -227,7 +230,7 @@ public class ProtocolImpl implements Protocol
            throws BrokerException, IOException
     {
         if (DEBUG) {
-        Globals.getLogger().log(Logger.INFO, 
+        logger.log(Logger.INFO, 
         "ProtocolImpl.ACKNOWLEDGE:TID="+tid+", ackType="+ackType+", ids="+ids+
         ", cids="+cids+", validate="+validate+", deadComment="+deadComment+
         ", deliverCnt="+deliverCnt+", exception="+exception);
@@ -516,31 +519,52 @@ public class ProtocolImpl implements Protocol
        *@param session session associated with the consumer
        *@param selector selector string (or null if none)
        *@param clientid clientid or null if none
-       *@param durablename durable name or null if none
+       *@param subscriptionName if dest is Topic and 
+       *       if either durable true or share true, the subscription name
+       *@param durable if dest is Topic, if true, this is a durable subscription
+       *@param share if dest is Topic, if true, this is a shared subscription
+       *@param jmsshare if dest is Topic, 
+       *       if true and share true, this is a JMS 2.0 Shared Subscription
+       *       if false and share true, this is a MQ Shared Subscription
        *@param nolocal is NoLocal turned on (topics only)
        *@param size prefetch size (or -1 if none)
-       *@param shared is this a shared connection
        *@param creator_uid a unique id to use as the creator for this consumer
        *                   which is used for indempotence (usually sysmessageid)
        *@return a consumer
        */
       public Consumer createConsumer(Destination d, IMQConnection con,
-                        Session session, String selector, String clientid,
-                        String durablename, boolean nolocal, int size,
-                        boolean shared, String creator_uid, boolean acc, boolean useFlowControl)
-        throws BrokerException, SelectorFormatException, IOException
-      {
-          if (acc)
+          Session session, String selector, String clientid,
+          String subscriptionName, boolean durable, boolean share, 
+          boolean jmsshare, boolean nolocal, 
+          int size, String creator_uid, boolean acc, boolean useFlowControl)
+          throws BrokerException, SelectorFormatException, IOException {
+
+          if (acc) {
               checkAccessPermission(PacketType.ADD_CONSUMER, d, con);
+          }
           ConsumerHandler handler = (ConsumerHandler)
                       pr.getHandler(PacketType.ADD_CONSUMER);
           String selectorstr = selector;
           if (selectorstr != null && selectorstr.trim().length() == 0) {
               selectorstr = null;
           }
+          if (d.isTemporary()) {
+              if (durable) {
+                  String emsg = br.getKString(br.X_INVALID_DEST_DURA_CONSUMER,
+                                ""+d.getDestinationUID(), ""+subscriptionName);
+                  logger.log(Logger.ERROR, emsg);
+                  throw new BrokerException(emsg, Status.PRECONDITION_FAILED);
+              }
+              if (share) {
+                  String emsg = br.getKString(br.X_INVALID_DEST_SHARE_CONSUMER,
+                                ""+d.getDestinationUID(), ""+subscriptionName);
+                  logger.log(Logger.ERROR, emsg);
+                  throw new BrokerException(emsg, Status.PRECONDITION_FAILED);
+              }
+          }
           Consumer[] c = handler.createConsumer(d.getDestinationUID(), con,
-                       session, selectorstr, clientid, durablename,
-                       nolocal, size, shared, creator_uid, false, useFlowControl);
+                       session, selectorstr, clientid, subscriptionName, durable,
+                       share, jmsshare, nolocal, size, creator_uid, false, useFlowControl);
           if (c[2] != null)
               c[2].resume("Resuming from protocol");
           if (c[1] != null)
@@ -597,7 +621,7 @@ public class ProtocolImpl implements Protocol
               throws BrokerException {
 
           if (DEBUG) {
-          Globals.getLogger().log(Logger.INFO,
+          logger.log(Logger.INFO,
           "ProtocolImpl.END TRANSACTION:TID="+id+", XID="+xid+", xaFlags="+xaFlags);
           }
           
@@ -634,7 +658,7 @@ public class ProtocolImpl implements Protocol
           throws BrokerException
      {
           if (DEBUG) {
-          Globals.getLogger().log(Logger.INFO,
+          logger.log(Logger.INFO,
           "ProtocolImpl.START TRANSACTION:XID="+xid+", type="+type+", conn="+con);
           }
           
@@ -685,7 +709,7 @@ public class ProtocolImpl implements Protocol
                         xaFlags, PacketType.START_TRANSACTION, 
                         false, o.toString());
           if (DEBUG) {
-          Globals.getLogger().log(Logger.INFO, 
+          logger.log(Logger.INFO, 
           "ProtocolImpl.STARTED TRANSACTION:TID="+id+", XID="+xid+", type="+type+", con="+con);
           }
 
@@ -708,7 +732,7 @@ public class ProtocolImpl implements Protocol
           throws BrokerException
      {
           if (DEBUG) {
-          Globals.getLogger().log(Logger.INFO,
+          logger.log(Logger.INFO,
           "ProtocolImpl.COMMIT TRANSACTION:TID="+id+", XID="+xid+", xaFlags="+xaFlags);
           }
           
@@ -775,7 +799,7 @@ public class ProtocolImpl implements Protocol
           throws BrokerException
      {
           if (DEBUG) {
-          Globals.getLogger().log(Logger.INFO,
+          logger.log(Logger.INFO,
           "ProtocolImpl.PREPARE TRANSACTION:TID="+id+", xaFlags="+xaFlags);
           }
 
@@ -813,7 +837,7 @@ public class ProtocolImpl implements Protocol
           throws BrokerException
      {
           if (DEBUG) {
-          Globals.getLogger().log(Logger.INFO, 
+          logger.log(Logger.INFO, 
           "ProtocolImpl.ROLLBACK TRANSACTION:TID="+id+", XID="+xid+
           ", xaFlags="+xaFlags+", redeliver="+redeliver+", setRedeliver="+setRedeliver);
           }
@@ -899,7 +923,7 @@ public class ProtocolImpl implements Protocol
      public JMQXid[] recoverTransaction(TransactionUID id)
      {
          if (DEBUG) {
-         Globals.getLogger().log(Logger.INFO, "ProtocolImpl.RECOVER TRANSACTION:TID="+id);
+         logger.log(Logger.INFO, "ProtocolImpl.RECOVER TRANSACTION:TID="+id);
          }
 
          TransactionHandler handler = (TransactionHandler)
@@ -1052,7 +1076,7 @@ public class ProtocolImpl implements Protocol
                Producer pausedProducer = handler.checkFlow(msg, con);
                boolean transacted = (msg.getTransactionID() != 0);
                if (DEBUG) {
-               Globals.getLogger().log(Logger.INFO, 
+               logger.log(Logger.INFO, 
                "ProtocolImpl.PROCESS MESSAGE["+msg+"]TID="+msg.getTransactionID()+" on connection "+con);
                }
     
@@ -1085,7 +1109,7 @@ public class ProtocolImpl implements Protocol
                   handler.forwardMessage(d, ref, s);
              } catch (Exception e) {
                   Object[] emsg = { ref, d.getDestinationUID(), s };
-                  Globals.getLogger().logStack(Logger.WARNING,
+                  logger.logStack(Logger.WARNING,
                       Globals.getBrokerResources().getKString(
                       BrokerResources.X_ROUTE_PRODUCED_MSG_FAIL, emsg), e);
              }

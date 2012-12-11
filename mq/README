@@ -48,6 +48,15 @@ Message Queue Build Instructions
    set MAVEN_OPTS to "-Xmx512m -Xms256m -XX:MaxPermSize=512m".
 
 
+Message Queue Build Instructions for C Client Library
+-----------------------------------------------------
+1. Fill in necessary info for your platform in
+   $TOP/src/buildant/default.properties
+
+2. cd $TOP/main/packager-opensource
+   ant builddclient
+
+
 Message Queue Build Output
 --------------------------
 
@@ -100,3 +109,4 @@ Documentation
 -------------
 The latest documentation for Message Queue can be found on the GlassFish documentation page:
 http://glassfish.java.net/docs/index.html
+

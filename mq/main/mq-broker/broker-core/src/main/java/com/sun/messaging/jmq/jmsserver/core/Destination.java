@@ -4498,7 +4498,7 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
         notifyAttrUpdated(DestinationInfo.DEST_PREFETCH, 
 			oldVal, new Long(maxPrefetch));
     }
-    public void setMaxSharedConsumers(int prefetch) {
+    public void setMaxSharedConsumers(int max) {
         // does nothing for destinations
     }
     public void setSharedFlowLimit(int prefetch) {

@@ -60,5 +60,5 @@ public @interface JMSConnectionFactory {
      * Specifies the JNDI lookup name of a {@code javax.jms.ConnectionFactory}
      * to be used when injecting a {@code javax.jms.JMSContext} object.
      */
-    String value() default "";
+    String value();
 }

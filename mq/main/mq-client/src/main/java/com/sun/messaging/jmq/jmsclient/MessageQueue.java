@@ -74,6 +74,12 @@ public interface MessageQueue {
      * @param nobj new object to be enqueued
      */
     public void enqueue(Object nobj);
+    
+    /**
+     * Adds the specified object to the front of the queue.
+     * @param nobj new object to be added to the front of the queue
+     */
+    public void enqueueFirst(Object nobj);
 
     /**
      * Dequeues an element from the queue.

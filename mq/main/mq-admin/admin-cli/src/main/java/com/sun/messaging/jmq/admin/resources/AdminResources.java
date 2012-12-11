@@ -511,8 +511,10 @@ public class AdminResources extends MQResourceBundle {
 
     final public static String I_JMQCMD_DUR_NAME		= "A1430";
     final public static String I_JMQCMD_CLIENT_ID		= "A1431";
-    final public static String I_JMQCMD_DUR_NUM_MSG		= "A1432";
-    final public static String I_JMQCMD_DUR_STATE		= "A1433";
+    final public static String I_JMQCMD_SUB_NUM_MSG		= "A1432";
+    final public static String I_JMQCMD_SUB_STATE		= "A1433";
+    final public static String I_JMQCMD_SUB_NAME                = "A1434";
+    final public static String I_JMQCMD_DURABLE                 = "A1435";
 
     final public static String I_JMQCMD_BKR_HOST 		= "A1440";
     final public static String I_JMQCMD_PRIMARY_PORT 		= "A1441";
@@ -580,9 +582,9 @@ public class AdminResources extends MQResourceBundle {
     final public static String I_JMQCMD_UPDATE_DEST_NOOP	= "A1549";
     final public static String I_JMQCMD_UPDATE_DEST_SUC		= "A1550";
 
-    final public static String I_JMQCMD_LIST_DUR		= "A1551";
-    final public static String I_JMQCMD_LIST_DUR_SUC		= "A1552";
-    final public static String I_JMQCMD_LIST_DUR_FAIL		= "A1553";
+    final public static String I_JMQCMD_LIST_SUB	 =     "A1551";
+    final public static String I_JMQCMD_LIST_SUB_SUC		= "A1552";
+    final public static String I_JMQCMD_LIST_SUB_FAIL		= "A1553";
 
     final public static String I_JMQCMD_DESTROY_DUR             = "A1554";
     final public static String I_JMQCMD_DESTROY_DUR_SUC         = "A1555";
@@ -955,7 +957,7 @@ public class AdminResources extends MQResourceBundle {
     /**
      * New string for listing all durables
      */
-    final public static String I_JMQCMD_LIST_ALL_DUR		= "A1780";
+    final public static String I_JMQCMD_LIST_ALL_SUB		= "A1780";
     
     
     /*

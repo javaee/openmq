@@ -668,6 +668,13 @@ public class BrokerResources extends MQResourceBundle {
     final public static String I_CREATED_NEW_CONSUMER_FOR_OLD = "B1471";
     final public static String I_CLUSTER_ROUTER_PENDING_TXN_CHECK_THREAD_START = "B1472";
     final public static String I_CLUSTER_ROUTER_PENDING_TXN_CHECK_THREAD_EXIT = "B1473";
+    final public static String I_CLS_PROCESS_CACHED_TAKEOVERS_FORWARD = "B1474";
+    final public static String I_CLS_FORWARD_CACHED_TAKEOVERS = "B1475";
+    final public static String I_ADD_CONSUMER_IGNORE_SUBSCRIPTION_NAME = "B1476";
+    final public static String I_ADD_SHARE_CONSUMER_IGNORE_CLIENT_FLAG = "B1477";
+    final public static String I_CREATE_UNSHARED_DURA = "B1478";
+    final public static String I_CREATE_SHARED_DURA = "B1479";
+    final public static String I_CREATE_SHARED_NONDURA_SUB = "B1480";
 
     // 2000-2999 Warning Messages
     final public static String W_AUTH_FAILED	 	= "B2000";
@@ -969,6 +976,8 @@ public class BrokerResources extends MQResourceBundle {
     final public static String W_UNABLE_UPDATE_CLUSTER_TXN_COMPLETE_STATE = "B2273";
     final public static String W_UNABLE_GET_TXN_BROKERS_ON_TXN_COMPLETE = "B2274";
     final public static String W_IGNORE_REMOTE_MSG_SENT_FROM = "B2275";
+    final public static String W_DURA_SUB_NOT_FOUND_ON_ATTACH = "B2276";
+    final public static String W_NON_DURA_SUB_NOT_FOUND_ON_ATTACH = "B2277";
 
     // 3000-3999 Error Messages
     final public static String E_PERSISTENT_OPEN 	= "B3000";
@@ -1731,6 +1740,14 @@ public class BrokerResources extends MQResourceBundle {
     final public static String X_STORE_CHECK_EXISTENCE_TXN_AFTER_ADD_FAILURE = "B4431";
     final public static String X_NO_CLIENTID_NOLOCAL_DURA = "B4432";
     final public static String X_STORE_DELIVERED_ON_ADD_DELIVERYCOUNT = "B4433";
+    final public static String X_NO_CLIENTID_NOLOCAL_SHARE = "B4434";
+    final public static String X_DURABLE_EXIST_CONFLICT = "B4435";
+    final public static String X_INVALID_SUBSCRIPTION_NAME_DURA = "B4436";
+    final public static String X_INVALID_SUBSCRIPTION_NAME_SHARE = "B4437";
+    final public static String X_INVALID_DEST_DURA_CONSUMER = "B4438";
+    final public static String X_INVALID_DEST_SHARE_CONSUMER = "B4439";
+    final public static String X_REPLACE_ACTIVE_DURA = "B4440";
+    final public static String X_NON_DURA_SUB_CONFLICT = "B4441";
 
     /***************** End of message key constants *******************/
 

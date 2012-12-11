@@ -440,9 +440,10 @@ public class Queue extends Destination
     }
 
 
+    @Override
     public void setDestinationProperties(Map m) 
-        throws BrokerException
-    {
+    throws BrokerException {
+
         if (m.get(MAX_ACTIVE) != null) {
            try {
                setMaxActiveConsumers(((Integer)m.get(MAX_ACTIVE)).intValue());

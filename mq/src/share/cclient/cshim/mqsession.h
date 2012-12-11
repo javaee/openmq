@@ -159,6 +159,32 @@ MQCreateMessageConsumer(const MQSessionHandle     sessionHandle,
                         MQConsumerHandle *        consumerHandle);
 
 /**
+ * Creates a shared non-durable subscription on the specified Topic 
+ * destination with the given properties for synchronous receiving.
+ *
+ * @param sessionHandle the handle to the session for which to
+ *        create the message consumer
+ * @param destinationHandle the destination on which the consumer
+ *        receives messages
+ * @param subscriptionName the subscription name
+ * @param messageSelector the message selector
+ * @param noLocal if MQ_TRUE and the connection has client ID set, 
+ *        the subscription should not receive messages sent by a
+ *        producer on a connection with the same client ID
+ * @param consumerHandle the output handle to the newly created
+ *        consumer
+ * @return the status of the function call.  Pass this value to
+ *         MQStatusIsError to determine if the call was
+ *         successful.  */
+EXPORTED_SYMBOL MQStatus
+MQCreateSharedMessageConsumer(const MQSessionHandle     sessionHandle,
+                        const MQDestinationHandle destinationHandle,
+                        ConstMQString             subscriptionName,
+                        ConstMQString             messageSelector,
+                        MQBool                    noLocal,
+                        MQConsumerHandle *        consumerHandle);
+
+/**
  * Creates a durable message consumer with the given properties
  * for synchronous receiving.
  *
@@ -168,8 +194,8 @@ MQCreateMessageConsumer(const MQSessionHandle     sessionHandle,
  *        receives messages
  * @param durableName the name of the durable subscriber.  
  * @param messageSelector the messages selector
- * @param noLocal MQ_TRUE iff the consumer should not receive 
- *        messages sent by a producer on this connection
+ * @param noLocal if MQ_TRUE the consumer should not receive messages
+ *        sent by a producer on a connection with the same client ID
  * @param consumerHandle the output handle to the newly creaated
  *        consumer
  * @return the status of the function call.  Pass this value to
@@ -185,6 +211,32 @@ MQCreateDurableMessageConsumer(
                       MQConsumerHandle *        consumerHandle);
 
 /**
+ * Creates a shared durable subscription on the specified Topic 
+ * destination with the given properties for synchronous receiving.
+ *
+ * @param sessionHandle the handle to the session for which to
+ *        create the message consumer
+ * @param destinationHandle the destination on which the consumer
+ *        receives messages
+ * @param durableName the subscription name
+ * @param messageSelector the message selector
+ * @param noLocal if MQ_TRUE and the connection has client ID set, 
+ *        the subscription should not receive messages sent by a
+ *        producer on a connection with the same client ID
+ * @param consumerHandle the output handle to the newly created
+ *        consumer
+ * @return the status of the function call.  Pass this value to
+ *         MQStatusIsError to determine if the call was
+ *         successful.  */
+EXPORTED_SYMBOL MQStatus
+MQCreateSharedDurableMessageConsumer(const MQSessionHandle     sessionHandle,
+                        const MQDestinationHandle destinationHandle,
+                        ConstMQString             durableName,
+                        ConstMQString             messageSelector,
+                        MQBool                    noLocal,
+                        MQConsumerHandle *        consumerHandle);
+
+/**
  * Creates a message consumer for asynchronous receiving.  The session
  * that is represented by the sessionHandle must be created with 
  * MQ_SESSION_ASYNC_RECEIVE
@@ -197,7 +249,7 @@ MQCreateDurableMessageConsumer(
  * @param noLocal MQ_TRUE iff the consumer should not receive
  *        messages sent by a producer on this connection
  * @param messageListener the message listener callback function
- * @param messageListenerCallbackData void * data pointer that to be
+ * @param listenerCallbackData void * data pointer that to be
  *        passed to the message listener function when it is called
  * @param consumerHandle the output handle to the newly creaated
  *        consumer
@@ -207,6 +259,40 @@ MQCreateDurableMessageConsumer(
 EXPORTED_SYMBOL MQStatus
 MQCreateAsyncMessageConsumer(const MQSessionHandle     sessionHandle,
                              const MQDestinationHandle destinationHandle,
+                             ConstMQString             messageSelector,
+                             MQBool                    noLocal,
+                             MQMessageListenerFunc     messageListener,
+                             void *                    listenerCallbackData,
+                             MQConsumerHandle *        consumerHandle);
+
+
+/**
+ * Creates a shared non-durable subscription on the specified Topic
+ * destination for asynchronous receiving.  The session that is
+ * represented by the sessionHandle must be created with 
+ * MQ_SESSION_ASYNC_RECEIVE
+ *
+ * @param sessionHandle the handle to the session for which to
+ *        create the message consumer.
+ * @param destinationHandle the destination on which the consumer
+ *        receives messages
+ * @param subscriptionName the subscription name
+ * @param messageSelector the messages selector
+ * @param noLocal if MQ_TRUE and the connection has client ID set,
+ *        the subscription should not receive  messages sent by 
+ *        a producer on a connection that has the same client ID
+ * @param messageListener the message listener callback function
+ * @param listenerCallbackData void * data pointer that to be
+ *        passed to the message listener function when it is called
+ * @param consumerHandle the output handle to the newly creaated
+ *        consumer
+ * @return the status of the function call.  Pass this value to
+ *         MQStatusIsError to determine if the call was
+ *         successful.  */
+EXPORTED_SYMBOL MQStatus
+MQCreateAsyncSharedMessageConsumer(const MQSessionHandle     sessionHandle,
+                             const MQDestinationHandle destinationHandle,
+                             ConstMQString             subscriptionName,
                              ConstMQString             messageSelector,
                              MQBool                    noLocal,
                              MQMessageListenerFunc     messageListener,
@@ -227,7 +313,7 @@ MQCreateAsyncMessageConsumer(const MQSessionHandle     sessionHandle,
  * @param noLocal MQ_TRUE iff the consumer should not receive
  *        messages sent by a producer on this connection
  * @param messageListener the mesage listener callback function
- * @param messageListenerCallbackData void * data pointer that to be
+ * @param listenerCallbackData void * data pointer that to be
  *        passed to the message listener function when it is called
  * @param consumerHandle the output handle to the newly creaated
  *        consumer
@@ -245,6 +331,39 @@ MQCreateAsyncDurableMessageConsumer(
                            void *                    listenerCallbackData,
                            MQConsumerHandle *        consumerHandle);
 
+
+/**
+ * Creates a shared durable subscription on the specified Topic
+ * destination for asynchronous receiving.  The session that is
+ * represented by the sessionHandle must be created with 
+ * MQ_SESSION_ASYNC_RECEIVE
+ *
+ * @param sessionHandle the handle to the session for which to
+ *        create the message consumer.
+ * @param destinationHandle the destination on which the consumer
+ *        receives messages
+ * @param durableName the durable name
+ * @param messageSelector the messages selector
+ * @param noLocal if MQ_TRUE and the connection has client ID set,
+ *        the consumer should not receive  messages sent by  a
+ *        producer on a connection that has the same client ID
+ * @param messageListener the message listener callback function
+ * @param listenerCallbackData void * data pointer that to be
+ *        passed to the message listener function when it is called
+ * @param consumerHandle the output handle to the newly creaated
+ *        consumer
+ * @return the status of the function call.  Pass this value to
+ *         MQStatusIsError to determine if the call was
+ *         successful.  */
+EXPORTED_SYMBOL MQStatus
+MQCreateAsyncSharedDurableMessageConsumer(const MQSessionHandle sessionHandle,
+                             const MQDestinationHandle destinationHandle,
+                             ConstMQString             durableName,
+                             ConstMQString             messageSelector,
+                             MQBool                    noLocal,
+                             MQMessageListenerFunc     messageListener,
+                             void *                    listenerCallbackData,
+                             MQConsumerHandle *        consumerHandle);
 
 /**
  * Unsubscribes the durable message consumer with the given durable

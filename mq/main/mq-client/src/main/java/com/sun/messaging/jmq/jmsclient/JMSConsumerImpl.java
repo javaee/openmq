@@ -54,14 +54,18 @@ import javax.jms.InvalidDestinationException;
 import javax.jms.InvalidDestinationRuntimeException;
 import javax.jms.InvalidSelectorException;
 import javax.jms.InvalidSelectorRuntimeException;
+import javax.jms.IllegalStateException;
 import javax.jms.JMSConsumer;
 import javax.jms.JMSException;
 import javax.jms.JMSRuntimeException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
+import javax.jms.MessageFormatException;
+import javax.jms.MessageFormatRuntimeException;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
+import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
 
@@ -72,14 +76,14 @@ import com.sun.messaging.jmq.jmsclient.resources.ClientResources;
 public class JMSConsumerImpl implements JMSConsumer, Traceable {
 	
 	JMSContextImpl context;
-	MessageConsumer messageConsumer;
+	MQMessageConsumer messageConsumer;
 	boolean closed=false;
 			
 	protected void initialiseConsumer(JMSContextImpl context, Destination destination) {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = context.getSession().createConsumer(destination);
+			messageConsumer = (MQMessageConsumer) context.getSession().createConsumer(destination);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (JMSException e) {
@@ -92,7 +96,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = context.getSession().createConsumer(destination,messageSelector);
+			messageConsumer = (MQMessageConsumer) context.getSession().createConsumer(destination,messageSelector);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (InvalidSelectorException e) {
@@ -108,7 +112,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = context.getSession().createConsumer(destination,messageSelector,noLocal);
+			messageConsumer = (MQMessageConsumer) context.getSession().createConsumer(destination,messageSelector,noLocal);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (InvalidSelectorException e) {
@@ -123,7 +127,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = context.getSession().createDurableConsumer(topic,name);
+			messageConsumer = (MQMessageConsumer) context.getSession().createDurableConsumer(topic,name);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (JMSException e) {
@@ -131,17 +135,48 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		}
 		if (context.getAutoStart()) context.start();
 	}
-	
-	
+
 	protected void initialiseDurableConsumer(JMSContextImpl context, Topic topic, String name, String messageSelector, boolean noLocal) {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = context.getSession().createDurableConsumer(topic,name,messageSelector,noLocal);
+			messageConsumer = (MQMessageConsumer) context.getSession().createDurableConsumer(topic,name,messageSelector,noLocal);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (InvalidSelectorException e) {
 			throw new MQInvalidSelectorRuntimeException(e);			
+		} catch (IllegalStateException e) {
+			throw new MQIllegalStateRuntimeException(e);			
+		} catch (JMSException e) {
+			throw new MQRuntimeException(e);
+		}
+		if (context.getAutoStart()) context.start();
+	}
+
+	protected void initialiseSharedDurableConsumer(JMSContextImpl context, Topic topic, String name) {
+		context.checkNotClosed();
+		this.context=context;
+		try {
+			messageConsumer = (MQMessageConsumer)context.getSession().createSharedDurableConsumer(topic,name);
+		} catch (InvalidDestinationException e) {
+			throw new MQInvalidDestinationRuntimeException(e);
+		} catch (JMSException e) {
+			throw new MQRuntimeException(e);
+		}
+		if (context.getAutoStart()) context.start();
+	}
+
+	protected void initialiseSharedDurableConsumer(JMSContextImpl context, Topic topic, String name, String messageSelector, boolean noLocal) {
+		context.checkNotClosed();
+		this.context=context;
+		try {
+			messageConsumer = (MQMessageConsumer) context.getSession().createSharedDurableConsumer(topic,name,messageSelector,noLocal);
+		} catch (InvalidDestinationException e) {
+			throw new MQInvalidDestinationRuntimeException(e);
+		} catch (InvalidSelectorException e) {
+			throw new MQInvalidSelectorRuntimeException(e);			
+		} catch (IllegalStateException e) {
+			throw new MQIllegalStateRuntimeException(e);			
 		} catch (JMSException e) {
 			throw new MQRuntimeException(e);
 		}
@@ -152,7 +187,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = context.getSession().createSharedConsumer(topic,sharedSubscriptionName);
+			messageConsumer = (MQMessageConsumer) context.getSession().createSharedConsumer(topic,sharedSubscriptionName);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);		
 		} catch (JMSException e) {
@@ -165,7 +200,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = context.getSession().createSharedConsumer(topic,sharedSubscriptionName,messageSelector);
+			messageConsumer = (MQMessageConsumer) context.getSession().createSharedConsumer(topic,sharedSubscriptionName,messageSelector);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (InvalidSelectorException e) {
@@ -180,11 +215,13 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = context.getSession().createSharedConsumer(topic,sharedSubscriptionName,messageSelector,noLocal);
+			messageConsumer = (MQMessageConsumer) context.getSession().createSharedConsumer(topic,sharedSubscriptionName,messageSelector,noLocal);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (InvalidSelectorException e) {
 			throw new MQInvalidSelectorRuntimeException(e);			
+		} catch (IllegalStateException e) {
+			throw new MQIllegalStateRuntimeException(e);		
 		} catch (JMSException e) {
 			throw new MQRuntimeException(e);
 		}
@@ -283,74 +320,44 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 	}
 
 	@Override
-	public <T> T receivePayload(Class<T> c) {
-		Message message = receive();
-		if (message==null){
-			return null;
-		} else {
-			return extractPayload(c, message);
-		}
+	public <T> T receiveBody(Class<T> c) {
+		checkNotClosed();
+		context.checkNotClosed();
+		try {
+			return messageConsumer.receiveBody(c);
+		} catch (MessageFormatException mfe) {
+			throw new MQMessageFormatRuntimeException(mfe);
+		} catch (JMSException e) {
+			throw new MQRuntimeException(e);
+		}	
 	}
 
 	@Override
-	public <T> T receivePayload(Class<T> c, long timeout) {
-		Message message = receive(timeout);
-		if (message==null){
-			return null;
-		} else {
-			return extractPayload(c, message);
-		}
-	}
-
-	@Override
-	public <T> T receivePayloadNoWait(Class<T> c) {
-		Message message = receiveNoWait();
-		if (message==null){
-			return null;
-		} else {
-			return extractPayload(c, message);
-		}
+	public <T> T receiveBody(Class<T> c, long timeout) {
+		checkNotClosed();
+		context.checkNotClosed();
+		try {
+			return messageConsumer.receiveBody(c,timeout);
+		} catch (MessageFormatException mfe) {
+			throw new MQMessageFormatRuntimeException(mfe);
+		} catch (JMSException e) {
+			throw new MQRuntimeException(e);
+		}	
 	}
 	
-	private <T> T extractPayload(Class<T> c, Message message) {
+	@Override
+	public <T> T receiveBodyNoWait(Class<T> c) {
+		checkNotClosed();
+		context.checkNotClosed();
 		try {
-			if (String.class.isAssignableFrom(c)) {
-				TextMessage textMessage = (TextMessage) message;
-				String payload = textMessage.getText();
-				return (T) payload;
-			}
-			if (Map.class.isAssignableFrom(c)) {
-				MapMessage mapMessage = (MapMessage) message;
-				Map<String,Object> payload = new HashMap<String,Object>();
-				for (Enumeration<String> mapNamesEnum = mapMessage.getMapNames(); mapNamesEnum.hasMoreElements();) {
-					String thisName =  mapNamesEnum.nextElement();
-					payload.put(thisName, mapMessage.getObject(thisName));				}
-				return (T) payload;
-			}
-			if (byte[].class.isAssignableFrom(c)) {
-				BytesMessage bytesMessage = (BytesMessage) message;
-				long numBytes = bytesMessage.getBodyLength();
-				byte[] payload = new byte[(int) numBytes];
-				bytesMessage.readBytes(payload);
-				return (T) payload;
-			}
-			// check for Serializable last, since some other valid classes are also Serializable 
-			if (Serializable.class.isAssignableFrom(c)) {
-				ObjectMessage objectMessage = (ObjectMessage) message;
-				Serializable payload = objectMessage.getObject();
-				return (T) payload;
-			}
-			// Payload class {0} not supported
-            String errorString = AdministeredObject.cr.getKString(ClientResources.X_PAYLOAD_CLASS_UNSUPPORTED, c);
-            JMSRuntimeException jmse = new javax.jms.JMSRuntimeException(errorString, ClientResources.X_PAYLOAD_CLASS_UNSUPPORTED);
-            ExceptionHandler.throwJMSRuntimeException(jmse);
-            // never reached
-    		return null;
+			return messageConsumer.receiveBodyNoWait(c);
+		} catch (MessageFormatException mfe) {
+			throw new MQMessageFormatRuntimeException(mfe);
 		} catch (JMSException e) {
 			throw new MQRuntimeException(e);
 		}
 	}
-	
+		
 	@Override
 	public void close() {
 		if (closed) return;
@@ -358,6 +365,8 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.removeConsumer(this);
 		try {
 			messageConsumer.close();
+		} catch (IllegalStateException e) {
+			throw new MQIllegalStateRuntimeException(e);
 		} catch (JMSException e) {
 			throw new MQRuntimeException(e);
 		}
@@ -373,5 +382,5 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 			throw new JMSRuntimeException(errorString);
 		}
 	}
-	
+		
 }

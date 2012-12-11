@@ -118,7 +118,7 @@ public class WakeupableTimer implements Runnable
 
             synchronized(this) {
                 while (valid && !wakeup &&
-                       !(waittime == 0L && nowaitOn0)) { 
+                       !(waittime == 0L && nowaitOn0)) {
                     if (nowaitOn0) {
                         nowaitOn0 = false;
                     }
@@ -159,16 +159,21 @@ public class WakeupableTimer implements Runnable
             if (mynexttime == 0L) {
                 mynexttime = time + repeatinterval;
             }
+            boolean asrequested = false; 
             synchronized(this) {
                 if (nexttime > 0L && nexttime < mynexttime) {
                     mynexttime = nexttime;
                     nowaitOn0 = true;
+                    asrequested = true;
                 }
                 nexttime = 0L;
             }
             waittime = mynexttime - time;
             if (waittime < 0L) {
                 waittime = 0L;
+            }
+            if (waittime == 0L && !asrequested) {
+                nowaitOn0 = false;
             }
 
             } catch (Throwable e) {

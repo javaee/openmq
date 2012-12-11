@@ -44,10 +44,10 @@ package javax.jms;
   * {@code XAQueueConnectionFactory} and 
   * {@code XATopicConnectionFactory} interfaces.
   *
-  * <P>Some application servers provide support for grouping JTS capable 
+  * <P>Some application servers provide support for grouping JTA capable 
   * resource use into a distributed transaction (optional). To include JMS API transactions 
-  * in a JTS transaction, an application server requires a JTS aware JMS
-  * provider. A JMS provider exposes its JTS support using an
+  * in a JTA transaction, an application server requires a JTA aware JMS
+  * provider. A JMS provider exposes its JTA support using an
   * {@code XAConnectionFactory} object, which an application server uses 
   * to create {@code XAConnection} objects.
   *
@@ -63,13 +63,7 @@ package javax.jms;
   * available in their environment, rather than use these XA
   * interfaces directly. 
   *
-  * @version     1.1 April 4, 2002
-  * @author      Mark Hapner
-  * @author      Rich Burridge
-  * @author      Kate Stout
-  *
-  * @see         javax.jms.XAQueueConnectionFactory
-  * @see         javax.jms.XATopicConnectionFactory
+  * @version     2.0
   */
 
 public interface XAConnectionFactory {
@@ -93,7 +87,7 @@ public interface XAConnectionFactory {
     createXAConnection() throws JMSException;
 
 
-    /** Creates an XA  connection with the specified user identity.
+    /** Creates an {@code XAConnection} with the specified user identity.
       * The connection is created in stopped mode. No messages 
       * will be delivered until the {@code Connection.start} method
       * is explicitly called.
@@ -101,7 +95,7 @@ public interface XAConnectionFactory {
       * @param userName the caller's user name
       * @param password the caller's password
       *  
-      * @return a newly created XA connection
+      * @return a newly created {@code XAConnection}
       *
       * @exception JMSException if the JMS provider fails to create an XA  
       *                         connection due to some internal error.
@@ -114,4 +108,45 @@ public interface XAConnectionFactory {
     XAConnection
     createXAConnection(String userName, String password) 
 					     throws JMSException;
+    
+	/**
+	 * Creates a {@code XAJMSContext} with the default user identity
+	 * <p>
+     * A connection and session are created for use by the new {@code XAJMSContext}. 
+     * The connection is created in stopped mode but will be automatically started
+     * when a {@code JMSConsumer} is created.
+	 * 
+	 * @return a newly created {@code XAJMSContext}
+	 * 
+	 * @exception JMSRuntimeException
+	 *                if the JMS provider fails to create the {@code XAJMSContext} due
+	 *                to some internal error.
+	 * @exception JMSSecurityRuntimeException
+	 *                if client authentication fails due to an invalid user name
+	 *                or password.
+	 * @since 2.0
+	 */
+	XAJMSContext createXAContext();
+   
+    /** 
+     * Creates a JMSContext with the specified user identity
+	 * <p>
+     * A connection and session are created for use by the new {@code XAJMSContext}. 
+     * The connection is created in stopped mode but will be automatically started
+     * when a {@code JMSConsumer} is created.
+     * 
+     * @param userName the caller's user name
+     * @param password the caller's password
+     *  
+     * @return a newly created JMSContext
+     *
+     * @exception JMSRuntimeException if the JMS provider fails to create the 
+     *                         JMSContext due to some internal error.
+     * @exception JMSSecurityRuntimeException  if client authentication fails due to 
+     *                         an invalid user name or password.
+     * @since 2.0 
+     * 
+     */
+    XAJMSContext createXAContext(String userName, String password);    
+   
 }

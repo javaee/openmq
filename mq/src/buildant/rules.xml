@@ -65,6 +65,9 @@
  <!-- load the definitions file -->
  <import file="${rulesdir}/paths.xml"/>
 
+ <!-- load the definitions file for native code-->
+ <import file="${rulesdir}/cpaths.xml"/>
+
  <!-- load the jar files rules -->
  <import file="${rulesdir}/jarrules.xml"/>
 

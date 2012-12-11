@@ -686,8 +686,12 @@ public class Globals extends CommGlobals
     }    
 
     public static void handleGlobalError(Throwable thr, String msg) {
+        handleGlobalError(thr, msg, null);
+    }
 
-        if (!errhandler.handleGlobalError(thr, msg)) {
+    protected static void handleGlobalError(Throwable thr, String msg, Integer exitCode) {
+
+        if (!errhandler.handleGlobalError(thr, msg, exitCode)) {
             logger.logStack(Logger.ERROR,BrokerResources.E_INTERNAL_BROKER_ERROR, "received unexpected exception  ", thr);
             Throwable trace = new Throwable();
             trace.fillInStackTrace();

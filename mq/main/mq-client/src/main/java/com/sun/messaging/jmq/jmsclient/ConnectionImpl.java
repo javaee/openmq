@@ -2108,7 +2108,6 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
     stop() throws JMSException {
 
         checkConnectionState();
-
         if ( isStopped || isClosed ) {
             return;
         }
@@ -2119,8 +2118,7 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
             exitConnection();
             return;
         }
-
-        checkPermission();
+        checkPermission(false);
 
         setClientIDFlag();
 
@@ -2210,7 +2208,7 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
         }
 
         //check if this call is allowed.
-        checkPermission();
+        checkPermission(true);
 
         synchronized ( this ) {
 
@@ -2323,34 +2321,31 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
         allowToSetClientID = false;
     }
 
+    protected void closeAllSessions() {
 
-    protected void closeAllSessions()  {
-    	
-    	connectionLogger.log(Level.FINEST, "closing all sessions ...");
-    	
+        connectionLogger.log(Level.FINEST, "closing all sessions ...");
+
+        com.sun.messaging.jms.IllegalStateException ex = null;
+
         //close all sessions in this connection
         SessionImpl session = null;
-
         try {
-        	
             while ( sessionTable.size() > 0 ) {
                 session = (SessionImpl) sessionTable.firstElement();
                 this.closeSession(session);
             }
-            
-        }finally {
-        	connectionLogger.log(Level.FINEST, "all sessions closed ...");
+        } finally {
+            connectionLogger.log(Level.FINEST, "all sessions closed ...");
         }
     }
     
-    protected void closeSession (SessionImpl session) {
-    	
-    	try {
-    		session.close();
-    	} catch (Exception e) {
-    		ExceptionHandler.rootLogger.log(Level.WARNING, e.getMessage(), e);
+    private void closeSession (SessionImpl session) { 
+        try {
+            session.close();
+        } catch (Exception e) {
+            ExceptionHandler.rootLogger.log(Level.WARNING, e.getMessage(), e);
     	} finally {
-    		sessionTable.remove(session);
+            sessionTable.remove(session);
     	}
     }
     
@@ -2384,9 +2379,9 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
         
         try {
             //close sessions
-        	closeAllSessions();
+            closeAllSessions();
             
-        	//close consumers in the interest table. 
+            //close consumers in the interest table. 
             closeConsumerQueues();
             
             closeConnectionConsumers();
@@ -2537,8 +2532,8 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
      * reader thread in this connection.  If any comparison returns true
      * in the Session.checkPermission(), IllegalStateException is thrown.
      */
-    protected void
-    checkPermission() throws JMSException {
+    private void
+    checkPermission(boolean checkAsyncSend) throws JMSException {
         SessionImpl session = null;
 
         try {
@@ -2546,6 +2541,9 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
             while (enum2.hasMoreElements()) {
                 session = (SessionImpl) enum2.nextElement();
                 session.checkPermission();
+                if (checkAsyncSend) {
+                    session.checkPermissionForAsyncSend();
+                }
             }
         } catch (JMSException ie) {
             throw ie;
@@ -3023,8 +3021,8 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
                              String messageSelector,
                              ServerSessionPool sessionPool,
                              int maxMessages)
-    throws JMSException
-    {
+                             throws JMSException {
+
         return createUnifiedConnectionConsumer(destination,
                        messageSelector, sessionPool,
                        maxMessages, null, false);
@@ -3089,9 +3087,9 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
     createConnectionConsumer(Queue queue,
                              String messageSelector,
                              ServerSessionPool sessionPool,
-                 int maxMessages)
-    throws JMSException
-    {
+                             int maxMessages)
+                             throws JMSException {
+
         return createUnifiedConnectionConsumer(queue,
                        messageSelector, sessionPool,
                        maxMessages, null, false);
@@ -3156,8 +3154,7 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
                              String messageSelector,
                              ServerSessionPool sessionPool,
                              int maxMessages)
-    throws JMSException
-    {
+                             throws JMSException {
         return createUnifiedConnectionConsumer(topic,
                        messageSelector, sessionPool,
                        maxMessages, null, false);
@@ -3191,26 +3188,67 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
                                     String messageSelector,
                                     ServerSessionPool sessionPool,
                                     int maxMessages)
-    throws JMSException
-    {
+                                    throws JMSException {
+
         return createUnifiedConnectionConsumer(topic,
                        messageSelector, sessionPool,
                        maxMessages, subscriptionName, true);
 
     }
 
+    //@Override 
+    public ConnectionConsumer
+    createSharedConnectionConsumer(Topic topic,
+                                   String subscriptionName,
+                                   String messageSelector,
+                                   ServerSessionPool sessionPool,
+                                   int maxMessages)
+                                   throws JMSException {
+
+        return createUnifiedConnectionConsumer(topic,
+                       messageSelector, sessionPool,
+                       maxMessages, subscriptionName, false, true);
+    }
+
+    //@Override 
+    public ConnectionConsumer
+    createSharedDurableConnectionConsumer(Topic topic,
+                                    String subscriptionName,
+                                    String messageSelector,
+                                    ServerSessionPool sessionPool,
+                                    int maxMessages)
+                                    throws JMSException {
+
+        return createUnifiedConnectionConsumer(topic,
+                       messageSelector, sessionPool,
+                       maxMessages, subscriptionName, true, true);
+    }
 
     private ConnectionConsumer createUnifiedConnectionConsumer(Destination destination,
             String messageSelector, ServerSessionPool sessionPool,
             int maxMessages, String subscriptionName, boolean durable) throws JMSException {
 
+        return createUnifiedConnectionConsumer(destination, messageSelector,
+                   sessionPool, maxMessages, subscriptionName, durable, false);
+    }
+
+    private ConnectionConsumer createUnifiedConnectionConsumer(Destination destination,
+            String messageSelector, ServerSessionPool sessionPool,
+            int maxMessages, String subscriptionName, boolean durable, boolean share)
+            throws JMSException {
+
+
         checkConnectionState();
 
         //Disallow null/empty durable subscription names
-        if (durable && (subscriptionName == null || "".equals(subscriptionName))) {
-            String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_INVALID_DURABLE_NAME, "\"\"");
+        if ((durable || share) && (subscriptionName == null || "".equals(subscriptionName))) {
+            String ekey = AdministeredObject.cr.X_INVALID_DURABLE_NAME;
+            if (!durable) {
+                ekey =  AdministeredObject.cr.X_INVALID_SHARED_SUBSCRIPTION_NAME;
+            }
+            String errorString = AdministeredObject.cr.getKString(ekey, "\"\"");
             JMSException jmse =
-            new JMSException(errorString, AdministeredObject.cr.X_INVALID_DURABLE_NAME);
+            new JMSException(errorString, ekey);
 
             ExceptionHandler.throwJMSException(jmse);
         }
@@ -3231,7 +3269,8 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
         //disallow to set client ID after this action.
         setClientIDFlag();
 
-        return new ConnectionConsumerImpl(this, destination, messageSelector, sessionPool, load, subscriptionName);
+        return new ConnectionConsumerImpl(this, destination, messageSelector, 
+                       sessionPool, load, subscriptionName, durable, share);
     }
 
     //End of methods moved from UnifiedConnectionImpl.

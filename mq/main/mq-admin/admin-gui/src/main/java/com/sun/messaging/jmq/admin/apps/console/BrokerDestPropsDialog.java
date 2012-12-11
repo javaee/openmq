@@ -106,10 +106,11 @@ public class BrokerDestPropsDialog extends AdminDialog
     private static String close[] = {acr.getString(acr.I_DIALOG_CLOSE)};
 
     private static String[] columnNames = 
-		{ar.getString(ar.I_JMQCMD_DUR_NAME),
+		{ar.getString(ar.I_JMQCMD_SUB_NAME),
     	    	 ar.getString(ar.I_JMQCMD_CLIENT_ID),
-    		 ar.getString(ar.I_JMQCMD_DUR_NUM_MSG),
-    		 ar.getString(ar.I_JMQCMD_DUR_STATE)};
+    		 ar.getString(ar.I_JMQCMD_DURABLE),
+    		 ar.getString(ar.I_JMQCMD_SUB_NUM_MSG),
+    		 ar.getString(ar.I_JMQCMD_SUB_STATE)};
 
     /*
      * The tabbed pane and the individual tabs.
@@ -386,7 +387,7 @@ public class BrokerDestPropsDialog extends AdminDialog
 
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab(acr.getString(acr.I_DEST_PROP_BASIC), makeBasicTab());
-        tabbedPane.addTab(acr.getString(acr.I_DEST_PROP_DUR), makeDurTab());
+        tabbedPane.addTab(acr.getString(acr.I_DEST_PROP_SUB), makeDurTab());
 
         workPanel.add(tabbedPane);
 
@@ -1083,11 +1084,16 @@ public class BrokerDestPropsDialog extends AdminDialog
                 selectedRow = lsm.getMinSelectionIndex();
                 selectedDurName = (String)model.getValueAt(selectedRow, 0);
                 selectedClientID = (String)model.getValueAt(selectedRow, 1);
-
-                deleteButton.setEnabled(true);
-                purgeButton.setEnabled(true);
 	    }
 	}
+        String durable = (String)model.getValueAt(selectedRow, 2);
+        if (durable != null && durable.trim().toLowerCase().equals("true")) {
+            deleteButton.setEnabled(true);
+            purgeButton.setEnabled(true);
+        } else {
+            deleteButton.setEnabled(false);
+            purgeButton.setEnabled(false);
+        }
     }
     /*
      * END INTERFACE ListSelectionListener
@@ -1144,8 +1150,10 @@ public class BrokerDestPropsDialog extends AdminDialog
                 else if (col == 1 && i == row)
 		    return ((durInfo.clientID == null) ? "" : durInfo.clientID);	
                 else if (col == 2 && i == row)
+                    return String.valueOf(durInfo.isDurable);
+                else if (col == 3 && i == row)
 		    return (new Integer(durInfo.nMessages)).toString();
-                else if (col == 3 && i == row) {
+                else if (col == 4 && i == row) {
                     if (durInfo.isActive)
 			return ar.getString(ar.I_ACTIVE);
                     else

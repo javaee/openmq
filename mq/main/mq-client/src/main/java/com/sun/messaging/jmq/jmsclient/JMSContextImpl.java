@@ -75,7 +75,10 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
+import javax.jms.TransactionInProgressException;
 import javax.jms.TransactionRolledBackException;
+import javax.jms.XAConnection;
+import javax.jms.XAConnectionFactory;
 
 import com.sun.messaging.AdministeredObject;
 import com.sun.messaging.jmq.jmsclient.resources.ClientResources;
@@ -84,6 +87,7 @@ import com.sun.messaging.jms.MQInvalidDestinationRuntimeException;
 import com.sun.messaging.jms.MQInvalidSelectorRuntimeException;
 import com.sun.messaging.jms.MQRuntimeException;
 import com.sun.messaging.jms.MQSecurityRuntimeException;
+import com.sun.messaging.jms.MQTransactionInProgressRuntimeException;
 import com.sun.messaging.jms.MQTransactionRolledBackRuntimeException;
 
 public class JMSContextImpl implements JMSContext, Traceable {
@@ -243,6 +247,60 @@ public class JMSContextImpl implements JMSContext, Traceable {
 		initializeForExistingConnection(contextSet);
 	}
 	
+	public JMSContextImpl(XAConnectionFactory xaConnectionFactory, ContainerType containerType, String userName, String password) {
+		this.containerType=containerType;
+		
+		// create XA connection
+		try {
+			connection = xaConnectionFactory.createXAConnection(userName,password);
+		} catch (SecurityException e) {
+			JMSSecurityRuntimeException jsre = new com.sun.messaging.jms.MQSecurityRuntimeException(e.getMessage(),null,e);
+			ExceptionHandler.throwJMSRuntimeException(jsre);
+		} catch (JMSSecurityException e) {
+			throw new MQSecurityRuntimeException(e);
+		} catch (JMSException e) {
+			throw new MQRuntimeException(e);
+		}
+		// create XA session
+		try {
+			session = ((XAConnection) connection).createXASession();
+		} catch (JMSException e) {
+			try {
+				connection.close();
+			} catch (JMSException e1) {	
+			}
+			throw new MQRuntimeException(e);	
+		}
+		initializeForNewConnection();
+	}
+	
+	public JMSContextImpl(XAConnectionFactory xaConnectionFactory, ContainerType containerType) {
+		this.containerType=containerType;
+		
+		// create XA connection
+		try {
+			connection = xaConnectionFactory.createXAConnection();
+		} catch (SecurityException e) {
+			JMSSecurityRuntimeException jsre = new com.sun.messaging.jms.MQSecurityRuntimeException(e.getMessage(),null,e);
+			ExceptionHandler.throwJMSRuntimeException(jsre);
+		} catch (JMSSecurityException e) {
+			throw new MQSecurityRuntimeException(e);
+		} catch (JMSException e) {
+			throw new MQRuntimeException(e);
+		}
+		// create XA session
+		try {
+			session = ((XAConnection) connection).createXASession();
+		} catch (JMSException e) {
+			try {
+				connection.close();
+			} catch (JMSException e1) {	
+			}
+			throw new MQRuntimeException(e);	
+		}
+		initializeForNewConnection();
+	}
+	
 	/**
 	 * Initialize a newly-created JMSContext that has created a new Connection
 	 */
@@ -384,6 +442,8 @@ public class JMSContextImpl implements JMSContext, Traceable {
 
 		try {
 			connection.stop();
+		} catch (IllegalStateException e) {
+			throw new MQIllegalStateRuntimeException(e); 		
 		} catch (JMSException e) {
 			throw new MQRuntimeException(e);
 		}
@@ -418,6 +478,8 @@ public class JMSContextImpl implements JMSContext, Traceable {
 			try {
 				messageProducer.close();
 				messageProducer=null;
+			} catch (IllegalStateException e) {
+				throw new MQIllegalStateRuntimeException(e);
 			} catch (JMSException e) {
 				throw new MQRuntimeException(e);
 			}
@@ -426,6 +488,8 @@ public class JMSContextImpl implements JMSContext, Traceable {
 		// close the Session
 		try {
 			session.close();
+		} catch (IllegalStateException e) {
+			throw new MQIllegalStateRuntimeException(e);
 		} catch (JMSException e) {
 			throw new MQRuntimeException(e);
 		}
@@ -440,6 +504,8 @@ public class JMSContextImpl implements JMSContext, Traceable {
 			if (contextSet.isEmpty()){
 				try {
 					connection.close();
+				} catch (IllegalStateException e) {
+					throw new MQIllegalStateRuntimeException(e); 		
 				} catch (JMSException e) {
 					throw new MQRuntimeException(e);
 				}
@@ -577,6 +643,8 @@ public class JMSContextImpl implements JMSContext, Traceable {
 			session.commit();
 		} catch (TransactionRolledBackException e) {
 			throw new MQTransactionRolledBackRuntimeException(e);
+		} catch (TransactionInProgressException e) {
+			throw new MQTransactionInProgressRuntimeException(e);
 		} catch (IllegalStateException e) {
 			throw new MQIllegalStateRuntimeException(e);
 		} catch (JMSException e) {
@@ -686,6 +754,26 @@ public class JMSContextImpl implements JMSContext, Traceable {
 		addConsumer(consumer);
 		return consumer;
 	}
+
+	@Override
+        public JMSConsumer createSharedDurableConsumer(Topic topic, String name) {
+		checkNotClosed();
+		disallowSetClientID();	
+		JMSConsumerImpl consumer = new JMSConsumerImpl();
+		consumer.initialiseSharedDurableConsumer(this,topic,name);
+		addConsumer(consumer);
+		return consumer;
+        }
+
+	@Override
+        public JMSConsumer createSharedDurableConsumer(Topic topic, String name, String messageSelector, boolean noLocal) {
+		checkNotClosed();
+		disallowSetClientID();	
+		JMSConsumerImpl consumer = new JMSConsumerImpl();
+		consumer.initialiseSharedDurableConsumer(this,topic,name,messageSelector,noLocal);
+		addConsumer(consumer);
+		return consumer;
+        }
 
 	@Override
 	public JMSConsumer createSharedConsumer(Topic topic, String sharedSubscriptionName) {

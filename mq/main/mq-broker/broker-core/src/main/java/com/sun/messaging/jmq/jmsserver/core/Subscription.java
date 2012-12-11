@@ -81,6 +81,7 @@ public class Subscription extends Consumer implements SubscriptionSpi
 {
     static final long serialVersionUID = -6794838710921895217L;
 
+    private static boolean DEBUG = false;
 
     /**
      * cache containing clientid/durable name pairs which were
@@ -105,6 +106,12 @@ public class Subscription extends Consumer implements SubscriptionSpi
      * is this a shared non-durable or a durable subscription
      */
     boolean isDurable = true;
+
+    /**
+     * JMS 2.0 shared subscription
+     */
+    boolean jmsshared = false;
+    transient String ndSubscriptionName = null;
 
     /**
      * current active consumers
@@ -150,6 +157,12 @@ public class Subscription extends Consumer implements SubscriptionSpi
         Collections.synchronizedMap(new HashMap<Integer, ChangeRecordInfo>());
 
     private transient FaultInjection fi = FaultInjection.getInjection();
+
+    static {
+        if (Globals.getLogger().getLevel() <= Logger.DEBUG) {
+            DEBUG = true;
+        }
+    }
 
     public ChangeRecordInfo getCurrentChangeRecordInfo(int type) {
         return currentChangeRecordInfo.get(Integer.valueOf(type));
@@ -280,6 +293,7 @@ public class Subscription extends Consumer implements SubscriptionSpi
         subLock = new Object();
         stored = true;
         active = false;
+        ndSubscriptionName = null;
         getConsumerUID().setShouldStore(true);
         hashcode = calcHashcode();
         ackMsgsOnDestroy = true;  
@@ -303,10 +317,11 @@ public class Subscription extends Consumer implements SubscriptionSpi
      * Create a Durable Subscription Object
      */
     private Subscription(DestinationUID d, String selector, 
-                         boolean noLocal, String durable,
+                         boolean noLocal, String durable, 
+                         boolean share, boolean jmsshare,
                          String clientID, boolean notify,
                          boolean autostore /* false only in testing */,
-                         ConsumerUID requid)
+                         ConsumerUID requid, Integer sharecnt)
                          throws IOException, SelectorFormatException, BrokerException {
 
         super(d, selector, noLocal, requid);
@@ -314,6 +329,14 @@ public class Subscription extends Consumer implements SubscriptionSpi
                    uid + getDSubLogString(clientID, durableName));
         getConsumerUID().setShouldStore(true);
         this.durableName = durable;
+        if (share) {
+            if (sharecnt == null) {
+                setShared(true);
+            } else {
+                setMaxNumActiveConsumers(sharecnt.intValue());
+            }
+        }
+        jmsshared = jmsshare;
         this.clientID = clientID;
         activeConsumers = new HashMap();
         active = false;
@@ -368,16 +391,26 @@ public class Subscription extends Consumer implements SubscriptionSpi
     /**
      * Create a Non-Durable Subscription Object
      */
-    private Subscription(DestinationUID d, String clientID,
-        String selector, boolean noLocal)
+    private Subscription(DestinationUID d, 
+        String clientID, String selector, String subscriptionName, 
+        boolean share, boolean jmsshare, boolean noLocal, Integer sharecnt)
         throws IOException, SelectorFormatException, BrokerException {
 
-        super(d,selector,noLocal, (ConnectionUID)null);
+        super(d, selector, noLocal, (ConnectionUID)null);
         isDurable = false;
         logger.log(Logger.DEBUG,"Creating Non-Durable Subscription " +
              uid + " with clientID " + clientID);
         getConsumerUID().setShouldStore(true);
         this.clientID = clientID;
+        if (share) {
+            if (sharecnt == null) {
+                setShared(true);
+            } else {
+                setMaxNumActiveConsumers(sharecnt.intValue());
+            }
+        }
+        jmsshared = jmsshare;
+        ndSubscriptionName = subscriptionName;
         activeConsumers = new HashMap();
         active = false;
         hashcode = calcHashcode();
@@ -400,6 +433,14 @@ public class Subscription extends Consumer implements SubscriptionSpi
         maxNumActiveConsumers = 
              (share ? getFirstDestination().getMaxNumSharedConsumers()
                    : 1);
+    }
+
+    public boolean getJMSShared() {
+        return jmsshared;
+    }
+
+    public String getNDSubscriptionName() {
+        return ndSubscriptionName;
     }
 
     public boolean getShared() {
@@ -586,10 +627,9 @@ public class Subscription extends Consumer implements SubscriptionSpi
                 if (!active) {
                     logger.log(Logger.DEBUG, "Cleaning up non-durable " +
                                " subscription " + this);
-                    String cuid = clientID + ":" + 
-                           consumer.getDestinationUID()   
-                           + ":" + selstr;
-                    nonDurableList.remove(cuid);
+                    String key = getNDSubKey(clientID,  consumer.getDestinationUID(),
+                                             selstr, getNDSubscriptionName());
+                    nonDurableList.remove(key);
                     destroyConsumer(new HashSet(), (Map)null, false, true, false);
 
                 }
@@ -632,6 +672,10 @@ public class Subscription extends Consumer implements SubscriptionSpi
                 c.purgeConsumer();
             }
         }
+    }
+    public String getDSubLongLogString(String cid, String dname) { 
+        return "["+getDSubKey(cid, dname)+"]"+
+                (getShared() ? (getJMSShared() ? "jms":"mq"):"");
     }
 
    /**********************************************************************************
@@ -974,6 +1018,11 @@ public class Subscription extends Consumer implements SubscriptionSpi
         String clientID, boolean override, boolean removingDest,
         boolean notify, boolean recordRemoval)
         throws BrokerException {
+        if (DEBUG) {
+            Globals.getLogger().log(Logger.INFO, "Subscription.unsubscribe("+
+            durableName+", "+clientID+", "+override+", "+removingDest+", "+
+            notify+", "+recordRemoval+")");
+        }
         synchronized(Subscription.class) {
             Object key = getDSubKey(clientID, durableName);
             Subscription s = durableList.get(key);
@@ -1038,11 +1087,15 @@ public class Subscription extends Consumer implements SubscriptionSpi
         }
     }
 
-    public static Subscription subscribe(String name,
+    /**
+     * "public" for persist store internal test
+     */
+    public static Subscription subscribe(String name, 
+       boolean share, boolean jmsshare,
         String clientID, String sel, DestinationUID duid,
         boolean nolocal, boolean notify,
         boolean autostore /* false only in testing */,
-        ConsumerUID requid)
+        ConsumerUID requid, Integer sharecnt)
         throws BrokerException, SelectorFormatException {
 
         synchronized(Subscription.class) {
@@ -1054,8 +1107,9 @@ public class Subscription extends Consumer implements SubscriptionSpi
                         BrokerResources.X_DURABLE_CONFLICT, args));
              }
              try {
-                 s = new Subscription(duid, sel,nolocal,
-                     name, clientID, notify, autostore, requid); 
+                 s = new Subscription(duid, sel,nolocal, 
+                         name, share, jmsshare, clientID, 
+                         notify, autostore, requid, sharecnt); 
              } catch (IOException ex) {
 
                  String args[] = { getDSubLogString(clientID, name), duid.toString()};
@@ -1089,63 +1143,94 @@ public class Subscription extends Consumer implements SubscriptionSpi
     }
 
     public static Subscription findCreateDurableSubscription(
-        String clientID, String durableName, DestinationUID uid,
-        String selectorstr, boolean noLocal) 
+        String clientID, String durableName, boolean share, boolean jmsshare,
+        DestinationUID uid, String selectorstr, boolean noLocal) 
         throws BrokerException, SelectorFormatException { 
 
         return findCreateDurableSubscription(clientID,
-           durableName, uid, selectorstr,
-           noLocal, false, null);
+           durableName, share, jmsshare, uid, selectorstr,
+           noLocal, false, null, null);
     }
 
     public static Subscription findCreateDurableSubscription(
-        String clientID, String durableName, DestinationUID uid, 
-        String selectorstr, boolean noLocal, boolean notify) 
+        String clientID, String durableName, boolean share, boolean jmsshare, 
+        DestinationUID uid, String selectorstr, boolean noLocal, boolean notify) 
         throws BrokerException, SelectorFormatException { 
 
         return findCreateDurableSubscription(clientID,
-               durableName, uid, selectorstr,
-               noLocal, true, null);
+               durableName, share, jmsshare, uid, selectorstr,
+               noLocal, true, null, null);
     }
 
     public static Subscription findCreateDurableSubscription(
-        String clientID, String durableName, DestinationUID uid,
-        String selectorstr, boolean noLocal, boolean notify, ConsumerUID requid) 
+        String clientID, String durableName, boolean share, boolean jmsshare,
+        DestinationUID uid, String selectorstr, boolean noLocal, boolean notify,
+        ConsumerUID requid, Integer sharecnt) 
         throws BrokerException, SelectorFormatException { 
+        if (DEBUG) {
+            Globals.getLogger().log(Logger.INFO, "Subscription.findCreateDurableSubscription("+
+            clientID+", "+durableName+", "+share+", "+jmsshare+", "+uid+", "+selectorstr+
+            ", "+noLocal+", "+notify+", "+requid+")");
+        }
 
         Logger logger = Globals.getLogger();
         synchronized(Subscription.class) {
              Subscription s = findDurableSubscription(clientID, durableName);
              
              if (s != null && ((s.isActive() && !s.getShared()) || 
+                               (s.getJMSShared() != jmsshare) || 
                                !uid.equals(s.getDestinationUID()) || 
-                               s.getNoLocal() != noLocal || 
+                               (clientID != null && s.getNoLocal() != noLocal) || 
                                ((selectorstr != null || s.getSelectorStr() != null) && 
                                 (selectorstr == null ||
                                 !selectorstr.equals(s.getSelectorStr()))))) {
-                   // dont match
-                   if (s.isActive() && !s.getShared()) {
-
-                       String args[] = { getDSubLogString(clientID, durableName), uid.toString() };
-                       throw new BrokerException(
-                            Globals.getBrokerResources().getKString(
-                                BrokerResources.X_DURABLE_CONFLICT, args),
-                            BrokerResources.X_DURABLE_CONFLICT,
-                            (Throwable) null,
-                            Status.CONFLICT);
-                   } else {
-                       logger.log(Logger.DEBUG, "Unsubscribing subscription "+
-                                  getDSubLogString(clientID, durableName));
-                       unsubscribe(durableName, clientID, false, false, notify, false);
-                       s = null;
-                   }
+                 // dont match
+                 if (s.isActive() && !s.getShared()) {
+                     String args[] = { getDSubLogString(clientID, durableName), uid.toString() };
+                     throw new BrokerException(
+                         Globals.getBrokerResources().getKString(
+                         BrokerResources.X_DURABLE_CONFLICT, args),
+                         BrokerResources.X_DURABLE_CONFLICT, (Throwable) null,
+                         Status.CONFLICT);
+                 }
+                 if (s.getJMSShared() != jmsshare) {
+                     String args[] = { s.getDSubLongLogString(clientID, durableName),
+                                       uid.toString() };
+                     throw new BrokerException(
+                         Globals.getBrokerResources().getKString(
+                         BrokerResources.X_DURABLE_EXIST_CONFLICT, args),
+                         BrokerResources.X_DURABLE_EXIST_CONFLICT, (Throwable) null,
+                         Status.CONFLICT);
+                 }
+                 if (s.isActive()) {
+                     String args[] = { getDSubLogString(clientID, durableName), 
+                                       ""+s.getDestinationUID() };
+                     throw new BrokerException(
+                         Globals.getBrokerResources().getKString(
+                         BrokerResources.X_REPLACE_ACTIVE_DURA, args),
+                         BrokerResources.X_REPLACE_ACTIVE_DURA, (Throwable) null,
+                         Status.CONFLICT);
+                 }
+                 if (DEBUG) {
+                     Globals.getLogger().log(Logger.INFO, "Subscription.findCreateDurableSubscription("+
+                     clientID+", "+durableName+", "+share+", "+jmsshare+", "+uid+", "+selectorstr+
+                     ", "+noLocal+", "+notify+", "+requid+"): not match, unsubscribe durable subscription "+
+                     s.getDSubLongLogString(clientID, durableName));
+                 }
+                 unsubscribe(durableName, clientID, false, false, notify, false);
+                 s = null;
              }
              if (s == null) {
-                  logger.log(Logger.DEBUG,"creating new durable subscription "+
-                             getDSubLogString(clientID, durableName)+" got " + s);
-
-                  s = subscribe(durableName, clientID, selectorstr, uid, 
-                                noLocal, notify, true, requid);
+                 if (DEBUG) {
+                     logger.log(Logger.INFO, "Subscription.findCreateDurableSubscription(): "+
+                     "Creating new durable subscription "+getDSubLogString(clientID, durableName));
+                 }
+                 s = subscribe(durableName, share, jmsshare, clientID, selectorstr, 
+                                uid, noLocal, notify, true, requid, sharecnt);
+                 if (DEBUG) {
+                     logger.log(Logger.INFO,"Subscription.findCreateDurableSubscription(): "+
+                     "Created new durable subscription "+s.getDSubLongLogString(clientID, durableName));
+                 }
              }
              return s;
         }
@@ -1154,19 +1239,42 @@ public class Subscription extends Consumer implements SubscriptionSpi
  *          Static Non-Durable Subscriber Methods
  **********************************************************************************/
 
-    private static String createNDUID( String clientID,
-             DestinationUID uid, String selectorstr) {
+    public static String getNDSubKey(String clientID, DestinationUID uid, 
+        String selectorstr, String subscriptionName) {
+        if (subscriptionName == null) {
             return clientID + ":" + uid + ":" + selectorstr;
+        } 
+        return clientID + ":"+subscriptionName;
+    }
+
+    public static String getNDSubLogString(String clientID, DestinationUID uid,
+        String selectorstr, String subscriptionName) {
+        return "["+getNDSubKey(clientID, uid, selectorstr, subscriptionName)+"]";
+    }
+
+    public static String getNDSubLongLogString(String clientID,  
+        DestinationUID uid, String selectorstr, String subscriptionName,
+        boolean isNoLocal) {
+        if (subscriptionName == null) {
+            return getNDSubLogString(clientID, uid, 
+                   selectorstr, subscriptionName)+"("+isNoLocal+")";
+        }
+        return getNDSubLogString(clientID, uid, 
+               selectorstr, subscriptionName)+
+               "("+uid+", "+selectorstr+", "+isNoLocal+")";
     }
 
     public static Subscription findNonDurableSubscription(String clientID,
-             DestinationUID uid, String selectorstr) {
-        
+        DestinationUID uid, String selectorstr, String subscriptionName) {
+        if (DEBUG) {
+            Globals.getLogger().log(Logger.INFO, 
+            "Subscription.findNonDurableSubscription("+clientID+", "+
+             uid+", "+selectorstr+", "+subscriptionName+")");
+        }
         synchronized(Subscription.class) {
-            String lookup = createNDUID(clientID, uid, selectorstr);
-            // OK .. look the subscription up
-            return (Subscription)nonDurableList.get(
-                    lookup);
+            String key = getNDSubKey(clientID, uid, 
+                             selectorstr, subscriptionName);
+            return (Subscription)nonDurableList.get(key);
         }
     }
 
@@ -1174,51 +1282,93 @@ public class Subscription extends Consumer implements SubscriptionSpi
      * create a non-durable shared subscription
      * @return the new subscription (if just created)
      */
-    public static Subscription createAttachNonDurableSub(Consumer c, Connection con)
-        throws BrokerException, IOException, SelectorFormatException
-    {
+    public static Subscription createAttachNonDurableSub(Consumer c, 
+        Connection con, String subscriptionName, boolean share, boolean jmsshare)
+        throws BrokerException, IOException, SelectorFormatException {
+        if (DEBUG) {
+            Globals.getLogger().log(Logger.INFO, 
+            "Subscription.createAttachNonDurableSub("+c+", "+
+             con+", "+subscriptionName+", "+share+", "+jmsshare+")");
+        }
+
         String clientID = null;
         if (con != null) {
             clientID = (String)con.getClientData(IMQConnection.CLIENT_ID);
         }
         synchronized (Subscription.class) {
-            Subscription sub = findNonDurableSubscription(
-                clientID, c.getDestinationUID(),
-                c.getSelectorStr());
-            if (sub == null) {
-                sub = findCreateNonDurableSubscription(clientID,
-                    c.getSelectorStr(),
-                    c.getDestinationUID(),
-                    c.getNoLocal(), null);
-            }
+            Subscription sub = findCreateNonDurableSubscription(clientID,
+                                   c.getSelectorStr(), subscriptionName, 
+                                   share, jmsshare, c.getDestinationUID(), 
+                                   c.getNoLocal(), null, null);
             sub.attachConsumer(c, con);
             return sub;
         }
     }
-
     
     public static Subscription findCreateNonDurableSubscription(
-            String clientID, String selectorstr,
-            DestinationUID duid, boolean isNoLocal, ConsumerUID optUID) 
-        throws BrokerException, IOException, SelectorFormatException
-    {
+        String clientID, String selectorstr, String subscriptionName,
+        boolean share, boolean jmsshare, DestinationUID duid,
+        boolean isNoLocal, ConsumerUID optUID, Integer sharecnt) 
+        throws BrokerException, IOException, SelectorFormatException {
+        if (DEBUG) {
+            Globals.getLogger().log(Logger.INFO, 
+            "Subscription.findCreateNonDurableSubscription("+clientID+", "+
+             selectorstr+", "+subscriptionName+", "+share+", "+jmsshare+", "+
+             duid+", "+isNoLocal+", "+optUID+", "+sharecnt+")");;
+        }
+
         synchronized (Subscription.class) {
             
-            // OK .. look the subscription up
-            String uid = createNDUID(clientID, duid, selectorstr);
-            // OK .. look the subscription up
-            Subscription sub = (Subscription)nonDurableList.get(uid);
-            if (sub == null) {
-                sub = new Subscription(duid, clientID, selectorstr, isNoLocal);
-                if (optUID != null) {
-                   sub.setConsumerUID(optUID);
+            Subscription sub = findNonDurableSubscription(
+                 clientID, duid, selectorstr, subscriptionName);
+            if (DEBUG) {
+                if (sub != null) {
+                    Globals.getLogger().log(Logger.INFO, 
+                   "Subscription.findCreateNonDurableSubscription("+clientID+", "+
+                    selectorstr+", "+subscriptionName+", "+share+", "+jmsshare+", "+
+                    duid+", "+isNoLocal+", "+optUID+", "+sharecnt+")\nFound Subscription:\n("+
+                    sub.getClientID()+", "+sub.getSelectorStr()+", "+sub.getNDSubscriptionName()+
+                    ", "+sub.getDestinationUID()+", "+sub.getNoLocal()+")");;
                 }
-                Globals.getLogger().log(Logger.DEBUG,"Created new non-durable "
-                    + "subscription " + sub);
-                nonDurableList.put(uid, sub);
+            }
+            if (sub != null && subscriptionName != null &&
+                (test2StringNotSame(subscriptionName, sub.getNDSubscriptionName()) ||
+                 !duid.equals(sub.getDestinationUID()) ||
+                 test2StringNotSame(selectorstr, sub.getSelectorStr()) ||
+                 test2StringNotSame(clientID, sub.getClientID()) || 
+                 (clientID != null && sub.getNoLocal() != isNoLocal))) {
+                String args[] = { getNDSubLongLogString(clientID, duid, 
+                                      selectorstr, subscriptionName, isNoLocal),
+                                  ""+duid,
+                                  getNDSubLongLogString(sub.getClientID(),
+                                      sub.getDestinationUID(), sub.getSelectorStr(),
+                                      sub.getNDSubscriptionName(), sub.getNoLocal()),
+                                  ""+sub.getDestinationUID() };
+                throw new BrokerException(
+                    Globals.getBrokerResources().getKString(
+                    BrokerResources.X_NON_DURA_SUB_CONFLICT, args), Status.CONFLICT);
+            }
+            if (sub == null) {
+                sub = new Subscription(duid, clientID, selectorstr, 
+                          subscriptionName, share, jmsshare, isNoLocal, sharecnt);
+                if (optUID != null) {
+                    sub.setConsumerUID(optUID);
+                }
+                String key = getNDSubKey(clientID, duid, 
+                                 selectorstr, subscriptionName);
+                if (DEBUG) {
+                    Globals.getLogger().log(Logger.INFO, 
+                    "Created new non-durable subscription "+key+"@"+sub.hashCode());
+                }
+                nonDurableList.put(key, sub);
             }  
             return sub;
         }
+    }
 
+    private static boolean test2StringNotSame(String str1, String str2) {
+
+        return ((str1 != null || str2 != null) && 
+                (str1 == null || !str1.equals(str2)));
     }
 }

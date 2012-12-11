@@ -644,6 +644,26 @@ public class BrokerCmdProperties extends Properties
     }
 
     /**
+     * Whether detail mode is specified
+     * This is a debug mode and only take effect if a sub-command supports it
+     */
+    public boolean detailModeSet()  {
+	String s = getProperty(PROP_NAME_OPTION_DETAIL);
+
+	if (s == null)  {
+	    return (false);
+	}
+
+	if (s.equalsIgnoreCase(Boolean.TRUE.toString()))  {
+	    return (true);
+	} else if (s.equalsIgnoreCase(Boolean.FALSE.toString()))  {
+	    return (false);
+	}
+
+	return (false);
+    }
+
+    /**
      * Returns whether show-temporary-destination mode is set.
      *
      * @return  true if show-temporary-destination mode is set, 

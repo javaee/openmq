@@ -1258,10 +1258,14 @@ public class IMQDirectService extends IMQService implements JMSService
      *  @param  dest The Destination from which the consumer will receive
      *          messages
      *  @param  selector The selector which will be used to filter messages
-     *  @param  durableName If non-null, and dest is a Topic, this consumer is
-     *          a durable subscription and this parameter will be the name
-     *          assigned to the durable subscription. A non-null, empty
-     *          durableName is an error.
+     *  @param subscriptionName if dest is Topic and 
+     *         if either durable true or share true, the subscription name
+     *  @param durable if dest is Topic, if true, this is a durable subscription
+     *  @param share if dest is Topic, if true, this is a shared subscription
+     *  @param jmsshare if dest is Topic, 
+     *         if true and share true, this is a JMS 2.0 Shared Subscription
+     *         if false and share true, this is a MQ Shared Subscription
+     *
      *  @param  clientId The clientId to use when this is a durable subscription
      *          with a non-null durableName. This clientId must match the one
      *          that has been set on the connection previously.
@@ -1269,12 +1273,6 @@ public class IMQDirectService extends IMQService implements JMSService
      *          messages produced on the same connection<br>
      *          If {@code false}, consumer wants to receive messages produced
      *          on the same connection as well.
-     *  @param  shared If {@code true}, and dest is a Topic, this is a
-     *          shared consumer and messages will be shared with other
-     *          consumers in the same group that have the same
-     *          clientId+DurableName for Shared Durable Subscriptions<p>
-     *          OR<p>
-     *          clientId+TopicName+Selector for Shared Non-Durable Sunscriptions
      *
      *  @return The JMSServiceReply of the request to add a consumer
      *
@@ -1295,9 +1293,11 @@ public class IMQDirectService extends IMQService implements JMSService
      *
      */
     public JMSServiceReply addConsumer(long connectionId, long sessionId,
-            Destination dest, String selector, String durableName,
-            String clientId, boolean noLocal, boolean shared)
-                                    throws JMSServiceException  {
+        Destination dest, String selector, String subscriptionName,
+        boolean durable, boolean share, boolean jmsshare,
+        String clientId, boolean noLocal)
+        throws JMSServiceException  {
+
 	JMSServiceReply reply;
 	IMQConnection cxn;
 	HashMap props = new HashMap();
@@ -1325,8 +1325,9 @@ public class IMQDirectService extends IMQService implements JMSService
             boolean useFlowControl=false;
             con = protocol.createConsumer(d, cxn,
                         session, selector, clientId,
-                        durableName, noLocal, size,
-                        shared, new Object().toString(), acEnabled, useFlowControl);
+                        subscriptionName, durable, share, jmsshare, 
+                        noLocal, size, new Object().toString(),
+                        acEnabled, useFlowControl);
 	    consumerID = con.getConsumerUID().longValue();
 	} catch(Exception e)  {
 	    String errStr = "addConsumer: Add consumer failed. Connection ID: "

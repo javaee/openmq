@@ -365,8 +365,8 @@ implements javax.jms.Session,
 	@Override
 	public MessageConsumer createSharedConsumer(Topic topic,
 			String sharedSubscriptionName) throws JMSException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("This method is new in JMS 2.0 and is not yet implemented");
+            return xas.createSharedConsumer(
+                topic, sharedSubscriptionName, null, false);
 	}
 
 
@@ -374,8 +374,8 @@ implements javax.jms.Session,
 	public MessageConsumer createSharedConsumer(Topic topic,
 			String sharedSubscriptionName, String messageSelector)
 			throws JMSException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("This method is new in JMS 2.0 and is not yet implemented");
+            return xas.createSharedConsumer(
+                topic, sharedSubscriptionName, messageSelector, false);
 	}
 
 
@@ -383,9 +383,23 @@ implements javax.jms.Session,
 	public MessageConsumer createSharedConsumer(Topic topic,
 			String sharedSubscriptionName, String messageSelector,
 			boolean noLocal) throws JMSException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("This method is new in JMS 2.0 and is not yet implemented");
+            return xas.createSharedConsumer(
+                topic, sharedSubscriptionName, messageSelector, false);
 	}
+
+        @Override 
+        public MessageConsumer createSharedDurableConsumer(Topic topic, String name)
+            throws JMSException {
+            return xas.createSharedDurableConsumer(topic, name, null, false);
+        }
+
+        @Override 
+        public MessageConsumer createSharedDurableConsumer(
+            Topic topic, String name, String messageSelector, boolean noLocal)
+            throws JMSException {
+            return xas.createSharedDurableConsumer(
+                topic, name, messageSelector, noLocal);
+        }
 
     public TopicPublisher
     createPublisher(Topic topic)

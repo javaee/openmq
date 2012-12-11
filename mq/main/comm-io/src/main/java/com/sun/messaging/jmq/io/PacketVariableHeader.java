@@ -462,7 +462,7 @@ public class PacketVariableHeader {
     private void writeInt(DataOutputStream dos, int type, int value)
 	throws IOException {
 	dos.writeShort(type);
-        dos.writeShort(8);
+        dos.writeShort(4);
 	dos.writeInt(value);
     }
 

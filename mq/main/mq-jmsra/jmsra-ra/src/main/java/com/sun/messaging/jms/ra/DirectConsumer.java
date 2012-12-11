@@ -44,6 +44,10 @@ import javax.jms.*;
 
 import java.util.logging.Logger;
 
+import com.sun.messaging.AdministeredObject;
+import com.sun.messaging.jmq.jmsclient.ExceptionHandler;
+import com.sun.messaging.jmq.jmsclient.MQMessageConsumer;
+import com.sun.messaging.jmq.jmsclient.resources.ClientResources;
 import com.sun.messaging.jmq.jmsservice.JMSAck;
 import com.sun.messaging.jmq.jmsservice.JMSService;
 import com.sun.messaging.jmq.jmsservice.JMSServiceReply;
@@ -56,7 +60,7 @@ import com.sun.messaging.jmq.io.JMSPacket;
  *  operation.
  */
 public class DirectConsumer
-        implements javax.jms.MessageConsumer,
+        implements MQMessageConsumer,
         javax.jms.QueueReceiver, javax.jms.TopicSubscriber,
         com.sun.messaging.jmq.jmsservice.Consumer
     {
@@ -249,6 +253,45 @@ public class DirectConsumer
         this._checkIfClosed(methodName);
         return this.ds._fetchMessage(this.consumerId, -1L, methodName);
     }
+
+	@Override
+	public <T> T receiveBody(Class<T> c) throws JMSException {
+		return receiveBody(c,0);
+	}
+
+	@Override
+	public <T> T receiveBody(Class<T> c, long timeout) throws JMSException {
+		Message message = receive(timeout);
+		if (message==null){
+			return null;
+		} else {
+			return returnPayload(message,c);
+		}
+	}
+	
+	@Override
+	public <T> T receiveBodyNoWait(Class<T> c) throws JMSException {
+		Message message = receiveNoWait();
+		if (message==null){
+			return null;
+		} else {
+			return returnPayload(message,c);
+		}
+	}
+	
+	private <T> T returnPayload(Message message, Class<T> c) throws JMSException {
+		T body = message.getBody(c);
+		if (body==null){
+			// must be a Message
+			// this doesn't have a payload, and we can't return null because this would clash with the "no message received" case,
+			// so we throw an exception
+			// "Message has no body and so cannot be returned using this method" 
+			String errorString = AdministeredObject.cr.getKString(ClientResources.X_MESSAGE_HAS_NO_BODY);
+			JMSException jmse = new javax.jms.MessageFormatException(errorString, ClientResources.X_MESSAGE_HAS_NO_BODY);
+			ExceptionHandler.throwJMSException(jmse);
+		}
+		return body;
+	}
 
     /**
      *  Set a JMS MessageListener on this MessageConsumer

@@ -201,6 +201,7 @@ public class NewInterestHandler extends GPacketHandler {
         try {
             String dname = csi.getDurableName();
             String cid = csi.getClientID();
+            String ndsubname = csi.getNDSubscriptionName();
 
             // if we receive a packet which does not support
             // shared subscriptions -> we are dealing with an
@@ -211,12 +212,12 @@ public class NewInterestHandler extends GPacketHandler {
             boolean nonDurableOK = (allowsNonDurable == null
                          ? false : allowsNonDurable.booleanValue());
 
-            // check if anything is bogus in the paclet
-            if ((dname == null && cid == null) || 
-                 (!nonDurableOK  && dname == null)) {
-                logger.log(logger.INFO,
-                    "Internal Error in handleAttachDurable : " +
-                    dname + ":" + cid);
+            // check if anything is bogus in the packet
+            if (!((cid != null && (nonDurableOK || dname != null)) ||
+                  (cid == null && (dname != null || ndsubname != null)))) {
+                logger.log(logger.ERROR, BrokerResources.E_INTERNAL_ERROR+
+                    " in handleAttachDurable: " +
+                    dname + ":" + cid+", "+ndsubname+", "+nonDurableOK);
                 return;
             }
 
@@ -239,9 +240,22 @@ public class NewInterestHandler extends GPacketHandler {
                 DestinationUID duid = cons.getDestinationUID();
                 String selector = cons.getSelectorStr();
                 sub = Subscription.findNonDurableSubscription(
-                    cid, duid, selector);
+                                   cid, duid, selector, ndsubname);
+                if (sub == null) {
+                    String[] args = { Subscription.getNDSubLongLogString(
+                                          cid, duid, selector, ndsubname,
+                                          cons.getNoLocal()),
+                                      cons.toString(), sender.toString() };
+                    logger.log(logger.WARNING, Globals.getBrokerResources().getKString(
+                        BrokerResources.W_NON_DURA_SUB_NOT_FOUND_ON_ATTACH, args));
+                }
             } else {
                 sub = Subscription.findDurableSubscription(cid, dname);
+                if (sub == null) {
+                    logger.log(logger.WARNING, Globals.getBrokerResources().getKString(
+                    BrokerResources.W_DURA_SUB_NOT_FOUND_ON_ATTACH, 
+                    Subscription.getDSubLogString(cid, dname), sender));
+                }
             }
 
             if (DEBUG) {
@@ -250,9 +264,6 @@ public class NewInterestHandler extends GPacketHandler {
                        ", consumer="+cons+" from "+sender);
             }
             if (sub == null) {
-                logger.log(logger.WARNING, "Can not attach subscription "+
-                           Subscription.getDSubLogString(cid, dname)+
-                           ": not found, requested from "+sender);
                 return;
             }
 

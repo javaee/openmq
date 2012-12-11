@@ -1109,7 +1109,7 @@ public class RaptorProtocol implements Protocol, PartitionListener
         ReplyStatus reply = null;
         int status = Status.OK; 
         String reason = null;
-		try {
+        try {
             reply = takeoverPendingReplyTracker.waitForReply(cti.getXid(), takeoverPendingReplyTimeout);
             if (reply != null && reply.getStatus() != Status.OK) {
                 status = reply.getStatus();
@@ -1126,7 +1126,7 @@ public class RaptorProtocol implements Protocol, PartitionListener
                                               ProtocolGlobals.G_TAKEOVER_PENDING_REPLY), 
                                           cti.toString(), Status.getString(status), reason };
             logger.log(logger.WARNING, br.getKString(br.W_CLUSTER_WAIT_REPLY_FAILED, args));
-		}
+        }
         sendTakeoverPendingReply(sender, cti, status, reason);
 
         } finally {
@@ -1297,15 +1297,26 @@ public class RaptorProtocol implements Protocol, PartitionListener
             TakingoverEntry toe = null; 
             GPacket[] gps = null;
             synchronized(takingoverBrokers) {
-                Iterator itr = takingoverBrokers.keySet().iterator();
-                while (itr.hasNext()) {
-                    toe = (TakingoverEntry)itr.next();
-                    gps = toe.getGPackets();
-                    for (int i = 0; i < gps.length; i++) {
-                        try {
-                        c.unicast(ba, gps[i]);
-                        } catch (IOException e) {/* Ignore */}
-                    } 
+                if (takingoverBrokers.size() > 0) {
+                    logger.log(logger.INFO, br.getKString(
+                        br.I_CLS_PROCESS_CACHED_TAKEOVERS_FORWARD,
+                        String.valueOf(takingoverBrokers.size()), ba));
+                    Iterator itr = takingoverBrokers.keySet().iterator();
+                    while (itr.hasNext()) {
+                        toe = (TakingoverEntry)itr.next();
+                        gps = toe.getGPackets();
+                        for (int i = 0; i < gps.length; i++) {
+                            if (i == 0) {
+                                Object[] args = { String.valueOf(gps.length),
+                                  ProtocolGlobals.getPacketTypeDisplayString(gps[i].getType()), ba };
+                                logger.log(logger.INFO, br.getKString(
+                                    br.I_CLS_FORWARD_CACHED_TAKEOVERS, args));
+                            }
+                            try {
+                                c.unicast(ba, gps[i]);
+                            } catch (IOException e) {/* Ignore */}
+                        }
+                    }
                 }
             }
             return; 
@@ -2685,13 +2696,13 @@ public class RaptorProtocol implements Protocol, PartitionListener
             ConsumerUID intid = target.getConsumerUID();
             ConsumerUID storedid = target.getStoredConsumerUID();
             boolean rflag = pkt.getRedeliverFlag(storedid);
+            int dct = pkt.getRedeliverCount(storedid);
             try {
                 pkt.delivered(intid, storedid, intid.isUnsafeAck(), true);
             } catch (Exception ex) {
                 logger.logStack(Logger.WARNING, BrokerResources.E_INTERNAL_BROKER_ERROR,
                 "saving redeliver flag for " + pkt.getSysMessageID() + " to " + intid, ex);
             }
-            int dct = pkt.getRedeliverCount(storedid);
             if (rflag) {
                 redeliverFlag = true;
                 if (dct < 1) { 

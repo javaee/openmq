@@ -410,6 +410,9 @@ public class MBeanResources extends MQResourceBundle {
     final public static String I_CLS_OP_CHANGE_MASTER_BROKER_PARAM_NEWMASTERBROKER_DESC		= "MB1271";
     final public static String I_CLS_ATTR_USE_SHARED_DATABASE_FOR_CONFIG_RECORD_DESC        = "MB1272";
     final public static String I_DST_ATTR_NUM_MSGS_IN_DELAY_DELIVERY  = "MB1273";
+    
+    final public static String I_LOG_ATTR_LOG_DIRECTORY		= "MB1274";
+    final public static String I_LOG_ATTR_LOG_FILE_NAME		= "MB1275";
 
     // 2000-2999 Warning Messages
     final public static String W_DUMMY	 		= "MB2000";

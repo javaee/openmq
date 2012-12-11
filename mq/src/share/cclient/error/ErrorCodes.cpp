@@ -219,6 +219,7 @@ errorStr(const MQError errorCode)
   case MQ_THREAD_OUTSIDE_XA_TRANSACTION:        return "The calling thread is not associated with a XA transaction";
   case MQ_XA_SESSION_NO_TRANSATION:             return "The XA session has no active transaction";
   case MQ_XA_SESSION_IN_PROGRESS:               return "XA session is in progress";
+  case MQ_SHARED_SUBSCRIPTION_NOT_TOPIC:        return "Shared subscription must use Topic destination";
 
     
   case MQ_MESSAGE_NO_DESTINATION:               return "The message does not have a destination";
@@ -246,7 +247,9 @@ errorStr(const MQError errorCode)
   case MQ_CONSUMER_NOT_FOUND:                   return "Message consumer not found";
   case MQ_DESTINATION_CONSUMER_LIMIT_EXCEEDED:  return "The number of consumers on the destination exceeded limit";
   case MQ_CONSUMER_DESTINATION_NOT_FOUND:       return "Destination that this consumer was on no longer exists";
-  case MQ_NOLOCAL_DURABLE_CONSUMER_WITHOUT_CLIENTID: return "Client ID must set when noLocal is true to create durable subscription";
+  case MQ_NOLOCAL_DURABLE_CONSUMER_NO_CLIENTID: return "Client ID must set when noLocal is true to create durable subscription";
+  case MQ_NOLOCAL_SHARED_SUBSCRIPTION_NO_CLIENTID: return "Client ID must set when noLocal is true to create shared subscription";
+  case MQ_CONSUMER_NO_SUBSCRIPTION_NAME:        return "There is no subscription name specified";
 
 
   case MQ_CONNECTION_START_ERROR:               return "Connection start failed";

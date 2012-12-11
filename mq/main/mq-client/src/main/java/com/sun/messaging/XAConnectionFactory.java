@@ -45,7 +45,10 @@
 package com.sun.messaging;
 
 import javax.jms.*;
+
+import com.sun.messaging.jmq.jmsclient.ContainerType;
 import com.sun.messaging.jmq.jmsclient.XAConnectionImpl;
+import com.sun.messaging.jmq.jmsclient.XAJMSContextImpl;
 import com.sun.messaging.jmq.jmsclient.XAQueueConnectionImpl;
 import com.sun.messaging.jmq.jmsclient.XATopicConnectionImpl;
 
@@ -177,5 +180,21 @@ public class XAConnectionFactory extends com.sun.messaging.ConnectionFactory imp
     public XATopicConnection createXATopicConnection(String username, String password) throws JMSException {
         return new XATopicConnectionImpl(getCurrentConfiguration(), username, password, getConnectionType());
     }
+
+	@Override
+	public XAJMSContext createXAContext() {
+		return new XAJMSContextImpl(this, getContainerType());
+	}
+
+	@Override
+	public XAJMSContext createXAContext(String userName, String password) {
+		return new XAJMSContextImpl(this, getContainerType(), userName, password);
+	}
+	
+	private ContainerType getContainerType(){
+		//TODO We can't certain that we are in a JavaEE_Web_or_EJB environment - but it is likely 
+		//TODO Need to fix
+		return ContainerType.JavaEE_Web_or_EJB;
+	}
 
 }

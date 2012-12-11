@@ -1940,8 +1940,12 @@ public class PacketReference implements Sized, Ordered
     }
 
     public int getRedeliverCount(ConsumerUID intid) {
-        ConsumerMessagePair cmp = getAck(intid);
-        return cmp == null ? 0 : cmp.getRedeliverCount();
+        try {
+            ConsumerMessagePair cmp = getAck(intid);
+            return cmp == null ? 0 : cmp.getRedeliverCount();
+        } catch (Exception e) {
+             return 0;
+        }
     }
 
 

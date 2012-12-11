@@ -165,6 +165,7 @@ public class TransactionLogReplayer
                                       storedInterests);
                 if (!matched) {
                     logger.log(Logger.FORCE, BrokerResources.I_REPLACE_MSG_TXNLOG, mid);
+		    dst.removeMessage(mid, RemoveReason.REMOVED_OTHER);
                     msgStore.removeMessage(did, mid, false);
                     rerouteMessage(pkt, workMessage.getStoredInterests(), mid, dst);
                 }

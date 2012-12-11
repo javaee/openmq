@@ -193,23 +193,30 @@ public interface MessageConsumer extends AutoCloseable{
     receiveNoWait() throws JMSException;
 
 
-    /** Closes the message consumer.
-      *
-      * <P>Since a provider may allocate some resources on behalf of a
-      * {@code MessageConsumer} outside the Java virtual machine, clients 
-      * should close them when they
-      * are not needed. Relying on garbage collection to eventually reclaim
-      * these resources may not be timely enough.
-      *
-      * <P>This call blocks until a {@code receive} or message listener in 
-      * progress has completed. A blocked message consumer {@code receive} 
-      * call 
-      * returns null when this message consumer is closed.
-      *  
-      * @exception JMSException if the JMS provider fails to close the consumer
-      *                         due to some internal error.
-      */ 
+	/**
+	 * Closes the message consumer.
+	 * 
+	 * <P>
+	 * Since a provider may allocate some resources on behalf of a
+	 * {@code MessageConsumer} outside the Java virtual machine, clients should
+	 * close them when they are not needed. Relying on garbage collection to
+	 * eventually reclaim these resources may not be timely enough.
+	 * <P>
+	 * This call blocks until a {@code receive} or message listener in progress
+	 * has completed. A blocked message consumer {@code receive} call returns
+	 * null when this message consumer is closed.
+	 * <p>
+	 * A {@code MessageListener} must not attempt to close its own
+	 * {@code MessageConsumer} as this would lead to deadlock. The JMS provider
+	 * must detect this and throw a {@code IllegalStateException}.
+	 * 
+	 * @exception IllegalStateException
+	 *                this method has been called by a {@code MessageListener}
+	 *                on its own {@code MessageConsumer}
+	 * @exception JMSException
+	 *                if the JMS provider fails to close the consumer due to
+	 *                some internal error.
+	 */
 
-    void
-    close() throws JMSException;
+	void close() throws JMSException;
 }

@@ -74,7 +74,8 @@ abstract class Consumer {
     protected Destination destination = null;
     private String destName = null; //for logging/error reporting only
     protected String durableName = null;
-    protected String sharedSubscriptionName = null;
+    protected String sharedSubscriptionName = null; //JMS2.0 non-durable
+    protected boolean shared = false; //JMS 2.0, Topic only 
 
     protected boolean debug = Debug.debug;
 
@@ -275,6 +276,14 @@ abstract class Consumer {
 
     protected boolean getDurable() {
         return durable;
+    }
+
+    protected void setShared ( boolean flag ) {
+        shared = flag;
+    }
+
+    protected boolean getShared () {
+        return shared;
     }
 
     //protected void setIsTopic ( boolean flag ) {

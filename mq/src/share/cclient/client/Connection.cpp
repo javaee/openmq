@@ -271,7 +271,7 @@ Connection::openConnection(Properties * connectionProperties,
     
     // Set the clientID for this connection.
     if (this->clientID != NULL) {
-      ERRCHK( setClientID() );
+      ERRCHK( setClientID(PR_FALSE) );
     }
 
     LOG_INFO(( CODELOC, CONNECTION_LOG_MASK, this->id(), MQ_SUCCESS,
@@ -306,14 +306,17 @@ Cleanup:
  *
  */
 MQError
-Connection::setClientID()
+Connection::setClientID(PRBool ifnotNULL)
 {
   CHECK_OBJECT_VALIDITY();
 
   MQError errorCode = MQ_SUCCESS;
   
   if (this->clientID == NULL) {
-    return MQ_SUCCESS;
+     if (ifnotNULL) {
+        return MQ_SUCCESS;
+    }
+    ERRCHK( MQ_INVALID_CLIENTID );
   }
   CNDCHK( this->clientID->length() == 0, MQ_INVALID_CLIENTID );
 

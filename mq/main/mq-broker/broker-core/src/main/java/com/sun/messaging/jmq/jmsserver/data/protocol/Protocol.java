@@ -315,21 +315,26 @@ public interface Protocol
        *@param session session associated with the consumer
        *@param selector selector string (or null if none)
        *@param clientid clientid or null if none
-       *@param durablename durable name or null if none
+       *@param subscriptionName if dest is Topic and 
+       *       if either durable true or share true, the subscription name
+       *@param durable if dest is Topic, if true, this is a durable subscription
+       *@param share if dest is Topic, if true, this is a shared subscription
+       *@param jmsshare if dest is Topic, 
+       *       if true and share true, this is a JMS 2.0 Shared Subscription
+       *       if false and share true, this is a MQ Shared Subscription
        *@param nolocal is NoLocal turned on (topics only)
        *@param size prefetch size (or -1 if none)
-       *@param shared is this a shared connection
        *@param creator_uid a unique id to use as the creator for this consumer
        *                   which is used for indempotence (usually sysmessageid)
        *@param acc check access_control
        *@return a consumer
        */
       public Consumer createConsumer(Destination d, IMQConnection con,
-                        Session session, String selector, String clientid,
-                        String durablename, boolean nolocal, int size,
-                        boolean shared, String creator_uid, boolean acc, boolean useFlowControl)
-        throws BrokerException, SelectorFormatException, IOException;
-        
+          Session session, String selector, String clientid,
+          String subscriptionName, boolean durable, 
+          boolean share, boolean jmsshare, boolean nolocal, 
+          int size, String creator_uid, boolean acc, boolean useFlowControl)
+          throws BrokerException, SelectorFormatException, IOException;
 
       /**
        * Destroys a durable subscription

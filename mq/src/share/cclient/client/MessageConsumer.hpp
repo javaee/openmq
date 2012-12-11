@@ -80,12 +80,15 @@ protected:
   /** True iff this MessageConsumer is durable */
   PRBool isDurable;
 
+  /** True iff this MessageConsumer is shared */
+  PRBool isShared;
+
   /** True iff this MessageConsumer should not consume messages produced
    *  by this connection */
   PRBool noLocal;
 
-  /** Name of the durable subscription.  NULL if no durable subscription */
-  const UTF8String * durableName;
+  /** The subscription name.  NULL if not durable and not shared */
+  const UTF8String * subscriptionName;
 
   const UTF8String * messageSelector;
 
@@ -148,7 +151,8 @@ public:
   MessageConsumer(Session * const session, 
                   Destination * const destination,
                   const PRBool isDurable,
-                  const UTF8String * const durableName, 
+                  const PRBool isShared,
+                  const UTF8String * const subscriptionName, 
                   const UTF8String * const messageSelector, 
                   const PRBool noLocal,
                   MQMessageListenerFunc messageListener,
@@ -172,8 +176,9 @@ public:
   ReceiveMode getReceiveMode() const;
   PRBool getIsTopic() const; 
   PRBool getIsDurable() const;
+  PRBool getIsShared() const;
   PRBool getNoLocal() const;
-  const UTF8String * getDurableName() const;
+  const UTF8String * getSubscriptionName() const;
   const UTF8String * getMessageSelector() const;
   ReceiveQueue * getReceiveQueue() const;
   PRBool getIsInitialized() const;

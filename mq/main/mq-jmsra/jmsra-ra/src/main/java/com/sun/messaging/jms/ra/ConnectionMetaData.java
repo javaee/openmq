@@ -94,6 +94,8 @@ public abstract class ConnectionMetaData implements javax.jms.ConnectionMetaData
         if (hasJMSXRcvTimestamp())
             supportedProperties.addElement(
                     JMSService.JMSXProperties.JMSXRcvTimestamp.toString());
+        supportedProperties.addElement(
+            JMSService.JMSXProperties.JMSXDeliveryCount.toString());
     }
 
     protected abstract boolean hasJMSXAppID();

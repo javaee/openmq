@@ -107,6 +107,9 @@ public abstract class IMQBasicConnection extends IMQConnection
         Globals.getConfig().getBooleanProperty(
             Globals.IMQ + ".packet.debug.in");
 
+    public static boolean getDEBUG() {
+        return DEBUG;    
+    }
     public static boolean getDumpPacket() {
         return DUMP_PACKET;
     }

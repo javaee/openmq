@@ -44,6 +44,8 @@
 
 package com.sun.messaging.jmq.util.admin;
 
+import java.util.Map;
+
 /**
  * DurableInfo encapsulates information about a JMQ Durable subscription.
  * It is used to pass this information between the Broker and an
@@ -54,14 +56,18 @@ package com.sun.messaging.jmq.util.admin;
  */
 public class DurableInfo implements java.io.Serializable {
 
-    static final long serialVersionUID = 3007822764231656173L;
+    static final long serialVersionUID = 2435222814345146809L;
 
     public String	name;
     public String	clientID;
     public int		nMessages;
     public boolean      isActive;
+    public boolean isDurable = false;
     public boolean isShared = false;
+    public boolean isJMSShared = false;
     public int activeCount = 0;
+    public String uidString = null;
+    public Map<String, ConsumerInfo> activeConsumers = null;
 
     public ConsumerInfo consumer;
 
@@ -79,6 +85,11 @@ public class DurableInfo implements java.io.Serializable {
 	nMessages = 0;
         isActive = false;
 	consumer = null;
+        isDurable = false;
+        isShared = false;
+        isJMSShared = false;
+        uidString = null;
+        activeConsumers = null;
     }
 
     /**

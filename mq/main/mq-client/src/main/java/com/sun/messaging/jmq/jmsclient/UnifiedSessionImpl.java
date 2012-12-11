@@ -375,10 +375,7 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
     public TopicSubscriber
     createDurableSubscriber(Topic topic, String name) throws JMSException {
 
-        checkSessionState();
-        checkTemporaryDestination(topic);
-        checkClientIDWithBroker();
-        return new TopicSubscriberImpl (this, topic, name);
+        return createDurableSubscriber(topic, name, null, false);
     }
 
    /** Creates a durable subscription with the specified name on the
@@ -441,18 +438,18 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
      * @since 2.0
      */
     public TopicSubscriber
-    createDurableSubscriber(Topic topic,
-                            String name,
-                String messageSelector,
-                boolean noLocal) throws JMSException {
-
+    createDurableSubscriber(Topic topic, String name,
+                            String messageSelector,
+                            boolean noLocal) 
+                            throws JMSException {
 
         checkSessionState();
         checkTemporaryDestination(topic);
-        checkClientIDWithBroker();
-        checkNoLocalForDuraOrShared(noLocal, name, true);
+        checkClientIDForNoLocal(noLocal, name, 
+                     true /*dura*/, false /*shared*/);
+        checkClientIDWithBroker(true /*require clientid*/);
         return new TopicSubscriberImpl (this, topic, name,
-                                        messageSelector, noLocal);
+                       messageSelector, noLocal, false /*shared*/);
     }
 
     /** Create a Publisher for the specified topic.
@@ -544,7 +541,7 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
         }
 
         //unsubscribe
-        checkClientIDWithBroker();
+        checkClientIDWithBroker(false /*require clientid*/);
         connection.unsubscribe ( name );
         deregistered = true;
     }
@@ -701,10 +698,17 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
 
     }
 
-
-    protected void checkClientIDWithBroker() throws JMSException {
+    private void checkClientIDWithBroker(boolean clientIDRequired)
+    throws JMSException {
 
         String clientID = connection.getClientID();
+
+	if ( clientIDRequired && clientID == null ) {
+            String errorString = AdministeredObject.cr.getKString(
+                       AdministeredObject.cr.X_INVALID_CLIENT_ID, "\"\"");
+            throw new javax.jms.IllegalStateException (errorString, 
+                          AdministeredObject.cr.X_INVALID_CLIENT_ID);
+	}
 
         if (clientID != null) {
             if (connection.getProtocolHandler().isClientIDsent() == false) {
@@ -713,22 +717,30 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
         }
     }
 
-    protected void checkNoLocalForDuraOrShared(boolean noLocal,
-        String name, boolean durable)
+    private void checkClientIDForNoLocal(boolean noLocal, 
+        String name, boolean durable, boolean shared) 
         throws JMSException {
-        if (!noLocal) {
+
+        if (!noLocal || !(durable || shared)) {
             return;
         }
 
         String clientID = connection.getClientID();
 
         if (clientID == null) {
-            if (durable) {
+            if (durable && !shared) {
                 String errorString = AdministeredObject.cr.getKString(
                     AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_DURA, name);
                 throw new javax.jms.IllegalStateException(errorString, 
                     AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_DURA);
-            } else { 
+            }
+            if (durable && shared) {
+                String errorString = AdministeredObject.cr.getKString(
+                    AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_DURA_SHARE, name);
+                throw new javax.jms.IllegalStateException(errorString, 
+                    AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_DURA_SHARE);
+            }
+            if (shared) {
                 String errorString = AdministeredObject.cr.getKString(
                     AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_SHARE, name);
                 throw new javax.jms.IllegalStateException(errorString, 
@@ -770,13 +782,6 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
         boolean noLocal) throws JMSException {
         checkSessionState();
         checkTemporaryDestination(topic);
-        checkNoLocalForDuraOrShared(noLocal, sharedSubscriptionName, false);
-        if (topic == null) {
-            String errorString = AdministeredObject.cr.getKString(
-                    AdministeredObject.cr.X_DESTINATION_NOTFOUND, "null" );
-            throw new InvalidDestinationException(errorString,
-                    AdministeredObject.cr.X_DESTINATION_NOTFOUND);
-        }
         if (sharedSubscriptionName == null || 
             sharedSubscriptionName.trim().length() == 0) {
             String errorString = AdministeredObject.cr.getKString(
@@ -786,7 +791,9 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
                 AdministeredObject.cr.X_INVALID_SHARED_SUBSCRIPTION_NAME);
             ExceptionHandler.throwJMSException(jmse);
         }
-
+        checkClientIDForNoLocal(noLocal, sharedSubscriptionName,
+                                false /*dura*/, true /*shared*/);
+        checkClientIDWithBroker(false /*require clientid*/);
         return new TopicSubscriberImpl(this, topic, 
             messageSelector, noLocal, sharedSubscriptionName);
     }
@@ -802,4 +809,24 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
         String messageSelector, boolean noLocal) throws JMSException {
         return createDurableSubscriber(topic, name, messageSelector, noLocal);
     }
+
+    @Override
+    public MessageConsumer createSharedDurableConsumer(Topic topic, String name)
+    throws JMSException {
+        return createSharedDurableConsumer(topic, name, null, false);
+    }
+
+    @Override
+    public MessageConsumer createSharedDurableConsumer(Topic topic, String name,
+         String messageSelector, boolean noLocal)
+         throws JMSException {
+
+        checkSessionState();
+        checkTemporaryDestination(topic);
+        checkClientIDForNoLocal(noLocal, name, true /*dura*/, true /*shared*/);
+        checkClientIDWithBroker(false /*require clientid*/);
+        return new TopicSubscriberImpl (this, topic, name,
+                       messageSelector, noLocal, true /*shared*/);
+    }
+
 }

@@ -53,14 +53,14 @@
     <groupId>javax.jms</groupId>
     <artifactId>javax.jms-api</artifactId>
     <packaging>jar</packaging>
-    <version>2.0-b07</version>
+    <version>2.0-b08</version>
     <properties>
 	<spec.title>Java(TM) Message Service Specification</spec.title>
-        <jmsspecversion>2.0-b07</jmsspecversion>
-        <spec.version>1.1.99.07</spec.version>
+        <jmsspecversion>2.0-b08</jmsspecversion>
+        <spec.version>1.1.99.08</spec.version>
 	<extension.name>javax.jms</extension.name>
         <bundle.symbolicName>javax.jms-api </bundle.symbolicName>
-        <bundle.version>1.1.99.b07</bundle.version>
+        <bundle.version>1.1.99.b08</bundle.version>
         <bundle.name>JMS API</bundle.name>
         <vendor.name>Oracle Corporation</vendor.name>
         <implementation.vendor.id>org.glassfish.mq</implementation.vendor.id>
@@ -126,9 +126,9 @@
                         <Extension-Name>${extension.name}</Extension-Name>
                         <Specification-Version>${spec.version}</Specification-Version>
                         <Specification-Vendor>${vendor.name}</Specification-Vendor>
-                        <Implementation-Version>2.0-b07</Implementation-Version>
+                        <Implementation-Version>2.0-b08</Implementation-Version>
                         <Implementation-Vendor-Id>${implementation.vendor.id}</Implementation-Vendor-Id>
-                        <specversion>2.0-b07</specversion>
+                        <specversion>2.0-b08</specversion>
                     </instructions>
                 </configuration>
                 <executions>

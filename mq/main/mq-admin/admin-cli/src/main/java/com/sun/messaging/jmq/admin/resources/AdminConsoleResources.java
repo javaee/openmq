@@ -666,7 +666,7 @@ public class AdminConsoleResources extends MQResourceBundle {
      * Start of tab titles
      */
     final public static String I_DEST_PROP_BASIC       	= "A1503";
-    final public static String I_DEST_PROP_DUR       	= "A1504";
+    final public static String I_DEST_PROP_SUB       	= "A1504";
     /*
      * End of tab titles
      */

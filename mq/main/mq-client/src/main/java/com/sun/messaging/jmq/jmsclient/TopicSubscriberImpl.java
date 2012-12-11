@@ -111,28 +111,17 @@ public class TopicSubscriberImpl extends MessageConsumerImpl implements TopicSub
         this.topic = topic;
     }
 
-    public TopicSubscriberImpl(SessionImpl session,
-                            Topic topic, String durableName)
-                            throws JMSException {
-
-        super (session, topic);
-        this.topic = topic;
-
-        setDurable (true);
-        setDurableName ( durableName );
-
-        init();
-    }
-
     public TopicSubscriberImpl(SessionImpl session, Topic topic,
-                                 String durableName, String selector,
-                                 boolean noLocal) throws JMSException {
+                               String durableName, String selector,
+                               boolean noLocal, boolean shared)
+                              throws JMSException {
 
         super (session, topic);
         this.topic = topic;
 
         setMessageSelector (selector);
         setNoLocal (noLocal);
+        setShared (shared );
         setDurable (true);
         setDurableName ( durableName );
 
@@ -149,6 +138,7 @@ public class TopicSubscriberImpl extends MessageConsumerImpl implements TopicSub
 
         setMessageSelector (selector);
         setNoLocal (noLocal);
+        setShared( true );
         setSharedSubscriptionName( sharedSubscriptionName );
 
         init();

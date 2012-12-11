@@ -61,9 +61,10 @@ package javax.jms;
   * {@code IllegalStateException} 
   * if they are used from {@code QueueSession}:
   *<UL>
+  *   <LI>{@code createDurableSubscriber}
   *   <LI>{@code createDurableConsumer}
   *   <LI>{@code createSharedConsumer}
-  *   <LI>{@code createDurableSubscriber}
+  *   <LI>{@code createSharedDurableConsumer}
   *   <LI>{@code createTemporaryTopic}
   *   <LI>{@code createTopic}
   *   <LI>{@code unsubscribe}

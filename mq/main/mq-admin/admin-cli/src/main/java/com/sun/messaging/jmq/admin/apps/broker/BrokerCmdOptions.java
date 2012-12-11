@@ -255,6 +255,7 @@ public interface BrokerCmdOptions  {
     public static String OPTION_DEBUG			= "-debug";
     public static String OPTION_ADMIN_DEBUG		= "-adebug";
     public static String OPTION_NOCHECK			= "-nocheck";
+    public static String OPTION_DETAIL			= "-detail";
     public static String OPTION_RECV_TIMEOUT		= "-rtm";
     public static String OPTION_NUM_RETRIES		= "-rtr";
     public static String OPTION_SINGLE_TARGET_ATTR	= "-attr";
@@ -493,6 +494,9 @@ public interface BrokerCmdOptions  {
 
     public static String PROP_NAME_OPTION_NOCHECK	= "nocheck";
     public static String PROP_VALUE_OPTION_NOCHECK	= "true";
+
+    public static String PROP_NAME_OPTION_DETAIL	= "detail";
+    public static String PROP_VALUE_OPTION_DETAIL	= "true";
 
     public static String PROP_NAME_OPTION_RECV_TIMEOUT	= "receiveTimeout";
     public static String PROP_NAME_OPTION_NUM_RETRIES	= "numRetries";

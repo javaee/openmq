@@ -45,6 +45,7 @@
 package com.sun.messaging.jmq.admin.apps.broker;
 
 import java.io.*;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Hashtable;
 import java.util.HashMap;
@@ -77,6 +78,7 @@ import com.sun.messaging.jmq.util.DebugPrinter;
 import com.sun.messaging.jmq.util.admin.MessageType;
 import com.sun.messaging.jmq.util.admin.DestinationInfo;
 import com.sun.messaging.jmq.util.admin.DurableInfo;
+import com.sun.messaging.jmq.util.admin.ConsumerInfo;
 import com.sun.messaging.jmq.util.admin.ServiceInfo;
 import com.sun.messaging.jmq.jmsclient.GenericPortMapperClient;
 import com.sun.messaging.jmq.admin.event.AdminEventListener;
@@ -367,7 +369,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
             boolean listDstName = false; // display dst if we list all
 
             if (broker == null)  {
-                Globals.stdErrPrintln(ar.getString(ar.I_JMQCMD_LIST_DUR_FAIL));
+                Globals.stdErrPrintln(ar.getString(ar.I_JMQCMD_LIST_SUB_FAIL));
                 return (1);
             }
 
@@ -378,9 +380,9 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
             String destName = brokerCmdProps.getDestName();
 
             if (destName != null)
-                Globals.stdOutPrintln(ar.getString(ar.I_JMQCMD_LIST_DUR, destName));
+                Globals.stdOutPrintln(ar.getString(ar.I_JMQCMD_LIST_SUB, destName));
             else
-                Globals.stdOutPrintln(ar.getString(ar.I_JMQCMD_LIST_ALL_DUR));
+                Globals.stdOutPrintln(ar.getString(ar.I_JMQCMD_LIST_ALL_SUB));
             printBrokerInfo(broker);
 
             try {
@@ -389,7 +391,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
             } catch (BrokerAdminException bae)  {
                 handleBrokerAdminException(bae);
 
-                Globals.stdErrPrintln(ar.getString(ar.I_JMQCMD_LIST_DUR_FAIL));
+                Globals.stdErrPrintln(ar.getString(ar.I_JMQCMD_LIST_SUB_FAIL));
                 return (1);
             }
 
@@ -408,7 +410,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 
                 handleBrokerAdminException(bae);
 
-                Globals.stdErrPrintln(ar.getString(ar.I_JMQCMD_LIST_DUR_FAIL));
+                Globals.stdErrPrintln(ar.getString(ar.I_JMQCMD_LIST_SUB_FAIL));
                 return (1);
             }
 		
@@ -420,56 +422,98 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
                     BrokerCmdPrinter bcp = null;
                     String[] row = null;
                     if (listDstName) {
+                        row = new String[6];
+                        bcp= new BrokerCmdPrinter(6, 3, "-");
+                    } else {
                         row = new String[5];
                         bcp= new BrokerCmdPrinter(5, 3, "-");
-                    } else {
-                        row = new String[4];
-                        bcp= new BrokerCmdPrinter(4, 3, "-");
+                    }
+                    if (brokerCmdProps.detailModeSet()) {
+                        bcp.setSortNeeded(false);
                     }
                     int indx = 0;
-                    row[indx ++] = ar.getString(ar.I_JMQCMD_DUR_NAME);
+                    row[indx ++] = ar.getString(ar.I_JMQCMD_SUB_NAME);
                     row[indx ++] = ar.getString(ar.I_JMQCMD_CLIENT_ID);
                     if (listDstName)
                         row[indx ++] = ar.getString(ar.I_JMQCMD_DST_NAME);
-                    row[indx ++] = ar.getString(ar.I_JMQCMD_DUR_NUM_MSG);
-                    row[indx ++] = ar.getString(ar.I_JMQCMD_DUR_STATE);
+                    row[indx ++] = ar.getString(ar.I_JMQCMD_DURABLE);
+                    row[indx ++] = ar.getString(ar.I_JMQCMD_SUB_NUM_MSG);
+                    row[indx ++] = ar.getString(ar.I_JMQCMD_SUB_STATE);
                     bcp.addTitle(row);
 
                     Enumeration thisEnum = durs.elements();
                     while (thisEnum.hasMoreElements()) {
                         DurableInfo dInfo = (DurableInfo)thisEnum.nextElement();
                         indx = 0;
-                        row[indx ++] = (dInfo.name == null) ? "" : dInfo.name;
+                        row[indx++] = (dInfo.name == null) ? "" : dInfo.name;
                         row[indx++] = (dInfo.clientID == null) ? "" : dInfo.clientID;
-                        if (listDstName)
-                            row[indx ++] = (dInfo.consumer == null) ? "" : dInfo.consumer.destination;
-                        row[indx ++] = new Integer(dInfo.nMessages).toString();
-			if (dInfo.isActive) {
-                        if (dInfo.isShared && listDstName) {
-                            row[indx ++] = ar.getString(ar.I_ACTIVE)+"["+dInfo.activeCount+"]"; 
-                        } else {
-                            row[indx ++] = ar.getString(ar.I_ACTIVE); 
+                        if (listDstName) {
+                            row[indx++] = (dInfo.consumer == null) ? "" : dInfo.consumer.destination;
                         }
-            } else {
-                            row[indx ++] = ar.getString(ar.I_INACTIVE); 
-            }
+                        row[indx++] = String.valueOf(dInfo.isDurable);
+                        row[indx++] = new Integer(dInfo.nMessages).toString();
+			if (dInfo.isActive) {
+                            if (dInfo.isShared) {
+                                row[indx] = ar.getString(ar.I_ACTIVE)+"["+dInfo.activeCount+"]"+
+                                               (dInfo.isJMSShared ? "jms":"mq");
+                            } else {
+                                row[indx] = ar.getString(ar.I_ACTIVE);
+                            }
+                        } else {
+                            if (dInfo.isShared) { 
+                                row[indx] = ar.getString(ar.I_INACTIVE)+"[0]"+
+                                               (dInfo.isJMSShared ? "jms":"mq");
+                            } else {
+                                row[indx] = ar.getString(ar.I_INACTIVE); 
+                            }
+                        }
+                        if (brokerCmdProps.detailModeSet()) {
+                            row[indx] = row[indx]+", ["+dInfo.uidString+"]";
+                        }
+                        indx++;
                         bcp.add(row);
+                        if (brokerCmdProps.detailModeSet()) {
+                            if (dInfo.activeConsumers == null) {
+                                continue;
+                            }
+                            for (Map.Entry<String, ConsumerInfo> pair: dInfo.activeConsumers.entrySet()) {
+                                ConsumerInfo cinfo = pair.getValue();
+                                String cinfostr = null;
+                                if (cinfo.connection != null) {
+                                    cinfostr = "["+cinfo.uidString+", "+cinfo.subuidString+", "+
+                                                 cinfo.connection.uuid+", "+cinfo.brokerAddressShortString+"]";
+                                } else {
+                                    cinfostr = "["+cinfo.uidString+", "+cinfo.subuidString+", "+
+                                                 cinfo.brokerAddressShortString+"]";
+                                }
+                                int tmpindx  = 0;
+                                row[tmpindx++] = " ";
+                                row[tmpindx++] = " ";
+                                if (listDstName) {
+                                    row[tmpindx++] = " ";
+                                }
+                                row[tmpindx++] = " ";
+                                row[tmpindx++] = " ";
+                                row[tmpindx++] = cinfostr;
+                                bcp.add(row);
+                            }
+                        }
                     }
 
         	    // Use durname+clientID as the key when listing.
         	    bcp.setKeyCriteria(new int[] {0, 1});
                     bcp.println();
-                    Globals.stdOutPrintln(ar.getString(ar.I_JMQCMD_LIST_DUR_SUC));
+                    Globals.stdOutPrintln(ar.getString(ar.I_JMQCMD_LIST_SUB_SUC));
 
                 } else  {
-                    Globals.stdErrPrintln(ar.getString(ar.I_JMQCMD_LIST_DUR_FAIL));
+                    Globals.stdErrPrintln(ar.getString(ar.I_JMQCMD_LIST_SUB_FAIL));
                     return (1);
                 }
 
             } catch (BrokerAdminException bae)  {
                 handleBrokerAdminException(bae);
 
-                Globals.stdErrPrintln(ar.getString(ar.I_JMQCMD_LIST_DUR_FAIL));
+                Globals.stdErrPrintln(ar.getString(ar.I_JMQCMD_LIST_SUB_FAIL));
                 return (1);
 	    }
         } else if (CMDARG_TRANSACTION.equals(commandArg)) {

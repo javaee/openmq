@@ -47,13 +47,12 @@
 
    <!-- ===================  targets ================= -->
 
-
-    <target name="preparec">
+    <target name="preparec" if="mqcrt.willbuild">
       <!-- Create obj directory -->
       <mkdir  dir="${archbinary.dir}/obj/cclient"/>
     </target>
 
-    <target name="cleanc">
+    <target name="cleanc" if="mqcrt.willbuild">
       <!-- Create obj directory -->
       <echo message="### Cleaning up ${archbinary.dir}/obj/cclient directory"/>
       <delete dir="${archbinary.dir}/obj/cclient"/>
@@ -62,33 +61,43 @@
 
     <target name="buildcclient" 
           depends="preparec"
-          description="Builds the C Client API">
+          description="Builds the C Client API" if="mqcrt.willbuild">
 
-     <condition property="ccopts" value="-g">
-         <and>
-            <equals arg1="${arch}" arg2="solaris"/>
-            <isset property="ccargs.solaris"/>
-            <isset property="compile.debug"/>
-         </and>
-     </condition>
-     <condition property="ccopts" value="-O">
-         <and>
-            <equals arg1="${arch}" arg2="solaris"/>
-            <isset property="ccargs.solaris"/>
-         </and>
-     </condition>
-
-     <mkdir  dir="${archbinary.dir}/obj/cclient/error"/>
-     <exec executable = "/bin/sh" os="SunOS,Linux,Solaris">
-	<arg line='-c "cd ${basec.dir}/error; CC ${ccopts} ${ccargs} ${cincludes} -o ${archbinary.dir}/obj/cclient/error/ErrorCodes.o ${basec.dir}/error/ErrorCodes.cpp;"' />
-     </exec>
-     <exec executable = "/bin/sh" os="SunOS,Linux,Solaris">
-	<arg line='-c "cd ${basec.dir}/error; CC ${ccopts} ${ccargs} ${cincludes} -o ${archbinary.dir}/obj/cclient/error/ErrorTrace.o ${basec.dir}/error/ErrorTrace.cpp;"' />
-     </exec>
-     <mkdir  dir="${archbinary.dir}/obj/cclient/util"/>
-     <exec executable = "/bin/sh" os="SunOS,Linux,Solaris">
-	<arg line='-c "cd ${basec.dir}/util; CC ${ccopts} ${ccargs} ${cincludes} -o ${archbinary.dir}/obj/cclient/util/Logger.o ${basec.dir}/util/Logger.cpp;"' />
-     </exec>
+     <mkdir dir="${archbinary.dir}/obj/cclient/auth"/>
+     <mkdir dir="${archbinary.dir}/obj/cclient/basictypes"/>
+     <mkdir dir="${archbinary.dir}/obj/cclient/client"/>
+     <mkdir dir="${archbinary.dir}/obj/cclient/client/auth"/>
+     <mkdir dir="${archbinary.dir}/obj/cclient/client/protocol"/>
+     <mkdir dir="${archbinary.dir}/obj/cclient/containers"/>
+     <mkdir dir="${archbinary.dir}/obj/cclient/cshim"/>
+     <mkdir dir="${archbinary.dir}/obj/cclient/debug"/>
+     <mkdir dir="${archbinary.dir}/obj/cclient/error"/>
+     <mkdir dir="${archbinary.dir}/obj/cclient/io"/>
+     <mkdir dir="${archbinary.dir}/obj/cclient/net"/>
+     <mkdir dir="${archbinary.dir}/obj/cclient/serial"/>
+     <mkdir dir="${archbinary.dir}/obj/cclient/util"/>
+     <echo message="Building C++ for mqcrt..."/>
+     <apply executable="${mqcrt.cxx.tool}" os="Mac OS X,Linux,SunOS,Solaris" relative="false" verbose="true" dest="${archbinary.dir}/obj/cclient" failonerror="true">
+         <arg line="${mqcrt.cxxargs} ${mqcrt.cppflags} ${mqcrt.cxxopts} ${mqcrt.cincludes} -o "/>
+         <targetfile/>
+         <srcfile/>
+         <fileset dir="${basec.dir}" includes="**/*.cpp" excludes="examples/**,**/SocketTest.cpp"/>
+         <mapper type="glob" from="*.cpp" to="*.o"/>
+     </apply>
+     <echo message="Building C for mqcrt..."/>
+     <apply executable="${mqcrt.cc.tool}" os="Mac OS X,Linux,SunOS,Solaris" relative="false" verbose="true" dest="${archbinary.dir}/obj/cclient" failonerror="true">
+         <arg line="${mqcrt.ccargs} ${mqcrt.cppflags} ${mqcrt.ccopts} ${mqcrt.cincludes} -o "/>
+         <targetfile/>
+         <srcfile/>
+         <fileset dir="${basec.dir}" includes="**/*.c" excludes="examples/**,**/*Test.c"/>
+         <mapper type="glob" from="*.c" to="*.o"/>
+     </apply>
+     <echo message="Linking mqcrt..."/>
+     <apply executable="${mqcrt.dld.tool}" os="Mac OS X,Linux,SunOS,Solaris" relative="false" verbose="true" failonerror="true" parallel="true">
+         <arg line="${mqcrt.dldargs} ${mqcrt.dldopts} -o ${archbinary.dir}/obj/cclient/${mqcrt.libname} ${mqcrt.linkdirs} ${mqcrt.libs}"/>
+         <srcfile/>
+         <fileset dir="${archbinary.dir}/obj" includes="**/*.o"/>
+     </apply>
     </target>
 
 </project>

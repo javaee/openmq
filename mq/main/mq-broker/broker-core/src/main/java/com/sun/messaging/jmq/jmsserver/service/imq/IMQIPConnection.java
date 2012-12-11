@@ -1459,14 +1459,7 @@ public class IMQIPConnection extends IMQBasicConnection
                 if (convertPkt != null)
                     convertPkt.handleWritePacket(ctrlpkt); 
                 if (IMQBasicConnection.DEBUG || DUMP_PACKET || OUT_DUMP_PACKET) {
-                    int flag = (DUMP_PACKET || OUT_DUMP_PACKET) 
-                            ? Logger.INFO : Logger.DEBUGHIGH;
-                    logger.log(flag, "\n------------------------------"
-                            +"\nSending Control Packet -[block = "+BLOCKING 
-                            + ",nio = "+!STREAMS+"]   Dumping"
-                            + "\n------------------------------"
-                            + "\n" + ctrlpkt.dumpPacketString("<<<<****")
-                            + "\n------------------------------");
+                    dumpControlPacket(ctrlpkt);
                 }
                 inCtrlWrite = !writeOutPacket(ctrlpkt);
                 if (!inCtrlWrite) { // we are done
@@ -1665,6 +1658,17 @@ public class IMQIPConnection extends IMQBasicConnection
         } else  {
             return Operation.PROCESS_PACKETS_COMPLETE;
         }
+    }
+
+    protected void dumpControlPacket(Packet pkt) {
+        int loglevel = ((DUMP_PACKET || OUT_DUMP_PACKET) ? 
+                        Logger.INFO : Logger.DEBUGHIGH);
+        logger.log(loglevel, "\n------------------------------"
+                            +"\nSending Control Packet -[block = "+BLOCKING 
+                            + ",nio = "+!STREAMS+"]   Dumping"
+                            + "\n------------------------------"
+                            + "\n" + pkt.dumpPacketString("<<<<****")
+                            + "\n------------------------------");
     }
 
     protected void checkState() {

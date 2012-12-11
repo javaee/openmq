@@ -63,6 +63,7 @@ import com.sun.messaging.jmq.io.Packet;
 import com.sun.messaging.jmq.io.PacketType;
 import com.sun.messaging.jmq.io.SysMessageID;
 
+import com.sun.messaging.jmq.jmsclient.MessageImpl;
 import com.sun.messaging.jmq.jmsclient.zip.Compressor;
 import com.sun.messaging.jmq.jmsclient.zip.Decompressor;
 
@@ -153,6 +154,8 @@ public class DirectPacket
     
     protected boolean shouldCompress = false;
 
+    protected int clientRetries = 0;
+
     public static final String JMS_SUN_COMPRESS = "JMS_SUN_COMPRESS";
 
     public static final String JMS_SUN_UNCOMPRESSED_SIZE =
@@ -206,12 +209,23 @@ public class DirectPacket
     /** Create a new instance of DirectPacket - used by Consumer.deliver */
     public DirectPacket(JMSPacket jmsPacket, long consumerId,
             DirectSession ds, JMSService jmsservice)
-    throws JMSException {
+            throws JMSException {
         if (jmsPacket != null) {
             this.pkt = jmsPacket.getPacket();
             this.consumerId = consumerId;
             this.ds = ds;
-            this._getPropertiesFromPacket();
+            try {
+                this.properties = (Hashtable<String, Object>)this.pkt.getProperties();
+            } catch (Exception ex) {
+                this.properties = null;
+                ex.printStackTrace();
+                String exerrmsg = _lgrMID_EXC + "DirectPacket:Constructor on deliver:"
+                    + "Unable to get properties from JMSPacket.";
+                JMSException jmse = new JMSException(exerrmsg);
+                throw jmse;
+            }
+            this.setIntProperty(JMSService.JMSXProperties.JMSXDeliveryCount.toString(),
+                                jmsPacket.getPacket().getDeliveryCount());
             this.readOnlyProperties = true;
             this.readOnlyBody = true;
         } else {
@@ -1910,18 +1924,6 @@ public class DirectPacket
         return this.pkt.getMessageBodyByteArray();
     }
 
-    protected void _getPropertiesFromPacket(){
-        try {
-            this.properties = (Hashtable<String, Object>)this.pkt.getProperties();
-        } catch (IOException ex) {
-            this.properties = null;
-            ex.printStackTrace();
-        } catch (ClassNotFoundException ex) {
-            this.properties = null;
-            ex.printStackTrace();
-        }
-    }
-
     protected void _acknowledgeThisMessageForMDB(DirectXAResource dxar)
     throws javax.jms.JMSException {
         if (_logFINE){
@@ -1930,7 +1932,7 @@ public class DirectPacket
         }
         //This is only called for an MDB message - skip consumerId check
         this.ds._acknowledgeThisMessageForMDB(this, this.consumerId,
-                JMSService.MessageAckType.ACKNOWLEDGE, dxar);
+                JMSService.MessageAckType.ACKNOWLEDGE, dxar, getClientRetries());
     }
 
     protected void _acknowledgeThisMessageAsDeadForMDB(DirectXAResource dxar)
@@ -1941,7 +1943,7 @@ public class DirectPacket
         }
         //This is only called for an MDB message - skip consumerId check
         this.ds._acknowledgeThisMessageForMDB(this, this.consumerId,
-                JMSService.MessageAckType.DEAD, dxar);
+                JMSService.MessageAckType.DEAD, dxar, getClientRetries());
     }
     /////////////////////////////////////////////////////////////////////////
     //  end MQ methods for DirectPacket / javax.jms.Message
@@ -2064,4 +2066,30 @@ public class DirectPacket
     //is sent without calling clear properties.
     shouldCompress = true;
   }
+
+@Override
+public <T> T getBody(Class<T> c) throws JMSException {
+	return MessageImpl._getBody(this, c);
+}
+
+@Override
+public boolean isBodyAssignableTo(Class c) throws JMSException {
+	return MessageImpl._isBodyAssignableTo(this, c);
+}
+
+    public void updateDeliveryCount(int newDeliveryCount) {
+        if (this.properties == null) {
+            this.properties = new Hashtable<String, Object>();
+        }
+        this.properties.put(JMSService.JMSXProperties.JMSXDeliveryCount.toString(),
+                            Integer.valueOf(newDeliveryCount));
+    }
+
+    public int getClientRetries() {
+        return clientRetries;
+    }
+
+    public void setClientRetries(int retryCount) {
+        clientRetries = retryCount;
+    }
 }

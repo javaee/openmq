@@ -101,66 +101,6 @@
          </not>
      </condition>
 
- <!-- ==================== C Includes =========================== -->
-      <!-- XXX - I'd really like to look set this by retrieving a
-           composite property e.g. cincludes=${cincludes.${arch}}
-           but I cant get it to work -->
-
-     <condition property="cincludes" value="${cincludes.solaris}">
-         <and>
-            <equals arg1="${arch}" arg2="solaris"/>
-            <isset property="cincludes.solaris"/>
-         </and>
-     </condition>
-     <condition property="cincludes" value="${cincludes.linux}">
-         <and>
-            <equals arg1="${arch}" arg2="linux"/>
-            <isset property="cincludes.linux"/>
-         </and>
-     </condition>
-     <condition property="cincludes" value="${cincludes.win32}">
-         <and>
-            <equals arg1="${arch}" arg2="win32"/>
-            <isset property="cincludes.win32"/>
-         </and>
-     </condition>
-     <condition property="cincludes" value="-unset-">
-         <not>
-            <isset property="cincludes"/>
-         </not>
-     </condition>
-
- <!-- ==================== C args =========================== -->
-      <!-- XXX - I'd really like to look set this by retrieving a
-           composite property e.g. ccargs=${ccargs.${arch}}
-           but I cant get it to work -->
-
-     <condition property="ccargs" value="${ccargs.solaris}">
-         <and>
-            <equals arg1="${arch}" arg2="solaris"/>
-            <isset property="ccargs.solaris"/>
-         </and>
-     </condition>
-
-     <condition property="ccargs" value="${ccargs.linux}">
-         <and>
-            <equals arg1="${arch}" arg2="linux"/>
-            <isset property="ccargs.linux"/>
-         </and>
-     </condition>
-     <condition property="ccargs" value="${ccargs.win32}">
-         <and>
-            <equals arg1="${arch}" arg2="win32"/>
-            <isset property="ccargs.win32"/>
-         </and>
-     </condition>
-     <condition property="ccargs" value="-unset-">
-         <not>
-            <isset property="ccargs"/>
-         </not>
-     </condition>
-
-
  <!-- ==================== locations =========================== -->
      <!-- useJMQExternal  determines if jmq external is used -->
 

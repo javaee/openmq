@@ -187,6 +187,20 @@ class SessionQueue implements Traceable {
             Debug.println(this);
         }
     }
+    
+    /**
+     * Adds an object to the front of the queue with no special synchronization.
+     * @param nobj new object to be added to the front of the queue
+     */
+    protected void
+    enqueueFirst(Object nobj) {
+
+        queue.enqueueFirst(nobj);
+
+        if ( debug ) {
+            Debug.println(this);
+        }
+    }
 
     /**
     Dequeues an element from the queue without any special synchronization.

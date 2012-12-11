@@ -222,7 +222,7 @@ MessageConsumerTable::operationAll(MessageConsumerOP op, const void * opData)
            consumer->stop();
            if (error != MQ_SUCCESS) errorCode = error;
          } else if (op == MessageConsumerTable::UNSUBSCRIBE_DURABLE) {
-           if (((UTF8String *)opData)->equals(consumer->getDurableName())) {
+           if (((UTF8String *)opData)->equals(consumer->getSubscriptionName())) {
              errorCode = MQ_CANNOT_UNSUBSCRIBE_ACTIVE_CONSUMER;
              break;
            }

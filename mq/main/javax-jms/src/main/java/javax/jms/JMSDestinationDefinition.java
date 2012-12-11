@@ -45,16 +45,22 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Annotation used to define a Java Message Service (JMS) destination
- *  and be registered with JNDI. The {@code JMSDestination}
- *  may be configured by setting the annotation elements for commonly used
- *  {@code JMSDestination} properties.  Additional standard and
- *  vendor-specific properties may be specified using the {@code properties
- *  } element. Once defined, a destination resource may be referenced by
- *  a component using the {@code lookup} element of the
- *  {@code Resource} annotation.
- *
- *  @see javax.annotation.Resource
+ * An application may use this annotation to specify a JMS {@code 
+ * Destination} resource that it requires in its operational 
+ * environment. This provides information that can be used at the 
+ * application's deployment to provision the required resource
+ * and allows an application to be deployed into a Java EE environment 
+ * with more minimal administrative configuration.
+ * <p>
+ * The {@code Destination} resource may be configured by 
+ * setting the annotation elements for commonly used properties. 
+ * Additional properties may be specified using the {@code properties}
+ * element. Once defined, a {@code Destination} resource may be referenced by a
+ * component in the same way as any other {@code Destination} resource,
+ * for example by using the {@code lookup} element of the {@code Resource}
+ * annotation.
+ * 
+ * @see javax.annotation.Resource
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

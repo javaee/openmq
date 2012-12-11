@@ -2129,6 +2129,8 @@ public class ProtocolHandler {
             message.setStringProperty(ConnectionMetaDataImpl.JMSXRcvTimestamp,
                                       String.valueOf(System.currentTimeMillis()));
         }
+        message.setIntProperty(ConnectionMetaDataImpl.JMSXDeliveryCount,
+                               pkt.getDeliveryCount());
 
         message.setMessageReadMode(true);
         message.setPropertiesReadMode(true);
@@ -2220,8 +2222,6 @@ public class ProtocolHandler {
             props.put("JMQNamespace", connection.getRANamespaceUID());
         }
 
-        //props.put("JMQShare", new Boolean(connection.imqEnableSharedClientID));
-        
         props.put("JMQShare", Boolean.valueOf (connection.imqEnableSharedClientID));
         
         //set properties to the packet
@@ -2308,14 +2308,24 @@ public class ProtocolHandler {
         //set durable flag
         if (consumer.getDurable() == true) {
             props.put("JMQDurableName", consumer.getDurableName());
-            props.put("JMQShare", Boolean.valueOf(
-                 connection.imqEnableSharedClientID));
-        } else {
-            props.put("JMQShare", Boolean.valueOf (
-                (consumer.getSharedSubscriptionName() != null ||
-                 connection.imqEnableSharedSubscriptions) && 
-                (!dest.isTemporary())));
         }
+
+        //set correct share flag
+        if (consumer.getShared()) { //JMS2.0
+            props.put("JMQJMSShare", Boolean.valueOf(consumer.getShared()));
+            if (consumer.getSharedSubscriptionName() != null) {
+                props.put("JMQSharedSubscriptionName", consumer.getSharedSubscriptionName());
+            }
+        } else { 
+            if (consumer.getDurable()) {
+                props.put("JMQShare",
+                    Boolean.valueOf(connection.imqEnableSharedClientID));
+            } else {
+                props.put("JMQShare",
+                    Boolean.valueOf(connection.imqEnableSharedSubscriptions && 
+                                    (!dest.isTemporary())));
+            }
+	}
 
         props.put("JMQDestination", dest.getName());
         //set dest type
@@ -2376,10 +2386,11 @@ public class ProtocolHandler {
             PacketType.ADD_CONSUMER_REPLY);
 
         int statusCode = -1;
-
+        String reason = null;
         try {
             Hashtable replyProps = reply.getProperties();
             statusCode = ((Integer) replyProps.get("JMQStatus")).intValue();
+            reason = (String)replyProps.get("JMQReason");
         } catch (IOException e) {
             ExceptionHandler.handleException(e,
                 ClientResources.X_NET_ACK, true);
@@ -2433,8 +2444,8 @@ public class ProtocolHandler {
                 ClientResources.L_QUEUE : ClientResources.L_TOPIC));
             String errorString = AdministeredObject.cr.getKString(
                 ClientResources.X_DESTINATION_CONSUMER_LIMIT_EXCEEDED,
-                destString, dest.getName()) +
-                                 this.getUserBrokerInfo();
+                destString, dest.getName()) +this.getUserBrokerInfo()+
+                (reason == null ? "":"["+reason+"]");
 
             ExceptionHandler.throwJMSException (
             new com.sun.messaging.jms.ResourceAllocationException(errorString,

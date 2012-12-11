@@ -53,6 +53,7 @@ import javax.jms.CompletionListener;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.InvalidDestinationException;
+import javax.jms.MessageNotWriteableException;
 import javax.jms.JMSException;
 import javax.jms.JMSProducer;
 import javax.jms.JMSRuntimeException;
@@ -67,6 +68,7 @@ import javax.jms.TextMessage;
 import com.sun.messaging.AdministeredObject;
 import com.sun.messaging.jmq.jmsclient.resources.ClientResources;
 import com.sun.messaging.jms.MQInvalidDestinationRuntimeException;
+import com.sun.messaging.jms.MQMessageNotWriteableRuntimeException;
 import com.sun.messaging.jms.MQMessageFormatRuntimeException;
 import com.sun.messaging.jms.MQRuntimeException;
 
@@ -124,7 +126,10 @@ public class JMSProducerImpl implements JMSProducer, Traceable {
 			}
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
+		} catch (MessageFormatException e) {
+			throw new MQMessageFormatRuntimeException(e);
 		} catch (JMSException e) {
+			throw new MQRuntimeException(e);
 		}
 		return this;
 	}
@@ -148,6 +153,8 @@ public class JMSProducerImpl implements JMSProducer, Traceable {
 			}
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
+		} catch (MessageFormatException e) {
+			throw new MQMessageFormatRuntimeException(e);
 		} catch (JMSException e) {
 			throw new MQRuntimeException(e);
 		}	
@@ -166,6 +173,10 @@ public class JMSProducerImpl implements JMSProducer, Traceable {
 					Entry<String, Object> thisEntry = entryIter.next();
 					mapMessage.setObject((String) thisEntry.getKey(), thisEntry.getValue());
 				}
+			} catch (MessageNotWriteableException e) {
+				throw new MQMessageNotWriteableRuntimeException(e);
+			} catch (MessageFormatException e) {
+				throw new MQMessageFormatRuntimeException(e);
 			} catch (JMSException e) {
 				throw new MQRuntimeException(e);
 			}			
@@ -178,6 +189,8 @@ public class JMSProducerImpl implements JMSProducer, Traceable {
 			}
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
+		} catch (MessageFormatException e) {
+			throw new MQMessageFormatRuntimeException(e);
 		} catch (JMSException e) {
 			throw new MQRuntimeException(e);
 		}	
@@ -193,6 +206,8 @@ public class JMSProducerImpl implements JMSProducer, Traceable {
 		if (payload!=null){
 			try {
 				bytesMessage.writeBytes(payload);
+			} catch (MessageNotWriteableException e) {
+				throw new MQMessageNotWriteableRuntimeException(e);
 			} catch (JMSException e) {
 				throw new MQRuntimeException(e);
 			}
@@ -205,6 +220,8 @@ public class JMSProducerImpl implements JMSProducer, Traceable {
 			}
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
+		} catch (MessageFormatException e) {
+			throw new MQMessageFormatRuntimeException(e);
 		} catch (JMSException e) {
 			throw new MQRuntimeException(e);
 		}	
@@ -226,6 +243,8 @@ public class JMSProducerImpl implements JMSProducer, Traceable {
 			}
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
+		} catch (MessageFormatException e) {
+			throw new MQMessageFormatRuntimeException(e);
 		} catch (JMSException e) {
 			throw new MQRuntimeException(e);
 		}	
@@ -307,6 +326,10 @@ public class JMSProducerImpl implements JMSProducer, Traceable {
 			Entry<String, Object> thisEntry = iterator.next();
 			try {
 				message.setObjectProperty(thisEntry.getKey(), thisEntry.getValue());
+			} catch (MessageNotWriteableException e) {
+				throw new MQMessageNotWriteableRuntimeException(e);
+			} catch (MessageFormatException e) {
+				throw new MQMessageFormatRuntimeException(e);
 			} catch (JMSException e) {
 				throw new MQRuntimeException(e);
 			}
@@ -426,6 +449,8 @@ public class JMSProducerImpl implements JMSProducer, Traceable {
 		// Verify that the specified value is a valid message property value
 		try {
 			MessageImpl.checkValidPropertyValue(name, value);
+		} catch (MessageFormatException e) {
+			throw new MQMessageFormatRuntimeException(e);
 		} catch (JMSException e) {
 			throw new MQRuntimeException(e);
 		}
