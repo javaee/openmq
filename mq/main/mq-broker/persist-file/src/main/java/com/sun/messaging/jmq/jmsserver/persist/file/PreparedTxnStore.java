@@ -162,7 +162,8 @@ class PreparedTxnStore extends RandomAccessStore {
 			if (fsize > 0) {
 				maxRecordSize = (int) p.maxRecordSize.getBytes();
 
-				vrfile = new VRFileRAF(new File(dir, VRFILE_NAME), fsize, Globals.isMinimumWrites(), Broker.isInProcess());
+				vrfile = new VRFileRAF(new File(dir, VRFILE_NAME), fsize, 
+                                             Globals.isMinimumWritesFileStore(), Broker.isInProcess());
 				vrfile.setBlockSize(p.blockSize);
 				
 

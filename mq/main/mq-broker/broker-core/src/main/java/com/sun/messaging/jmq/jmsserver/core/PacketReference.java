@@ -701,7 +701,7 @@ public class PacketReference implements Sized, Ordered
          return d;
     }
 
-    boolean isStored() {
+    public boolean isStored() {
         return isStored;
     }
 
@@ -997,6 +997,10 @@ public class PacketReference implements Sized, Ordered
 
     public void setNeverStore(boolean s) {
         neverStore = s;
+    }
+
+    public boolean getNeverStore() {
+        return neverStore;
     }
 
     public long byteSize() {
@@ -1456,18 +1460,7 @@ public class PacketReference implements Sized, Ordered
             try {
                 pstore.storeMessage(destination,
                     (Packet)getPacket(), Destination.PERSIST_SYNC);
-                if (Globals.isNewTxnLogEnabled()) {
-                    if (getPacket().getTransactionID() > 0) {
-                        // transacted so will realy be stored when routed
-                        // don't make a softRef yet as may get garbage collected
-                        isStored = false;
-                        return;
-                    } else {
-                        makePacketSoftRef();
-                    }
-                } else {
-                    makePacketSoftRef();
-                }
+                makePacketSoftRef();
             } catch (IOException ex) {
                 throw new BrokerException(ex.toString(), ex);
             } catch (Exception ex) {
@@ -1478,6 +1471,10 @@ public class PacketReference implements Sized, Ordered
             }
             isStored = true;
         }
+    }
+
+    public synchronized void setIsStored() {
+        isStored = true;
     }
 
     public void store(Collection consumers) throws BrokerException {
@@ -1809,7 +1806,10 @@ public class PacketReference implements Sized, Ordered
             }
             newp.setProperties(oldprops);
         } catch (Exception ex) {
-            Globals.getLogger().logStack(Logger.INFO,"Internal Error updating properties", ex);
+            Globals.getLogger().logStack(Logger.WARNING, 
+            Globals.getBrokerResources().getKString(
+            BrokerResources.X_REPLACE_PROPS_FOR_REPLACE_MSG,
+            this, ex.getMessage()), ex);
         }
 
         setPacketObject(true /* soft*/, newp);

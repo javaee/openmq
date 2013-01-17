@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -69,6 +69,7 @@ import com.sun.messaging.jmq.jmsserver.persist.api.Store;
 import com.sun.messaging.jmq.jmsserver.persist.api.MigratableStore;
 import com.sun.messaging.jmq.jmsserver.persist.api.ReplicableStore;
 import com.sun.messaging.jmq.jmsserver.persist.api.PartitionListener;
+import com.sun.messaging.jmq.jmsserver.persist.api.StoreSessionReaperListener;
 import com.sun.messaging.jmq.jmsserver.cluster.api.*;
 import com.sun.messaging.jmq.jmsserver.cluster.api.ha.*;
 import com.sun.messaging.jmq.jmsserver.cluster.manager.ClusterManagerImpl;
@@ -95,7 +96,7 @@ import com.sun.messaging.jmq.jmsserver.multibroker.BrokerInfo;
 import com.sun.messaging.jmq.jmsserver.multibroker.raptor.handlers.*;
 import com.sun.messaging.jmq.jmsserver.persist.api.ChangeRecordInfo;
 
-public class RaptorProtocol implements Protocol, PartitionListener
+public class RaptorProtocol implements Protocol, PartitionListener, StoreSessionReaperListener
 {
     protected static final Logger logger = Globals.getLogger();
     protected static final BrokerResources br = Globals.getBrokerResources();
@@ -132,7 +133,7 @@ public class RaptorProtocol implements Protocol, PartitionListener
 
     private boolean shutdown = false;
     protected Map brokerList = null;
-    private Map takingoverBrokers = null;
+    private Map<TakingoverEntry, TakingoverEntry> takingoverBrokers = null;
 
     protected HashMap resTable = null;
     protected Random r = null;
@@ -182,7 +183,8 @@ public class RaptorProtocol implements Protocol, PartitionListener
     private String newMasterBrokerPreparedUUID = null; 
     private BrokerAddress newMasterBrokerPreparedSender = null; 
     private DestinationList DL = Globals.getDestinationList();
-    private Map<String, BrokerAddress> inDSubToBrokerMap = new HashMap<String, BrokerAddress>();
+    private Map<String, ChangeRecord> inDSubToBrokerMap = 
+        Collections.synchronizedMap(new HashMap<String, ChangeRecord>());
 
     public RaptorProtocol(MessageBusCallback cb, Cluster c, 
         BrokerAddress myaddress, BrokerInfo myinfo) throws BrokerException
@@ -202,7 +204,8 @@ public class RaptorProtocol implements Protocol, PartitionListener
         resTable = new HashMap();
         r = new Random();
         brokerList = Collections.synchronizedMap(new LinkedHashMap());
-        takingoverBrokers = Collections.synchronizedMap(new LinkedHashMap());
+        takingoverBrokers = Collections.synchronizedMap(
+            new LinkedHashMap<TakingoverEntry, TakingoverEntry>());
         myPretakeovers = Collections.synchronizedMap(new LinkedHashMap());
         cfgSrvWaitObject = new Object();
         eventLogWaiters = Collections.synchronizedMap(new LinkedHashMap());
@@ -383,12 +386,12 @@ public class RaptorProtocol implements Protocol, PartitionListener
         }
         if (Globals.getHAEnabled()) {
             synchronized(takingoverBrokers) {
-                l = new ArrayList(takingoverBrokers.keySet());
+                l = new ArrayList<TakingoverEntry>(takingoverBrokers.keySet());
             }
             ht.put("takingoverBrokersCount", l.size());
-            itr = l.iterator();
-            while (itr.hasNext()) {
-                TakingoverEntry toe = (TakingoverEntry)itr.next();
+            Iterator<TakingoverEntry> itr1 = l.iterator();
+            while (itr1.hasNext()) {
+                TakingoverEntry toe = itr1.next();
                 ht.put(toe.toString(), toe.toLongString());
             }
         }
@@ -653,6 +656,18 @@ public class RaptorProtocol implements Protocol, PartitionListener
         }
         Globals.getDestinationList().
             addPartitionListener((PartitionListener)this);
+        try {
+            store.addPartitionListener((PartitionListener)this);
+            if (Globals.getHAEnabled()) {
+                store.addStoreSessionReaperListener(this);
+            }
+        } catch (Exception e) {
+            if (DEBUG) {
+            logger.logStack(logger.WARNING, "Unable to add store listener: "+e.getMessage(), e);
+            } else {
+            logger.log(logger.WARNING, "Unable to add store listener: "+e.getMessage(), e);
+            }
+        }
     }
 
     /*********************************************
@@ -690,9 +705,51 @@ public class RaptorProtocol implements Protocol, PartitionListener
     /**
      * @param partitionID the partition id
      */
-    public void partitionRemoved(UID partitionID, Object source) {
+    public void partitionRemoved(UID partitionID, Object source, Object destinedTo) {
+        if (destinedTo != null) {
+            return; 
+        }
+        if (!(source instanceof Store)) {
+            return;
+        }
+        List<TakingoverEntry> entries = null;
+        synchronized(takingoverBrokers) {
+            entries = new ArrayList<TakingoverEntry>(takingoverBrokers.keySet());
+        } 
+        Iterator<TakingoverEntry> itr = entries.iterator();
+        TakingoverEntry toe = null;
+        while (itr.hasNext()) {
+            toe =  itr.next();
+            if (!toe.storeSession.equals(partitionID)) {
+                continue;
+            }
+            takingoverBrokers.remove(toe);
+            logger.log(logger.INFO, br.getKString(
+                br.I_REMOVE_CACHED_TAKEOVER_NOTIFICATION_ENTRY, toe.toLongString()));
+        }
     }
 
+    public void runStoreSessionTask() { 
+        List<TakingoverEntry> entries = null;
+        synchronized(takingoverBrokers) {
+            entries = new ArrayList<TakingoverEntry>(takingoverBrokers.keySet());
+        } 
+        Iterator<TakingoverEntry> itr = entries.iterator();
+        TakingoverEntry toe = null;
+        while (itr.hasNext()) {
+            toe =  itr.next();
+            try {
+                if (store.getStoreSessionOwner(toe.storeSession.longValue()) == null) {
+                    takingoverBrokers.remove(toe);
+                    logger.log(logger.INFO, br.getKString(
+                        br.I_REMOVE_CACHED_TAKEOVER_NOTIFICATION_ENTRY, toe.toLongString())+
+                        ", ("+takingoverBrokers.size()+")");
+                }
+            } catch (Exception e) {
+                logger.logStack(logger.WARNING, e.getMessage(), e);
+            }
+        }
+    }
 
     class BrokerInfoEx {
         private int GOODBYE_SENT           = 0x00000001;
@@ -1065,9 +1122,11 @@ public class RaptorProtocol implements Protocol, PartitionListener
 
     public boolean isTakeoverTarget(BrokerAddress ba) {
         if (!Globals.getHAEnabled()) return false;
-        TakingoverEntry toe = (TakingoverEntry)takingoverBrokers.get(
+        TakingoverEntry toe = takingoverBrokers.get(
                               new TakingoverEntry(ba.getBrokerID(), ba.getStoreSessionUID()));
-        if (toe == null) return false;
+        if (toe == null) {
+            return false;
+        }
         return toe.isTakeoverTarget(ba);
     }
 
@@ -1157,21 +1216,43 @@ public class RaptorProtocol implements Protocol, PartitionListener
             return;
         }
         BrokerAddress ba = null;
-        BrokerInfoEx[] binfos = (BrokerInfoEx[])brokerList.values().toArray(new BrokerInfoEx[0]);
+        BrokerInfoEx[] binfos = null;
+        synchronized(brokerList) {
+            binfos = (BrokerInfoEx[])brokerList.values().toArray(new BrokerInfoEx[0]);
+        }
         for (int i = 0; i < binfos.length; i++) {
             ba = binfos[i].getBrokerInfo().getBrokerAddr();
+            if (brokerList.get(ba) == null) { 
+                continue;             
+            }
             if (toe.isTakeoverTarget(ba)) {
+                String logmsg1 = null;
                 if (complete) {
-                logger.log(logger.WARNING, "Force closing broker link to "+ba+ " because it has been TAKEOVER");
+                    Object[] args = { ba };
+                    logmsg1 = br.getKTString(br.W_FORCE_CLOSE_BROKER_LINK_TAKEOVER, args);
                 } else {
-                logger.log(logger.WARNING, "Force closing broker link to "+ba+ " because it is being TAKEOVER");
+                    Object[] args = { ba };
+                    logmsg1 = br.getKTString(br.W_FORCE_CLOSE_BROKER_LINK_BEING_TAKEOVER, args);
                 }
+                logger.log(logger.WARNING, logmsg1); 
                 c.closeLink(ba, true); 
-                synchronized (binfos[i]) {
-                    while (!(binfos[i].deactivated())) {
-                        logger.log(logger.INFO, "Waiting for broker link to "+ba+ " deactivated .."); 
+                long totalwaited = 0L;
+                while (brokerList.get(ba) == binfos[i] && !shutdown) {
+                    synchronized (binfos[i]) {
                         try {
-                        binfos[i].wait(60000);
+                            if (binfos[i].deactivated()) {
+                                break;
+                            }
+                            binfos[i].wait(15000L);
+                            totalwaited += 15000L;
+                            if (totalwaited >= c.getLinkInitWaitTime()) {
+                                logger.log(logger.WARNING, logmsg1); 
+                                c.closeLink(ba, true); 
+                                break; 
+                            }
+                            Object[] args = { ba+", ("+totalwaited+" ms of "+c.getLinkInitWaitTime()+")" };
+                            logger.log(logger.WARNING, br.getKTString(
+                                       br.I_WAITING_FOR_BROKER_LINK_DEACTIVATED, args)); 
                         } catch (InterruptedException e) {}
                     }
                 }
@@ -1179,7 +1260,7 @@ public class RaptorProtocol implements Protocol, PartitionListener
         }
     }
 
-    public void postTakeover(String brokerID, UID storeSession, boolean aborted) {
+    public void postTakeover(String brokerID, UID storeSession, boolean aborted, boolean notify) {
         if (aborted) {
             logger.log(logger.INFO, br.getKString(br.I_CLUSTER_PRETAKEOVER_ABORT,
                        "[brokerID="+brokerID+", storeSession="+storeSession+"]"));
@@ -1210,6 +1291,10 @@ public class RaptorProtocol implements Protocol, PartitionListener
         }
         try {
              ClusterTakeoverInfo cti = ClusterTakeoverInfo.newInstance(brokerID, storeSession); 
+             if (!notify) {
+                 TakingoverEntry.takeoverComplete(takingoverBrokers, cti);
+                 return;
+             }
              logger.log(logger.INFO, br.getKString(br.I_CLUSTER_BROADCAST_TAKEOVER_COMPLETE,
                         "[brokerID="+brokerID+", storeSession="+storeSession+"]"));
              receivedTakeoverComplete(null, cti);
@@ -1227,7 +1312,9 @@ public class RaptorProtocol implements Protocol, PartitionListener
             logger.log(logger.INFO, br.getKString(br.I_CLUSTER_RECEIVE_NOTIFICATION, args));
         }
         TakingoverEntry toe = TakingoverEntry.takeoverComplete(takingoverBrokers, cti);
-        if (toe == null) return;
+        if (toe == null) {
+            return;
+        }
         Thread t = new TakeoverCleanupThread(takeoverCleanupTG, this, sender, cti, toe,
                                              ProtocolGlobals.G_TAKEOVER_COMPLETE);
         t.start();
@@ -1241,17 +1328,16 @@ public class RaptorProtocol implements Protocol, PartitionListener
                                           "["+cti+"]", sender };
             logger.log(logger.INFO, br.getKString(br.I_CLUSTER_RECEIVE_NOTIFICATION, args));
         }
+        boolean doconverge = true;
         if (toe == null || (getBrokerList(sender, null)).length == 0) {
             sendTakeoverPendingReply(sender, cti, Status.OK, null);
-            if (toe != null) {
-                takeoverCleanup(toe, false);
-                toe.preTakeoverDone(cti.getXid());
+            doconverge = false;
+            if (toe == null) {
+                return;
             }
-
-            return;
         }
-        Thread t = new TakeoverCleanupThread(takeoverCleanupTG, this, sender, cti, toe,
-                                             ProtocolGlobals.G_TAKEOVER_PENDING);
+        Thread t = new TakeoverCleanupThread(takeoverCleanupTG, this, 
+                       sender, cti, toe, ProtocolGlobals.G_TAKEOVER_PENDING, doconverge);
         t.start();
     }
 
@@ -1304,7 +1390,7 @@ public class RaptorProtocol implements Protocol, PartitionListener
                     Iterator itr = takingoverBrokers.keySet().iterator();
                     while (itr.hasNext()) {
                         toe = (TakingoverEntry)itr.next();
-                        gps = toe.getGPackets();
+                        gps = toe.getNotificationGPackets();
                         for (int i = 0; i < gps.length; i++) {
                             if (i == 0) {
                                 Object[] args = { String.valueOf(gps.length),
@@ -1324,7 +1410,7 @@ public class RaptorProtocol implements Protocol, PartitionListener
         TakingoverEntry toe = (TakingoverEntry)takingoverBrokers.get(
                  new TakingoverEntry(ba.getBrokerID(), ba.getStoreSessionUID()));
         if (toe == null) return;
-        GPacket gp = toe.getGPacket(ba);
+        GPacket gp = toe.getNotificationGPacket(ba);
         if (gp == null) return; 
         try {
             c.unicastAndClose(ba, gp);
@@ -3753,8 +3839,8 @@ public class RaptorProtocol implements Protocol, PartitionListener
     public void receiveConfigChangeEvent(BrokerAddress sender,
         Long xidProp, byte[] eventData) {
         if (DEBUG) {
-            logger.log(logger.INFO, "RaptorProtocol.receiveConfigChangeEvent. xid = " +
-                                     xidProp.longValue()+" from "+sender);
+            logger.log(logger.INFO, 
+            "RaptorProtocol.receiveConfigChangeEvent(xid="+xidProp+") from "+sender);
         }
 
         int status = ProtocolGlobals.G_EVENT_LOG_SUCCESS;
@@ -3809,35 +3895,46 @@ public class RaptorProtocol implements Protocol, PartitionListener
                 }
             }
 
-            synchronized(inDSubToBrokerMap) {
-                if (cr.getOperation() == ProtocolGlobals.G_REM_DURABLE_INTEREST) {
+            if (cr.getOperation() == ProtocolGlobals.G_REM_DURABLE_INTEREST) {
                     inDSubToBrokerMap.remove(cr.getUniqueKey());
-                } else if (cr.getOperation() == ProtocolGlobals.G_NEW_INTEREST) {
-                    if (Subscription.findDurableSubscription(
-                        ((InterestUpdateChangeRecord)cr).getSubscriptionKey()) != null) {
-                        inDSubToBrokerMap.remove(cr.getUniqueKey());
-                        String emsg = br.getKString(br.X_RECORD_DURA_SUB_EXIST_ALREADY, 
-                                      "["+cr.getUniqueKey()+"]", sender);
-                        logger.log(logger.WARNING, emsg);
-                        throw new BrokerException(emsg, Status.CONFLICT);
-                    }
-                    BrokerAddress addr = inDSubToBrokerMap.get(cr.getUniqueKey());
-                    if (addr != null) {
-                        Object[] args = { "["+cr.getUniqueKey()+"]", sender, addr };
-                        String emsg = br.getKString(br.X_RECORD_DURA_SUB_CONCURRENT, args);
-                        logger.log(logger.WARNING, emsg);
-                        throw new BrokerException(emsg, Status.CONFLICT);
-                    }
-                    inDSubToBrokerMap.put(cr.getUniqueKey(), sender);
-                }
-                try {
-                    store.storeConfigChangeRecord(System.currentTimeMillis(), eventData, false);
-                } catch (Exception e) {
+            } else if (cr.getOperation() == ProtocolGlobals.G_NEW_INTEREST) {
+                Subscription sub = Subscription.findDurableSubscription(
+                    ((InterestUpdateChangeRecord)cr).getSubscriptionKey());
+                if (sub != null) {
                     inDSubToBrokerMap.remove(cr.getUniqueKey());
-                    throw e;
+                    String emsg = br.getKString(br.I_RECORD_DURA_SUB_EXIST_ALREADY, 
+                        "["+cr.getUniqueKey()+"]"+sub.getDSubLongLogString(), sender);
+                    logger.log(logger.INFO, emsg);
+                    if (sub.getShared() != ((InterestUpdateChangeRecord)cr).getShared() || 
+                        sub.getJMSShared() != ((InterestUpdateChangeRecord)cr).getJMSShared()) {
+                        throw new BrokerException(emsg);
+                    }
+                } else {
+                    synchronized(inDSubToBrokerMap) {
+                        InterestUpdateChangeRecord existcr = (InterestUpdateChangeRecord)
+                                                   inDSubToBrokerMap.get(cr.getUniqueKey());
+                        if (existcr != null) {
+                            Object[] args = { "["+cr.getUniqueKey()+"]", existcr.getBroker(), sender };
+                            String emsg = br.getKString(br.I_RECORD_DURA_SUB_CONCURRENT, args)+
+                                              existcr.getFlagString();
+                            logger.log(logger.INFO, emsg);
+                            if (((InterestUpdateChangeRecord)cr).getShared() != existcr.getShared() ||
+                                ((InterestUpdateChangeRecord)cr).getJMSShared() != existcr.getJMSShared()) {
+                                throw new BrokerException(emsg);
+                            }
+                        } else {
+                            ((InterestUpdateChangeRecord)cr).setBroker(sender);
+                            inDSubToBrokerMap.put(cr.getUniqueKey(), cr);
+                        }
+                    }
                 }
             }
-
+            try {
+                store.storeConfigChangeRecord(System.currentTimeMillis(), eventData, false);
+            } catch (Exception e) {
+                inDSubToBrokerMap.remove(cr.getUniqueKey());
+                throw e;
+            }
         } finally {
             setConfigOpInProgress(false);
         }
@@ -4491,7 +4588,7 @@ public class RaptorProtocol implements Protocol, PartitionListener
      */
     public synchronized int addBrokerInfo(BrokerInfo brokerInfo) {
         if (DEBUG) {
-            logger.log(Logger.DEBUG, "RaptorProtocol.addBrokerInfo : " + brokerInfo);
+            logger.log(Logger.INFO, "RaptorProtocol.addBrokerInfo("+brokerInfo+")");
         }
 
         if (brokerInfo.getClusterProtocolVersion() == null) {
@@ -4546,7 +4643,9 @@ public class RaptorProtocol implements Protocol, PartitionListener
         }
 
         synchronized (brokerList) {
-            if (shutdown) return ADD_BROKER_INFO_BAN;
+            if (shutdown) {
+                return ADD_BROKER_INFO_BAN;
+            }
             if (isTakeoverTarget(brokerInfo.getBrokerAddr())) {
                 logger.log(logger.WARNING, br.getKString(
                        br.W_CLUSTER_REJECT_TAKINGOVER_TARGET, brokerInfo));
@@ -4562,7 +4661,11 @@ public class RaptorProtocol implements Protocol, PartitionListener
             }
             BrokerInfoEx brokerInfoEx = new BrokerInfoEx(brokerInfo);
             brokerList.put(brokerInfo.getBrokerAddr(), brokerInfoEx);
-
+            if (DEBUG) {
+                logger.log(logger.INFO, 
+                    "RaptorProtocol.addBrokerInfo(): added BrokerInfoEx@"+
+                     brokerInfoEx.hashCode()+" for broker "+brokerInfo.getBrokerAddr());
+            }
         }
 
         /* not used anymore 
@@ -6169,316 +6272,6 @@ class TakeoverPendingReplyWaiter extends ReplyWaiter {
     }
 }
 
-class TakingoverEntry {
-
-    protected String brokerID;
-    protected UID storeSession;
-    private boolean takeoverComplete = false;
-    private Map xids = null;
-
-    private long timeout = 0;
-    private static int DEFAULT_TAKEOVER_PENDING_TIMEOUT = 
-        2*HAMonitorServiceImpl.MONITOR_TIMEOUT_DEFAULT; //in seconds
-
-    public static int getTakeoverTimeout() {
-         HAMonitorService hams = Globals.getHAMonitorService();
-         if (hams == null) {
-             return DEFAULT_TAKEOVER_PENDING_TIMEOUT;
-         }
-         int to =  (2*hams.getMonitorInterval());
-         if (to < DEFAULT_TAKEOVER_PENDING_TIMEOUT) { 
-            return DEFAULT_TAKEOVER_PENDING_TIMEOUT;
-         }
-         return to;
-    }
-
-    class XidEntry {
-        String brokerHost = null;
-        UID brokerSession = null;
-        long expire = 0;
-
-        public XidEntry(String brokerHost, UID brokerSession, boolean timedout) {
-            this.brokerHost = brokerHost;
-            this.brokerSession = brokerSession;
-            this.expire = 0;
-            if (timedout) this.expire = System.currentTimeMillis();
-        }
-        public String toString() {
-            return "brokerHost="+brokerHost+
-                   ", brokerSession="+brokerSession+
-                   ", expire="+expire;
-        }
-    }
-
-    public String toString() {
-        return ("brokerID="+brokerID+", storeSession="+storeSession);
-    }
-
-    public String toLongString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("brokerID="+brokerID+", storeSession="+storeSession+
-                  ", takeoverComplete="+takeoverComplete+
-                  ", timeout="+timeout);
-        ArrayList al = null; 
-        synchronized(xids) {
-            al = new ArrayList(xids.keySet());
-        }
-        sb.append("\nxidsSize="+al.size());
-        Iterator itr = al.iterator();
-        while (itr.hasNext()) {
-            Long xid = (Long)itr.next();
-            XidEntry xe = (XidEntry)xids.get(xid); 
-            sb.append("\n(xid)").append(xid).append(": ").append(xe).append("\n");
-        }
-        return sb.toString();
-    }
-
-    class ExpireComparator implements Comparator {
-        public int compare(Object o1, Object o2) {
-            XidEntry x1 = (XidEntry)o1;
-            XidEntry x2 = (XidEntry)o2;
-            return (new Long(x1.expire)).compareTo(new Long(x2.expire));
-        }
-        public int hashCode() {
-            return super.hashCode();
-        }
-
-        public boolean equals(Object o) {
-            return super.equals(o);
-        }
-    }
-
-    class SessionComparator implements Comparator {
-        public int compare(Object o1, Object o2) {
-            XidEntry x1 = (XidEntry)o1;
-            XidEntry x2 = (XidEntry)o2;
-            return (new Long(x1.brokerSession.getTimestamp())).compareTo(
-                    new Long(x2.brokerSession.getTimestamp()));
-        }
-        public int hashCode() {
-            return super.hashCode();
-        }
-
-        public boolean equals(Object o) {
-            return super.equals(o);
-        }
-    }
-
-
-    public TakingoverEntry(String brokerID, UID storeSession) {
-        this(brokerID, storeSession, 0);
-    }
-
-    public TakingoverEntry(String brokerID, UID storeSession, int timeout) {
-        this.brokerID = brokerID;
-        this.storeSession = storeSession;
-        this.timeout = timeout * 1000L;
-        xids = Collections.synchronizedMap(new LinkedHashMap());
-    }
-
-    public synchronized boolean addXid(Long xid, String brokerHost, 
-                                       UID brokerSession, boolean timedout) {
-        if (xid == null) return false;
-        XidEntry x = (XidEntry)xids.get(xid);
-        if (x != null)  {
-            if (timedout) x.expire = System.currentTimeMillis();
-            return false;
-        }
-        XidEntry xe = new XidEntry(brokerHost, brokerSession, timedout);
-        xids.put(xid, xe);
-        return true;
-    }
-
-    public synchronized boolean isTakeoverTarget(BrokerAddress ba) {
-        if (!ba.getBrokerID().equals(brokerID) || 
-                !ba.getStoreSessionUID().equals(storeSession)) {
-            return false;
-        }
-        if (takeoverComplete) return true;
-        if (xids.size() == 0) return false; 
-
-        long expireTime = 0;
-        Collection c = xids.values();
-        ArrayList l = new ArrayList(c);
-        Collections.sort(l, new ExpireComparator());
-        expireTime  = ((XidEntry)l.get(0)).expire;
-        if (expireTime != 0) {
-            expireTime  = ((XidEntry)l.get(l.size()-1)).expire;
-        }
-        if (expireTime == 0) return true;
-        if (System.currentTimeMillis() <= expireTime) return true;
-
-        if (Globals.getHAMonitorService().isTakingoverTarget(
-                    ba.getBrokerID(), ba.getStoreSessionUID())) {
-            return true;
-        }
-
-        ArrayList sl = new ArrayList();
-        XidEntry x = null;
-        Iterator itr = l.iterator();
-        while (itr.hasNext()) {
-            x = (XidEntry)itr.next();
-            if (x.brokerHost.equals(
-                ((BrokerMQAddress)ba.getMQAddress()).getHost().getHostAddress())) {
-                sl.add(x);
-            }
-        }
-        if (sl.size() == 0) return !ifOwnStoreSession(ba);
-
-        Collections.sort(sl, new SessionComparator());
-        if (ba.getBrokerSessionUID().getTimestamp() <= 
-            ((XidEntry)sl.get(sl.size()-1)).brokerSession.getTimestamp()) return true;
-
-        return !ifOwnStoreSession(ba);
-    }
-
-    private boolean ifOwnStoreSession(BrokerAddress ba) {
-
-        try {
-            if (!Globals.getSFSHAEnabled()) {
-                return Globals.getStore().ifOwnStoreSession(
-                       ba.getStoreSessionUID().longValue(), ba.getBrokerID());
-            }
-            HAClusterManagerImpl cm = (HAClusterManagerImpl)Globals.getClusterManager();
-            String owner = cm.lookupStoreSessionOwner(ba.getStoreSessionUID());
-            if (owner != null && owner.equals(ba.getBrokerID())) {
-                return true;
-            }
-
-        } catch (Exception e) {
-            Globals.getLogger().log(Logger.WARNING, e.getMessage(), e);
-        }
-
-        return false;
-    }
-
-    public synchronized void preTakeoverDone(Long xid) {
-         XidEntry x = (XidEntry)xids.get(xid);
-         if (x == null) return;
-         if (x.expire != 0) return;
-         x.expire = System.currentTimeMillis() + timeout;
-    }
-
-    public synchronized boolean takeoverComplete() {
-        boolean ret = takeoverComplete;
-        takeoverComplete = true;
-        return ret;
-    }
-
-    public synchronized void takeoverAbort(Long xid) {
-        XidEntry x = (XidEntry)xids.get(xid);
-        if (x != null) x.expire = System.currentTimeMillis();
-    }
-
-    public synchronized GPacket[] getGPackets() {
-        ArrayList l =  new ArrayList();
-        ClusterTakeoverInfo cti = null;
-        if (takeoverComplete) {
-            cti = ClusterTakeoverInfo.newInstance(brokerID, storeSession); 
-            try {
-            l.add(cti.getGPacket(ProtocolGlobals.G_TAKEOVER_COMPLETE));
-            } catch (BrokerException e) {/* Ignore */}
-            return (GPacket[])l.toArray(new GPacket[0]);
-        } 
-        Long xid = null;
-        XidEntry x =  null;
-        Iterator itr = xids.keySet().iterator();
-        while (itr.hasNext()) {
-            xid = (Long)itr.next();
-            x = (XidEntry)xids.get(xid);
-            boolean timedout = false;
-            if (x.expire != 0 && System.currentTimeMillis() > x.expire) { 
-                timedout = true;
-            }
-            cti = ClusterTakeoverInfo.newInstance(brokerID, storeSession, x.brokerHost,
-                                                  x.brokerSession, xid, false, timedout); 
-            try {
-            l.add(cti.getGPacket(ProtocolGlobals.G_TAKEOVER_PENDING));
-            } catch (BrokerException e) {/* Ignore */}
-        }
-        return (GPacket[])l.toArray(new GPacket[0]);
-    }
-
-    public synchronized GPacket getGPacket(BrokerAddress ba) {
-        if (!ba.getBrokerID().equals(brokerID) ||
-            !ba.getStoreSessionUID().equals(storeSession)) {
-            return null;
-        }
-        ClusterTakeoverInfo cti = null;
-        if (takeoverComplete) {
-            cti = ClusterTakeoverInfo.newInstance(brokerID, storeSession); 
-            try {
-            return cti.getGPacket(ProtocolGlobals.G_TAKEOVER_COMPLETE);
-            } catch (BrokerException e) {/* Ignore */}
-            return null;
-        }
-        Long xid = null;
-        XidEntry x = null;
-        Iterator itr = xids.keySet().iterator();
-        while (itr.hasNext()) {
-            xid = (Long)itr.next();
-            x = (XidEntry)xids.get(xid);
-            if (x.brokerHost.equals(
-                ((BrokerMQAddress)ba.getMQAddress()).getHost().getHostAddress())) {
-                cti = ClusterTakeoverInfo.newInstance(brokerID, storeSession,
-                                    x.brokerHost, x.brokerSession, xid, false);
-                try {
-                return cti.getGPacket(ProtocolGlobals.G_TAKEOVER_PENDING);
-                } catch (BrokerException e) {/* Ignore */}
-            }
-        }
-        return null;
-    }
-
-    public boolean equals(Object obj) {
-        if (!(obj instanceof TakingoverEntry)) return false;
-        TakingoverEntry toe = (TakingoverEntry)obj;
-        return brokerID.equals(toe.brokerID) && (storeSession.equals(toe.storeSession));
-    }
-
-    public int hashCode() {
-        return brokerID.hashCode() + (int)(storeSession.longValue() ^ (storeSession.longValue() >>> 32));
-    }
-
-    public static TakingoverEntry addTakingoverEntry(Map takingoverBrokers, ClusterTakeoverInfo cti) {
-        boolean exist = false;
-        TakingoverEntry toe = new TakingoverEntry(cti.getBrokerID(), cti.getStoreSession(), getTakeoverTimeout());
-        synchronized(takingoverBrokers) {
-            TakingoverEntry v = (TakingoverEntry)takingoverBrokers.get(toe);
-            if (v != null) {
-                toe = v;
-            } else {
-                takingoverBrokers.put(toe, toe);
-            }
-            if (toe.addXid(cti.getXid(), cti.getBrokerHost(), 
-                cti.getBrokerSession(), cti.isTimedout())) return toe;
-        }
-        return null;
-    }
-
-    public static void removeTakingoverEntry(Map takingoverBrokers, ClusterTakeoverInfo cti) {
-        TakingoverEntry toe = new TakingoverEntry(cti.getBrokerID(), cti.getStoreSession());
-        synchronized(takingoverBrokers) {
-            TakingoverEntry v = (TakingoverEntry)takingoverBrokers.get(toe);
-            if (v == null) return;
-            v.takeoverAbort(cti.getXid());
-        }
-    }
-
-    public static TakingoverEntry takeoverComplete(Map takingoverBrokers, ClusterTakeoverInfo cti) {
-        synchronized(takingoverBrokers) {
-            TakingoverEntry toe = (TakingoverEntry)takingoverBrokers.get(
-                                   new TakingoverEntry(cti.getBrokerID(), cti.getStoreSession())); 
-            if (toe == null) {
-                toe = new TakingoverEntry(cti.getBrokerID(), cti.getStoreSession(), getTakeoverTimeout());
-                takingoverBrokers.put(toe, toe);
-            }
-            if (toe.takeoverComplete()) return null;
-            return toe;
-        }
-    }
-}
-
 class TakeoverCleanupThread extends Thread {
 
     private Logger logger = Globals.getLogger();
@@ -6487,12 +6280,21 @@ class TakeoverCleanupThread extends Thread {
     private ClusterTakeoverInfo cti = null;
     private TakingoverEntry toe = null;
     private short protocol;
+    private boolean doconverge = true;
 
     public TakeoverCleanupThread(ThreadGroup tg, 
                                  RaptorProtocol p, 
                                  BrokerAddress sender, 
                                  ClusterTakeoverInfo cti, 
                                  TakingoverEntry toe, short protocol) {
+        this(tg, p, sender, cti, toe, protocol, false);
+    }
+
+    public TakeoverCleanupThread(ThreadGroup tg, 
+                                 RaptorProtocol p, 
+                                 BrokerAddress sender, 
+                                 ClusterTakeoverInfo cti, 
+                                 TakingoverEntry toe, short protocol, boolean doconverge) {
         super(tg, "TakeoverCleanup");
         if (Thread.MAX_PRIORITY - 1 > 0) setPriority(Thread.MAX_PRIORITY-1);
         setDaemon(true);
@@ -6501,6 +6303,7 @@ class TakeoverCleanupThread extends Thread {
         this.cti = cti;
         this.toe = toe;
         this.protocol = protocol;
+        this.doconverge = doconverge;
     }
 
     public void run() {
@@ -6509,7 +6312,9 @@ class TakeoverCleanupThread extends Thread {
 
         if (protocol == ProtocolGlobals.G_TAKEOVER_COMPLETE) return;
 
-        p.takeoverPendingConvergecast(sender, cti);
+        if (doconverge) {
+            p.takeoverPendingConvergecast(sender, cti);
+        }
         toe.preTakeoverDone(cti.getXid());
         logger.log(Logger.DEBUG, "Done processing "+ ProtocolGlobals.getPacketTypeString(protocol));
     }

@@ -1518,6 +1518,10 @@ public class ClusterImpl implements Cluster, ClusterListener {
         readyForBroadcast = true;
     }
 
+    public long getLinkInitWaitTime() {
+        return BrokerLink.INIT_WAIT_TIME;
+    }
+
     public void sendFlowControlUpdate(BrokerAddressImpl addr)
         throws IOException {
         if (flowControlState == Packet.STOP_FLOW)

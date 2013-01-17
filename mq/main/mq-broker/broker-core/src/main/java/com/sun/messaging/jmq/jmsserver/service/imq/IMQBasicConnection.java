@@ -260,9 +260,9 @@ public abstract class IMQBasicConnection extends IMQConnection
      * default toString method, sub-classes should override
      */
     public String toString() {
-        return "IMQConn[" +getConnectionStateString(state) 
-                   +","+getRemoteConnectionString() + "," 
-                   + localsvcstring +"]";
+        return "IMQConn["+getConnectionUID()+", "+
+                getConnectionStateString(state)+", "+
+                getRemoteConnectionString()+", "+localsvcstring +"]";
     }
 
     /**

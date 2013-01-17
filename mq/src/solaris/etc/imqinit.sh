@@ -99,21 +99,15 @@ findj2se() {
         if [ "$imq_osver" = "5.9" -o "$imq_osver" = "5.8" -o "$imq_osver" = "5.7" ];  then
             _j2se_locations="\
 /usr/jdk/latest \
-/usr/jdk/jdk1.6.* \
-/usr/jdk/jdk1.5.* \
-/usr/jdk/j2sdk1.5.* \
-/usr/jdk/entsys-j2se \
-/usr/j2se \
+/usr/jdk/jdk1.7.* \
 "
         else
-            # Solaris 10 or newer. /usr/java points to 1.5
+            # Solaris 10 or newer. 
             _j2se_locations="\
 /usr/jdk/latest \
-/usr/jdk/jdk1.6.* \
-/usr/jdk/jdk1.5.* \
+/usr/jdk/jdk1.7.* \
 /usr/java \
 /usr/jdk/entsys-j2se \
-/usr/j2se \
 "
         fi
         ;;
@@ -121,26 +115,20 @@ findj2se() {
     Linux)
         _j2se_locations="\
 /usr/java/latest \
-/usr/java/jre1.6.* \
-/usr/java/jdk1.6.* \
-/usr/java/jre1.5.* \
-/usr/java/jdk1.5.* \
-/usr/jdk/entsys-j2se \
+/usr/java/jre1.7.* \
+/usr/java/jdk1.7.* \
 "
         ;;
 
     HP-UX)
        _j2se_locations="\
-/opt/java1.5* \
-/usr/jdk/entsys-j2se \
-/opt/java1.4* \
+/opt/java1.7* \
 "
         ;;
 
     AIX)
        _j2se_locations="\
-/usr/java6* \
-/usr/java5* \
+/usr/java7* \
 "
         ;;
 
@@ -148,21 +136,14 @@ findj2se() {
             _j2se_locations="\
 /Library/Java/Home \
 /usr \
-/usr/jdk/entsys-j2se \
 "
         ;;
 
     *)
         _j2se_locations="\
-/usr/jdk/entsys-j2se \
-/usr/j2se \
 /usr/java \
-/usr/java/jre1.5.* \
-/usr/java/jdk1.5.* \
-/usr/java/j2re1.4.2* \
-/usr/java/j2sdk1.4.2* \
-/usr/java/j2re1.4* \
-/usr/java/j2sdk1.4* \
+/usr/java/jre1.7.* \
+/usr/java/jdk1.7.* \
 $mq_home/jre \
 "
         ;;

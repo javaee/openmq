@@ -72,7 +72,8 @@ public class ClusterTakeoverInfo
     private UID brokerSession = null;
     private String brokerHost = null;
     private Long xid =   null;
-    private boolean fromTaker = true;
+    //if issued or pkt originated from sender
+    private boolean fromTaker = true; 
     private String taker = null;
     private Long timestamp = null;
     private boolean timedout = false;
@@ -103,7 +104,9 @@ public class ClusterTakeoverInfo
         taker = (String)pkt.getProp("taker");
         fromTaker = (taker != null);
         timestamp = (Long)pkt.getProp("timestamp");
-        if (timestamp != null) timedout = (timestamp.equals(new Long(0)));
+        if (timestamp != null) {
+            timedout = (timestamp.equals(new Long(0)));
+        }
         xid = (Long)pkt.getProp("X");
     }
 
@@ -182,7 +185,7 @@ public class ClusterTakeoverInfo
         if (protocol == ProtocolGlobals.G_TAKEOVER_ABORT) {
             gp.setType(ProtocolGlobals.G_TAKEOVER_ABORT);
             if (fromTaker) {
-            gp.putProp("taker", cb.getBrokerName());
+                gp.putProp("taker", cb.getBrokerName());
             }
             gp.setBit(gp.A_BIT, false);
             gp.putProp("X", xid);

@@ -90,9 +90,7 @@ public class InfoRequestHandler extends PacketHandler
           try {
               pktprops = msg.getProperties();
           } catch (Exception ex) {
-              
-              logger.log(Logger.INFO,"Internal Error: error "
-                   + " retrieving properties from INFO_REQUEST message ", ex);
+              logger.logStack(Logger.WARNING, "INFO-REQUEST Packet.getProperties()", ex);
               pktprops = new Hashtable();
 
           }
@@ -157,7 +155,7 @@ public class InfoRequestHandler extends PacketHandler
                       bodyProperties.put("ShutdownMS", new Long(timeout));
                   }
               } catch (BrokerException ex) {
-                  logger.logStack(Logger.INFO,"Internal Error: setting timeout ", ex);
+                  logger.logStack(Logger.WARNING,  "INFO-REQUEST", ex);
               }
           } else if (requestType == REQUEST_CLUSTER_INFO) {
               bodyProperties = getAllInfo();
@@ -208,8 +206,7 @@ public class InfoRequestHandler extends PacketHandler
                   pkt.setMessageBody(bos.toByteArray());
                   bos.close();
               } catch (Exception ex) {
-                   logger.log(Logger.WARNING,"XXX-L10N Internal Error "
-                         + " sending back broker data", ex);
+                  logger.logStack(Logger.WARNING, "INFO-REQUEST", ex);
               }
           }
           // OK deal with properties, etc
@@ -254,8 +251,7 @@ public class InfoRequestHandler extends PacketHandler
         try {
             state = bc.getState();
         } catch (BrokerException ex) {
-            logger.log(Logger.INFO,"L10N-XXX Internal Error "
-                     + " unable to retrieve state", ex);
+            logger.logStack(Logger.WARNING, "INFO-REQUEST", ex);
             state = BrokerState.INITIALIZING;
         }
 

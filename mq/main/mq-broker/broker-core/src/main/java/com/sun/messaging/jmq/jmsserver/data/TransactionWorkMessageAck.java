@@ -55,6 +55,9 @@ public class TransactionWorkMessageAck {
 	SysMessageID sysMessageID;
 	ConsumerUID consumerID;
 
+        //for non-newTxnLog processing and persistence
+        TransactionAcknowledgement ta = null;
+
 	public TransactionWorkMessageAck() {
 
 	}
@@ -90,6 +93,14 @@ public class TransactionWorkMessageAck {
 		this.consumerID = consumerID;
 	}
 	
+        public void setTransactionAcknowledgement(TransactionAcknowledgement ta) {
+            this.ta = ta; 
+        }
+
+        public TransactionAcknowledgement getTransactionAcknowledgement() {
+            return ta; 
+        }
+
 	public String toString()
 	{
 		StringBuffer result = new StringBuffer("dest=").append(destUID);
@@ -113,5 +124,4 @@ public class TransactionWorkMessageAck {
 		long cid = dis.readLong();
 		consumerID = new ConsumerUID(cid);
 	}
-	
 }

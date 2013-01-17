@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -121,14 +121,6 @@ public @interface JMSConnectionFactoryDefinition {
 	 * active.
 	 */
 	boolean transactional() default true;
-
-	/**
-	 * Number of connections that should be created when a connection pool is
-	 * initialized.
-	 * <p>
-	 * Default is vendor-specific
-	 */
-	int initialPoolSize() default -1;
 
 	/**
 	 * Maximum number of connections that should be concurrently allocated for a

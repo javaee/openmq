@@ -61,6 +61,7 @@ import com.sun.messaging.jmq.jmsserver.core.DestinationUID;
 import com.sun.messaging.jmq.jmsserver.data.BaseTransaction;
 import com.sun.messaging.jmq.jmsserver.data.ClusterTransaction;
 import com.sun.messaging.jmq.jmsserver.data.TransactionAcknowledgement;
+import com.sun.messaging.jmq.jmsserver.data.TransactionWork;
 import com.sun.messaging.jmq.jmsserver.data.TransactionBroker;
 import com.sun.messaging.jmq.jmsserver.data.TransactionState;
 import com.sun.messaging.jmq.jmsserver.data.TransactionUID;
@@ -679,10 +680,19 @@ public class NoPersistPartition implements PartitionedStore {
      * @exception NullPointerException	if <code>txnID</code> is
      *			<code>null</code>
      */
+    @Override
     public void updateTransactionState(TransactionUID txnID,
         TransactionState state, boolean sync) throws IOException, BrokerException {
         throw new UnsupportedOperationException(
         getClass().getName()+":updateTransactionState");
+    }
+
+    @Override
+    public void updateTransactionStateWithWork(TransactionUID txnID,
+        TransactionState state, TransactionWork txnwork, boolean sync) 
+        throws IOException, BrokerException {
+        throw new UnsupportedOperationException(
+        getClass().getName()+":updateTransactionStateWithWork");
     }
 
     /**

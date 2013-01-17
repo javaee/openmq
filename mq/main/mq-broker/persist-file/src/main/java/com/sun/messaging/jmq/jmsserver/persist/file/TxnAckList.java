@@ -103,11 +103,11 @@ class TxnAckList {
                 TidList.DEFAULT_TXN_USE_MEMORY_MAPPED_FILE);
 
             if (useMemoryMappedFile) {
-	        tidMap = new PHashMapMMF(
-                    backingFile, filesize.getBytes(), 1024, false, clear, Globals.isMinimumWrites(), Broker.isInProcess());
+	        tidMap = new PHashMapMMF(backingFile, filesize.getBytes(), 1024, false, 
+                             clear, Globals.isMinimumWritesFileStore(), Broker.isInProcess());
             } else {
-                tidMap = new PHashMap(
-                    backingFile, filesize.getBytes(), 1024, false, clear, Globals.isMinimumWrites(), Broker.isInProcess());
+                tidMap = new PHashMap(backingFile, filesize.getBytes(), 1024, false, 
+                             clear, Globals.isMinimumWritesFileStore(), Broker.isInProcess());
             }
 	} catch (IOException e) {
 	    logger.log(logger.ERROR, br.X_LOAD_TXNACK_FAILED, e);
@@ -177,7 +177,8 @@ class TxnAckList {
 	try {
 	    // load old data
 	    // safe=false; reset=false
-	    olddata = new PHashMap(oldFile, false, false, Globals.isMinimumWrites(), Broker.isInProcess());
+	    olddata = new PHashMap(oldFile, false, false, 
+                          Globals.isMinimumWritesFileStore(), Broker.isInProcess());
 	} catch (IOException e) {
 	    logger.log(logger.ERROR, br.X_UPGRADE_TXNACK_FAILED, oldFile,
 			backingFile, e);
@@ -232,11 +233,11 @@ class TxnAckList {
 	    // safe=false; reset=false
             if (config.getBooleanProperty(TidList.TXN_USE_MEMORY_MAPPED_FILE_PROP,
                 TidList.DEFAULT_TXN_USE_MEMORY_MAPPED_FILE)) {
-	        tidMap = new PHashMapMMF(
-                    backingFile, oldFile.length(), 1024, false, false, Globals.isMinimumWrites(), Broker.isInProcess());
+	        tidMap = new PHashMapMMF(backingFile, oldFile.length(), 1024, false, 
+                             false, Globals.isMinimumWritesFileStore(), Broker.isInProcess());
             } else {
-                tidMap = new PHashMap(
-                    backingFile, oldFile.length(), 1024, false, false, Globals.isMinimumWrites(), Broker.isInProcess());
+                tidMap = new PHashMap(backingFile, oldFile.length(), 1024, false, 
+                             false, Globals.isMinimumWritesFileStore(), Broker.isInProcess());
             }
 	} catch (IOException e) {
 	    logger.log(logger.ERROR, br.X_UPGRADE_TXNACK_FAILED, oldFile,

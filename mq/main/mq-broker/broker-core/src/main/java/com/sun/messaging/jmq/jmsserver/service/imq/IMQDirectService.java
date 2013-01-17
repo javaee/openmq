@@ -333,6 +333,7 @@ public class IMQDirectService extends IMQService implements JMSService
 
 	try  {
 	    con.authenticate(username, password);
+            con.setClientProtocolVersion(con.getHighestSupportedProtocol());
 	    /*
 	    System.err.println("#### CREATE DIRECT CXN: AUTH SUCCESSFULL");
 	    System.err.println("#### DIRECT CXN authenticated name: " + con.getAuthenticatedName());
@@ -1361,6 +1362,8 @@ public class IMQDirectService extends IMQService implements JMSService
      *  @param  connectionId The Id of the connection
      *  @param  sessionId The Id of the session
      *  @param  consumerId The Id of the consumer to delete
+     *  @param  lastMessageSeen The last message received by this consumer which
+     *  		has been seen by the application. Set to null if deleting a durable subscription.
      *  @param  durableName The name of the durable subscription to remove
      *          if the consumer is unsubscribing.
      *  @param  clientId The clientId of the connection
@@ -1378,7 +1381,7 @@ public class IMQDirectService extends IMQService implements JMSService
      *
      */
     public JMSServiceReply deleteConsumer(long connectionId, long sessionId,
-            long consumerId, String durableName, String clientId) 
+            long consumerId, SysMessageID lastMessageSeen, String durableName, String clientId) 
 			throws JMSServiceException  {
 	JMSServiceReply reply;
 	IMQConnection cxn;
@@ -1392,7 +1395,7 @@ public class IMQDirectService extends IMQService implements JMSService
 	try  {
 	    if (durableName == null)  {
 	        ConsumerUID conUID = new ConsumerUID(consumerId);
-                protocol.destroyConsumer(conUID, session, cxn);
+                protocol.destroyConsumer(conUID, session, lastMessageSeen, cxn);
 	    } else  {
                 protocol.unsubscribe(durableName, clientId, cxn);
 	    }
@@ -1418,7 +1421,7 @@ public class IMQDirectService extends IMQService implements JMSService
 
 	return (reply);
     }
-
+    
     /**
      *  Configure a consumer for async or sync message consumption.<p>
      *  This method is used to enable and disable async delivery of messages
@@ -2474,7 +2477,7 @@ public class IMQDirectService extends IMQService implements JMSService
 	}
 
 	try  {
-	    protocol.redeliver(conUIDs, messageIDs, cxn, txnUID, true); 
+	    protocol.redeliver(conUIDs, messageIDs, cxn, txnUID, setRedelivered); 
 	} catch(Exception e)  {
 	    String errStr = 
 	    "redeliverMessages: Redeliver failed. Connection ID: "
@@ -2652,6 +2655,7 @@ public class IMQDirectService extends IMQService implements JMSService
 	    SessionListener.stopConnection(cxn);
         }
     }
+
 }
 
     /**

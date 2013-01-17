@@ -505,7 +505,7 @@ public class Consumer implements ConsumerSpi, EventBroadcaster,
 
         if (DEBUG) {
             logger.log(logger.INFO, "destroyConsumer("+delivered.size()+
-            ", "+remotePendings+", "+remoteCleanup+", "+destroyingDest+", "+notify);
+            ", "+remotePendings+", "+remoteCleanup+", "+destroyingDest+", "+notify+")");
         }
 
         synchronized(destroyLock) {
@@ -755,11 +755,9 @@ public class Consumer implements ConsumerSpi, EventBroadcaster,
             }
             msgs.removeAll(s, cleanupReason);
         } catch (Exception ex) {
-            logger.log(Logger.WARNING,"Internal Error: Problem cleaning consumer " 
-                            + this, ex);
+            logger.logStack(Logger.WARNING, br.getKString(
+            br.W_EXCEPTION_CLEANUP_CONSUMER, this, ex.getMessage()), ex);
         }
-
-        
     }
 
     /**
@@ -912,8 +910,10 @@ public class Consumer implements ConsumerSpi, EventBroadcaster,
         this.selstr = selstr;
         selector = getSelector(selstr);
         initInterest();
-        logger.log(Logger.DEBUG,"Created new consumer "+ uid +
-              " on destination " + d + " with selector " + selstr);
+        if (DEBUG) {
+            logger.log(Logger.INFO, "Consumer: created new consumer "+
+                uid+ " on destination "+d+" with selector "+selstr);
+        }
               
     }
 
@@ -1416,6 +1416,10 @@ public class Consumer implements ConsumerSpi, EventBroadcaster,
                 if (rcnt < 2) {
                     rcnt = 2;
                 }
+            }
+            if (DEBUG) {
+                logger.log(Logger.INFO, 
+                "Consumer.getAndFillNextPacket: Set DeliveryCount to "+rcnt+" for message "+ref+" for consumer "+this);
             }
             p.setDeliveryCount(rcnt);
             if (ref.isLast(uid)) {

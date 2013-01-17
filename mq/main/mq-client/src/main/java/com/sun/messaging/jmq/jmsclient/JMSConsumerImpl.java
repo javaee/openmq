@@ -83,7 +83,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = (MQMessageConsumer) context.getSession().createConsumer(destination);
+			messageConsumer = (MQMessageConsumer) context._getSession().createConsumer(destination);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (JMSException e) {
@@ -96,7 +96,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = (MQMessageConsumer) context.getSession().createConsumer(destination,messageSelector);
+			messageConsumer = (MQMessageConsumer) context._getSession().createConsumer(destination,messageSelector);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (InvalidSelectorException e) {
@@ -112,7 +112,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = (MQMessageConsumer) context.getSession().createConsumer(destination,messageSelector,noLocal);
+			messageConsumer = (MQMessageConsumer) context._getSession().createConsumer(destination,messageSelector,noLocal);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (InvalidSelectorException e) {
@@ -127,9 +127,11 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = (MQMessageConsumer) context.getSession().createDurableConsumer(topic,name);
+			messageConsumer = (MQMessageConsumer) context._getSession().createDurableConsumer(topic,name);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
+		} catch (IllegalStateException e) {
+			throw new MQIllegalStateRuntimeException(e);			
 		} catch (JMSException e) {
 			throw new MQRuntimeException(e);
 		}
@@ -140,7 +142,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = (MQMessageConsumer) context.getSession().createDurableConsumer(topic,name,messageSelector,noLocal);
+			messageConsumer = (MQMessageConsumer) context._getSession().createDurableConsumer(topic,name,messageSelector,noLocal);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (InvalidSelectorException e) {
@@ -157,7 +159,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = (MQMessageConsumer)context.getSession().createSharedDurableConsumer(topic,name);
+			messageConsumer = (MQMessageConsumer)context._getSession().createSharedDurableConsumer(topic,name);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (JMSException e) {
@@ -170,7 +172,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = (MQMessageConsumer) context.getSession().createSharedDurableConsumer(topic,name,messageSelector,noLocal);
+			messageConsumer = (MQMessageConsumer) context._getSession().createSharedDurableConsumer(topic,name,messageSelector,noLocal);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (InvalidSelectorException e) {
@@ -187,7 +189,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = (MQMessageConsumer) context.getSession().createSharedConsumer(topic,sharedSubscriptionName);
+			messageConsumer = (MQMessageConsumer) context._getSession().createSharedConsumer(topic,sharedSubscriptionName);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);		
 		} catch (JMSException e) {
@@ -200,7 +202,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = (MQMessageConsumer) context.getSession().createSharedConsumer(topic,sharedSubscriptionName,messageSelector);
+			messageConsumer = (MQMessageConsumer) context._getSession().createSharedConsumer(topic,sharedSubscriptionName,messageSelector);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (InvalidSelectorException e) {
@@ -215,7 +217,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = (MQMessageConsumer) context.getSession().createSharedConsumer(topic,sharedSubscriptionName,messageSelector,noLocal);
+			messageConsumer = (MQMessageConsumer) context._getSession().createSharedConsumer(topic,sharedSubscriptionName,messageSelector,noLocal);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (InvalidSelectorException e) {

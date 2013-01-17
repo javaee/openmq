@@ -2527,7 +2527,6 @@ public class ProtocolHandler {
                 //bug 6388624 - Messages sent (but not delivered) are not 
                 //redelivered until session closed (if no msgs seen)
                 //default is set to true
-                //props.put("JMQRedeliverAll", new Boolean (true));
                 props.put("JMQRedeliverAll", Boolean.TRUE);
             }
         }

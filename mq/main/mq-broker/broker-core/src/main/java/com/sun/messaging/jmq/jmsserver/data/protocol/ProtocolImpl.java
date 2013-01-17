@@ -593,17 +593,17 @@ public class ProtocolImpl implements Protocol
        * <P>Packet:<b>DELETE_CONSUMER</b></P>
        *@param uid ConsumerUID to close.
        *@param session session associated with the consumer.
+       *@param lastid last message id seen by application
        *@param con Connection associated with the consumer (used
        *          for retrieving protocol version).
        */
       public void destroyConsumer(ConsumerUID uid, Session session,
-            IMQConnection con)
-          throws BrokerException
-      {
+          SysMessageID lastid, IMQConnection con)
+          throws BrokerException {
           ConsumerHandler handler = (ConsumerHandler)
                       pr.getHandler(PacketType.ADD_CONSUMER);
           handler.destroyConsumer(con, session, uid,
-                  null, null, null, false, false);
+                  null, null, lastid, (lastid == null), false);
       }
 
 

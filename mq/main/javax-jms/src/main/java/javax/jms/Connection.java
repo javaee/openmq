@@ -637,87 +637,214 @@ public interface Connection extends AutoCloseable {
     void 
     close() throws JMSException; 
     
-      /** Creates a connection consumer for this connection (optional operation).
-      * This is an expert facility not used by regular JMS clients.
-     * <p>
-     * This method must not be used in a Java EE web or EJB application. 
-     * Doing so may cause a {@code JMSException} to be thrown though this is not guaranteed.
-     * 
-      * @param destination the destination to access
-      * @param messageSelector only messages with properties matching the
-      * message selector expression are delivered.  A value of null or
-      * an empty string indicates that there is no message selector  
-      * for the message consumer.
-      * @param sessionPool the server session pool to associate with this 
-      * connection consumer
-      * @param maxMessages the maximum number of messages that can be
-      * assigned to a server session at one time
-      *
-      * @return the connection consumer
-      *
-      * @exception JMSException if the {@code Connection} object fails
-      *                         to create a connection consumer for one of the following reasons:
-      *                         <ul>
-      *                         <li>an internal error has occurred
-      *                         <li>invalid arguments for {@code sessionPool} and {@code messageSelector} or
-      *                         <li>this method has been called in a Java EE web or EJB application 
-      *                         (though it is not guaranteed that an exception is thrown in this case)
-      *                         </ul>
-      * @exception InvalidDestinationException if an invalid destination is specified.
-      * @exception InvalidSelectorException if the message selector is invalid.
-      *
-      *
-      * @since 1.1
-      * @see javax.jms.ConnectionConsumer
-      */ 
-    ConnectionConsumer
-    createConnectionConsumer(Destination destination,
-                             String messageSelector,
-                             ServerSessionPool sessionPool,
-			     int maxMessages)
-			     throws JMSException;
+	/**
+	 * Creates a connection consumer for this connection (optional operation)
+	 * on the specific destination.
+	 * <p>
+	 * This is an expert facility not used by ordinary JMS clients.
+	 * <p>
+	 * This method must not be used in a Java EE web or EJB application. Doing
+	 * so may cause a {@code JMSException} to be thrown though this is not
+	 * guaranteed.
+	 * 
+	 * @param destination
+	 *            the destination to access
+	 * @param messageSelector
+	 *            only messages with properties matching the message selector
+	 *            expression are delivered. A value of null or an empty string
+	 *            indicates that there is no message selector for the message
+	 *            consumer.
+	 * @param sessionPool
+	 *            the server session pool to associate with this connection
+	 *            consumer
+	 * @param maxMessages
+	 *            the maximum number of messages that can be assigned to a
+	 *            server session at one time
+	 * 
+	 * @return the connection consumer
+	 * 
+	 * @exception InvalidDestinationException
+	 *                if an invalid destination is specified.
+	 * @exception InvalidSelectorException
+	 *                if the message selector is invalid.
+	 * @exception JMSException
+	 *                if the {@code Connection} object fails to create a
+	 *                connection consumer for one of the following reasons:
+	 *                <ul>
+	 *                <li>an internal error has occurred 
+	 *                <li>invalid arguments for {@code sessionPool} and 
+	 *                {@code messageSelector} or 
+	 *                <li>this method has been called in a Java EE web or EJB
+	 *                application (though it is not guaranteed that an exception
+	 *                is thrown in this case)
+	 *                </ul>
+	 * 
+	 * @since 1.1
+	 * @see javax.jms.ConnectionConsumer
+	 */
+	ConnectionConsumer createConnectionConsumer(Destination destination,
+			String messageSelector, ServerSessionPool sessionPool,
+			int maxMessages) throws JMSException;
+	
+	/**
+	 * Creates a connection consumer for this connection (optional operation)
+	 * on the specific topic using a shared non-durable subscription with
+	 * the specified name.
+	 * <p>
+	 * This is an expert facility not used by ordinary JMS clients.
+	 * <p>
+	 * This method must not be used in a Java EE web or EJB application. Doing
+	 * so may cause a {@code JMSException} to be thrown though this is not
+	 * guaranteed.
+	 * 
+	 * @param topic
+	 *            the topic to access
+	 * @param subscriptionName
+	 *            the name used to identify the shared non-durable subscription
+	 * @param messageSelector
+	 *            only messages with properties matching the message selector
+	 *            expression are delivered. A value of null or an empty string
+	 *            indicates that there is no message selector for the message
+	 *            consumer.
+	 * @param sessionPool
+	 *            the server session pool to associate with this connection
+	 *            consumer
+	 * @param maxMessages
+	 *            the maximum number of messages that can be assigned to a
+	 *            server session at one time
+	 * 
+	 * @return the connection consumer
+	 * 
+	 * @exception IllegalStateException
+	 *                if called on a {@code QueueConnection}
+	 * @exception InvalidDestinationException
+	 *                if an invalid destination is specified.
+	 * @exception InvalidSelectorException
+	 *                if the message selector is invalid.
+	 * @exception JMSException
+	 *                if the {@code Connection} object fails to create a
+	 *                connection consumer for one of the following reasons:
+	 *                <ul>
+	 *                <li>an internal error has occurred 
+	 *                <li>invalid arguments for {@code sessionPool} and 
+	 *                {@code messageSelector} or 
+	 *                <li>this method has been called in a Java EE web or EJB
+	 *                application (though it is not guaranteed that an exception
+	 *                is thrown in this case)
+	 *                </ul>
+	 * 
+	 * @since 2.0
+	 * @see javax.jms.ConnectionConsumer
+	 */
+	ConnectionConsumer createSharedConnectionConsumer(Topic topic,
+			String subscriptionName,
+			String messageSelector, ServerSessionPool sessionPool,
+			int maxMessages) throws JMSException;
 
 
-    /** Create a durable connection consumer for this connection (optional operation). 
-      * This is an expert facility not used by regular JMS clients.
-     * <p>
-     * This method must not be used in a Java EE web or EJB application. 
-     * Doing so may cause a {@code JMSException} to be thrown though this is not guaranteed.
-     *               
-      * @param topic topic to access
-      * @param subscriptionName durable subscription name
-      * @param messageSelector only messages with properties matching the
-      * message selector expression are delivered.  A value of null or
-      * an empty string indicates that there is no message selector 
-      * for the message consumer.
-      * @param sessionPool the server session pool to associate with this 
-      * durable connection consumer
-      * @param maxMessages the maximum number of messages that can be
-      * assigned to a server session at one time
-      *
-      * @return the durable connection consumer
-      *  
-      * @exception JMSException if the {@code Connection} object fails
-      *                         to create a connection consumer for one of the following reasons:
-      *                         <ul>
-      *                         <li>an internal error has occurred
-      *                         <li>invalid arguments for {@code sessionPool} and {@code messageSelector} or
-      *                         <li>this method has been called in a Java EE web or EJB application 
-      *                         (though it is not guaranteed that an exception is thrown in this case)
-      *                         </ul>
-      * @exception InvalidDestinationException if an invalid destination
-      *             is specified.
-      * @exception InvalidSelectorException if the message selector is invalid.
-      * @since 1.1
-      * @see javax.jms.ConnectionConsumer
-      */
-    ConnectionConsumer
-    createDurableConnectionConsumer(Topic topic,
-				    String subscriptionName,
-                                    String messageSelector,
-                                    ServerSessionPool sessionPool,
-				    int maxMessages)
-                             throws JMSException;
+	/**
+	 * Creates a connection consumer for this connection (optional operation)
+	 * on the specific topic using an unshared durable subscription with
+	 * the specified name.
+	 * <p>
+	 * This is an expert facility not used by ordinary JMS clients.
+	 * <p>
+	 * This method must not be used in a Java EE web or EJB application. Doing
+	 * so may cause a {@code JMSException} to be thrown though this is not
+	 * guaranteed.
+	 * 
+	 * @param topic
+	 *            topic to access
+	 * @param subscriptionName
+	 *            the name used to identify the unshared durable subscription
+	 * @param messageSelector
+	 *            only messages with properties matching the message selector
+	 *            expression are delivered. A value of null or an empty string
+	 *            indicates that there is no message selector for the message
+	 *            consumer.
+	 * @param sessionPool
+	 *            the server session pool to associate with this durable
+	 *            connection consumer
+	 * @param maxMessages
+	 *            the maximum number of messages that can be assigned to a
+	 *            server session at one time
+	 * 
+	 * @return the durable connection consumer
+	 * 
+	 * @exception IllegalStateException
+	 *                if called on a {@code QueueConnection}
+	 * @exception InvalidDestinationException
+	 *                if an invalid destination is specified.
+	 * @exception InvalidSelectorException
+	 *                if the message selector is invalid.
+	 * @exception JMSException
+	 *                if the {@code Connection} object fails to create a
+	 *                connection consumer for one of the following reasons:
+	 *                <ul>
+	 *                <li>an internal error has occurred 
+	 *                <li>invalid arguments
+	 *                for {@code sessionPool} and {@code messageSelector} or 
+	 *                <li>this method has been called in a Java EE web or EJB
+	 *                application (though it is not guaranteed that an exception
+	 *                is thrown in this case)
+	 *                </ul>
+	 * @since 1.1
+	 * @see javax.jms.ConnectionConsumer
+	 */
+	ConnectionConsumer createDurableConnectionConsumer(Topic topic, String subscriptionName, String messageSelector,
+			ServerSessionPool sessionPool, int maxMessages) throws JMSException;
+	
+	/**
+	 * Creates a connection consumer for this connection (optional operation)
+	 * on the specific topic using a shared durable subscription with
+	 * the specified name.
+	 * <p>
+	 * This is an expert facility not used by ordinary JMS clients.
+	 * <p>
+	 * This method must not be used in a Java EE web or EJB application. Doing
+	 * so may cause a {@code JMSException} to be thrown though this is not
+	 * guaranteed.
+	 * 
+	 * @param topic
+	 *            topic to access
+	 * @param subscriptionName
+	 *            the name used to identify the shared durable subscription 
+	 * @param messageSelector
+	 *            only messages with properties matching the message selector
+	 *            expression are delivered. A value of null or an empty string
+	 *            indicates that there is no message selector for the message
+	 *            consumer.
+	 * @param sessionPool
+	 *            the server session pool to associate with this durable
+	 *            connection consumer
+	 * @param maxMessages
+	 *            the maximum number of messages that can be assigned to a
+	 *            server session at one time
+	 * 
+	 * @return the durable connection consumer
+	 * 
+	 * @exception IllegalStateException
+	 *                if called on a {@code QueueConnection}
+	 * @exception InvalidDestinationException
+	 *                if an invalid destination is specified.
+	 * @exception InvalidSelectorException
+	 *                if the message selector is invalid.
+	 * @exception JMSException
+	 *                if the {@code Connection} object fails to create a
+	 *                connection consumer for one of the following reasons:
+	 *                <ul>
+	 *                <li>an internal error has occurred 
+	 *                <li>invalid arguments
+	 *                for {@code sessionPool} and {@code messageSelector} or 
+	 *                <li>this method has been called in a Java EE web or EJB
+	 *                application (though it is not guaranteed that an exception
+	 *                is thrown in this case)
+	 *                </ul>
+	 * @since 2.0
+	 * @see javax.jms.ConnectionConsumer
+	 */
+	ConnectionConsumer createSharedDurableConnectionConsumer(Topic topic, String subscriptionName, String messageSelector,
+			ServerSessionPool sessionPool, int maxMessages) throws JMSException;
           
 }
 

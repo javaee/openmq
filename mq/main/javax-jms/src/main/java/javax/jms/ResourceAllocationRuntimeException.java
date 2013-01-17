@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,25 +38,56 @@
  * holder.
  */
 
-package com.sun.messaging.jmq.jmsserver.persist.api;
+package javax.jms;
 
-
-import com.sun.messaging.jmq.util.UID;
 /**
- */
-public interface PartitionListener  
-{
-    
-    /**
-     * @param partitionID the partition id
-     */
-    public void partitionAdded(UID partitionID, Object source);
+ * <P>This unchecked exception is thrown when a provider is unable to allocate the 
+ *    resources required by a method. For example, this exception should be 
+ *    thrown when a call to 
+ *    {@code ConnectionFactory.createContext} fails due to a
+ *    lack of JMS provider resources.
+ *
+ * @version 2.0
+ **/
 
-    /**
-     * @param partitionID the partition id
-     * @param source the component or object issued this notification
-     * @param destinedTo null if the partition is deleted from cluster 
-     */
-    public void partitionRemoved(UID partitionID, Object source, Object destinedTo);
+public class ResourceAllocationRuntimeException extends JMSRuntimeException {
+
+  /** Constructs a {@code ResourceAllocationRuntimeException} with the specified 
+   *  reason and error code.
+   *
+   *  @param  reason        a description of the exception
+   *  @param  errorCode     a string specifying the vendor-specific
+   *                        error code
+   *                        
+   **/
+  public 
+  ResourceAllocationRuntimeException(String reason, String errorCode) {
+    super(reason, errorCode);
+  }
+
+  /** Constructs a {@code ResourceAllocationRuntimeException} with the specified 
+   *  reason. The error code defaults to null.
+   *
+   *  @param  reason        a description of the exception
+   **/
+  public 
+  ResourceAllocationRuntimeException(String reason) {
+    super(reason);
+  }
+  
+	/**
+	 * Constructs a {@code ResourceAllocationRuntimeException} with the specified detail message,
+	 * error code and cause
+	 * 
+	 * @param detailMessage
+	 *            a description of the exception
+	 * @param errorCode
+	 *            a provider-specific error code
+	 * @param cause
+	 *            the underlying cause of this exception
+	 */
+	public ResourceAllocationRuntimeException(String detailMessage, String errorCode, Throwable cause) {
+		super(detailMessage,errorCode,cause);
+	}
 
 }

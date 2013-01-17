@@ -227,9 +227,12 @@ public interface ClusterBroadcast {
 
     public void preTakeover(String brokerID, UID storeSession, 
                 String brokerHost, UID brokerSession) throws BrokerException ;
-	public void postTakeover(String brokerID, UID storeSession, boolean aborted);
 
-	public void sendClusterTransactionInfo(long tid, BrokerAddress to);
+    /**
+     */
+    public void postTakeover(String brokerID, UID storeSession, boolean aborted, boolean notify);
+
+    public void sendClusterTransactionInfo(long tid, BrokerAddress to);
 
     /**
      * Lookup the broker address for a broker ID - only for HA mode and BDBREP mode 

@@ -44,7 +44,14 @@
 
 package com.sun.messaging;
 
-import javax.jms.*;
+import javax.jms.JMSException;
+import javax.jms.JMSSecurityException;
+import javax.jms.XAConnection;
+import javax.jms.XAJMSContext;
+import javax.jms.XAQueueConnection;
+import javax.jms.XATopicConnection;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import com.sun.messaging.jmq.jmsclient.ContainerType;
 import com.sun.messaging.jmq.jmsclient.XAConnectionImpl;
@@ -59,6 +66,9 @@ import com.sun.messaging.jmq.jmsclient.XATopicConnectionImpl;
  * @see         javax.jms.XAConnectionFactory javax.jms.XAConnectionFactory
  */
 public class XAConnectionFactory extends com.sun.messaging.ConnectionFactory implements javax.jms.XAConnectionFactory {
+	
+    /* The type of container in which this class is operating. See the ContainerType enum for possible values */
+    private static ContainerType containerType;
 
     /**
      * Create an XA connection with default user identity.
@@ -191,10 +201,25 @@ public class XAConnectionFactory extends com.sun.messaging.ConnectionFactory imp
 		return new XAJMSContextImpl(this, getContainerType(), userName, password);
 	}
 	
-	private ContainerType getContainerType(){
-		//TODO We can't certain that we are in a JavaEE_Web_or_EJB environment - but it is likely 
-		//TODO Need to fix
-		return ContainerType.JavaEE_Web_or_EJB;
+	protected static ContainerType getContainerType(){
+		// Overrides the implementation in BasicConnectionFactory which always returns JavaSE
+		
+		if (containerType==null){
+			Boolean inAppClientContainer = false;
+			// See Java EE 7 section EE.5.17 "5.17 Application Client Container Property"
+			String lookupName = "java:comp/InAppClientContainer";
+			try {
+				InitialContext ic = new InitialContext();
+				inAppClientContainer = (Boolean)ic.lookup(lookupName);
+				if (inAppClientContainer){
+					containerType=ContainerType.JavaEE_ACC;
+				} else {
+					containerType=ContainerType.JavaEE_Web_or_EJB;
+				}
+			} catch (NamingException e) {
+				containerType=ContainerType.JavaSE;
+			}
+		}
+		return containerType;
 	}
-
 }

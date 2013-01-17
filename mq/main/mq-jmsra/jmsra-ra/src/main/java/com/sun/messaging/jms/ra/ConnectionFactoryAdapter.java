@@ -341,4 +341,8 @@ public class ConnectionFactoryAdapter
     throws JMSException {
         return (XAResource)null;
     }
+
+    ManagedConnectionFactory getMCF() {
+        return mcf;
+    }
 }

@@ -354,7 +354,7 @@ public interface Protocol
        *          for retrieving protocol version).
        */
       public void destroyConsumer(ConsumerUID uid, Session session,
-            IMQConnection con)
+          SysMessageID lastid, IMQConnection con)
           throws BrokerException;
 
 

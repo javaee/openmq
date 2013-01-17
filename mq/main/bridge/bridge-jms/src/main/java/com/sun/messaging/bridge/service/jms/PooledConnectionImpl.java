@@ -128,8 +128,21 @@ public class PooledConnectionImpl extends PooledConnection implements Connection
     return _conn.createDurableConnectionConsumer(topic, subscriptionName, 
                                 messageSelector, sessionPool, maxMessages);
     }
+    
+	@Override
+	public ConnectionConsumer createSharedConnectionConsumer(Topic topic, String subscriptionName,
+			String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+		return _conn.createSharedConnectionConsumer(topic, subscriptionName, messageSelector, sessionPool, maxMessages);
+	}
+
+	@Override
+	public ConnectionConsumer createSharedDurableConnectionConsumer(Topic topic, String subscriptionName,
+			String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+		return _conn.createSharedDurableConnectionConsumer(topic, subscriptionName, messageSelector, sessionPool, maxMessages);
+	}
 
     public String toString() {
         return _conn.toString();
     }
+
 }

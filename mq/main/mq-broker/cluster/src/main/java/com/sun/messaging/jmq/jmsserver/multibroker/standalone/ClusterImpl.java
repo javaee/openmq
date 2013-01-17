@@ -92,6 +92,10 @@ public class ClusterImpl implements Cluster, ConfigListener {
     public void closeLink(BrokerAddress remote, boolean force) {
     }
 
+    public long getLinkInitWaitTime() {
+        return 1L;
+    }
+
     public boolean isReachable(BrokerAddress remote, int timeout) throws IOException {
         return true;
     }

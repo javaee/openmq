@@ -85,6 +85,7 @@ import com.sun.messaging.jmq.jmsserver.data.TransactionBroker;
 import com.sun.messaging.jmq.jmsserver.data.TransactionList;
 import com.sun.messaging.jmq.jmsserver.data.TransactionState;
 import com.sun.messaging.jmq.jmsserver.data.TransactionUID;
+import com.sun.messaging.jmq.jmsserver.data.AutoRollbackType;
 import com.sun.messaging.jmq.jmsserver.multibroker.Protocol;
 import com.sun.messaging.jmq.jmsserver.resources.BrokerResources;
 import com.sun.messaging.jmq.jmsserver.service.ConnectionUID;
@@ -1780,7 +1781,7 @@ class BrokerConsumers implements Runnable, com.sun.messaging.jmq.util.lists.Even
                     tl = itr.next();
                     tltas = tltasmap.get(tl);
                     tas = (TransactionAcknowledgement[])tltas.toArray(new TransactionAcknowledgement[0]);
-                    TransactionState ts = new TransactionState();
+                    TransactionState ts = new TransactionState(AutoRollbackType.NOT_PREPARED, 0L, true);
                     ts.setState(TransactionState.PREPARED);
                     if (getDEBUG()) {
                         logger.log(logger.INFO, 

@@ -182,9 +182,8 @@ public class BasicConnectionFactory extends com.sun.messaging.AdministeredObject
 		return new JMSContextImpl(this,getContainerType(), sessionMode);
 	}
 	
-	private ContainerType getContainerType(){
-		//TODO We can't certain that we are in a Java SE environment - we might be being used from GenericJMSRA
-		//TODO Need to fix
+	protected static ContainerType getContainerType(){
+		// this is overridden in the subtype XAConnectionFactory
 		return ContainerType.JavaSE;
 	}
 

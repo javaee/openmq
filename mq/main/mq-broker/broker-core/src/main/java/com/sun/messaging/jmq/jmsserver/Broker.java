@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -53,6 +53,8 @@ import java.net.*;
 import java.lang.reflect.*;
 
 import com.sun.messaging.jmq.util.StringUtil;
+import com.sun.messaging.jmq.util.PassfileObfuscator;
+import com.sun.messaging.jmq.util.PassfileObfuscatorImpl;
 import com.sun.messaging.jmq.Version;
 import com.sun.messaging.jmq.io.*;
 import com.sun.messaging.jmq.util.BrokerExitCode;
@@ -943,6 +945,7 @@ public class Broker implements GlobalErrorHandler, CommBroker {
         // create the Interest manager, which handles maping
         // interests to destinations
         try {
+            Globals.isMinimumPersist(); //logging
             store = Globals.getStore();
         } catch (BrokerException ex) {
             logger.logStack(Logger.ERROR, BrokerResources.E_PERSISTENT_OPEN, ex);
@@ -2312,51 +2315,48 @@ public class Broker implements GlobalErrorHandler, CommBroker {
     	    	
         BrokerConfig bcfg = Globals.getConfig(); 
 
-		Properties props = new Properties();
-		
-		if (bcfg.getBooleanProperty(Globals.KEYSTORE_USE_PASSFILE_PROP)) {
-			// read passwords from a password file
+        Properties props = new Properties();
+	
+        if (bcfg.getBooleanProperty(Globals.KEYSTORE_USE_PASSFILE_PROP)) {
+            // read passwords from a password file
 
-			// get password file location
-        String pf_value = null;
-        String pf_dir = null;
-			if ((pf_value = bcfg.getProperty(Globals.KEYSTORE_PASSDIR_PROP)) != null) {
-        pf_value = StringUtil.expandVariables(pf_value, bcfg);
-        pf_dir = pf_value;
-        } else {
-				pf_dir = bcfg.getProperty(Globals.IMQ + ".etchome") + File.separator + "security";
-        }
+            // get password file location
+            String pf_value = null;
+            String pf_dir = null;
+            if ((pf_value = bcfg.getProperty(Globals.KEYSTORE_PASSDIR_PROP)) != null) {
+                pf_value = StringUtil.expandVariables(pf_value, bcfg);
+                pf_dir = pf_value;
+            } else {
+                pf_dir = bcfg.getProperty(Globals.IMQ + ".etchome") + File.separator + "security";
+            }
         
-			String passfile_location = pf_dir + File.separator + bcfg.getProperty(Globals.KEYSTORE_PASSFILE_PROP);
-        File pf = new File(passfile_location);
-        if (pf.exists()) {
-
-        // read password from passfile
-        try {
-					InputStream fis = FileUtil.retrieveObfuscatedFile(passfile_location);
+            String passfile_location = pf_dir + File.separator + bcfg.getProperty(Globals.KEYSTORE_PASSFILE_PROP);
+            File pf = new File(passfile_location);
+            if (pf.exists()) {
+                // read password from passfile
+                try {
+                    PassfileObfuscator po = new PassfileObfuscatorImpl();
+                    InputStream fis = po.retrieveObfuscatedFile(passfile_location, Globals.IMQ);
                     props.load(fis);
-				} catch (IOException ioex) {
-					logger.log(Logger.ERROR, rb.getKString(BrokerResources.X_READ_PASSFILE), ioex);
-				}
-
-			} else {
-				throw new FileNotFoundException(rb.getKString(rb.E_GET_PASSFILE, passfile_location));
-			}
-		}
-
-		if (Globals.isReadPropertiessFromStdin() || bcfg.getBooleanProperty(Globals.KEYSTORE_USE_PASSFILE_PROP)) {
-
-			// any passwords passed in through command line option take
-			// precedence
+                } catch (IOException ioex) {
+                    logger.log(Logger.ERROR, rb.getKString(BrokerResources.X_READ_PASSFILE), ioex);
+                }
+            } else {
+                throw new FileNotFoundException(rb.getKString(rb.E_GET_PASSFILE, passfile_location));
+            }
+        }
+        if (Globals.isReadPropertiessFromStdin() || 
+            bcfg.getBooleanProperty(Globals.KEYSTORE_USE_PASSFILE_PROP)) {
+            // any passwords passed in through command line option take precedence
 
             // db password
             if (dbPWOverride) {
-            props.put(dbPWProp, bcfg.getProperty(dbPWProp));
+                props.put(dbPWProp, bcfg.getProperty(dbPWProp));
             }
 
             // ldap password
             if (ldapPWOverride) {
-            props.put(ldapPWProp, bcfg.getProperty(ldapPWProp));
+                props.put(ldapPWProp, bcfg.getProperty(ldapPWProp));
             }
 
             // keystore password
@@ -2369,8 +2369,7 @@ public class Broker implements GlobalErrorHandler, CommBroker {
                 props.put(bridgeManagerPWProp, bcfg.getProperty(bridgeManagerPWProp));
             }
             bcfg.putAll(props);
-
-    }
+        }
     }
 
 	/**

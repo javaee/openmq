@@ -1130,7 +1130,19 @@ public class TransactionHandler extends PacketHandler
                 fi.checkFaultAndThrowBrokerException(
                    FaultInjection.FAULT_TXN_COMMIT_1_1, null);
             }
-            translist.updateState(id, s, true);
+
+            if (ts.getState() == TransactionState.PREPARED ||
+                (baseTransaction != null && 
+                 baseTransaction.getState() == TransactionState.PREPARED)) {
+                translist.updateState(id, s, true);
+            } else { //1-phase commit 
+                if (ts.getType() != AutoRollbackType.NEVER &&
+                    Globals.isMinimumPersistLevel2()) {
+                    translist.updateStateCommitWithWork(id, s, true);
+                } else {
+                    translist.updateState(id, s, true);
+                }
+            }
             if (fi.FAULT_INJECTION) {
                 checkFIAfterDB(PacketType.COMMIT_TRANSACTION);
                 fi.checkFaultAndExit(FaultInjection.FAULT_TXN_COMMIT_1_5, 
@@ -1463,7 +1475,7 @@ public class TransactionHandler extends PacketHandler
 					txnWorkMessage.setDestUID(dest.getDestinationUID());
 					txnWorkMessage.setPacketReference(ref);
 					
-					txnWork.addMesage(txnWorkMessage);
+					txnWork.addMessage(txnWorkMessage);
 				}
 
 			} catch (Exception ex) {
@@ -2441,7 +2453,12 @@ public class TransactionHandler extends PacketHandler
                     logTxn(pstore, baseTransaction);                	
                 }
             }
-            translist.updateState(id, s, onephasePrepare, persist);
+            if (ts.getType() != AutoRollbackType.NEVER &&
+                Globals.isMinimumPersistLevel2()) { 
+                translist.updateStatePrepareWithWork(id, s, onephasePrepare, persist);
+            } else {
+                translist.updateState(id, s, onephasePrepare, persist);
+            }
             prepared = true;
             if (fi.FAULT_INJECTION) {
                 if (fi.checkFault(fi.FAULT_TXN_PREPARE_3_KILL_CLIENT, null)) {
@@ -3045,13 +3062,12 @@ public class TransactionHandler extends PacketHandler
                   throw e;
               }
               
-              if(Globals.isMinimumWrites()|| Globals.isNewTxnLogEnabled())
-              {
+              if ((ts.getType() != AutoRollbackType.NEVER && 
+                   Globals.isMinimumPersist()) || 
+                  Globals.isNewTxnLogEnabled()) {
             	  // don't persist end state change            	 
             	 translist.updateState(id, s, false); 
-              }
-              else
-              {
+              } else {
                  translist.updateState(id, s, true);
               }
           } catch (Exception ex) {

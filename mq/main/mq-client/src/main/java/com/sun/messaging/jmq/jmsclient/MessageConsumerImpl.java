@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -758,16 +758,7 @@ public class MessageConsumerImpl extends Consumer
 				message = (MessageImpl) receiveQueue.dequeue();
 				if (message != null) {
 					try {
-						body = message.getBody(c);
-						if (body==null){
-							// must be a Message
-							// this doesn't have a payload, and we can't return null because this would clash with the "no message received" case,
-							// so we throw an exception
-							// "Message has no body and so cannot be returned using this method" 
-							String errorString = AdministeredObject.cr.getKString(ClientResources.X_MESSAGE_HAS_NO_BODY);
-							JMSException jmse = new javax.jms.MessageFormatException(errorString, ClientResources.X_MESSAGE_HAS_NO_BODY);
-							ExceptionHandler.throwJMSException(jmse);
-						}
+						body = returnPayload(message,c);
 					} catch (MessageFormatException mfe) {
 						// message could not be converted
 						if (session.getAcknowledgeMode()==Session.AUTO_ACKNOWLEDGE || session.getAcknowledgeMode()==Session.DUPS_OK_ACKNOWLEDGE){
@@ -808,13 +799,9 @@ public class MessageConsumerImpl extends Consumer
 		return body;
 	}
 
-	@Override
-	public <T> T receiveBody(Class<T> c) throws JMSException {
-		return receiveBody(c,0);
-	}
-		
 	private <T> T returnPayload(Message message, Class<T> c) throws JMSException {
-		T body = message.getBody(c);
+		T body;
+		body = message.getBody(c);
 		if (body==null){
 			// must be a Message
 			// this doesn't have a payload, and we can't return null because this would clash with the "no message received" case,
@@ -827,6 +814,11 @@ public class MessageConsumerImpl extends Consumer
 		return body;
 	}
 
+	@Override
+	public <T> T receiveBody(Class<T> c) throws JMSException {
+		return receiveBody(c,0);
+	}
+		
     /** Since a provider may allocate some resources on behalf of a
       * MessageConsumer outside the JVM, clients should close them when they
       * are not needed. Relying on garbage collection to eventually reclaim
@@ -857,6 +849,8 @@ public class MessageConsumerImpl extends Consumer
             isClosed = true;
 
         }
+
+        session.checkPermission();
 
         try {
 

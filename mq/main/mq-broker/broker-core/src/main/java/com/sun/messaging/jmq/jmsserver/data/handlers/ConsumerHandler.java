@@ -165,13 +165,14 @@ public class ConsumerHandler extends PacketHandler
             conPaused = true;
             if (msg.getPacketType() == PacketType.ADD_CONSUMER) {
                 if (DEBUG) {
-                    logger.log(Logger.DEBUGHIGH, "ConsumerHandler: handle() "
-                      + "[ Received AddConsumer message {0}]", msg.toString());
+                    logger.log(Logger.INFO, "ConsumerHandler: "+
+                    "[Received AddConsumer message {0}]", msg.toString());
                 }
                 pkt.setPacketType(PacketType.ADD_CONSUMER_REPLY);
                 if (lsessionid == null) {
-                    if (DEBUG)
-                    logger.log(Logger.DEBUG,"not Raptor consumer packet (no session id)");
+                    if (DEBUG) {
+                        logger.log(Logger.INFO, "ConsumerHandler: not Raptor consumer packet (no session id)");
+                    }
                     // assign session same # as consumer
                     SessionUID sessionID = new SessionUID(
                                con.getConnectionUID().longValue());
@@ -429,9 +430,8 @@ public class ConsumerHandler extends PacketHandler
 
             } else { // removing Interest
                 if (DEBUG) {
-                    logger.log(Logger.DEBUGHIGH, 
-                        "ConsumerHandler: handle() [ Received DestroyConsumer message {0}]", 
-                         msg.toString());
+                    logger.log(Logger.INFO, "ConsumerHandler: "+
+                    "[Received DestroyConsumer message {0}]", msg.toString());
                 }
 
                 warning = BrokerResources.W_DESTROY_CONSUMER_FAILED;
@@ -476,8 +476,8 @@ public class ConsumerHandler extends PacketHandler
                      }
                 }
                 if (DEBUG && lastid != null) {
-                    logger.log(Logger.DEBUG,"Sent lastID [" + lastid + "]"
-                       + " for consumer " + uid + DL.get(con.getPartitionedStore(), lastid));
+                    logger.log(Logger.INFO, "ConsumerHandler: destroy consumer with lastID ["+lastid+"]"+
+                        DL.get(con.getPartitionedStore(), lastid)+" for consumer "+uid);
                 }
 
                 Boolean rAll = (Boolean)props.get("JMQRedeliverAll");
@@ -644,8 +644,9 @@ public class ConsumerHandler extends PacketHandler
             if (session != null) { // should only be null w/ indemp
                 Consumer c = (Consumer)session.detatchConsumer(uid, lastid, redeliver, redeliverAll);
                 if (DEBUG) {
-                logger.log(Logger.INFO, "Closed consumer "+c+", with {lastid="+lastid+", redeliver="+
-                           redeliver+ ", redeliverAll="+redeliverAll+", isindemp="+isIndemp+"}");
+                logger.log(Logger.INFO, "ConsumerHandler: closed consumer "+c+
+                    ", with {lastid="+lastid+", redeliver="+redeliver+ ", redeliverAll="+
+                     redeliverAll+", isindemp="+isIndemp+"}");
                 }
                 DestinationUID dest_uid = c.getDestinationUID();
                 Destination[] ds = DL.getDestination(con.getPartitionedStore(), dest_uid);

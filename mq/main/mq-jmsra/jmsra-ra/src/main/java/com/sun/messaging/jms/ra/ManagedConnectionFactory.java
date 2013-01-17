@@ -642,7 +642,12 @@ implements javax.resource.spi.ManagedConnectionFactory,
     getUserName()
     {
         _loggerOC.entering(_className, "getUserName()", userName);
-        return userName;
+        if (userName != null)
+            return userName;
+        else if (ra != null)
+            return ra.getUserName();
+        else
+            return null;
     }
 
     /** Sets the Password for this ManagedConnectionFactory instance
@@ -685,7 +690,12 @@ implements javax.resource.spi.ManagedConnectionFactory,
     getPassword()
     {
         _loggerOC.entering(_className, "getPassword()");
-        return password;
+        if (password != null)
+            return password;
+        else if (ra != null)
+            return ra.getPassword();
+        else
+            return null;
     }
  
     /** Sets the ClientId for this ManagedConnectionFactory instance

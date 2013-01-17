@@ -91,9 +91,8 @@ public class FlowHandler extends PacketHandler
           try {
               props = msg.getProperties();
           } catch (Exception ex) {
-            logger.log(Logger.INFO,"Internal Error: unable to retrieve "+
-                " properties from resume message " + msg, ex);
-            props = new Hashtable();
+              logger.logStack(Logger.WARNING, "RESUME-FLOW Packet.getProperties()", ex);
+              props = new Hashtable();
           }
 
           Integer bufsize = null; 

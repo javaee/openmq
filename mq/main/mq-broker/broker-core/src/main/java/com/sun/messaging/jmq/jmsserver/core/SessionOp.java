@@ -758,7 +758,10 @@ public class SessionOp extends SessionOpSpi
                                                   RemoveReason.ACKNOWLEDGED, ref);
                                           }
                                       } catch (Exception ex) {
-                                          logger.logStack(Logger.INFO,"Internal Error", ex);
+                                          Object[] args = { ref, this, ex.getMessage() };
+                                          logger.logStack(Logger.WARNING, 
+                                          Globals.getBrokerResources().getKString(
+                                          BrokerResources.X_CLEANUP_MSG_CLOSE_SESSION, args), ex);
                                       }
 
                                       } finally {

@@ -76,8 +76,8 @@ implements ShareConfigRecordDAO {
     protected String insertSQL;
     protected String insertResetRecordSQL;
     protected String insertResetRecordWithLockSQL;
-    protected String selectTypeByMaxSeqUKeySQL;
-    protected String selectMaxSeqUKeySQL;
+    protected String selectTypeFlagByMaxSeqUKeySQL;
+    protected String selectMaxSeqFlagUKeySQL;
     protected String selectRecordsSinceSQL;
     protected String selectSinceWithResetRecordSQL;
     protected String selectAllSQL;
@@ -103,8 +103,9 @@ implements ShareConfigRecordDAO {
             .append( RECORD_COLUMN ).append( ", " )
             .append( TYPE_COLUMN ).append( ", " )
             .append( UKEY_COLUMN ).append( ", " )
-            .append( CREATED_TS_COLUMN )
-            .append( ") VALUES ( ?, ?, ?, ?, ? )" )
+            .append( CREATED_TS_COLUMN ).append(", ")
+            .append( FLAG_COLUMN )
+            .append( ") VALUES ( ?, ?, ?, ?, ?, ? )" )
             .toString();
 
         insertSQLOracle = new StringBuffer(128)
@@ -115,8 +116,9 @@ implements ShareConfigRecordDAO {
             .append( RECORD_COLUMN ).append( ", " )
             .append( TYPE_COLUMN ).append( ", " )
             .append( UKEY_COLUMN ).append( ", " )
-            .append( CREATED_TS_COLUMN )
-            .append( ") VALUES ("+tableName+"_seq.NEXTVAL, ?, ?, ?, ?, ? )" )
+            .append( CREATED_TS_COLUMN ).append(", ")
+            .append( FLAG_COLUMN )
+            .append( ") VALUES ("+tableName+"_seq.NEXTVAL, ?, ?, ?, ?, ?, ? )" )
             .toString();
 
         selectSeqSQLOracle = new StringBuffer(128)
@@ -149,8 +151,10 @@ implements ShareConfigRecordDAO {
             .append( ") VALUES ( 1, ?, ?, ?, ?, ?, ? )" )
             .toString();
 
-        selectTypeByMaxSeqUKeySQL = new StringBuffer(128)
-            .append( "SELECT " ).append( TYPE_COLUMN )
+        selectTypeFlagByMaxSeqUKeySQL = new StringBuffer(128)
+            .append( "SELECT " )
+            .append( TYPE_COLUMN ).append(", ")
+            .append( FLAG_COLUMN )
             .append( " FROM " ).append( tableName )
             .append( " WHERE "   ).append( SEQ_COLUMN ).append( " IN (" )
             .append( " SELECT MAX(" ).append( SEQ_COLUMN ).append( ") " )
@@ -158,10 +162,17 @@ implements ShareConfigRecordDAO {
             .append( " WHERE ").append( UKEY_COLUMN ).append( " = ? )")
             .toString();
 
-        selectMaxSeqUKeySQL = new StringBuffer(128)
-            .append( "SELECT MAX(" ).append( SEQ_COLUMN ).append( ") " )
-            .append( "FROM ").append(  tableName )
+        selectMaxSeqFlagUKeySQL = new StringBuffer(128)
+            .append( "SELECT " )
+            .append( SEQ_COLUMN ).append(", ")
+            .append( FLAG_COLUMN )
+            .append( " FROM ").append(  tableName )
             .append( " WHERE ").append( UKEY_COLUMN ).append( " = ? ")
+            .append( " AND " )
+            .append( SEQ_COLUMN ).append( " = " )
+            .append( "(SELECT MAX(" ).append( SEQ_COLUMN ).append( ") " )
+            .append( " FROM ").append(  tableName )
+            .append( " WHERE ").append( UKEY_COLUMN ).append( " = ? )")
             .toString();
 
         selectSinceWithResetRecordSQL = new StringBuffer(128)
@@ -284,16 +295,21 @@ implements ShareConfigRecordDAO {
         try {
             CommDBManager mgr = getDBManager();
             if ( conn == null ) {
-                conn = mgr.getConnection( (mgr.isDerby() ? true:false) );
+                conn = mgr.getConnection( ((mgr.isDerby() || mgr.isDB2()) ? true:false) );
                 myConn = true;
             }
             String resetUUID = rec.getResetUUID(); 
 
             if (rec.isDuraAddRecord()) {
-                if (hasLastSeqForUKeyType( conn, rec.getUKey(), rec.getType()) ) {
-                    throw new BrokerException(br.getKString(
-                        br.X_SHARECC_RECORD_UKEY_TYPE_EXIST, rec.getUKey(),
-                        String.valueOf(rec.getType())), Status.CONFLICT);
+                Integer flag = hasLastSeqForUKeyType( conn, rec.getUKey(), rec.getType() );
+                if (flag != null) {
+                    String emsg = br.getKString(br.I_SHARECC_RECORD_UKEY_TYPE_EXIST,
+                                      rec.getUKey())+"["+rec.getType()+"]"+
+                                      ChangeRecordInfo.getFlagString(flag);
+                    logger.log(logger.INFO, emsg);
+                    if (flag.intValue() != rec.getFlag()) {
+                        throw new BrokerException(emsg);
+                    }
                 }
             }
 
@@ -303,7 +319,7 @@ implements ShareConfigRecordDAO {
                 sql = insertSQL;
             }
             if (mgr.supportsGetGeneratedKey()) {
-                if (mgr.isPostgreSQL() && mgr.getDBProductMajorVersion() >= 9) {
+                if (mgr.isPostgreSQL() || mgr.isDB2()) {
                     pstmt = conn.prepareStatement( sql, Statement.RETURN_GENERATED_KEYS );
                 } else {
                     pstmt = conn.prepareStatement( sql, new String[]{SEQ_COLUMN} );
@@ -316,6 +332,7 @@ implements ShareConfigRecordDAO {
             pstmt.setInt( 3, rec.getType() );
             pstmt.setString( 4, rec.getUKey() );
             pstmt.setLong( 5, rec.getTimestamp() );
+            pstmt.setInt( 6, rec.getFlag() );
             pstmt.executeUpdate();
             Long seq = null;
             if (mgr.supportsGetGeneratedKey()) {
@@ -350,10 +367,15 @@ implements ShareConfigRecordDAO {
             }
 
             if (rec.isDuraAddRecord()) {
-               if (!doesLastUKeyHasSeq( conn, rec.getUKey(), seq.longValue()) ) {
-                   throw new BrokerException(br.getKString(
-                       br.X_SHARECC_RECORD_UKEY_TYPE_EXIST, rec.getUKey(),
-                       String.valueOf(rec.getType())), Status.CONFLICT);
+                Integer flag = checkLastUKeyHasSeq(conn, rec.getUKey(), seq.longValue()); 
+                if (flag != null) {
+                    String emsg = br.getKString(br.I_SHARECC_RECORD_UKEY_TYPE_EXIST,
+                                      rec.getUKey())+"["+rec.getType()+"]"+
+                                      ChangeRecordInfo.getFlagString(flag);
+                    logger.log(logger.INFO, emsg);
+                    if (flag.intValue() != rec.getFlag()) {
+                        throw new BrokerException(emsg);
+                    }
                }
             }
 
@@ -1009,14 +1031,14 @@ implements ShareConfigRecordDAO {
         return seq;
     }
 
-    private boolean hasLastSeqForUKeyType( Connection conn, String ukey, int type )
+    private Integer hasLastSeqForUKeyType( Connection conn, String ukey, int type )
     throws BrokerException {
 
         boolean myConn = false;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         Exception myex = null;
-        String sql = selectTypeByMaxSeqUKeySQL;
+        String sql = selectTypeFlagByMaxSeqUKeySQL;
         try {
             // Get a connection
             if ( conn == null ) {
@@ -1028,13 +1050,14 @@ implements ShareConfigRecordDAO {
             pstmt.setString( 1, ukey );
             rs = pstmt.executeQuery();
             if ( !rs.next() ) {
-                return false;
+                return null;
             }
             int t = rs.getInt( 1 );
+            int flag = rs.getInt( 2 );
             if (t == type) {
-                return true;
+                return Integer.valueOf(flag);
             } 
-            return false;
+            return null;
         } catch ( Exception e ) {
             myex = e;
             try {
@@ -1066,14 +1089,14 @@ implements ShareConfigRecordDAO {
         }
     }
 
-    private boolean doesLastUKeyHasSeq( Connection conn, String ukey, long expectedSeq )
+    private Integer checkLastUKeyHasSeq( Connection conn, String ukey, long expectedSeq )
     throws BrokerException {
 
         boolean myConn = false;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         Exception myex = null;
-        String sql = selectMaxSeqUKeySQL;
+        String sql = selectMaxSeqFlagUKeySQL;
         try {
             // Get a connection
             if ( conn == null ) {
@@ -1083,15 +1106,17 @@ implements ShareConfigRecordDAO {
 
             pstmt = conn.prepareStatement( sql );
             pstmt.setString( 1, ukey );
+            pstmt.setString( 2, ukey );
             rs = pstmt.executeQuery();
             if ( !rs.next() ) {
-                return false;
+                return null;
             }
             long s = rs.getLong( 1 );
+            int flag = rs.getInt( 2 );
             if (s == expectedSeq) {
-                return true;
+                return null;
             } 
-            return false;
+            return Integer.valueOf(flag);
         } catch ( Exception e ) {
             myex = e;
             try {

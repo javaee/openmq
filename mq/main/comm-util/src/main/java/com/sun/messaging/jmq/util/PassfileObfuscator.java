@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,25 +38,40 @@
  * holder.
  */
 
-package com.sun.messaging.jmq.jmsserver.persist.api;
+package com.sun.messaging.jmq.util;
 
+import java.io.*;
 
-import com.sun.messaging.jmq.util.UID;
 /**
+ * This interface encapsulates passfile obfuscation/deobfuscation 
+ *
+ * A MQ un-obfuscated passfile has format of properties file with 
+ * MQ property name=value pairs where 'value' is a password
  */
-public interface PartitionListener  
-{
-    
-    /**
-     * @param partitionID the partition id
-     */
-    public void partitionAdded(UID partitionID, Object source);
+public interface PassfileObfuscator { 
 
     /**
-     * @param partitionID the partition id
-     * @param source the component or object issued this notification
-     * @param destinedTo null if the partition is deleted from cluster 
+     * @param source the fully qualified file name of the passfile to be obfuscated
+     * @param target the fully qualified file name for the obfuscated passfile
+     * @param prefix property name prefix for all name=value pairs
+     * @throws IOException
      */
-    public void partitionRemoved(UID partitionID, Object source, Object destinedTo);
+    public void obfuscateFile(String source, String target, String prefix) throws IOException; 
+
+    /**
+     * @param source the fully qualified file name of the passfile to be deobfuscated
+     * @param target the fully qualified file name for the deobfuscated passfile
+     * @param prefix property name prefix for all name=value pairs
+     * @throws IOException
+     */
+    public void deobfuscateFile(String source, String target, String prefix) throws IOException; 
+
+    /**
+     * @param source the fully qualified file name of the passfile 
+     * @param prefix property name prefix for all name=value pairs
+     * @return InputStream of the deobfuscated passfile
+     * @throws IOException
+     */
+    public InputStream retrieveObfuscatedFile(String source, String prefix) throws IOException; 
 
 }

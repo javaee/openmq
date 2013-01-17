@@ -365,6 +365,15 @@ public class JMSProducerImpl implements JMSProducer, Traceable {
 	@Override
 	public JMSProducer setDeliveryMode(int deliveryMode) {
 		contextImpl.checkNotClosed();
+		if (deliveryMode != DeliveryMode.NON_PERSISTENT &&
+			deliveryMode != DeliveryMode.PERSISTENT) {
+			String errorString = AdministeredObject.cr.getKString(
+				AdministeredObject.cr.X_INVALID_DELIVERY_PARAM,
+				"DeliveryMode", String.valueOf(deliveryMode));
+			JMSRuntimeException jmsre = new com.sun.messaging.jms.MQRuntimeException(
+				errorString, AdministeredObject.cr.X_INVALID_DELIVERY_PARAM);
+			ExceptionHandler.throwJMSRuntimeException(jmsre);
+		}
 		this.deliveryMode=deliveryMode;
 		return this;
 	}
@@ -378,6 +387,14 @@ public class JMSProducerImpl implements JMSProducer, Traceable {
 	@Override
 	public JMSProducer setPriority(int priority) {
 		contextImpl.checkNotClosed();
+		if ( priority < 0 || priority > 9 ) {
+			String errorString = AdministeredObject.cr.getKString(
+				AdministeredObject.cr.X_INVALID_DELIVERY_PARAM,
+				"DeliveryPriority", String.valueOf(priority));
+			JMSRuntimeException jmsre = new com.sun.messaging.jms.MQRuntimeException(
+				errorString, AdministeredObject.cr.X_INVALID_DELIVERY_PARAM);
+			ExceptionHandler.throwJMSRuntimeException(jmsre);
+		}
 		this.priority=priority;
 		return this;
 	}

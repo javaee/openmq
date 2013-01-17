@@ -343,7 +343,7 @@ public class NoCluster implements ClusterBroadcast {
         throw new BrokerException("Not Supported");
     }
 
-    public void postTakeover(String brokerID, UID storeSession, boolean aborted) {};
+    public void postTakeover(String brokerID, UID storeSession, boolean aborted, boolean notify) {};
 
     public void sendClusterTransactionInfo(long tid, BrokerAddress address) {};
 

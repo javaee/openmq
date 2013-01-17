@@ -215,7 +215,7 @@ public class StoreManager {
                     txnLogEnabled = new Boolean(config.getBooleanProperty(TXNLOG_ENABLED_PROP, false));
                     newTxnLogEnabled = new Boolean(config.getBooleanProperty(
                                        NEW_TXNLOG_ENABLED_PROP, NEW_TXNLOG_ENABLED_PROP_DEFAULT));
-                     if (!isConfiguredFileStore.booleanValue()) {
+                    if (!isConfiguredFileStore.booleanValue()) {
                         if (txnLogEnabled.booleanValue()) {
                             logger.log(Logger.WARNING, Globals.getBrokerResources().getKString(
                             BrokerResources.W_IGNORE_PROP_SETTING, TXNLOG_ENABLED_PROP+"=true"));
@@ -225,8 +225,8 @@ public class StoreManager {
                             BrokerResources.W_IGNORE_PROP_SETTING, NEW_TXNLOG_ENABLED_PROP+"=true"));
                         }
                         break;
-                    }
-
+                    } 
+                    Globals.isMinimumPersistLevel2(); //logging
 
                     if(Globals.isNewTxnLogEnabled())
                     {
@@ -269,7 +269,7 @@ public class StoreManager {
 	return store;
     }
 
-    private static boolean isConfiguredFileStore() {
+    public static boolean isConfiguredFileStore() {
         Boolean isfs = isConfiguredFileStore;
         if (isfs != null) return isfs.booleanValue();
 

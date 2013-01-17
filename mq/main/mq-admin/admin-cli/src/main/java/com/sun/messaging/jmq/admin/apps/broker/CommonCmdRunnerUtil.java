@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -55,12 +55,13 @@ import com.sun.messaging.jmq.admin.util.Globals;
 import com.sun.messaging.jmq.admin.util.CommonGlobals;
 import com.sun.messaging.jmq.util.DebugPrinter;
 import com.sun.messaging.jmq.util.MultiColumnPrinter;
+import com.sun.messaging.jmq.util.PassfileObfuscator;
+import com.sun.messaging.jmq.util.PassfileObfuscatorImpl;
 import com.sun.messaging.jmq.admin.bkrutil.BrokerAdminException;
 import com.sun.messaging.jmq.admin.bkrutil.BrokerAdminConn;
 import com.sun.messaging.jmq.admin.resources.AdminResources;
 import com.sun.messaging.jmq.admin.event.CommonCmdStatusEvent;
 import com.sun.messaging.jmq.util.Password;
-import com.sun.messaging.jmq.util.FileUtil;
 import com.sun.messaging.jmq.util.options.OptionException;
 import com.sun.messaging.jmq.util.options.UnrecognizedOptionException;
 import com.sun.messaging.jmq.util.options.InvalidBasePropNameException;
@@ -491,10 +492,11 @@ public class CommonCmdRunnerUtil {
 	    try  {
 	        Properties props = new Properties();
 		/*
-	     * Read password from passfile
+		 * Read password from passfile
 		 */
-                InputStream fis = FileUtil.retrieveObfuscatedFile(
-                        passfile);
+                PassfileObfuscator po = new PassfileObfuscatorImpl();
+                InputStream fis = po.retrieveObfuscatedFile(
+                                      passfile, Globals.IMQ);
 
                 props.load(fis);
 		ret = props.getProperty(passwdPropNameInPassFile);

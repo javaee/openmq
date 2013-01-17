@@ -119,6 +119,10 @@ public class WakeupableTimer implements Runnable
             synchronized(this) {
                 while (valid && !wakeup &&
                        !(waittime == 0L && nowaitOn0)) {
+                    if (DEBUG) {
+                        handler.handleLogInfo(name+" run(): before wait("+waittime+"), valid="+
+                            valid+ ", wakeup="+wakeup+", nowaitOn0="+nowaitOn0);
+                    }
                     if (nowaitOn0) {
                         nowaitOn0 = false;
                     }
@@ -149,8 +153,12 @@ public class WakeupableTimer implements Runnable
                 handler.handleLogInfo(name+" runTask "+handler.getClass().getName());
             }
 
+            boolean asrequested = false; 
             mynexttime = handler.runTask();
-
+            if (mynexttime > 0L) {
+                nowaitOn0 = true;
+                asrequested = true;
+            }
             if (DEBUG) {
                 handler.handleLogInfo(name+" completed run "+
                     handler.getClass().getName()+" with return "+mynexttime);
@@ -159,8 +167,11 @@ public class WakeupableTimer implements Runnable
             if (mynexttime == 0L) {
                 mynexttime = time + repeatinterval;
             }
-            boolean asrequested = false; 
             synchronized(this) {
+                if (DEBUG) {
+                    handler.handleLogInfo(name+" run() after runTask(), nexttime="+
+                                 nexttime+", mynexttime="+mynexttime+", time="+time);
+                }
                 if (nexttime > 0L && nexttime < mynexttime) {
                     mynexttime = nexttime;
                     nowaitOn0 = true;

@@ -147,7 +147,7 @@ class ConsumerDAOImpl extends BaseDAOImpl implements ConsumerDAO {
 
         selectExistSQL = new StringBuffer(128)
             .append( "SELECT " )
-            .append( ID_COLUMN )
+            .append( CONSUMER_COLUMN )
             .append( " FROM " ).append( tableName )
             .append( " WHERE " )
             .append( DURABLE_NAME_COLUMN ).append( " = ?" )
@@ -157,7 +157,7 @@ class ConsumerDAOImpl extends BaseDAOImpl implements ConsumerDAO {
 
         selectExistByIDSQL = new StringBuffer(128)
             .append( "SELECT " )
-            .append( ID_COLUMN )
+            .append( CONSUMER_COLUMN )
             .append( " FROM " ).append( tableName )
             .append( " WHERE " )
             .append( ID_COLUMN ).append( " = ?" )
@@ -210,16 +210,15 @@ class ConsumerDAOImpl extends BaseDAOImpl implements ConsumerDAO {
                 myConn = true;
             }
 
-            if ( checkConsumer( conn, consumer, true ) ) {
-                throw new BrokerException(
-                    br.getKString(BrokerResources.E_INTEREST_EXISTS_IN_STORE,
-                    "["+consumer.toString()+"]", consumer.getDestinationUID()), Status.CONFLICT );
+            Consumer tmpc = checkConsumer( conn, consumer, true ); 
+            if (tmpc != null) { 
+                throwConflictException(tmpc, consumer);
             }
-            if ( durableName != null &&
-                 checkConsumer( conn, consumer, false ) ) {
-                throw new BrokerException(
-                    br.getKString(br.X_DURABLE_SUB_EXIST_IN_STORE_ALREADY, 
-                        Subscription.getDSubLogString(clientID, durableName)));
+            if ( durableName != null) {
+                tmpc = checkConsumer( conn, consumer, false ); 
+                if (tmpc != null) { 
+                    throwConflictException(tmpc, consumer);
+                }
             }
             if (durableName != null && !dbMgr.isHADB() && !dbMgr.isDB2()) {
                 sql = insertNoDupSQL;
@@ -236,22 +235,18 @@ class ConsumerDAOImpl extends BaseDAOImpl implements ConsumerDAO {
                 Util.setString( pstmt, 7, clientID, false );
             }
             if (pstmt.executeUpdate() == 0) {
-                if ( checkConsumer( conn, consumer, true ) ) {
-                    throw new BrokerException(
-                        br.getKString(BrokerResources.E_INTEREST_EXISTS_IN_STORE,
-                        consumer.toString(), ""+consumer.getDestinationUID()), Status.CONFLICT );
+                tmpc = checkConsumer( conn, consumer, true ); 
+                if (tmpc != null) {
+                    throwConflictException(tmpc, consumer);
                 }
-                if ( durableName != null &&
-                     checkConsumer( conn, consumer, false ) ) {
-                    throw new BrokerException(
-                        br.getKString(BrokerResources.X_PERSIST_INTEREST_FAILED, consumer.toString())
-                        +": "+
-                        br.getKString(br.X_DURABLE_SUB_EXIST_IN_STORE_ALREADY, 
-                            Subscription.getDSubLogString(clientID, durableName)));
+                if ( durableName != null) { 
+                    tmpc = checkConsumer( conn, consumer, false ); 
+                    if (tmpc != null) {
+                        throwConflictException(tmpc, consumer);
+                    }
                 }
-                throw new BrokerException( br.getKString(
-                    BrokerResources.X_PERSIST_INTEREST_FAILED,
-                    consumerUID) );
+                throw new BrokerException(br.getKString(
+                    BrokerResources.X_PERSIST_INTEREST_FAILED, consumerUID));
             }
         } catch ( Exception e ) {
             myex = e;
@@ -284,6 +279,30 @@ class ConsumerDAOImpl extends BaseDAOImpl implements ConsumerDAO {
                 Util.close( null, pstmt, null, myex );
             }
         }
+    }
+
+    private void throwConflictException(Consumer existc, Consumer c)
+    throws BrokerException {
+        if (existc instanceof Subscription && 
+            c instanceof Subscription) {
+            Subscription existsub = (Subscription)existc;
+            Subscription sub = (Subscription)c;
+
+            if (existsub.getShared() != sub.getShared() ||
+                existsub.getJMSShared() != sub.getJMSShared()) {
+                throw new BrokerException(
+                    br.getKString(BrokerResources.X_DURABLE_SUB_EXIST_IN_STORE_ALREADY,
+                   "["+existsub.getDSubLongLogString()+"]"+existsub, 
+                    existsub.getDestinationUID()), Status.CONFLICT );
+            }
+            throw new ConsumerAlreadyAddedException(
+                br.getKString(BrokerResources.X_DURABLE_SUB_EXIST_IN_STORE_ALREADY,
+                "["+existsub.getDSubLongLogString()+"]"+existsub, 
+                 existsub.getDestinationUID()));
+        }
+        throw new ConsumerAlreadyAddedException(
+            br.getKString(BrokerResources.E_INTEREST_EXISTS_IN_STORE,
+            "["+existc+"]", existc.getDestinationUID()));
     }
 
     /**
@@ -507,7 +526,7 @@ class ConsumerDAOImpl extends BaseDAOImpl implements ConsumerDAO {
      * @return return true if the specified consumer exists
      * @throws BrokerException
      */
-    private boolean checkConsumer( Connection conn, Consumer consumer, boolean byId  )
+    private Consumer checkConsumer( Connection conn, Consumer consumer, boolean byId  )
     throws BrokerException {
 
         boolean found = false;
@@ -537,8 +556,10 @@ class ConsumerDAOImpl extends BaseDAOImpl implements ConsumerDAO {
             }
             rs = pstmt.executeQuery();
             if ( rs.next() ) {
-                found = true;
+                 Consumer c = (Consumer)Util.readObject( rs, 1 );
+                 return c;
             }
+            return null;
         } catch ( Exception e ) {
             myex = e;
             try {
@@ -554,6 +575,8 @@ class ConsumerDAOImpl extends BaseDAOImpl implements ConsumerDAO {
                 throw (BrokerException)e;
             } else if ( e instanceof SQLException ) {
                 ex = DBManager.wrapSQLException("[" + sql + "]", (SQLException)e);
+            } else if ( e instanceof IOException ) {
+                ex = DBManager.wrapIOException("[" + sql + "]", (IOException)e);
             } else {
                 ex = e;
             }
@@ -568,8 +591,6 @@ class ConsumerDAOImpl extends BaseDAOImpl implements ConsumerDAO {
                 Util.close( rs, pstmt, null, myex );
             }
         }
-
-        return found;
     }
 
     /**

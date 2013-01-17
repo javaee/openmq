@@ -40,26 +40,46 @@
 
 package com.sun.messaging.jms.ra;
 
-import javax.jms.*;
-
 import java.io.Serializable;
-import java.util.Vector;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Vector;
 import java.util.logging.Logger;
 
-import com.sun.messaging.jmq.jmsservice.JMSAck;
-import com.sun.messaging.jmq.io.JMSPacket;
-import com.sun.messaging.jmq.jmsservice.JMSService;
-import com.sun.messaging.jmq.jmsservice.JMSServiceReply;
-import com.sun.messaging.jmq.jmsservice.JMSServiceException;
-import com.sun.messaging.jmq.jmsservice.JMSService.SessionAckMode;
-import com.sun.messaging.jmq.jmsservice.Destination.Type;
-import com.sun.messaging.jmq.jmsservice.Destination.Life;
-import com.sun.messaging.jmq.jmsservice.Consumer;
+import javax.jms.BytesMessage;
+import javax.jms.Destination;
+import javax.jms.InvalidDestinationException;
+import javax.jms.InvalidSelectorException;
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageFormatException;
+import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.QueueBrowser;
+import javax.jms.QueueReceiver;
+import javax.jms.QueueSender;
+import javax.jms.Session;
+import javax.jms.StreamMessage;
+import javax.jms.TextMessage;
+import javax.jms.Topic;
+import javax.jms.TopicPublisher;
+import javax.jms.TopicSubscriber;
 
+import com.sun.messaging.AdministeredObject;
+import com.sun.messaging.jmq.io.JMSPacket;
 import com.sun.messaging.jmq.io.SysMessageID;
+import com.sun.messaging.jmq.jmsclient.ExceptionHandler;
+import com.sun.messaging.jmq.jmsclient.resources.ClientResources;
+import com.sun.messaging.jmq.jmsservice.JMSAck;
+import com.sun.messaging.jmq.jmsservice.JMSService;
+import com.sun.messaging.jmq.jmsservice.JMSService.MessageAckType;
+import com.sun.messaging.jmq.jmsservice.JMSService.SessionAckMode;
+import com.sun.messaging.jmq.jmsservice.JMSServiceException;
+import com.sun.messaging.jmq.jmsservice.JMSServiceReply;
+import com.sun.messaging.jms.IllegalStateException;
 /**
  *  DirectSession encapsulates JMS Session behavior for MQ DIRECT mode operation
  */
@@ -842,8 +862,8 @@ public class DirectSession
         }
         JMSServiceReply reply = null;
         try {
-            reply = this.jmsservice.deleteConsumer(this.connectionId,
-                    this.sessionId, 0L, name, this.dc._getClientID());
+            reply =  jmsservice.deleteConsumer(this.connectionId,
+                    this.sessionId, 0L, null, name, this.dc._getClientID());
         } catch (JMSServiceException jmsse) {
             String exErrMsg = _lgrMID_EXC+
                     "sessionId="+sessionId+":"+methodName+
@@ -2019,7 +2039,7 @@ public class DirectSession
      *  Fetch a message for a consumer performing a sync receive.<p>
      *  Only one thread in a session can do this at a time.
      */
-    protected synchronized javax.jms.Message _fetchMessage(long consumerId,
+    protected synchronized javax.jms.Message _fetchMessage(DirectConsumer consumer, long consumerId,
             long timeout, String methodName)
     throws JMSException {
         JMSPacket jmsPacket = null;
@@ -2050,6 +2070,7 @@ public class DirectSession
             try {
                 jmsMsg = DirectPacket.constructMessage(jmsPacket, consumerId,
                         this, this.jmsservice, false);
+                consumer.setLastMessageSeen(((DirectPacket)jmsMsg).getReceivedSysMessageID());
                 if (this.ackMode == SessionAckMode.CLIENT_ACKNOWLEDGE) {
                     messageID =
                             ((DirectPacket)jmsMsg).getReceivedSysMessageID();
@@ -2070,6 +2091,110 @@ public class DirectSession
             }
         }
     }
+    
+	/**
+	 * Fetch the body of a message for a consumer performing a sync receive.
+	 * <p>
+	 * Only one thread in a session can do this at a time.
+	 */
+	protected synchronized <T> T _fetchMessageBody(DirectConsumer consumer, long consumerId, long timeout, Class<T> c, String methodName)
+			throws JMSException {
+		T body = null;
+		MessageFormatException savedMFE = null;
+		JMSPacket jmsPacket = null;
+		javax.jms.Message jmsMsg = null;
+		SysMessageID messageID = null;
+		long xaTxnId = 0L;
+		if (false && this.dc.isStopped()) {
+			String excMsg = _lgrMID_INF + "consumerId=" + consumerId + ":" + methodName
+					+ ":Connection has not been started!";
+			_loggerJS.warning(excMsg);
+			throw new JMSException(excMsg);
+		}
+		if (this.dc.isManaged() && this.dc.isEnlisted()) {
+			xaTxnId = this.dc._getXAResource()._getTransactionId();
+		} else {
+			xaTxnId = this._getTransactionId();
+		}
+		try {
+			// get the next message but don't auto-acknowledge it
+			boolean autoAcknowledge=false;
+			jmsPacket = this.jmsservice.fetchMessage(this.connectionId, this.sessionId, consumerId, timeout,
+					autoAcknowledge, xaTxnId);
+		} catch (JMSServiceException jmsse) {
+			throw new com.sun.messaging.jms.JMSException(jmsse.getMessage(),null,jmsse);
+		}
+		if (jmsPacket != null) {
+			try {
+				jmsMsg = DirectPacket.constructMessage(jmsPacket, consumerId, this, this.jmsservice, false);
+				if (this.ackMode == SessionAckMode.CLIENT_ACKNOWLEDGE) {
+					messageID = ((DirectPacket) jmsMsg).getReceivedSysMessageID();
+					// Insert the message's ReceivedSysMessageID + consumerId
+					// for recover
+					unackedMessageIDs.add(messageID);
+					unackedConsumerIDs.add(consumerId);
+				}
+			} catch (Exception e) {
+				String exerrmsg = _lgrMID_EXC + "receive:Exception constructing message:" + e.getMessage();
+				JMSException jmse = new JMSException(exerrmsg);
+				jmse.initCause(e);
+				_loggerJS.warning(exerrmsg);
+				throw jmse;
+			}
+			try {
+				body = returnPayload(jmsMsg,c);
+				consumer.setLastMessageSeen(((DirectPacket)jmsMsg).getReceivedSysMessageID());
+			} catch (MessageFormatException mfe) {
+				// message could not be converted
+				if (xaTxnId==0L && (getAcknowledgeMode()==Session.AUTO_ACKNOWLEDGE || getAcknowledgeMode()==Session.DUPS_OK_ACKNOWLEDGE)){
+					// put the message back 
+                                        // note that we don't call setLastMessageSeen in this case
+					try {					
+						SysMessageID[] messageIDs = new SysMessageID[1];
+						messageIDs[0]=jmsPacket.getPacket().getSysMessageID();
+						Long[] consumerIDs = new Long[1];
+						consumerIDs[0]=consumerId;
+						boolean setRedelivered=false;
+						jmsservice.redeliverMessages(this.connectionId, this.sessionId,messageIDs,consumerIDs,xaTxnId, setRedelivered);
+					} catch (JMSServiceException jmsse) {
+						throw new com.sun.messaging.jms.JMSException(jmsse.getMessage(),null,jmsse);
+					}	
+					// throw now before we acknowledge it
+					throw mfe;
+				} else {
+					consumer.setLastMessageSeen(((DirectPacket)jmsMsg).getReceivedSysMessageID());
+					// throw at end of method
+					savedMFE=mfe;
+				}
+			}		
+			if (this.ackOnFetch) {
+				try {
+					// ??
+					SysMessageID sysMessageID = jmsPacket.getPacket().getSysMessageID();
+					jmsservice.acknowledgeMessage(connectionId,sessionId,consumerId,sysMessageID,xaTxnId,MessageAckType.ACKNOWLEDGE);
+				} catch (JMSServiceException e) {
+				}
+			}			
+		}
+		
+		if (savedMFE!=null) throw savedMFE;
+		return body;		
+	}
+    
+	private <T> T returnPayload(Message message, Class<T> c) throws JMSException {
+		T body;
+		body = message.getBody(c);
+		if (body==null){
+			// must be a Message
+			// this doesn't have a payload, and we can't return null because this would clash with the "no message received" case,
+			// so we throw an exception
+			// "Message has no body and so cannot be returned using this method" 
+			String errorString = AdministeredObject.cr.getKString(ClientResources.X_MESSAGE_HAS_NO_BODY);
+			JMSException jmse = new javax.jms.MessageFormatException(errorString, ClientResources.X_MESSAGE_HAS_NO_BODY);
+			ExceptionHandler.throwJMSException(jmse);
+		}
+		return body;
+	}
 
     /**
      *  Acknowledgea a single message in an outbound session

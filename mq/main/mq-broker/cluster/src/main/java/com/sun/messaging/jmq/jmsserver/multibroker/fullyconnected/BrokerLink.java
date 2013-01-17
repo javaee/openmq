@@ -109,10 +109,11 @@ public class BrokerLink extends Thread {
     private static Hashtable waitingMasterLogs = new Hashtable();
     private boolean readActive = true;
 
-    private long initWaitTimeSeconds = Globals.getConfig().getLongProperty(Globals.IMQ +
-                                               ".cluster.waitConnectionInitTimeout", 180);
-    private long initWaitTime = initWaitTimeSeconds * 1000;
-    private long DEFAULT_INIT_WAIT_INTERVAL = 60*1000;
+    private static final long initWaitTimeSeconds = 
+          Globals.getConfig().getLongProperty(Globals.IMQ +
+                   ".cluster.waitConnectionInitTimeout", 180);
+    protected static final long INIT_WAIT_TIME = initWaitTimeSeconds * 1000L;
+    private long DEFAULT_INIT_WAIT_INTERVAL = 15*1000L;
 
     private boolean firstInfoSent = false;
     private boolean firstReceive = true;
@@ -185,9 +186,11 @@ public class BrokerLink extends Thread {
             logger.log(logger.DEBUG, "BrokerLink.waitLinkInit : " + this);
         }
 
-        long endtime = System.currentTimeMillis() + initWaitTime;
-        long waittime = initWaitTime;
-        if (waittime > DEFAULT_INIT_WAIT_INTERVAL) waittime = DEFAULT_INIT_WAIT_INTERVAL;
+        long endtime = System.currentTimeMillis() + INIT_WAIT_TIME;
+        long waittime = INIT_WAIT_TIME;
+        if (waittime > DEFAULT_INIT_WAIT_INTERVAL) {
+            waittime = DEFAULT_INIT_WAIT_INTERVAL;
+        }
 
         synchronized (linkInitWaitObject) {
             while (! linkInitDone) {
@@ -205,7 +208,9 @@ public class BrokerLink extends Thread {
                     break;
                 }
                 waittime = endtime - curtime;
-                if (waittime > DEFAULT_INIT_WAIT_INTERVAL) waittime = DEFAULT_INIT_WAIT_INTERVAL;
+                if (waittime > DEFAULT_INIT_WAIT_INTERVAL) {
+                    waittime = DEFAULT_INIT_WAIT_INTERVAL;
+                }
             }
         }
 

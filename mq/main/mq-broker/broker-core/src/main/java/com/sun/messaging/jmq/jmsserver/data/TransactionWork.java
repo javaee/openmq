@@ -60,7 +60,7 @@ public class TransactionWork {
 		sentMessages = new ArrayList<TransactionWorkMessage>();
 	}
 
-	public void addMesage(TransactionWorkMessage msg) {
+	public void addMessage(TransactionWorkMessage msg) {
 		if (sentMessages == null)
 			sentMessages = new ArrayList<TransactionWorkMessage>();
 		sentMessages.add(msg);

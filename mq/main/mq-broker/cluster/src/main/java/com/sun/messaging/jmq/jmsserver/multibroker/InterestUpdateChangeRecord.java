@@ -48,10 +48,16 @@ import com.sun.messaging.jmq.io.GPacket;
 import com.sun.messaging.jmq.jmsserver.multibroker.raptor.ClusterSubscriptionInfo;
 import com.sun.messaging.jmq.jmsserver.multibroker.raptor.ProtocolGlobals;
 import com.sun.messaging.jmq.jmsserver.core.Subscription;
+import com.sun.messaging.jmq.jmsserver.core.BrokerAddress;
+import com.sun.messaging.jmq.jmsserver.persist.api.ChangeRecordInfo;
 
 public class InterestUpdateChangeRecord extends ChangeRecord {
     private String dname;
     private String cid;
+    //only for G_NEW_INTEREST
+    private Boolean shared = null;
+    private Boolean jmsshared = null;
+    private BrokerAddress broker = null;
 
     public InterestUpdateChangeRecord(GPacket gp) {
         operation = gp.getType();
@@ -59,16 +65,52 @@ public class InterestUpdateChangeRecord extends ChangeRecord {
         ClusterSubscriptionInfo csi = ClusterSubscriptionInfo.newInstance(gp);
         dname = csi.getDurableName();
         cid = csi.getClientID();
+        shared = csi.getShared();
+        jmsshared = csi.getJMSShared();
     }
 
     public String getSubscriptionKey() {  
         return Subscription.getDSubKey(cid, dname);
     }
+
+    @Override
     public String getUniqueKey() {
         return "dur:"+Subscription.getDSubKey(cid, dname);
     }
 
+    public Boolean getShared() {
+        return shared;
+    }
+
+    public Boolean getJMSShared() {
+        return jmsshared;
+    }
+
+    @Override
     public boolean isAddOp() {
         return (operation == ProtocolGlobals.G_NEW_INTEREST);
+    }
+
+    @Override
+    public void transferFlag(ChangeRecordInfo cri) {
+        if (shared != null && shared.booleanValue()) {
+            cri.setFlagBit(ChangeRecordInfo.SHARED);
+        }
+        if (jmsshared != null && jmsshared.booleanValue()) {
+            cri.setFlagBit(ChangeRecordInfo.JMSSHARED);
+        }
+    }
+
+    public String getFlagString() {
+        ChangeRecordInfo cri = new ChangeRecordInfo();
+        transferFlag(cri);
+        return cri.getFlagString(cri.getFlag());
+    }
+
+    public void setBroker(BrokerAddress b) {
+        broker = b;
+    }
+    public BrokerAddress getBroker() {
+        return broker;
     }
 }

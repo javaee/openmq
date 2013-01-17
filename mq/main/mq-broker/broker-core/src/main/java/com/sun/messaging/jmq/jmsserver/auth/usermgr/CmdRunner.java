@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -54,8 +54,9 @@ import java.util.Hashtable;
 import java.util.Enumeration;
 
 import com.sun.messaging.jmq.jmsserver.Globals;
+import com.sun.messaging.jmq.util.PassfileObfuscator;
+import com.sun.messaging.jmq.util.PassfileObfuscatorImpl;
 import com.sun.messaging.jmq.jmsserver.resources.BrokerResources;
-import com.sun.messaging.jmq.util.FileUtil;
 
 /** 
  * This class contains the logic to execute the user commands
@@ -434,7 +435,8 @@ public class CmdRunner implements UserMgrOptions  {
 	     *     src file:	srcFile
 	     *     target file:	targetFile
 	     */
-	    FileUtil.obfuscateFile(srcFile, targetFile);
+            PassfileObfuscator po = new PassfileObfuscatorImpl();
+	    po.obfuscateFile(srcFile, targetFile, Globals.IMQ);
 	} catch (Exception e)  {
 	    /*
 	    handleUserMgrExceptions(e);
@@ -491,7 +493,8 @@ public class CmdRunner implements UserMgrOptions  {
 	     *     src file:	srcFile
 	     *     target file:	targetFile
 	     */
-	    FileUtil.deobfuscateFile(srcFile, targetFile);
+            PassfileObfuscatorImpl po = new PassfileObfuscatorImpl();
+	    po.deobfuscateFile(srcFile, targetFile, Globals.IMQ);
 	} catch (Exception e)  {
 	    /*
 	    handleUserMgrExceptions(e);

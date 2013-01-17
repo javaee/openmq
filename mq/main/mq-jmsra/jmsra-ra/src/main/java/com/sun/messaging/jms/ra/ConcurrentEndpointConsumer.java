@@ -50,6 +50,7 @@ import java.lang.reflect.Method;
 import javax.jms.JMSException;
 
 import javax.resource.NotSupportedException;
+import javax.resource.ResourceException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 
 /**
@@ -73,7 +74,7 @@ public class ConcurrentEndpointConsumer extends EndpointConsumer {
             MessageEndpointFactory endpointFactory,
             javax.resource.spi.ActivationSpec spec,
             boolean isRADirect)
-    throws NotSupportedException {
+    throws ResourceException {
         super(ra, endpointFactory, spec);
         //connections = new Vector<DirectConnection>(this.numConcurrentConsumers);
         //this.onMessageMethod = ra._getOnMessageMethod();

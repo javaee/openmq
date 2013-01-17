@@ -228,14 +228,15 @@ public class DirectConnectionFactory extends ConnectionCreator
     public Connection createConnection()
     throws JMSException {
         _loggerJF.fine(_lgrMID_INF+"createConnection():");
-        String username, password;
-        if (this.mcf == null){
+        String username, password = null;
+        if (this.mcf == null || mcf.getUserName() == null)
             username = "guest";
-            password = "guest";
-        } else {
+        else
             username = mcf.getUserName();
+        if (this.mcf == null || mcf.getPassword() == null)
+            password = "guest";
+        else
             password = mcf.getPassword();
-        }
         return this.createConnection(username, password);
     }
 
@@ -312,14 +313,15 @@ public class DirectConnectionFactory extends ConnectionCreator
     public QueueConnection createQueueConnection()
     throws JMSException {
         _loggerJF.fine(_lgrMID_INF+"createQueueConnection():");
-        String username, password;
-        if (this.mcf == null){
+        String username, password = null;
+        if (this.mcf == null || mcf.getUserName() == null)
             username = "guest";
-            password = "guest";
-        } else {
+        else
             username = mcf.getUserName();
+        if (this.mcf == null || mcf.getPassword() == null)
+            password = "guest";
+        else
             password = mcf.getPassword();
-        }
         return this.createQueueConnection(username, password);
     }
 
@@ -369,14 +371,15 @@ public class DirectConnectionFactory extends ConnectionCreator
     public TopicConnection createTopicConnection()
     throws JMSException {
         _loggerJF.fine(_lgrMID_INF+"createTopicConnection():");
-        String username, password;
-        if (this.mcf == null){
+        String username, password = null;
+        if (this.mcf == null || mcf.getUserName() == null)
             username = "guest";
-            password = "guest";
-        } else {
+        else
             username = mcf.getUserName();
+        if (this.mcf == null || mcf.getPassword() == null)
+            password = "guest";
+        else
             password = mcf.getPassword();
-        }
         return this.createTopicConnection(username, password);
     }
 
@@ -572,5 +575,13 @@ public class DirectConnectionFactory extends ConnectionCreator
             throw new com.sun.messaging.jms.JMSException(
                 "MQRA:DCF:allocation failure:createConnection:"+re.getMessage(), code, re);
         }
+    }
+
+    ManagedConnectionFactory getMCF() {
+        return mcf;
+    }
+
+    void setMCF(ManagedConnectionFactory mcf) {
+        this.mcf = mcf;
     }
 }

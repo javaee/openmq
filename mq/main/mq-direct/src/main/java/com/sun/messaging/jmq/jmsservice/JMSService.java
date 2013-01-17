@@ -591,6 +591,8 @@ public interface JMSService {
      *  @param  connectionId The Id of the connection
      *  @param  sessionId The Id of the session
      *  @param  consumerId The Id of the consumer to delete
+     *  @param  lastMessageSeen The last message received by this consumer which
+     *  		has been seen by the application. Set to null if deleting a durable subscription.
      *  @param  durableName The name of the durable subscription to remove
      *          if the consumer is unsubscribing.
      *  @param  clientId The clientId of the connection
@@ -608,7 +610,7 @@ public interface JMSService {
      *
      */
     public JMSServiceReply deleteConsumer(long connectionId, long sessionId,
-            long consumerId, String durableName, String clientId)
+            long consumerId, SysMessageID lastMessageSeen, String durableName, String clientId)
     throws JMSServiceException;
 
     /**

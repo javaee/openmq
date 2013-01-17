@@ -612,7 +612,7 @@ public class NoClusterManager implements ClusterManager
     /**
      * @param partitionID the partition id
      */
-    public void partitionRemoved(UID partitionID, Object source) {
+    public void partitionRemoved(UID partitionID, Object source, Object destinedTo) {
     }
 
 }

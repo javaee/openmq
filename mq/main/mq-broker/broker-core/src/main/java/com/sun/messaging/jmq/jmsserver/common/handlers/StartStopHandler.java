@@ -54,7 +54,7 @@ import com.sun.messaging.jmq.jmsserver.service.Connection;
 import com.sun.messaging.jmq.jmsserver.util.BrokerException;
 import com.sun.messaging.jmq.util.log.*;
 import com.sun.messaging.jmq.jmsserver.Globals;
-
+import com.sun.messaging.jmq.jmsserver.resources.BrokerResources;
 import com.sun.messaging.jmq.jmsserver.service.imq.IMQConnection;
 import com.sun.messaging.jmq.jmsserver.service.imq.IMQBasicConnection;
 
@@ -98,28 +98,29 @@ public class StartStopHandler extends PacketHandler
                 if (suid != null) {
                     boolean bad = false;
                     Session s= Session.getSession(suid);
-                    if (s != null && !s.getConnectionUID().equals(con.getConnectionUID()))
+                    if (s != null && 
+                        !s.getConnectionUID().equals(con.getConnectionUID())) {
                         bad = true;
+                    }
                     assert s != null;
                     // OK .. the client should never be sending us
                     // a bad session ID, but in reconnect it sometimes
                     // does
                     // handle it gracefully if the client does the 
                     // wrong thing
-                    if (s == null || bad ) {
-                       logger.log(Logger.INFO,"Internal Error: received "
-                                 + "bad session id " + suid 
-                                 + " when starting session");
-                       if (bad) {
-                           logger.log(logger.INFO,"Session " + suid +
-                              " is bad because "
-                             + " it is from a different connection "
-                             + " [owning,current]=[" + s.getConnectionUID()
-                             + "," + con.getConnectionUID() + "]"); 
-                       }
+                    if (s == null) {
                        status = Status.ERROR;
-                       reason = "received bad session id " + suid +", session "+s+
-                                " when starting session";
+                       String[] args = { ""+suid, "START-SESSION", con.toString() };
+                       reason = Globals.getBrokerResources().getKString(
+                                BrokerResources.W_RECEIVED_UNKNOWN_SESSIONID, args);
+                       logger.log(Logger.WARNING, reason);
+                    } else if (bad) {
+                       status = Status.ERROR;
+                       String[] args = { ""+suid, "START-SESSION", con.toString(), 
+                                         s.getConnectionUID().toString() };
+                       reason = Globals.getBrokerResources().getKString(
+                                BrokerResources.W_RECEIVED_BAD_SESSIONID, args);
+                       logger.log(Logger.WARNING, reason);
                     } else {
                         s.resume("START_STOP");
                     }
@@ -131,8 +132,10 @@ public class StartStopHandler extends PacketHandler
                 if (suid != null) {
                     boolean bad = false;
                     Session s= Session.getSession(suid);
-                    if (s != null && !s.getConnectionUID().equals(con.getConnectionUID()))
+                    if (s != null && 
+                        !s.getConnectionUID().equals(con.getConnectionUID())) {
                         bad = true;
+                    }
                     assert s != null;
 
                     // OK .. the client should never be sending us
@@ -140,21 +143,19 @@ public class StartStopHandler extends PacketHandler
                     // does
                     // handle it gracefully if the client does the 
                     // wrong thing
-
-                    if (s == null || bad) {
-                       logger.log(Logger.INFO,"Internal Error: received "
-                                 + "bad session id " + suid 
-                                 + " when stopping session");
-                       if (bad) {
-                           logger.log(logger.INFO,"Session " + suid +
-                              " is bad because "
-                             + " it is from a different connection "
-                             + " [owning,current]=[" + s.getConnectionUID()
-                             + "," + con.getConnectionUID() + "]"); 
-                       }
+                    if (s == null) {
                        status = Status.ERROR;
-                       reason = "received bad session id " + suid +", session "+s+  
-                                " when stopping session";
+                       String[] args = { ""+suid, "STOP-SESSION", con.toString() };
+                       reason = Globals.getBrokerResources().getKString(
+                                BrokerResources.W_RECEIVED_UNKNOWN_SESSIONID, args);
+                       logger.log(Logger.WARNING, reason);
+                    } else if (bad) {
+                       status = Status.ERROR;
+                       String[] args = { ""+suid, "STOP-SESSION", con.toString(), 
+                                         s.getConnectionUID().toString() };
+                       reason = Globals.getBrokerResources().getKString(
+                                BrokerResources.W_RECEIVED_BAD_SESSIONID, args);
+                       logger.log(Logger.WARNING, reason);
                     } else {
                          s.pause("START_STOP");
                     }

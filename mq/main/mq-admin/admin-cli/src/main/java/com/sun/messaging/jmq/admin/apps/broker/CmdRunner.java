@@ -480,8 +480,9 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
                                 ConsumerInfo cinfo = pair.getValue();
                                 String cinfostr = null;
                                 if (cinfo.connection != null) {
-                                    cinfostr = "["+cinfo.uidString+", "+cinfo.subuidString+", "+
-                                                 cinfo.connection.uuid+", "+cinfo.brokerAddressShortString+"]";
+                                    cinfostr = "["+cinfo.uidString+", "+cinfo.subuidString+", ["+
+                                                 cinfo.connection.uuid+", "+cinfo.connection+"], "+
+                                                cinfo.brokerAddressShortString+"]";
                                 } else {
                                     cinfostr = "["+cinfo.uidString+", "+cinfo.subuidString+", "+
                                                  cinfo.brokerAddressShortString+"]";
@@ -6486,7 +6487,6 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 
                 broker.sendGetServicesMessage(svcName);
                 Vector svc = broker.receiveGetServicesReplyMessage();
-
                 if ((svc != null) && (svc.size() == 1)) {
                     Enumeration thisEnum = svc.elements();
                     ServiceInfo sInfo = (ServiceInfo)thisEnum.nextElement();
@@ -6610,6 +6610,66 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
             } catch (BrokerAdminException bae)  {
                 handleBrokerAdminException(bae);
                 retValue = 1;
+		return (1);
+            }
+
+        } else if (CMDARG_DURABLE.equals(commandArg)) {
+
+            String destName = brokerCmdProps.getDestName();
+            String subName = brokerCmdProps.getTargetName();
+            String clientID = brokerCmdProps.getClientID();
+	    String attrName = brokerCmdProps.getSingleTargetAttr();
+            if (!BrokerCmdOptions.PROP_NAME_OPTION_CUR_A_CONSUMERS.equals(attrName)) {
+                return 1;
+            }
+
+            if (broker == null)  {
+		Globals.stdOutPrintln("Problems connecting to the broker.");
+                retValue = 1;
+		return (1);
+            }
+            boolean force = brokerCmdProps.forceModeSet();
+            if (!force) {
+                broker = promptForAuthentication(broker);
+            }
+
+            try {
+                connectToBroker(broker);
+                if (destName != null) {
+                    isDestTypeTopic(broker, destName);
+                }
+
+                broker.sendGetDurablesMessage(destName, null);
+            	Vector durs = broker.receiveGetDurablesReplyMessage();
+                retValue = 1;
+                Enumeration thisEnum = durs.elements();
+                while (thisEnum.hasMoreElements()) {
+                    DurableInfo dinfo = (DurableInfo)thisEnum.nextElement();
+                    if (subName != null) {
+                        if (dinfo.name.equals(subName)) {
+                            if (clientID != null && clientID.equals(dinfo.clientID)) {
+                                Globals.stdOutPrintln(Integer.toString(dinfo.activeCount));
+                                return 0;
+                            } else {
+                                Globals.stdOutPrintln(Integer.toString(dinfo.activeCount));
+                                return 0;
+                            }
+                        }
+                    } else if (destName != null && dinfo.consumer != null &&
+                               destName.equals(dinfo.consumer.destination)) {
+                        if (clientID != null && clientID.equals(dinfo.clientID)) {
+                            Globals.stdOutPrintln(Integer.toString(dinfo.activeCount));
+                            return 0;
+                        } else {
+                            Globals.stdOutPrintln(Integer.toString(dinfo.activeCount));
+                            return 0;
+                        }
+                    }
+                }
+                Globals.stdErrPrintln("Subscription not found.");
+                return 1;
+            } catch (BrokerAdminException bae) {
+		handleBrokerAdminException(bae);
 		return (1);
             }
         }

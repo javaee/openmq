@@ -64,6 +64,12 @@ import com.sun.messaging.jmq.jmsserver.multibroker.raptor.ClusterSubscriptionInf
 import com.sun.messaging.jmq.jmsserver.multibroker.raptor.ProtocolGlobals;
 import com.sun.messaging.jmq.jmsserver.multibroker.raptor.RaptorProtocol;
 
+/**
+ * An object of this class is used to represent a change record 
+ * for processing at runtime in broker
+ *
+ * This class also contains static methods related to change record processing
+ */
 public class ChangeRecord {
 
     private static boolean DEBUG = false || Globals.getConfig().getBooleanProperty(
@@ -156,6 +162,9 @@ public class ChangeRecord {
 
     public int getPacketType() { 
         return gp.getType();
+    }
+
+    public void transferFlag(ChangeRecordInfo cri) {
     }
 
     public String toString() {
@@ -312,6 +321,7 @@ public class ChangeRecord {
                                    cr.getOperation(), cr.getUniqueKey(), 
                                    System.currentTimeMillis());
             rec.setDuraAdd(cr.isDuraAdd());
+            cr.transferFlag(rec);
         } catch (Exception e) {
             throw new BrokerException(e.toString(), e);
         }

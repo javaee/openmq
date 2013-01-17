@@ -40,12 +40,15 @@
 
 package com.sun.messaging.jms.ra;
 
+import java.util.Hashtable;
+import java.util.Enumeration;
 import javax.resource.*;
 import javax.resource.spi.*;
 
 import java.util.logging.Logger;
 
 import com.sun.messaging.jmq.DestinationName;
+import com.sun.messaging.jms.ra.util.CustomTokenizer;
 
 /**
  *  Encapsulates the configuration of a MessageEndpoint.
@@ -85,6 +88,9 @@ implements javax.resource.spi.ActivationSpec,
 
     /** The resource adapter instance that this instance is bound to */
     private com.sun.messaging.jms.ra.ResourceAdapter ra = null;
+
+    /** The instance carries on properties of connection factory */
+    private com.sun.messaging.jms.ra.ManagedConnectionFactory mcf;
 
     /* ActivationSpec attributes recommended for JMS RAs */
     /** The type of the destination for the MessageEndpoint consumer */
@@ -160,7 +166,10 @@ implements javax.resource.spi.ActivationSpec,
     private boolean reconnectAttemptsSet=false;
     private int reconnectInterval;
     private boolean reconnectIntervalSet=false;
-    
+
+    private String destinationLookup;
+    private String connectionFactoryLookup;
+
     /** ContextClassLoader for the onMessage Thread */
     private transient ClassLoader contextClassLoader = null;
         
@@ -351,6 +360,9 @@ implements javax.resource.spi.ActivationSpec,
         return ra;
     }
 
+    public void setMCF(com.sun.messaging.jms.ra.ManagedConnectionFactory mcf) {
+        this.mcf = mcf;
+    }
 
     // ActivationSpec Javabean configuration methods //
     // These Methods can throw java.lang.RuntimeException or subclasses //
@@ -885,15 +897,25 @@ implements javax.resource.spi.ActivationSpec,
 		this.addressListBehavior = addressListBehavior;		
 	}
 
+    /**
+     * Returns the specified addressListBehavior for this ActivationSpec if it is set,
+     * otherwise, returns the value specified on ManagedConnectionFactory if it is set,
+     * otherwise, returns the value specified on ResourceAdaptor.
+     * @return The addressListBehavior
+     */
 	public String getAddressListBehavior() {
 		_loggerIM.entering(_className, "getAddressListBehavior()", addressListBehavior);
 		
-        if ((addressListBehavior == null) && (ra != null)) {
-            return ra.getAddressListBehavior();
-        } else {
+        if (addressListBehavior != null) {
             return addressListBehavior;
+        } else {
+            if (mcf != null)
+                return mcf.getAddressListBehavior();
+            else if (ra != null)
+                return ra.getAddressListBehavior();
+            else
+                return null;
         }
-		
 	}	
 
 	/**
@@ -935,17 +957,23 @@ implements javax.resource.spi.ActivationSpec,
 		this.userName = userName;
 	}
 
-	/**
-	 * Returns the userName configured for this activationSpec if one is set, otherwise returned the userName configured for the ResourceAdapter.
-	 * 
-	 * @return 
-	 */
+    /**
+     * Returns the specified username for this ActivationSpec if it is set,
+     * otherwise, returns the value specified on ManagedConnectionFactory if it is set,
+     * otherwise, returns the value specified on ResourceAdaptor.
+     * @return The username
+     */
 	public String getUserName() {
 		_loggerIM.entering(_className, "getUserName()", userName);
-		if ((userName == null) && (ra != null)) {
-			return ra.getUserName();
+		if (userName != null) {
+		    return userName;
 		} else {
-			return userName;
+		    if (mcf != null && mcf.getUserName() != null)
+		        return mcf.getUserName();
+		    else if (ra != null)
+			    return ra.getUserName();
+			else
+			    return null;
 		}
 	}
 
@@ -959,17 +987,23 @@ implements javax.resource.spi.ActivationSpec,
         this.password = password;
     }
  
-	/**
-	 * Returns the password configured for this activationSpec if one is set, otherwise returned the password configured for the ResourceAdapter.
-	 * 
-	 * @return 
-	 */ 
+    /**
+     * Returns the specified password for this ActivationSpec if it is set,
+     * otherwise, returns the value specified on ManagedConnectionFactory if it is set,
+     * otherwise, returns the value specified on ResourceAdaptor.
+     * @return The password
+     */
     public String getPassword() {
         _loggerIM.entering(_className, "getPassword()");
-        if ((password == null) && (ra != null)) {
-            return ra.getPassword();
-        } else {
+        if (password != null) {
             return password;
+        } else {
+            if (mcf != null && mcf.getPassword() != null)
+                return mcf.getPassword();
+            else if (ra != null)
+                return ra.getPassword();
+            else
+                return null;
         }
     }
     
@@ -984,17 +1018,20 @@ implements javax.resource.spi.ActivationSpec,
         this.addressListIterationsSet=true;
 	}
 
-	/**
-	 * Returns the value of addressListIterations configured for this activationSpec if one is set, 
-	 * otherwise returned the value of addressListIterations configured for the ResourceAdapter.
-	 * 
-	 * @return 
-	 */
+    /**
+     * Returns the specified addressListIterations for this ActivationSpec if it is set,
+     * otherwise, returns the value specified on ManagedConnectionFactory if it is set,
+     * otherwise, returns the value specified on ResourceAdaptor.
+     * @return The addressListIterations
+     */
 	public int getAddressListIterations() {
 		if (addressListIterationsSet){
 			return addressListIterations;
 		} else {
-			return ra.getAddressListIterations();
+		    if (mcf != null)
+		        return mcf.getAddressListIterations();
+		    else
+			    return ra.getAddressListIterations();
 		}
 	}
 
@@ -1009,17 +1046,20 @@ implements javax.resource.spi.ActivationSpec,
 		this.reconnectAttemptsSet=true;
 	}
 
-	/**
-	 * Returns the value of reconnectAttempts configured for this activationSpec if one is set, 
-	 * otherwise returned the value of reconnectAttempts configured for the ResourceAdapter.
-	 * 
-	 * @return 
-	 */
+    /**
+     * Returns the specified reconnectAttempts for this ActivationSpec if it is set,
+     * otherwise, returns the value specified on ManagedConnectionFactory if it is set,
+     * otherwise, returns the value specified on ResourceAdaptor.
+     * @return The reconnectAttempts
+     */
 	public int getReconnectAttempts() {
 		if (reconnectAttemptsSet){
 			return reconnectAttempts;
 		} else {
-			return ra.getReconnectAttempts();
+		    if (mcf != null)
+		        return mcf.getReconnectAttempts();
+		    else
+			    return ra.getReconnectAttempts();
 		}
 	}
 	
@@ -1036,17 +1076,20 @@ implements javax.resource.spi.ActivationSpec,
 	}
 
 
-	/**
-	 * Returns the value of reconnectInterval configured for this activationSpec if one is set, 
-	 * otherwise returned the value of reconnectInterval configured for the ResourceAdapter.
-	 * 
-	 * @return 
-	 */
+    /**
+     * Returns the specified reconnectInterval for this ActivationSpec if it is set,
+     * otherwise, returns the value specified on ManagedConnectionFactory if it is set,
+     * otherwise, returns the value specified on ResourceAdaptor.
+     * @return The reconnectInterval
+     */
 	public int getReconnectInterval() {
 		if (reconnectIntervalSet){
 			return reconnectInterval;
 		} else {
-			return ra.getReconnectInterval();
+		    if (mcf != null)
+		        return mcf.getReconnectInterval();
+		    else
+			    return ra.getReconnectInterval();
 		}
 	}
 	
@@ -1069,7 +1112,43 @@ implements javax.resource.spi.ActivationSpec,
 		// Force reconnectEnabled to false for XAR success
 		return false;
 	}
-    
+
+    /**
+     * Returns the destinationLookup configured for this activationSpec.
+     * 
+     * @return 
+     */
+    public String getDestinationLookup() {
+        return destinationLookup;
+    }
+
+    /**
+     * Set the destinationLookup configured for this activationSpec.
+     * 
+     * @param destinationLookup
+     */
+    public void setDestinationLookup(String destinationLookup) {
+        this.destinationLookup = destinationLookup;
+    }
+
+    /**
+     * Returns the connectionFactoryLookup configured for this activationSpec.
+     * 
+     * @return 
+     */
+    public String getConnectionFactoryLookup() {
+        return connectionFactoryLookup;
+    }
+
+    /**
+     * Set the connectionFactoryLookup configured for this activationSpec.
+     * 
+     * @param destinationLookup
+     */
+    public void setConnectionFactoryLookup(String connectionFactoryLookup) {
+        this.connectionFactoryLookup = connectionFactoryLookup;
+    }
+
     /**
      * Set additional arbitrary connection factory properties
      * 
@@ -1091,9 +1170,71 @@ implements javax.resource.spi.ActivationSpec,
     public void setOptions(String props){
     	options=props;
     }
-    
+
+    /**
+     * Get additional arbitrary connection factory properties
+     *
+     * The properties will be merged among ActivationSpec and ManagedConnectionFactory.
+     * For example, if the ActivationSpec defines options="prop1=value1,prop2=value2"
+     * and the ManagedConnectionFactory defines options="prop2=valueB,prop3=valueC"
+     * then the merged version should be "prop1=value1,prop2=value2,prop3=valueC"
+     */
     public String getOptions(){
-    	return options;
+        String mergedOptions = null;
+        if (options != null) {
+            if (mcf != null && mcf.getOptions() != null) {
+                mergedOptions = mergeOptions(options, mcf.getOptions());
+            } else {
+                mergedOptions = options;
+            }
+        } else if (mcf != null && mcf.getOptions() != null) {
+            mergedOptions = mcf.getOptions();
+        }
+        return mergedOptions;
+    }
+
+    /**
+     * Merge the options of ActivationSpec and ManagedConnectionFactory.
+     * A property of Options defined in ActivationSpec will win
+     * if ManagedConnectionFactory has a property defined with the same name.
+     */
+    private String mergeOptions(String options, String mcfOptions) {
+        Hashtable<String, String> props = null;
+        try {
+            props = CustomTokenizer.parseToProperties(options);
+        } catch (InvalidPropertyException ipe) {
+            // syntax error in properties
+            String message="ActivationSpec property options has invalid value " + options + " error is: " + ipe.getMessage(); 
+            _loggerIM.warning(_lgrMID_WRN + message);
+            IllegalArgumentException iae = new IllegalArgumentException(_lgrMID_EXC + message); 
+            iae.initCause(ipe);
+            throw iae;
+        }
+        Hashtable<String, String> mcfProps = null;
+        try {
+            mcfProps = CustomTokenizer.parseToProperties(mcf.getOptions());
+        } catch (InvalidPropertyException ipe) {
+            // syntax error in properties
+            String message="ManagedConnectionFactory property options has invalid value " + mcf.getOptions() + " error is: " + ipe.getMessage(); 
+            _loggerIM.warning(_lgrMID_WRN + message);
+            IllegalArgumentException iae = new IllegalArgumentException(_lgrMID_EXC + message); 
+            iae.initCause(ipe);
+            throw iae;
+        }
+        Hashtable<String, String> mergedProps = new Hashtable<String, String>();
+        mergedProps.putAll(mcfProps);
+        Enumeration<String> keys = props.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            mergedProps.put(key, props.get(key));
+        }
+        StringBuffer mergedOptions = new StringBuffer();
+        keys = mergedProps.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            mergedOptions.append(",").append(key).append("=").append(mergedProps.get(key));
+        }
+        return mergedOptions.substring(1);
     }
      
     //////////////////////////////////////////////////////////////////////////////////
@@ -1103,7 +1244,8 @@ implements javax.resource.spi.ActivationSpec,
 	 * Return the addressList to use for this activation
 	 * 
 	 * If addressList is specified on this ActivatioSpec then this value is returned, unmodified.
-	 * If addressList is not specified on this ActivationSpec then a suitably adjusted value is obtained from the ResourceAdapter
+	 * If addressList is not specified on this ActivationSpec then a suitably adjusted value is obtained from the ManagedConnectionFactory
+	 * If addressList is not specified on this ManagedConnectionFactory then a suitably adjusted value is obtained from the ResourceAdapter
 	 * 
 	 * @return
 	 */
@@ -1111,7 +1253,9 @@ implements javax.resource.spi.ActivationSpec,
 		if (addressList != null) {
 			return addressList;
 		} else {
-			if (ra != null) {
+		    if (mcf != null) {
+		        return mcf.getAddressList();
+			} else if (ra != null) {
 				return ((com.sun.messaging.jms.ra.ResourceAdapter) ra)._getEffectiveConnectionURL();
 			} else {
 				return "localhost";
@@ -1204,6 +1348,8 @@ implements javax.resource.spi.ActivationSpec,
         return ("ActvationSpec configuration=\n"+
                 "\tDestinationType                     ="+destinationType+"\n"+
                 "\tDestination                         ="+destination+"\n"+
+                "\tDestinationLookup                   ="+destinationLookup+"\n"+
+                "\tConnectionFactoryLookup             ="+connectionFactoryLookup+"\n"+
                 "\tMessageSelector                     ="+messageSelector+"\n"+
                 "\tAcknowledgeMode                     ="+acknowledgeMode+"\n"+
                 "\tSubscriptionDurability              ="+subscriptionDurability+"\n"+
@@ -1232,7 +1378,8 @@ implements javax.resource.spi.ActivationSpec,
                 "\treconnectAttempts (in effect)       ="+getReconnectAttempts()+"\n"+
                 "\treconnectInterval (configured)      ="+reconnectInterval+"\n"+
                 "\treconnectInterval  (in effect)      ="+getReconnectInterval()+"\n"+
-                "\toptions                             ="+options+"\n");
+                "\toptions  (configured)               ="+options+"\n"+
+                "\toptions  (in effec)                 ="+getOptions()+"\n");
     }
 
 

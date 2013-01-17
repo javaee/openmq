@@ -96,8 +96,7 @@ public class GoodbyeHandler extends PacketHandler
         try {
             props = msg.getProperties();
         } catch (Exception ex) {
-            logger.log(Logger.INFO,"Internal Error: unable to retrieve "+
-                " properties from goodbye message " + msg, ex);
+            logger.logStack(Logger.WARNING, "GOODBY Packet.getProperties()",ex);
             props = new Hashtable();
         }
 

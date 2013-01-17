@@ -116,6 +116,11 @@ public interface Cluster {
     public void closeLink(BrokerAddress remote, boolean force);
 
     /**
+     * @return millisecs
+     */
+    public long getLinkInitWaitTime(); 
+
+    /**
      *
      * @param timeout Timeout in second
      */

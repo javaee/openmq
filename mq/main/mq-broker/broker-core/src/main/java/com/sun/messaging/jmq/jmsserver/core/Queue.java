@@ -448,7 +448,7 @@ public class Queue extends Destination
            try {
                setMaxActiveConsumers(((Integer)m.get(MAX_ACTIVE)).intValue());
            } catch (BrokerException ex) {
-               logger.log(Logger.INFO,"Internal Error ", ex);
+               logger.logStack(Logger.WARNING,  "setMaxActiveConsumers()", ex);
            }
 
         }
@@ -456,7 +456,7 @@ public class Queue extends Destination
            try {
                setMaxFailoverConsumers(((Integer)m.get(MAX_FAILOVER)).intValue());
            } catch (BrokerException ex) {
-               logger.log(Logger.INFO,"Internal Error ", ex);
+               logger.logStack(Logger.WARNING, "setMaxFailoverConsumers", ex);
            }
 
         }
@@ -499,7 +499,7 @@ public class Queue extends Destination
             try {
                 setMaxConsumers(maxSize);
             } catch (BrokerException ex) {
-                logger.log(Logger.INFO,"Internal Error ", ex);
+                logger.logStack(Logger.WARNING, "setMaxConsumers()", ex);
             }
         }
     }
@@ -523,7 +523,7 @@ public class Queue extends Destination
             try {
                 setDefaultCounts(type);
             } catch (Exception ex) {
-                logger.log(Logger.INFO,"Internal Error ", ex);
+                logger.logStack(Logger.WARNING, "setDefaultCounts()", ex);
             }
         }
     }

@@ -39,31 +39,32 @@
  */
 package com.sun.messaging.jms;
 
-import javax.jms.InvalidClientIDException;
+import javax.jms.ResourceAllocationRuntimeException;
+
 import com.sun.messaging.jmq.jmsclient.logging.Loggable;
 
 /**
- * <P>
  * This class is the MQ-specific implementation of
- * javax.jms.InvalidClientIDRuntimeException and adds the methods setLogState
+ * javax.jms.ResourceAllocationRuntimeException and adds the methods setLogState
  * and getlogState
  **/
-public class MQInvalidClientIDRuntimeException extends javax.jms.InvalidClientIDRuntimeException implements Loggable {
+public class MQResourceAllocationRuntimeException extends javax.jms.MessageFormatRuntimeException
+             implements Loggable {
 
 	private boolean isLogged = false;
-
+	
 	/**
-	 * Constructs a <code>MQInvalidClientIDRuntimeException</code> with the specified detail message
+	 * Constructs a <code>MQResourceAllocationRuntimeException</code> with the specified detail message
 	 * 
 	 * @param detailMessage
 	 *            a description of the exception
 	 **/
-	public MQInvalidClientIDRuntimeException(String detailMessage) {
+	public MQResourceAllocationRuntimeException(String detailMessage) {
 		super(detailMessage);
 	}
-	
+
 	/**
-	 * Constructs a <code>MQInvalidClientIDRuntimeException</code> with the specified detail message
+	 * Constructs a <code>MQResourceAllocationRuntimeException</code> with the specified detail message
 	 * and error code.
 	 * 
 	 * @param detailMessage
@@ -71,12 +72,12 @@ public class MQInvalidClientIDRuntimeException extends javax.jms.InvalidClientID
 	 * @param errorCode
 	 *            a provider-specific error code
 	 **/
-	public MQInvalidClientIDRuntimeException(String detailMessage, String errorCode) {
+	public MQResourceAllocationRuntimeException(String detailMessage, String errorCode) {
 		super(detailMessage,errorCode);
 	}
 
 	/**
-	 * Constructs a <code>MQInvalidClientIDRuntimeException</code> with the specified detail message,
+	 * Constructs a <code>MQResourceAllocationRuntimeException</code> with the specified detail message,
 	 * error code and cause
 	 * 
 	 * @param detailMessage
@@ -86,17 +87,17 @@ public class MQInvalidClientIDRuntimeException extends javax.jms.InvalidClientID
 	 * @param cause
 	 *            the underlying cause of this exception
 	 */
-	public MQInvalidClientIDRuntimeException(String detailMessage, String errorCode, Throwable cause) {
+	public MQResourceAllocationRuntimeException(String detailMessage, String errorCode, Throwable cause) {
 		super(detailMessage, errorCode, cause);
 	}
 	
 	/**
-	 * Construct a <code>MQInvalidClientIDRuntimeException</code> to wrap the
-	 * specified InvalidClientIDException
+	 * Construct a <code>MQResourceAllocationRuntimeException</code> to wrap the
+	 * specified ResourceAllocationException
 	 * 
 	 * @param cause the underlying cause of this exception
 	 */
-	public MQInvalidClientIDRuntimeException(InvalidClientIDException cause) {
+	public MQResourceAllocationRuntimeException(ResourceAllocationException cause) {
 		super(cause.getMessage(), cause.getErrorCode(), cause);
 	}
 	

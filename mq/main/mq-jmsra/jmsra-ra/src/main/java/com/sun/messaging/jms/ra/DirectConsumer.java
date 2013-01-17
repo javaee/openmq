@@ -40,19 +40,21 @@
 
 package com.sun.messaging.jms.ra;
 
-import javax.jms.*;
-
 import java.util.logging.Logger;
 
-import com.sun.messaging.AdministeredObject;
-import com.sun.messaging.jmq.jmsclient.ExceptionHandler;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Queue;
+import javax.jms.Topic;
+
+import com.sun.messaging.jmq.io.JMSPacket;
+import com.sun.messaging.jmq.io.SysMessageID;
 import com.sun.messaging.jmq.jmsclient.MQMessageConsumer;
-import com.sun.messaging.jmq.jmsclient.resources.ClientResources;
 import com.sun.messaging.jmq.jmsservice.JMSAck;
 import com.sun.messaging.jmq.jmsservice.JMSService;
-import com.sun.messaging.jmq.jmsservice.JMSServiceReply;
 import com.sun.messaging.jmq.jmsservice.JMSServiceException;
-import com.sun.messaging.jmq.io.JMSPacket;
+import com.sun.messaging.jmq.jmsservice.JMSServiceReply;
 //import com.sun.messaging.jmq.jmsservice.JMSServiceReply.Status;
 
 /**
@@ -130,8 +132,20 @@ public class DirectConsumer
      */
     private boolean isClosed;
     private boolean isClosing;
-
+    
     /**
+     * The last message which was seen by the application
+     * 
+     * A message is considered to have been "seen" if a call to receive(), receive(timeout) or receiveNoWait()
+     * returned the message, or a call to receiveBody(c), receiveBody(c,timeout) or receiveBodyNoWait(c) returned
+     * its body. 
+     * 
+     * If receiveBody(c), receiveBody(c,timeout) or receiveBodyNoWait(c) throws a MessageFormatRuntimeException
+     * then the  message is considered to have been "seen" unless the session mode was auto-ack or dups-ok mode.   
+     */
+    SysMessageID lastMessageSeen;
+
+	/**
      *  Logging
      */
     private static transient final String _className =
@@ -176,6 +190,22 @@ public class DirectConsumer
         this.clientId = ds.getConnection()._getClientID();
         this.noLocal = noLocal;
     }
+    
+    /**
+     * @return the last message seen by the application
+     */
+    private SysMessageID getLastMessageSeen() {
+		return lastMessageSeen;
+	}
+
+	/**
+	 * Set the last message seen by the application
+	 * 
+	 * @param lastMessageSeen
+	 */
+	protected void setLastMessageSeen(SysMessageID lastMessageSeen) {
+		this.lastMessageSeen = lastMessageSeen;
+	}
 
     /////////////////////////////////////////////////////////////////////////
     //  methods that implement javax.jms.MessageConsumer
@@ -229,7 +259,7 @@ public class DirectConsumer
     throws JMSException{
         String methodName = "receive()";
         this._checkIfClosed(methodName);
-        return this.ds._fetchMessage(this.consumerId, 0L, methodName);
+        return ds._fetchMessage(this, this.consumerId, 0L, methodName);
     }
 
     /**
@@ -240,7 +270,7 @@ public class DirectConsumer
     throws JMSException{
         String methodName = "receive(timeout)";
         this._checkIfClosed(methodName);
-        return this.ds._fetchMessage(this.consumerId, timeout, methodName);
+        return this.ds._fetchMessage(this, this.consumerId, timeout, methodName);
     }
 
     /**
@@ -251,48 +281,31 @@ public class DirectConsumer
     throws JMSException{
         String methodName = "receiveNoWait()";
         this._checkIfClosed(methodName);
-        return this.ds._fetchMessage(this.consumerId, -1L, methodName);
+        return this.ds._fetchMessage(this, this.consumerId, -1L, methodName);
     }
 
 	@Override
 	public <T> T receiveBody(Class<T> c) throws JMSException {
-		return receiveBody(c,0);
+        String methodName = "receiveBody(Class<T> c)";
+        this._checkIfClosed(methodName);
+        return this.ds._fetchMessageBody(this, this.consumerId,0L,c,methodName);
+        
 	}
 
 	@Override
 	public <T> T receiveBody(Class<T> c, long timeout) throws JMSException {
-		Message message = receive(timeout);
-		if (message==null){
-			return null;
-		} else {
-			return returnPayload(message,c);
-		}
+        String methodName = "receiveBody(Class<T> c, long timeout)";
+        this._checkIfClosed(methodName);
+        return this.ds._fetchMessageBody(this, this.consumerId,timeout,c,methodName);
 	}
 	
 	@Override
 	public <T> T receiveBodyNoWait(Class<T> c) throws JMSException {
-		Message message = receiveNoWait();
-		if (message==null){
-			return null;
-		} else {
-			return returnPayload(message,c);
-		}
+        String methodName = "receiveBodyNoWait(Class<T> c)";
+        this._checkIfClosed(methodName);
+        return this.ds._fetchMessageBody(this, this.consumerId,-1L,c,methodName);
 	}
 	
-	private <T> T returnPayload(Message message, Class<T> c) throws JMSException {
-		T body = message.getBody(c);
-		if (body==null){
-			// must be a Message
-			// this doesn't have a payload, and we can't return null because this would clash with the "no message received" case,
-			// so we throw an exception
-			// "Message has no body and so cannot be returned using this method" 
-			String errorString = AdministeredObject.cr.getKString(ClientResources.X_MESSAGE_HAS_NO_BODY);
-			JMSException jmse = new javax.jms.MessageFormatException(errorString, ClientResources.X_MESSAGE_HAS_NO_BODY);
-			ExceptionHandler.throwJMSException(jmse);
-		}
-		return body;
-	}
-
     /**
      *  Set a JMS MessageListener on this MessageConsumer
      */
@@ -527,7 +540,10 @@ public class DirectConsumer
             //XXX:tharakan:only unsubscribe passes in the durableName
             //pass null here
             //System.out.println("DC:Destroying cnsumerId="+consumerId+":connectionId="+connectionId);
-            jmsservice.deleteConsumer(connectionId, sessionId, consumerId, null, clientId);
+            //jmsservice.deleteConsumer(connectionId, sessionId, consumerId, null, clientId);
+            
+            jmsservice.deleteConsumer(connectionId, sessionId, consumerId, getLastMessageSeen(), null, clientId);
+            
         } catch (JMSServiceException jmsse){
             _loggerJMC.warning(_lgrMID_WRN+
                     "consumerId="+consumerId+":"+"close():"+

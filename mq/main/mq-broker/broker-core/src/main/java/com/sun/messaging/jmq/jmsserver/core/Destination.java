@@ -3919,10 +3919,9 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
                             try {
                                 consumers = routeLoadedTransactionMessage(pr);
                             } catch (Exception ex) {
-                                logger.log(Logger.INFO,"Internal Error "
-                                   + "loading/routing transacted message, " 
-                                   + "throwing out message " + 
-                                   pr.getSysMessageID(), ex);
+                                logger.logStack(Logger.WARNING, 
+                                  br.getKString(br.W_EXCEPTION_ROUTE_LOADED_MSG,
+                                  pr.getSysMessageID(), ex.getMessage()), ex);
                             }
                             if (consumers.length > 0) {
                                 int[] states = new int[consumers.length];

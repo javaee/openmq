@@ -42,6 +42,7 @@ package com.sun.messaging.jms.ra;
 
 
 import javax.jms.*;
+import javax.naming.NamingException;
 import javax.resource.NotSupportedException;
 import javax.resource.ResourceException;
 import javax.resource.spi.InvalidPropertyException;
@@ -171,7 +172,7 @@ public class EndpointConsumer implements
     public EndpointConsumer(com.sun.messaging.jms.ra.ResourceAdapter ra,
             MessageEndpointFactory endpointFactory,
             javax.resource.spi.ActivationSpec spec)
-    throws NotSupportedException {
+    throws ResourceException {
         if (ra == null || endpointFactory == null || spec ==null){
             throw new NotSupportedException("MQRA:EC:const:null RA||EPF||AS");
         }
@@ -188,7 +189,7 @@ public class EndpointConsumer implements
     }
 
     protected void _init()
-    throws NotSupportedException {
+    throws ResourceException {
         if (!this.ra.getInAppClientContainer()) {
             AccessController.doPrivileged(
                 new PrivilegedAction<Object>()
@@ -205,18 +206,40 @@ public class EndpointConsumer implements
         // ask the activation spec whether this endpoint should use RADirect
         // it will return true if the RA is configured to use RADirect and we haven't overridden addressList in the activation spec
         useRADirect = this.aSpec.useRADirect();
-                        
+
+        Object cfObj = null;
+        String connectionFactoryLookup = aSpec.getConnectionFactoryLookup();
+        if (connectionFactoryLookup != null) {
+            try {
+                cfObj = Util.jndiLookup(connectionFactoryLookup);
+            } catch (NamingException e) {
+                String errorMessage = "MQRA:EC:Invalid connectionFactoryLookup " + connectionFactoryLookup + " configured in ActivationSpec of MDB for no JNDI name found";
+                throw new ResourceException(errorMessage, e);
+            }
+        }
+
 		// Configure connection factory
 		if (useRADirect) {
 			JMSService jmsservice = this.ra._getJMSService();
 			this.dcf = new com.sun.messaging.jms.ra.DirectConnectionFactory(jmsservice, null);
-			
-			this.username = this.aSpec.getUserName();
-			this.password = this.aSpec.getPassword();
 
+            if (cfObj != null) {
+                DirectConnectionFactory cfd = (DirectConnectionFactory) cfObj;
+                ManagedConnectionFactory mcf = cfd.getMCF();
+                cfd.setMCF(mcf);
+                aSpec.setMCF(mcf);
+            }
+            this.username = this.aSpec.getUserName();
+            this.password = this.aSpec.getPassword();
 		} else {
 			xacf = new com.sun.messaging.XAConnectionFactory();
 			try {
+                if (cfObj != null) {
+                    ConnectionFactoryAdapter cfa = (ConnectionFactoryAdapter) cfObj;
+                    ManagedConnectionFactory mcf = cfa.getMCF();
+                    aSpec.setMCF(mcf);
+                }
+
 				// get addressList from activation spec or (suitably adjusted) from the resource adapter
 				this.xacf.setProperty(ConnectionConfiguration.imqAddressList, aSpec._AddressList());
 
@@ -248,7 +271,6 @@ public class EndpointConsumer implements
 				System.err.println("MQRA:EC:constr:Exception setting connection factory properties: "
 						+ jmse.getMessage());
 			}
-
 		}
         
         
@@ -693,8 +715,29 @@ public class EndpointConsumer implements
      *  instance passed in and validates related configs
      */
     private void setDestinationType()
-    throws NotSupportedException {
+    throws ResourceException {
         String destName = aSpec.getDestination();
+        String destinationLookup = aSpec.getDestinationLookup();
+        if (destinationLookup != null) {
+            Object destObj = null;
+            try {
+                destObj = Util.jndiLookup(destinationLookup);
+            } catch (NamingException e) {
+                String errorMessage = "MQRA:EC:Invalid destinationLookup " + destinationLookup + " configured in ActivationSpec of MDB for no JNDI name found";
+                throw new ResourceException(errorMessage, e);
+            }
+            if (destObj != null) {
+                if (destObj instanceof com.sun.messaging.Destination) {
+                    destName = ((com.sun.messaging.Destination) destObj).getName();
+                } else {
+                    String errorMessage = "MQRA:EC:Invalid destinationLookup " + destinationLookup + " configured in ActivationSpec of MDB, The JNDI object is required to be a Destionation";
+                    throw new NotSupportedException(errorMessage);
+                }
+            } else {
+                String errorMessage = "MQRA:EC:Invalid destinationLookup " + destinationLookup + " configured in ActivationSpec of MDB for JNDI object is null";
+                throw new NotSupportedException(errorMessage);
+            }
+        }
         try {
             if (aSpec._isDestTypeQueueSet()) {
                 this.destination = new com.sun.messaging.Queue(destName);

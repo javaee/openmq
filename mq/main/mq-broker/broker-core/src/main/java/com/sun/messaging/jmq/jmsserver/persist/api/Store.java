@@ -311,6 +311,22 @@ public abstract class Store implements JMSBridgeStore {
      * END of Partition Specific Methods 
      ***********************************************************/
 
+    /**
+     * @param listener the StoreSessionReaperListener to be added
+     * @exception BrokerException
+     */
+    public void addStoreSessionReaperListener(StoreSessionReaperListener listener)
+    throws BrokerException {
+    }
+
+    /**
+     * @param listener the StoreSessionReaperListener to be removed 
+     * @exception BrokerException
+     */
+    public void removeStoreSessionReaperListener(StoreSessionReaperListener listener)
+    throws BrokerException {
+    }
+
     public static boolean getDEBUG() {
         return DEBUG;
     }

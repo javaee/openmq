@@ -58,6 +58,7 @@ import com.sun.messaging.jmq.jmsserver.core.ConsumerUID;
 import com.sun.messaging.jmq.jmsserver.core.Destination;
 import com.sun.messaging.jmq.jmsserver.core.DestinationUID;
 import com.sun.messaging.jmq.jmsserver.data.TransactionAcknowledgement;
+import com.sun.messaging.jmq.jmsserver.data.TransactionWork;
 import com.sun.messaging.jmq.jmsserver.data.TransactionBroker;
 import com.sun.messaging.jmq.jmsserver.data.TransactionState;
 import com.sun.messaging.jmq.jmsserver.data.TransactionUID;
@@ -525,8 +526,14 @@ public abstract class StorePartition implements PartitionedStore {
      * @exception NullPointerException	if <code>txnID</code> is
      *			<code>null</code>
      */
+    @Override
     public abstract void updateTransactionState(TransactionUID txnID,
         TransactionState state, boolean sync) throws IOException, BrokerException;
+
+    @Override
+    public abstract void updateTransactionStateWithWork(TransactionUID txnID,
+        TransactionState state, TransactionWork txnwork, boolean sync) 
+        throws IOException, BrokerException;
 
     /**
      * Update transaction's participant brokers for the specified cluster

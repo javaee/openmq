@@ -95,7 +95,7 @@ class PropertiesFile {
 	try {
 	    // safe=false; caller controls data synchronization
 	    propMap = new PHashMap(backingFile, filesize.getBytes(),
-                false, clear, Globals.isMinimumWrites(), Broker.isInProcess());
+                false, clear, Globals.isMinimumWritesFileStore(), Broker.isInProcess());
 	} catch (IOException e) {
 	    logger.logStack(logger.ERROR, br.X_LOAD_PROPERTIES_FAILED, e);
 	    throw new BrokerException(
@@ -164,7 +164,8 @@ class PropertiesFile {
 	try {
 	    // load old data
 	    // safe=false; reset=false
-	    olddata = new PHashMap(oldFile, false, false, Globals.isMinimumWrites(), Broker.isInProcess());
+	    olddata = new PHashMap(oldFile, false, false, 
+                          Globals.isMinimumWritesFileStore(), Broker.isInProcess());
 	} catch (IOException e) {
 	    logger.log(logger.ERROR, br.X_UPGRADE_PROPERTIES_FAILED,
 			oldFile, backingFile, e);
@@ -217,7 +218,8 @@ class PropertiesFile {
 	try {
 	    // pass in safe=false; let caller decide when to sync
 	    // safe=false; reset=false
-	    propMap = new PHashMap(backingFile, oldFile.length(), false, false, Globals.isMinimumWrites(), Broker.isInProcess());
+	    propMap = new PHashMap(backingFile, oldFile.length(), false, false, 
+                          Globals.isMinimumWritesFileStore(), Broker.isInProcess());
 	} catch (IOException e) {
 	    logger.log(logger.ERROR, br.X_UPGRADE_DESTINATIONS_FAILED,
 			oldFile, backingFile, e);

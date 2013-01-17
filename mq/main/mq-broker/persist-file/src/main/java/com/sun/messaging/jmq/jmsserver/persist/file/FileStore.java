@@ -85,6 +85,7 @@ import com.sun.messaging.jmq.jmsserver.data.TransactionState;
 import com.sun.messaging.jmq.jmsserver.data.TransactionUID;
 import com.sun.messaging.jmq.jmsserver.data.TransactionWorkMessage;
 import com.sun.messaging.jmq.jmsserver.data.TransactionWorkMessageAck;
+import com.sun.messaging.jmq.jmsserver.data.TransactionWork;
 import com.sun.messaging.jmq.jmsserver.persist.api.LoadException;
 import com.sun.messaging.jmq.jmsserver.persist.api.Store;
 import com.sun.messaging.jmq.jmsserver.persist.api.TxnLoggingStore;
@@ -781,17 +782,6 @@ public class FileStore extends Store implements PartitionedStore,
 	super.checkClosedAndSetInProgress();
 
 	try {
-
-        if (Globals.isNewTxnLogEnabled()) {
-			long transactionID = message.getTransactionID();
-			if (transactionID != 0) {	
-				if (Store.getDEBUG()) {
-				    logger.log(Logger.DEBUG, "isNewTxnLogEnabled and msg is transacted so NOT storing now "
-						+ message.getSysMessageID());
-				}
-				return;
-			}
-		}
 	    msgStore.storeMessage(dst, message, emptyiid, emptystate, sync);
 
 	} finally {
@@ -1465,7 +1455,7 @@ public class FileStore extends Store implements PartitionedStore,
 	throws BrokerException {
 
 	if (Store.getDEBUG()) {
-	    logger.log(Logger.INFO, "FileStore.updateDestination() called");
+	    logger.log(Logger.INFO, "FileStore.updateDestination("+destination+", "+sync+")");
 	}
 
 	// make sure store is not closed then increment in progress count
@@ -1709,6 +1699,15 @@ public class FileStore extends Store implements PartitionedStore,
 	}
     }
 
+    @Override
+    public void updateTransactionStateWithWork(TransactionUID id, 
+        TransactionState ts, TransactionWork txnwork, boolean sync)
+        throws IOException, BrokerException {
+        throw new UnsupportedOperationException(
+        "updateTransactionStateWithWork() not supported by "+getStoreType()+" store");
+    
+    }
+
     /**
      * Retrieve all local and cluster transaction ids in the store
      * with their state
@@ -1756,10 +1755,6 @@ public class FileStore extends Store implements PartitionedStore,
 
 	if (Store.getDEBUG()) {
 	    logger.log(Logger.INFO, "FileStore.storeTransactionAck() called");
-	}
-	if(Globals.isNewTxnLogEnabled())
-	{
-		return;
 	}
 	
 	// make sure store is not closed then increment in progress count
@@ -1994,11 +1989,12 @@ public class FileStore extends Store implements PartitionedStore,
         super.checkClosedAndSetInProgress();
 
         try {
-        	if (Globals.isNewTxnLogEnabled()) {
-				throw new UnsupportedOperationException("storeRemoteTransaction not supported for isFastLogTransactions");
-			} else {
-            tidList.storeRemoteTransaction(id, ts, txnAcks, txnHomeBroker, sync);
-			}
+            if (Globals.isNewTxnLogEnabled()) {
+                throw new UnsupportedOperationException(
+                    "storeRemoteTransaction not supported for isFastLogTransactions");
+            } else {
+                tidList.storeRemoteTransaction(id, ts, txnAcks, txnHomeBroker, sync);
+            }
         } finally {
             // decrement in progress count
             super.setInProgress(false);

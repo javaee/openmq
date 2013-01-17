@@ -139,7 +139,7 @@ public class DirectConnection
      */
     ManagedConnection mc = null;
 
-    /**
+	/**
      *  Indicates whether this is managed via the JavaEE ManagedConnection
      *  interface
      */
@@ -287,6 +287,7 @@ public class DirectConnection
      *  @param  maxMessages The maxmimum number of messages that can be
      *          assigned to a ServerSession at a single time
      */
+	@Override
     public ConnectionConsumer createConnectionConsumer(
             Destination destination,
             String messageSelector,
@@ -300,8 +301,36 @@ public class DirectConnection
                 "ServerSessionPool=" + sessionPool + ":" +
                 "MaxMessages=" + maxMessages);
         _unsupported("createConnectionConsumer():");
-        return (ConnectionConsumer) null;
+        return null;
     }
+    
+	@Override
+	public ConnectionConsumer createSharedConnectionConsumer(Topic topic, String subscriptionName,
+			String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+        _loggerJC.fine(_lgrMID_INF+
+                "connectionId="+connectionId+":"+"createSharedConnectionConsumer():" +
+                "Topic=" + topic + ":" +
+                "subscriptionName=" + subscriptionName + ":" +
+                "MessageSelector=" + messageSelector + ":" +
+                "ServerSessionPool=" + sessionPool + ":" +
+                "MaxMessages=" + maxMessages);
+        _unsupported("createSharedConnectionConsumer():");
+        return null;
+	}
+
+	@Override
+	public ConnectionConsumer createSharedDurableConnectionConsumer(Topic topic, String subscriptionName,
+			String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+        _loggerJC.fine(_lgrMID_INF+
+                "connectionId="+connectionId+":"+"createSharedDurableConnectionConsumer():" +
+                "Topic=" + topic + ":" +
+                "subscriptionName=" + subscriptionName + ":" +
+                "MessageSelector=" + messageSelector + ":" +
+                "ServerSessionPool=" + sessionPool + ":" +
+                "MaxMessages=" + maxMessages);
+        _unsupported("createSharedDurableConnectionConsumer():");
+        return null;
+	}
 
     /**
      *  Create a Durable ConnectionConsumer in this JMS Connection
@@ -625,7 +654,7 @@ public class DirectConnection
                 "ServerSessionPool=" + sessionPool + ":" +
                 "MaxMessages=" + maxMessages);
         _unsupported("createConnectionConsumer():");
-        return (ConnectionConsumer) null;
+        return null;
     }
 
     /**
@@ -833,7 +862,7 @@ public class DirectConnection
     /**
      *  Get the XAResource for this DirectConnection
      */
-    protected DirectXAResource _getXAResource() {
+    public DirectXAResource _getXAResource() {
         if (this.xar != null) {
             return this.xar;
         }
@@ -1157,12 +1186,15 @@ public class DirectConnection
         } else {
             if (acknowledgeMode == Session.AUTO_ACKNOWLEDGE){
                 ackMode = SessionAckMode.AUTO_ACKNOWLEDGE;
+            } else if (acknowledgeMode == Session.DUPS_OK_ACKNOWLEDGE) {
+                ackMode = SessionAckMode.DUPS_OK_ACKNOWLEDGE;
             } else if (acknowledgeMode == Session.CLIENT_ACKNOWLEDGE) {
                 ackMode = SessionAckMode.CLIENT_ACKNOWLEDGE;
             } else if (acknowledgeMode == com.sun.messaging.jms.Session.NO_ACKNOWLEDGE){
                 ackMode = SessionAckMode.NO_ACKNOWLEDGE;
             } else {
-                ackMode = SessionAckMode.DUPS_OK_ACKNOWLEDGE;
+            	// default
+                ackMode = SessionAckMode.AUTO_ACKNOWLEDGE;
             }
         }
         return ackMode;
@@ -1572,4 +1604,5 @@ public class DirectConnection
 	    	_deleteTemporaryDestinations();
 		}
 	}
+
 }

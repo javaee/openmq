@@ -152,11 +152,8 @@ public class HelloHandler extends PacketHandler
           try {
               hello_props = msg.getProperties();
           } catch (Exception ex) {
-              
-              logger.log(Logger.INFO,"Internal Error: error "
-                   + " retrieving properties from hello message ", ex);
-             hello_props = new Hashtable();
-
+              logger.logStack(Logger.WARNING, "HELLO Packet.getProperties()", ex);
+              hello_props = new Hashtable();
           }
 
           boolean alreadyStarted = con.isStarted();

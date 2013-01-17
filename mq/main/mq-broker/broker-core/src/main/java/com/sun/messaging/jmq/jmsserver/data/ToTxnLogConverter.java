@@ -164,7 +164,7 @@ class TxnConverter {
 				twm.setStoredInterests(interests);
 				twm.setPacketReference(packRef);
 				twm.setDestUID(destUID);
-				txnWork.addMesage(twm);
+				txnWork.addMessage(twm);
 
 			}
 		}

@@ -127,14 +127,14 @@ class TidList {
 
             // safe = false; caller controls data synchronization
             if (useMemoryMappedFile) {
-                tidMap = new PHashMapMMF(
-                    backingFile, filesize.getBytes(), 1024, false, clear, Globals.isMinimumWrites(), Broker.isInProcess());
+                tidMap = new PHashMapMMF(backingFile, filesize.getBytes(), 1024, false,
+                             clear, Globals.isMinimumWritesFileStore(), Broker.isInProcess());
                 if (updateOptimization) {
                     ((PHashMapMMF)tidMap).intClientData(CLIENT_DATA_SIZE);
                 }
             } else {
-                tidMap = new PHashMap(
-                    backingFile, filesize.getBytes(), 1024, false, clear, Globals.isMinimumWrites(), Broker.isInProcess());
+                tidMap = new PHashMap(backingFile, filesize.getBytes(), 1024, false, 
+                             clear, Globals.isMinimumWritesFileStore(), Broker.isInProcess());
             }
 	} catch (IOException e) {
 	    logger.log(logger.ERROR, br.X_LOAD_TRANSACTIONS_FAILED, e);
@@ -238,7 +238,8 @@ class TidList {
 	try {
 	    // load old data
 	    // safe=false; reset=false
-	    olddata = new PHashMap(oldFile, false, false, Globals.isMinimumWrites(), Broker.isInProcess());
+	    olddata = new PHashMap(oldFile, false, false, 
+                          Globals.isMinimumWritesFileStore(), Broker.isInProcess());
 	} catch (IOException e) {
 	    logger.log(logger.ERROR, br.X_UPGRADE_TRANSACTIONS_FAILED,
 			oldFile, backingFile, e);
@@ -300,14 +301,14 @@ class TidList {
             // pass in safe=false; caller decide when to sync
             // safe=false; reset=false
             if (useMemoryMappedFile) {
-	        tidMap = new PHashMapMMF(
-                    backingFile, oldFile.length(), 1024, false, false, Globals.isMinimumWrites(), Broker.isInProcess());
+	        tidMap = new PHashMapMMF(backingFile, oldFile.length(), 1024, false, 
+                             false, Globals.isMinimumWritesFileStore(), Broker.isInProcess());
                 if (updateOptimization) {
                     ((PHashMapMMF)tidMap).intClientData(CLIENT_DATA_SIZE);
                 }
             } else {
-                tidMap = new PHashMap(
-                    backingFile, oldFile.length(), 1024, false, false, Globals.isMinimumWrites(), Broker.isInProcess());
+                tidMap = new PHashMap(backingFile, oldFile.length(), 1024, false, 
+                             false, Globals.isMinimumWritesFileStore(), Broker.isInProcess());
             }
 	} catch (IOException e) {
 	    logger.log(logger.ERROR, br.X_UPGRADE_TRANSACTIONS_FAILED,

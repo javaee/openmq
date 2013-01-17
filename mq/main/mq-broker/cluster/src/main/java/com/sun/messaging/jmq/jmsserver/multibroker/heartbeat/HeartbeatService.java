@@ -94,7 +94,8 @@ public class HeartbeatService implements HeartbeatCallback, ClusterListener, Con
     private ClusterManager clsmgr = null;
     private Heartbeat hb = null;
 
-    private Map brokers = Collections.synchronizedMap(new LinkedHashMap());
+    private Map<HeartbeatEntry, HeartbeatEntry> brokers = 
+        Collections.synchronizedMap(new LinkedHashMap<HeartbeatEntry, HeartbeatEntry>());
 
     private TimeoutTimer timeoutTimer = null;
 
@@ -209,14 +210,14 @@ public class HeartbeatService implements HeartbeatCallback, ClusterListener, Con
                     lock.wait(1000);
                     } catch (InterruptedException e) { /* Ignored */ }
                     if (stopped) break;
-                    Set ks = brokers.keySet();
+                    Set<HeartbeatEntry> ks = brokers.keySet();
                     hbes = (HeartbeatEntry[])ks.toArray(new HeartbeatEntry[0]);
                 }
                 if (DEBUG) {
                     logger.log(logger.DEBUGHIGH, getName()+ " checking "+hbes.length + " endpoints"); 
                 }
                 for (int i = 0; i < hbes.length; i++) {
-                    hbe = (HeartbeatEntry)hbes[i];
+                    hbe = hbes[i];
                     long timeout = (hbe.heartbeatInterval * hb.getTimeoutThreshold()) * 1000L;
                     if (hbe.lastTimestamp < (System.currentTimeMillis() - timeout)) { 
                         if (hbe.indoubtTimestamp < (System.currentTimeMillis() - timeout)) {
@@ -225,7 +226,7 @@ public class HeartbeatService implements HeartbeatCallback, ClusterListener, Con
                                 ClusteredBroker cb = clsmgr.getBroker(hbe.brokerID);
                                 cb.setBrokerInDoubt(true,  new UID(hbe.sessionUID));
                             }
-                            entry  = (HeartbeatEntry)brokers.get(hbe);
+                            entry  = brokers.get(hbe);
                             if (entry != null) {
                                 entry.indoubtTimestamp = System.currentTimeMillis();
                             }
@@ -268,7 +269,9 @@ public class HeartbeatService implements HeartbeatCallback, ClusterListener, Con
         GPacket gp = null;
 
         public boolean equals(Object obj) {
-            if (obj ==  null || !(obj instanceof HeartbeatEntry)) return false;
+            if (obj ==  null || !(obj instanceof HeartbeatEntry)) {
+                return false;
+            }
             HeartbeatEntry hbe = (HeartbeatEntry)obj;
             return brokerID.equals(hbe.brokerID) && sessionUID == hbe.sessionUID;
         }
@@ -298,19 +301,19 @@ public class HeartbeatService implements HeartbeatCallback, ClusterListener, Con
 
         HeartbeatEntry hbe = null;
 
-        ArrayList brokerSessions =  new ArrayList();
+        ArrayList<Long> brokerSessions =  new ArrayList();
         synchronized(brokers) {
-            Iterator itr = brokers.keySet().iterator();
+            Iterator<HeartbeatEntry> itr = brokers.keySet().iterator();
             while (itr.hasNext()) {
-                hbe =  (HeartbeatEntry)itr.next();
+                hbe = itr.next();
                 if (cb.getBrokerName().equals(hbe.brokerID)) {
-                    brokerSessions.add(new Long(hbe.sessionUID));
+                    brokerSessions.add(Long.valueOf(hbe.sessionUID));
                 }
             }
         }
-        Iterator itr = brokerSessions.iterator();
+        Iterator<Long> itr = brokerSessions.iterator();
         while (itr.hasNext()) {
-            removeBroker(cb, new UID(((Long)itr.next()).longValue()));
+            removeBroker(cb, new UID(itr.next().longValue()));
         }
 
         hbe = new HeartbeatEntry();
@@ -367,14 +370,24 @@ public class HeartbeatService implements HeartbeatCallback, ClusterListener, Con
         try {
             hbe.brokerID = cb.getBrokerName();
             hbe.sessionUID = brokerSession.longValue();
-            HeartbeatEntry existed = (HeartbeatEntry)brokers.remove(hbe);    
+            HeartbeatEntry existed = brokers.remove(hbe);    
             if (existed == null) {
                 logger.log(logger.WARNING, br.getKString(
                        br.W_CLUSTER_HB_REM_ENDPOINT_NOTFOUND, hbe));
                 return;
             }
-
-            hb.removeEndpoint(existed, existed.endpoint);
+            if (hb.removeEndpoint(existed, existed.endpoint)) {
+                synchronized(brokers) {
+                    Iterator<HeartbeatEntry> itr = brokers.keySet().iterator();
+                    while (itr.hasNext()) {
+                        HeartbeatEntry entry = itr.next();     
+                        if (cb.getBrokerName().equals(entry.brokerID) &&
+                            entry.endpoint.equals(existed.endpoint)) {
+                            itr.remove();
+                        }
+                    }
+                }
+            }
             logger.log(logger.INFO,  br.getKString(br.I_CLUSTER_HB_REM_ENDPOINT, existed));
 
         } catch (Exception e) {
@@ -387,7 +400,7 @@ public class HeartbeatService implements HeartbeatCallback, ClusterListener, Con
         HeartbeatEntry hbe = new HeartbeatEntry();
         hbe.brokerID = cb.getBrokerName();
         hbe.sessionUID = brokerSession.longValue();
-        HeartbeatEntry existed = (HeartbeatEntry)brokers.get(hbe);
+        HeartbeatEntry existed = brokers.get(hbe);
         if (existed == null) {
             if (DEBUG) {
             logger.log(logger.INFO, "Unsuspect " + hbe+ " not exist");
@@ -406,7 +419,7 @@ public class HeartbeatService implements HeartbeatCallback, ClusterListener, Con
         hbe.brokerID = brokerid;
         hbe.sessionUID = brokerSession.longValue();
         logger.log(logger.INFO, br.getKString(br.I_CHECK_HEARTBEAT, hbe.toString()));
-        HeartbeatEntry existed = (HeartbeatEntry)brokers.get(hbe);
+        HeartbeatEntry existed = brokers.get(hbe);
         if (existed == null) {
             logger.log(logger.INFO, 
                 br.getKString(br.I_HEARTBEAT_ENTRY_NOTFOUND, hbe.toString()));
@@ -467,7 +480,7 @@ public class HeartbeatService implements HeartbeatCallback, ClusterListener, Con
         hbe.sessionUID = hbi.getBrokerSession();
         hbe.lastSequence = hbi.getSequence();
 
-        HeartbeatEntry assigned = (HeartbeatEntry)brokers.get(hbe); 
+        HeartbeatEntry assigned = brokers.get(hbe); 
 
         if (assigned == null) {
             if (DEBUG) {
@@ -564,7 +577,7 @@ public class HeartbeatService implements HeartbeatCallback, ClusterListener, Con
 
         assert ( endpoint.equals(hbe.endpoint) );
 
-        HeartbeatEntry entry  = (HeartbeatEntry)brokers.get(hbe);
+        HeartbeatEntry entry  = brokers.get(hbe);
         if (entry == null) {
             if (DEBUG) {
             logger.logStack(logger.INFO, "HEARTBEAT: NotFound: Heart beat timeout because "+

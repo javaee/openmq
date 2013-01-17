@@ -107,7 +107,8 @@ class DestinationListStore {
 	backingFile = new File(topDir, BASENAME);
 	try {
 	    // pass in safe=false; caller decide when to sync
-	    dstMap = new PHashMap(backingFile, filesize.getBytes(), false, clear, Globals.isMinimumWrites(), Broker.isInProcess());
+	    dstMap = new PHashMap(backingFile, filesize.getBytes(), false, clear, 
+                         Globals.isMinimumWritesFileStore(), Broker.isInProcess());
 	} catch (IOException e) {
 	    logger.log(logger.ERROR, br.X_LOAD_DESTINATIONS_FAILED, e);
 	    throw new BrokerException(
@@ -172,7 +173,8 @@ class DestinationListStore {
 	try {
 	    // load old data
 	    // safe=false; reset=false
-	    olddata = new PHashMap(oldFile, false, false, Globals.isMinimumWrites(), Broker.isInProcess());
+	    olddata = new PHashMap(oldFile, false, false, 
+                          Globals.isMinimumWritesFileStore(), Broker.isInProcess());
 	} catch (IOException e) {
 	    logger.log(logger.ERROR, br.X_UPGRADE_DESTINATIONS_FAILED,
 			oldFile, backingFile, e);
@@ -225,7 +227,8 @@ class DestinationListStore {
 	try {
 	    // pass in safe=false; caller decide when to sync
 	    // safe=false; reset=false
-	    dstMap = new PHashMap(backingFile, oldFile.length(), false, false, Globals.isMinimumWrites(), Broker.isInProcess());
+	    dstMap = new PHashMap(backingFile, oldFile.length(), false, false, 
+                         Globals.isMinimumWritesFileStore(), Broker.isInProcess());
 	} catch (IOException e) {
 	    logger.log(logger.ERROR, br.X_UPGRADE_DESTINATIONS_FAILED,
 			oldFile, backingFile, e);

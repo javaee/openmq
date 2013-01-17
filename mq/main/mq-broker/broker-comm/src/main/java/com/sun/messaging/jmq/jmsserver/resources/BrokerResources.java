@@ -675,6 +675,13 @@ public class BrokerResources extends MQResourceBundle {
     final public static String I_CREATE_UNSHARED_DURA = "B1478";
     final public static String I_CREATE_SHARED_DURA = "B1479";
     final public static String I_CREATE_SHARED_NONDURA_SUB = "B1480";
+    final public static String I_UNABLE_GET_LOCK_ABORT_TAKEOVER = "B1481";
+    final public static String I_SHARECC_RECORD_UKEY_TYPE_EXIST = "B1482";
+    final public static String I_RECORD_DURA_SUB_EXIST_ALREADY = "B1483";
+    final public static String I_RECORD_DURA_SUB_CONCURRENT = "B1484";
+    final public static String I_WAITING_FOR_BROKER_LINK_DEACTIVATED = "B1485";
+    final public static String I_STORE_SESSION_REAPER_SCHEDULED = "B1486";
+    final public static String I_REMOVE_CACHED_TAKEOVER_NOTIFICATION_ENTRY = "B1487";
 
     // 2000-2999 Warning Messages
     final public static String W_AUTH_FAILED	 	= "B2000";
@@ -978,6 +985,13 @@ public class BrokerResources extends MQResourceBundle {
     final public static String W_IGNORE_REMOTE_MSG_SENT_FROM = "B2275";
     final public static String W_DURA_SUB_NOT_FOUND_ON_ATTACH = "B2276";
     final public static String W_NON_DURA_SUB_NOT_FOUND_ON_ATTACH = "B2277";
+    final public static String W_RECEIVED_UNKNOWN_SESSIONID = "B2278";
+    final public static String W_RECEIVED_BAD_SESSIONID = "B2279";
+    final public static String W_EXCEPTION_CLEANUP_CONSUMER = "B2280";
+    final public static String W_EXCEPTION_ROUTE_LOADED_MSG = "B2281";
+    final public static String W_FORCE_CLOSE_BROKER_LINK_TAKEOVER = "B2282";
+    final public static String W_FORCE_CLOSE_BROKER_LINK_BEING_TAKEOVER = "B2283";
+    final public static String W_CANNOT_SCHEDULE_STORE_SESSION_REAPER = "B2284";
 
     // 3000-3999 Error Messages
     final public static String E_PERSISTENT_OPEN 	= "B3000";
@@ -1714,11 +1728,8 @@ public class BrokerResources extends MQResourceBundle {
     final public static String X_LOAD_MSGS_TO_DESTROYED_DST = "B4405";
     final public static String X_LOAD_MSGS_TO_DST_NO_DELIVERY_TIMER = "B4406";
     final public static String X_RECORD_UNSUBSCRIBE_AFTER_FAILED_CREATION = "B4407";
-    final public static String X_RECORD_DURA_SUB_EXIST_ALREADY = "B4408";
-    final public static String X_RECORD_DURA_SUB_CONCURRENT = "B4409";
     final public static String X_MASTER_BROKER_VERSION_NO_SUPPORT = "B4410";
     final public static String X_SHARECC_QUERY_MAX_SEQ_UKEY = "B4411";
-    final public static String X_SHARECC_RECORD_UKEY_TYPE_EXIST = "B4412";
     final public static String X_SHARECC_CHECK_OLD_SCHEMA_TABLE = "B4413";
     final public static String X_SHARECC_CHECK_OLD_SCHEMA_TABLE_EMPTY = "B4414";
     final public static String X_SHARECC_QUERY_LOCKID = "B4415";
@@ -1748,6 +1759,8 @@ public class BrokerResources extends MQResourceBundle {
     final public static String X_INVALID_DEST_SHARE_CONSUMER = "B4439";
     final public static String X_REPLACE_ACTIVE_DURA = "B4440";
     final public static String X_NON_DURA_SUB_CONFLICT = "B4441";
+    final public static String X_REPLACE_PROPS_FOR_REPLACE_MSG = "B4442";
+    final public static String X_CLEANUP_MSG_CLOSE_SESSION = "B4443";
 
     /***************** End of message key constants *******************/
 

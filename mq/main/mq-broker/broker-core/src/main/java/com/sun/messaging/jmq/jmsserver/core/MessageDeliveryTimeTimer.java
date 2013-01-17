@@ -389,7 +389,9 @@ public class MessageDeliveryTimeTimer implements TimerEventHandler {
          }
          dues.clear();
          di = null;
+         int msize = 0;
          synchronized(this) {
+             msize = messages.size();
              itr = messages.iterator();
              while (itr.hasNext()) {
                  di = itr.next();
@@ -398,10 +400,16 @@ public class MessageDeliveryTimeTimer implements TimerEventHandler {
                  }
              }
          }
-         if (di == null) {
-             return 0L;
+         long ret = 0L; 
+         if (di != null) {
+             ret = di.getDeliveryTime();
          }
-         return di.getDeliveryTime();
+         if (DEBUG) {
+             logger.log(logger.INFO,  "MessageDeliveryTimeTimer:runTask() return "+ret+
+             " , next ready message "+di+", destination "+destination.getDestinationUID()+
+             " with current delivery delay messages "+msize);
+         }
+         return ret;
      }
 
      public void handleOOMError(Throwable e) {

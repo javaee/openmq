@@ -495,10 +495,9 @@ public class DataHandler extends PacketHandler
             //if transacted, just store, dont route
             if (transacted) {
                 try {
-                    ref.store();
                     TransactionList[] tls = DL.getTransactionList(storep);
                     TransactionList tl = tls[0];
-                    tl.addMessage(ref.getTransactionID(), ref.getSysMessageID());
+                    tl.addMessage(ref);
                 } catch (Exception ex) {
                     String emsg = br.getKString(br.X_PROCESS_PRODUCED_MESSAGE_FAIL,
                         ref+"[TID="+ref.getTransactionID()+", "+di+"]", ex.getMessage());

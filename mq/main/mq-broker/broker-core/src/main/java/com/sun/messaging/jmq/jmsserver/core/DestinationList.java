@@ -1057,10 +1057,10 @@ public class DestinationList implements ConnToPartitionStrategyContext
                         try {
                             consumers = d.routeLoadedTransactionMessage(pr);
                         } catch (Exception ex) {
-                            logger.log(Logger.INFO,"Internal Error "
-                               + "loading/routing transacted message, " 
-                               + "throwing out message " + 
-                               pr.getSysMessageID(), ex);
+                            logger.logStack(Logger.WARNING,
+                                Globals.getBrokerResources().getKString(
+                                BrokerResources.W_EXCEPTION_ROUTE_LOADED_MSG,
+                                pr.getSysMessageID(), ex.getMessage()), ex);
                         }
                         states = new int[consumers.length];
                         for (int i=0; i < states.length; i ++)  
@@ -2806,11 +2806,12 @@ public class DestinationList implements ConnToPartitionStrategyContext
         }
     }
 
-    private static void notifyPartitionRemoved(PartitionedStore ps, DestinationList dl) {
+    private static void notifyPartitionRemoved(PartitionedStore ps, 
+        DestinationList dl, String targetBroker) {
         synchronized(partitionListeners) {
             Iterator<PartitionListener> itr =  partitionListeners.iterator();
             while (itr.hasNext()) {
-                itr.next().partitionRemoved(ps.getPartitionID(), dl);
+                itr.next().partitionRemoved(ps.getPartitionID(), dl, targetBroker);
             }
         }
     }
@@ -2861,7 +2862,7 @@ public class DestinationList implements ConnToPartitionStrategyContext
                 partitionID), Status.NOT_ALLOWED); 
             }
             dl.valid = false;
-            notifyPartitionRemoved(pstore, dl);
+            notifyPartitionRemoved(pstore, dl, brokerID);
             pstore = dl.getPartitionedStore();
 
             dl.closeAttachedConnections(GoodbyeReason.MIGRATE_PARTITION, 

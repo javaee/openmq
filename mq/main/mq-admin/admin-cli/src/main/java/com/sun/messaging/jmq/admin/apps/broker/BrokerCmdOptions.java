@@ -223,7 +223,8 @@ public interface BrokerCmdOptions  {
     public static String[] CMD_GETATTR_VALID_CMDARGS	= {
 							    CMDARG_DESTINATION,
 							    CMDARG_SERVICE,
-							    CMDARG_BROKER
+							    CMDARG_BROKER,
+							    CMDARG_DURABLE
 							  };
 
     public static String[] CMD_UNGRACEFUL_KILL_VALID_CMDARGS  = {

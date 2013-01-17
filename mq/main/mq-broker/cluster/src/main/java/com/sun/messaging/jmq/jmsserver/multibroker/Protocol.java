@@ -193,7 +193,7 @@ public interface Protocol extends ClusterCallback
 
     public void preTakeover(String brokerID, UID storeSession,
                 String brokerHost, UID brokerSession) throws BrokerException ;
-    public void postTakeover(String brokerID, UID storeSession, boolean aborted);
+    public void postTakeover(String brokerID, UID storeSession, boolean aborted, boolean notify);
 
     public void sendClusterTransactionInfo(long tid,
                 com.sun.messaging.jmq.jmsserver.core.BrokerAddress to);

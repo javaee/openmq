@@ -192,7 +192,7 @@ class MessageInfo {
 	{
 		Globals.getLogger().log(Logger.DEBUG, "sync new MessageInfo "+mid+"with VRFileRAF");
 	}
-	if(!Globals.isMinimumWrites())
+	if(!Globals.isMinimumWritesFileStore())
 	{	
         synchronized (vrfile) {
             vrecord = (VRecordRAF)vrfile.allocate(bufsize);

@@ -589,12 +589,12 @@ public class CommonProtocol implements Protocol
         realProtocol.preTakeover(brokerID, storeSession, brokerHost, brokerSession);
     }
     
-	public void postTakeover(String brokerID, UID storeSession, boolean aborted) {
+	public void postTakeover(String brokerID, UID storeSession, boolean aborted, boolean notify) {
         if (!getProtocolInitComplete()) {
             logger.logStack(Logger.ERROR, "No protocol", new Exception("No protocol"));
             return;
         }
-        realProtocol.postTakeover(brokerID, storeSession, aborted);
+        realProtocol.postTakeover(brokerID, storeSession, aborted, notify);
     }
 
 	public void changeMasterBroker(BrokerMQAddress newmaster,

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -256,8 +256,15 @@ public class Subscription extends Consumer implements SubscriptionSpi
             if (isDurable != sub.isDurable) {
                 return false;
             }
+            if (test2StringNotSame(ndSubscriptionName, sub.ndSubscriptionName)) {
+                return false;
+            }
             if (isDurable) {
                 return (durableName.equals(sub.durableName) &&
+                        ((clientID == sub.clientID) ||
+                         (clientID != null && clientID.equals(sub.clientID))));
+            } else if (ndSubscriptionName != null) {
+                return (ndSubscriptionName.equals(sub.ndSubscriptionName) &&
                         ((clientID == sub.clientID) ||
                          (clientID != null && clientID.equals(sub.clientID))));
             } else {
@@ -308,6 +315,11 @@ public class Subscription extends Consumer implements SubscriptionSpi
             return durableName.hashCode() * 31+
                    (clientID == null ? 0:clientID.hashCode());
         }
+        if (ndSubscriptionName != null) {
+            return ndSubscriptionName.hashCode() * 31+
+                   (clientID == null ? 0:clientID.hashCode());
+        }
+
         return dest.hashCode() * 31 + 
                (clientID == null ? 0 : clientID.hashCode()) +
                (31*31*(selstr == null ? 0 : selstr.hashCode()));
@@ -363,11 +375,10 @@ public class Subscription extends Consumer implements SubscriptionSpi
                 stored = true;
             }
         } catch (Exception ex) {
-            String args[] = { getDSubLogString(clientID, durable), d.toString() };
-            if (ex instanceof BrokerException &&
-                ((BrokerException)ex).getStatusCode() == Status.CONFLICT) { 
-                logger.log(Logger.INFO, 
-                    br.getKString(br.E_STORE_DURABLE, args)+": "+ex.toString(), ex);
+            String args[] = { getDSubLongLogString(), d.toString() };
+            if (ex instanceof ConsumerAlreadyAddedException) {
+                logger.log(Logger.INFO, br.getKString(
+                           br.E_STORE_DURABLE, args)+": "+ex.getMessage());
             } else {
                 logger.logStack(Logger.ERROR, br.E_STORE_DURABLE, args, ex);
                 if (notify) {
@@ -673,8 +684,8 @@ public class Subscription extends Consumer implements SubscriptionSpi
             }
         }
     }
-    public String getDSubLongLogString(String cid, String dname) { 
-        return "["+getDSubKey(cid, dname)+"]"+
+    public String getDSubLongLogString() { 
+        return "["+getDSubKey(getClientID(), getDurableName())+"]"+
                 (getShared() ? (getJMSShared() ? "jms":"mq"):"");
     }
 
@@ -1169,8 +1180,8 @@ public class Subscription extends Consumer implements SubscriptionSpi
         throws BrokerException, SelectorFormatException { 
         if (DEBUG) {
             Globals.getLogger().log(Logger.INFO, "Subscription.findCreateDurableSubscription("+
-            clientID+", "+durableName+", "+share+", "+jmsshare+", "+uid+", "+selectorstr+
-            ", "+noLocal+", "+notify+", "+requid+")");
+            clientID+", "+durableName+", shared="+share+", jmsshare="+jmsshare+", duid="+uid+
+            ", selector="+selectorstr+", noLocal="+noLocal+", notify="+notify+", cuid="+requid+")");
         }
 
         Logger logger = Globals.getLogger();
@@ -1194,8 +1205,7 @@ public class Subscription extends Consumer implements SubscriptionSpi
                          Status.CONFLICT);
                  }
                  if (s.getJMSShared() != jmsshare) {
-                     String args[] = { s.getDSubLongLogString(clientID, durableName),
-                                       uid.toString() };
+                     String args[] = { s.getDSubLongLogString(), uid.toString() };
                      throw new BrokerException(
                          Globals.getBrokerResources().getKString(
                          BrokerResources.X_DURABLE_EXIST_CONFLICT, args),
@@ -1215,7 +1225,7 @@ public class Subscription extends Consumer implements SubscriptionSpi
                      Globals.getLogger().log(Logger.INFO, "Subscription.findCreateDurableSubscription("+
                      clientID+", "+durableName+", "+share+", "+jmsshare+", "+uid+", "+selectorstr+
                      ", "+noLocal+", "+notify+", "+requid+"): not match, unsubscribe durable subscription "+
-                     s.getDSubLongLogString(clientID, durableName));
+                     s.getDSubLongLogString());
                  }
                  unsubscribe(durableName, clientID, false, false, notify, false);
                  s = null;
@@ -1229,7 +1239,7 @@ public class Subscription extends Consumer implements SubscriptionSpi
                                 uid, noLocal, notify, true, requid, sharecnt);
                  if (DEBUG) {
                      logger.log(Logger.INFO,"Subscription.findCreateDurableSubscription(): "+
-                     "Created new durable subscription "+s.getDSubLongLogString(clientID, durableName));
+                     "Created new durable subscription "+s.getDSubLongLogString());
                  }
              }
              return s;

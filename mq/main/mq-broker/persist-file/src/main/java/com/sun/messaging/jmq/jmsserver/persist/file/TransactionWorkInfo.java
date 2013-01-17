@@ -173,7 +173,7 @@ class TransactionWorkInfo {
 			logger.log(Logger.DEBUG,msg);
 		}
 
-		if (!Globals.isMinimumWrites()) {
+		if (!Globals.isMinimumWritesFileStore()) {
 			synchronized (vrfile) {
 				vrecord = (VRecordRAF) vrfile.allocate(bufsize);
 

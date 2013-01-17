@@ -1084,6 +1084,9 @@ public class HAMonitorServiceImpl implements HAMonitorService, ClusterListener
                     logger.log(Logger.INFO, BrokerResources.I_TAKEOVER_OK,
                                             tracker.getTargetName());
 
+                    mbus.postTakeover(tracker.getTargetName(),
+                                      tracker.getStoreSessionUID(), false, false);
+
                     if (Globals.getStore().getPartitionModeEnabled()) {
 
                         UID uid = null;
@@ -1298,8 +1301,8 @@ public class HAMonitorServiceImpl implements HAMonitorService, ClusterListener
                             takeoverBy = bkrInfo.getTakeoverBrokerID();
                         }
 
-                        if ( state == BrokerState.FAILOVER_STARTED ||
-                             state == BrokerState.FAILOVER_PENDING ||
+                        if ( state == BrokerState.FAILOVER_PENDING ||
+                             state == BrokerState.FAILOVER_STARTED ||
                              state == BrokerState.FAILOVER_COMPLETE ) {
                             if (takeoverBy != null) {
                                 logger.log(Logger.INFO,
@@ -1309,13 +1312,14 @@ public class HAMonitorServiceImpl implements HAMonitorService, ClusterListener
                             } else {
                                 logger.log(Logger.ERROR,
                                     BrokerResources.I_NOT_TAKEOVER_BKR);
-                            }
+                            } 
+                        } else if (state == BrokerState.OPERATING && takeoverBy == null) {
+                            logger.logStack(Logger.INFO, BrokerResources.
+                                I_UNABLE_GET_LOCK_ABORT_TAKEOVER, cb.getBrokerName(), ex);
                         } else {
-                            logger.logStack(Logger.ERROR,
-                                BrokerResources.E_UNABLE_TO_TAKEOVER_BKR,
-                                brokerName,
-                                "Takeover lock error (state=" + state +
-                                ", takeoverBroker=" + takeoverBy + ")", ex);
+                            logger.logStack(Logger.WARNING, BrokerResources.
+                                I_UNABLE_GET_LOCK_ABORT_TAKEOVER, cb.getBrokerName()+
+                                "["+state+"]TAKEOVER_BROKER="+takeoverBy, ex);
                         }
 
                         try {
@@ -1341,15 +1345,19 @@ public class HAMonitorServiceImpl implements HAMonitorService, ClusterListener
                     cb.setBrokerIsUp(false, dbroker.brokerSession, null);
                     if (throwex) throw ex;
                 } finally {
-                    mbus.postTakeover(tracker.getTargetName(),
-                                      (takeoverComplete ? tracker.getStoreSessionUID():
-                                                          tracker.getDownStoreSessionUID()),
-                                      !takeoverComplete);
-                    if (tracker.getStage() < TakingoverTracker.AFTER_DB_SWITCH_OWNER) {
-                        takingoverTargets.remove(tracker);
-                    }
-                    if (translist != null) {
-                        translist.postProcess();
+                    try {
+                        mbus.postTakeover(tracker.getTargetName(),
+                            (takeoverComplete ? tracker.getStoreSessionUID():
+                                            tracker.getDownStoreSessionUID()),
+                            !takeoverComplete, true);
+                    } finally {
+                        if (tracker.getStage() < 
+                            TakingoverTracker.AFTER_DB_SWITCH_OWNER) {
+                            takingoverTargets.remove(tracker);
+                        }
+                        if (translist != null) {
+                            translist.postProcess();
+                        }
                     }
                 }
             }

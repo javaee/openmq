@@ -876,10 +876,11 @@ class BrokerDAOImpl extends BaseDAOImpl implements BrokerDAO {
             pstmt.setLong( 6, lastHeartbeat );
 
             if ( pstmt.executeUpdate() != 1 ) {
+                HABrokerInfo binfo = getBrokerInfo( conn, targetBrokerID );
                 String errorMsg = br.getKString(
                     BrokerResources.E_UNABLE_TO_ACQUIRE_TAKEOVER_LOCK, targetBrokerID );
                 TakeoverLockException ex = new TakeoverLockException( errorMsg );
-                ex.setBrokerInfo( bkrInfo ); // Store broker info
+                ex.setBrokerInfo( binfo ); // Store broker info
                 throw ex;
             }
         } catch ( Exception e ) {

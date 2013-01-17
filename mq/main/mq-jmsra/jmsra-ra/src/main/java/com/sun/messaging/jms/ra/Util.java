@@ -42,6 +42,8 @@ package com.sun.messaging.jms.ra;
 
 import javax.resource.spi.security.PasswordCredential;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -323,5 +325,20 @@ public class Util
         }
     }
 
+    public static Object jndiLookup(String jndiName) throws NamingException {
+        InitialContext ic = null;
+        Object obj = null;
+        try {
+            ic = new InitialContext();
+            obj = ic.lookup(jndiName);
+        } finally {
+            if (ic != null) {
+                try {
+                    ic.close();
+                } catch (Exception e) {}
+            }
+        }
+        return obj;
+    }
 }
 

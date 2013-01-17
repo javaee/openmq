@@ -54,6 +54,9 @@ import com.sun.messaging.jmq.jmsserver.core.*;
 import com.sun.messaging.jmq.jmsserver.data.TransactionUID;
 import com.sun.messaging.jmq.jmsserver.data.TransactionState;
 import com.sun.messaging.jmq.jmsserver.data.TransactionAcknowledgement;
+import com.sun.messaging.jmq.jmsserver.data.TransactionWork;
+import com.sun.messaging.jmq.jmsserver.data.TransactionWorkMessage;
+import com.sun.messaging.jmq.jmsserver.data.TransactionWorkMessageAck;
 import com.sun.messaging.jmq.jmsserver.data.TransactionBroker;
 import com.sun.messaging.jmq.jmsserver.util.*;
 import com.sun.messaging.jmq.jmsserver.*;
@@ -148,6 +151,8 @@ public class JDBCStore extends Store implements DBConstants, PartitionedStore {
 
     private List<PartitionListener> partitionListeners = 
                           new ArrayList<PartitionListener>();
+    private List<StoreSessionReaperListener> sessionReaperListeners = 
+                          new ArrayList<StoreSessionReaperListener>();
 
     private ReentrantLock partitionLock = new ReentrantLock();
     /**
@@ -230,22 +235,17 @@ public class JDBCStore extends Store implements DBConstants, PartitionedStore {
 
             if ( Globals.getHAEnabled() ) {
                 try {
-                    if (!partitionMode) { //XXX
-                        // Schedule inactive store session reaper for every 24 hrs.
-                        long period = 86400000; // 24 hours
-                        long delay = 60000 + (long)(Math.random() * 240000); // 1 - 5 mins
-                        sessionReaper = new StoreSessionReaperTask(this);
-                        Globals.getTimer().schedule(sessionReaper, delay, period);
-                        if (DEBUG) {
-                            logger.log(Logger.DEBUG,
-                            "Store session reaper task has been successfully scheduled [delay=" +
-                            delay + ", period=" +period + "]" );
-                        }
-                    }
+                    // Schedule inactive store session reaper for every 24 hrs.
+                    long period = 86400000; // 24 hours
+                    long delay = 60000 + (long)(Math.random() * 240000); // 1 - 5 mins
+                    sessionReaper = new StoreSessionReaperTask(this);
+                    Globals.getTimer().schedule(sessionReaper, delay, period);
+                    logger.log(Logger.INFO, br.getKString(
+                               br.I_STORE_SESSION_REAPER_SCHEDULED)+
+                               "[delay="+delay+", period="+period+"]");
                 } catch (IllegalStateException e) {
-                    logger.log(Logger.INFO, BrokerResources.E_INTERNAL_BROKER_ERROR,
-                        "Cannot schedule inactive store session reaper task, " +
-                        "the broker is probably shutting down", e);
+                    logger.logStack(Logger.WARNING, 
+                        br.getKString(br.W_CANNOT_SCHEDULE_STORE_SESSION_REAPER), e);
                 }
             } else {
                 // Lock the tables so that no other processes will access them
@@ -1819,6 +1819,96 @@ public class JDBCStore extends Store implements DBConstants, PartitionedStore {
                 replaycheck = retry.assertShouldRetry( e );
             }
         } while ( true );
+    }
+
+    public void updateTransactionStateWithWork(TransactionUID id, 
+        TransactionState ts, TransactionWork txnwork, boolean sync)
+        throws BrokerException {
+        if (partitionMode) {
+            throw new BrokerException(br.E_INTERNAL_ERROR+
+            " JDBCStore.updateTransactionStateWithWork(): Unexpected call for partition mode");
+        }
+
+        checkClosedAndSetInProgress();
+        try {
+            updateTransactionStateWithWorkInternal(id, ts, txnwork, getStoreSession(), sync);
+        } finally {
+            setInProgress(false);
+        }
+    }
+
+    public void updateTransactionStateWithWorkInternal(TransactionUID tid, 
+        TransactionState ts, TransactionWork txnwork, long storeSessionID, boolean sync)
+        throws BrokerException {
+
+        if (tid == null || ts == null || txnwork == null) {
+            throw new NullPointerException();
+        }
+        if (DEBUG) {
+            logger.log(Logger.INFO,
+            "JDBCStore.updateTransactionStateInternal("+tid+", "+ts+", "+", "+txnwork+", "+sync+")");
+        }
+
+        Connection conn = null;
+        Exception myex = null;
+        try {
+            conn = dbmgr.getConnection(false);
+            Util.RetryStrategy retry = null;
+            do {
+                try {
+                    Iterator<TransactionWorkMessage> itr1 = txnwork.getSentMessages().iterator();
+                    while (itr1.hasNext()) {
+                        TransactionWorkMessage txnmsg = itr1.next();
+                        Packet m = txnmsg.getMessage();
+                        if (m == null) {
+                            continue;
+                        }
+                        daoFactory.getMessageDAO().insert(conn, txnmsg.getDestUID(), 
+                            m, null, null, storeSessionID, m.getTimestamp(), true, false);
+                    }
+                    List<TransactionWorkMessageAck> txnacks = txnwork.getMessageAcknowledgments();
+                    if (txnacks != null) {
+                        Iterator<TransactionWorkMessageAck> itr2 = txnacks.iterator();
+                        while (itr2.hasNext()) {
+                            TransactionWorkMessageAck txnack = itr2.next();
+                            TransactionAcknowledgement ta = txnack.getTransactionAcknowledgement();
+                            if (ta != null) {
+                                daoFactory.getConsumerStateDAO().updateTransaction(conn,
+                                    ta.getSysMessageID(), ta.getStoredConsumerUID(), tid);
+                            }
+                        }
+                    }
+                    daoFactory.getTransactionDAO().updateTransactionState(conn, tid, ts, false);
+                    conn.commit();
+                    return;
+                } catch ( Exception e ) {
+                    if ( retry == null ) {
+                        retry = new Util.RetryStrategy();
+                    }
+                    try {
+                        retry.assertShouldRetry( e, conn );
+                    } catch (RetrySQLRecoverableException ee) {
+                        try {
+                            Util.close(null, null, conn, ee);
+                            conn = dbmgr.getConnection(false);
+                        } catch (Exception eee) {
+                            logger.logStack(Logger.WARNING, eee.getMessage(), eee);
+                            conn = null;
+                            if (e instanceof BrokerException) {
+                                throw (BrokerException)e;
+                            }
+                            throw new BrokerException(e.getMessage(), e);
+                        }
+                    }
+                }
+            } while ( true );
+        } catch (BrokerException e) {
+            myex = e;
+            throw e;
+        } finally {
+            Util.close(null, null, conn, myex);
+        }
+
     }
 
     /**
@@ -4213,15 +4303,26 @@ public class JDBCStore extends Store implements DBConstants, PartitionedStore {
             }
 
             try {
-                StoreSessionDAO sesDAO = store.daoFactory.getStoreSessionDAO();
-                List<Long> reaped = sesDAO.deleteInactiveStoreSession(null);
-                if (reaped.size() == 0) {
-                    store.notifyPartitionRemoved(null);
-                } else {
-                    Iterator<Long> itr = reaped.iterator();
-                    while (itr.hasNext()) {
-                        store.notifyPartitionRemoved(new UID(itr.next()));
+                if (!store.partitionMode) { 
+                    StoreSessionDAO sesDAO = store.daoFactory.getStoreSessionDAO();
+                    List<Long> reaped = sesDAO.deleteInactiveStoreSession(null);
+                    if (reaped.size() == 0) {
+                        store.notifyPartitionRemoved(null, null);
+                    } else {
+                        Iterator<Long> itr = reaped.iterator();
+                        while (itr.hasNext()) {
+                            store.notifyPartitionRemoved(new UID(itr.next()), null);
+                        }
                     }
+                }
+                List<StoreSessionReaperListener> moretasks = null;
+                synchronized(store.sessionReaperListeners) {
+                    moretasks = new ArrayList<StoreSessionReaperListener>(
+                                    store.sessionReaperListeners);
+                }
+                Iterator<StoreSessionReaperListener> itr = moretasks.iterator();
+                while (itr.hasNext()) {
+                    itr.next().runStoreSessionTask();
                 }
             } catch (Exception e) {
                 logger.logStack( Logger.ERROR,
@@ -4943,7 +5044,7 @@ public class JDBCStore extends Store implements DBConstants, PartitionedStore {
                     String emsg = "Departure partition "+partitionID+" does not exist in this broker";
                     throw new BrokerException(emsg, Status.NOT_FOUND);
                 }
-                notifyPartitionRemoved(partitionID);
+                notifyPartitionRemoved(partitionID, targetBrokerID); //XXX
                 if (!pstore.isClosed()) {
                     throw new BrokerException("Departure partition "+partitionID+ " not closed");
                 }
@@ -4952,7 +5053,7 @@ public class JDBCStore extends Store implements DBConstants, PartitionedStore {
             do {
                 try {
                     daoFactory.getStoreSessionDAO().moveStoreSession(
-                                       null, partitionID.longValue(), targetBrokerID);
+                        null, partitionID.longValue(), targetBrokerID);
                     return;
                 } catch ( Exception e ) {
                     if ( retry == null ) {
@@ -5148,11 +5249,11 @@ public class JDBCStore extends Store implements DBConstants, PartitionedStore {
         }
     }
 
-    protected void notifyPartitionRemoved(UID partitionID) {
+    protected void notifyPartitionRemoved(UID partitionID, String removedToBroker) {
         synchronized(partitionStores) {
             Iterator<PartitionListener> itr =  partitionListeners.iterator();
             while (itr.hasNext()) {
-                itr.next().partitionRemoved(partitionID, this);
+                itr.next().partitionRemoved(partitionID, this, removedToBroker);
             }
         }
     }
@@ -5194,6 +5295,40 @@ public class JDBCStore extends Store implements DBConstants, PartitionedStore {
         try {
             synchronized(partitionStores) {
                 partitionListeners.remove(listener);
+            }
+
+        } finally {
+            setInProgress(false);
+        }
+    }
+
+    /**
+     * @exception BrokerException
+     */
+    @Override
+    public void addStoreSessionReaperListener(StoreSessionReaperListener listener)
+    throws BrokerException {
+        checkClosedAndSetInProgress();
+        try {
+            synchronized(sessionReaperListeners) {
+                sessionReaperListeners.add(listener);
+            }
+
+        } finally {
+            setInProgress(false);
+        }
+    }
+
+    /**
+     * @exception BrokerException
+     */
+    @Override
+    public void removeStoreSessionReaperListener(StoreSessionReaperListener listener)
+    throws BrokerException {
+        checkClosedAndSetInProgress();
+        try {
+            synchronized(sessionReaperListeners) {
+                sessionReaperListeners.remove(listener);
             }
 
         } finally {

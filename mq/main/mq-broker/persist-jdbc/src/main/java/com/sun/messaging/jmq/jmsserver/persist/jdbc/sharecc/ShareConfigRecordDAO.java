@@ -77,7 +77,7 @@ public interface ShareConfigRecordDAO extends BaseDAO {
      * UID - global unique identifier for this record
      * RECORD - configuration Record
      * CREATED_TS - local timestamp when the entry was created
-     * FLAG - a reserved flag field 
+     * FLAG - a reserved flag field (current only last 2 bits used - for durable sub share type)  
      */
     public static final String TABLE = "MQSHARECC";
     public static final String TABLE_NAME_PREFIX = TABLE +

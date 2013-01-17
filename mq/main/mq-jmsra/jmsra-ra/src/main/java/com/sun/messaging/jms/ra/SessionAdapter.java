@@ -384,7 +384,7 @@ implements javax.jms.Session,
 			String sharedSubscriptionName, String messageSelector,
 			boolean noLocal) throws JMSException {
             return xas.createSharedConsumer(
-                topic, sharedSubscriptionName, messageSelector, false);
+                topic, sharedSubscriptionName, messageSelector, noLocal);
 	}
 
         @Override 

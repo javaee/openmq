@@ -98,7 +98,7 @@ class InterestStore {
 	try {
 	    // safe=false; data synchronization is controlled by caller
 	    interestMap = new PHashMap(backingFile, filesize.getBytes(),
-                false, clear, Globals.isMinimumWrites(), Broker.isInProcess());
+                false, clear, Globals.isMinimumWritesFileStore(), Broker.isInProcess());
 	} catch (IOException e) {
 	    throw new BrokerException(br.getString(
 					br.X_LOAD_INTERESTS_FAILED), e);
@@ -165,7 +165,8 @@ class InterestStore {
 	backingFile = new File(topDir, BASENAME);
 	try {
 	    // safe=false; reset=clear
-	    olddata = new PHashMap(oldFile, false, clear, Globals.isMinimumWrites(), Broker.isInProcess());
+	    olddata = new PHashMap(oldFile, false, clear, 
+                          Globals.isMinimumWritesFileStore(), Broker.isInProcess());
 	} catch (IOException e) {
 	    logger.log(logger.ERROR, br.X_UPGRADE_INTERESTS_FAILED,
 			oldFile, backingFile, e);
@@ -217,8 +218,8 @@ class InterestStore {
 
 	try {
 	    // safe=false; reset=false
-	    interestMap = new PHashMap(backingFile, oldFile.length(),
-                false, false, Globals.isMinimumWrites(), Broker.isInProcess());
+	    interestMap = new PHashMap(backingFile, oldFile.length(), false, false,
+                              Globals.isMinimumWritesFileStore(), Broker.isInProcess());
 	} catch (IOException e) {
 	    logger.log(logger.ERROR, br.X_UPGRADE_INTERESTS_FAILED,
 			oldFile, backingFile, e);

@@ -91,9 +91,8 @@ public class GenerateUIDHandler extends PacketHandler
           try {
               props = msg.getProperties();
           } catch (Exception ex) {
-            logger.log(Logger.INFO,"Internal Error: unable to retrieve "+
-                " properties from generateUID message " + msg, ex);
-            props = new Hashtable();
+              logger.logStack(Logger.WARNING, "GEN-UID Packet.getProperties()", ex);
+              props = new Hashtable();
           }
 
           Integer value = null; 

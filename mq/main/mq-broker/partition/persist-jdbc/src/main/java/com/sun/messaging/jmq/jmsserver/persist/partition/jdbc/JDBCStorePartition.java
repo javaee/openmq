@@ -52,6 +52,7 @@ import com.sun.messaging.jmq.jmsserver.core.ConsumerUID;
 import com.sun.messaging.jmq.jmsserver.core.Destination;
 import com.sun.messaging.jmq.jmsserver.core.DestinationUID;
 import com.sun.messaging.jmq.jmsserver.data.TransactionAcknowledgement;
+import com.sun.messaging.jmq.jmsserver.data.TransactionWork;
 import com.sun.messaging.jmq.jmsserver.data.TransactionBroker;
 import com.sun.messaging.jmq.jmsserver.data.TransactionState;
 import com.sun.messaging.jmq.jmsserver.data.TransactionUID;
@@ -674,12 +675,27 @@ public class JDBCStorePartition extends StorePartition {
      * @exception NullPointerException	if <code>txnID</code> is
      *			<code>null</code>
      */
+    @Override
     public void updateTransactionState(TransactionUID txnID,
         TransactionState state, boolean sync) throws BrokerException {
 
         checkClosedAndSetInProgress();
         try {
             ((JDBCStore)parent).updateTransactionStateInternal(txnID, state, sync);
+        } finally {
+            setInProgress(false);
+        }
+    }
+
+    @Override
+    public void updateTransactionStateWithWork(TransactionUID txnID,
+        TransactionState state, TransactionWork txnwork, boolean sync)
+        throws BrokerException {
+
+        checkClosedAndSetInProgress();
+        try {
+            ((JDBCStore)parent).updateTransactionStateWithWorkInternal(
+                txnID, state, txnwork, getPartitionID().longValue(), sync);
         } finally {
             setInProgress(false);
         }

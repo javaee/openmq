@@ -157,12 +157,14 @@ public class HeartbeatImpl implements Heartbeat {
 
     /**
      */
-    public synchronized void
+    public synchronized boolean 
     removeEndpoint(Object key, InetSocketAddress endpoint) throws IOException {
         endpoints.remove(key);
         if (!endpoints.containsValue(endpoint)) {
             sender.remove(endpoint);
+            return true;
         }
+        return false; 
     }
 
 

@@ -60,6 +60,7 @@ import com.sun.messaging.jmq.jmsserver.core.DestinationUID;
 import com.sun.messaging.jmq.jmsserver.data.BaseTransaction;
 import com.sun.messaging.jmq.jmsserver.data.ClusterTransaction;
 import com.sun.messaging.jmq.jmsserver.data.TransactionAcknowledgement;
+import com.sun.messaging.jmq.jmsserver.data.TransactionWork;
 import com.sun.messaging.jmq.jmsserver.data.TransactionBroker;
 import com.sun.messaging.jmq.jmsserver.data.TransactionState;
 import com.sun.messaging.jmq.jmsserver.data.TransactionUID;
@@ -515,6 +516,13 @@ public interface PartitionedStore {
      */
     public void updateTransactionState(TransactionUID txnID,
         TransactionState state, boolean sync) throws IOException, BrokerException;
+
+    /**
+     * Update transaction state and at same time persist transaction work
+     */
+    public void updateTransactionStateWithWork(TransactionUID txnID,
+        TransactionState state, TransactionWork txnwork, boolean sync)
+        throws IOException, BrokerException;
 
     /**
      * Update transaction's participant brokers for the specified cluster

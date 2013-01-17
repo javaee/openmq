@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -301,10 +301,13 @@ public class JMSContextImpl implements JMSContext, Traceable {
 		initializeForNewConnection();
 	}
 	
+	public JMSContextImpl() {
+	}
+
 	/**
 	 * Initialize a newly-created JMSContext that has created a new Connection
 	 */
-	private void initializeForNewConnection() {
+	protected void initializeForNewConnection() {
 		contextSet = new HashSet<JMSContext>();
 		contextSet.add(this);
 	}
@@ -826,7 +829,7 @@ public class JMSContextImpl implements JMSContext, Traceable {
 		disallowSetClientID();
 		
 		try {
-			return session.createBrowser(queue);
+			return session.createBrowser(queue, messageSelector);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);	
 		} catch (InvalidSelectorException e) {
@@ -921,11 +924,20 @@ public class JMSContextImpl implements JMSContext, Traceable {
      * Check that setClientID is allowed to be called. 
      * If it isn't, log and throw a IllegalStateRuntimeException.
      */
-    protected void checkSetClientIDAllowed() {
-        if ( allowToSetClientID == false ) {
+    private void checkSetClientIDAllowed() {
+        boolean throwex = false;
+        JMSException ex = null;
+        try {
+            if (allowToSetClientID == false || connection.getClientID() != null) {
+                throwex = true;
+            }
+        } catch (JMSException e) {
+            ex = e;
+        }
+        if (throwex || ex != null) {
             String errorString = AdministeredObject.cr.getKString(ClientResources.X_SET_CLIENT_ID);
             IllegalStateRuntimeException isre = new javax.jms.IllegalStateRuntimeException
-                      (errorString, ClientResources.X_SET_CLIENT_ID);
+                      (errorString, ClientResources.X_SET_CLIENT_ID, ex);
             ExceptionHandler.throwJMSRuntimeException(isre);
         }
     }
@@ -978,8 +990,12 @@ public class JMSContextImpl implements JMSContext, Traceable {
 		}
 	}
 
-	protected Session getSession() {
+	protected Session _getSession() {
 		return session;
+	}
+	
+	public Connection _getConnection(){
+		return connection;
 	}
 	
 }

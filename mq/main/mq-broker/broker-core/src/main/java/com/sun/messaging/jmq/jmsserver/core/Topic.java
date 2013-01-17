@@ -819,7 +819,7 @@ public class Topic extends Destination
                setMaxSharedConsumers(((Integer)m.get(
                      MAX_SHARE_CONSUMERS)).intValue());
            } catch (Exception ex) {
-               logger.log(Logger.INFO,"Internal Error ", ex);
+               logger.logStack(Logger.WARNING, "setMaxSharedConsumers()", ex);
            }
 
         }
@@ -828,7 +828,7 @@ public class Topic extends Destination
                setSharedFlowLimit(((Integer)m.get(
                      SHARED_PREFETCH)).intValue());
            } catch (Exception ex) {
-               logger.log(Logger.INFO,"Internal Error ", ex);
+               logger.logStack(Logger.WARNING, "setSharedFlowLimit()", ex);
            }
 
         }

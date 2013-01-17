@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -111,6 +111,8 @@ public class Globals extends CommonGlobals
     /*---------------------------------------------
      *          global static variables
      *---------------------------------------------*/
+
+    public static final String IMQ = "imq";
 
     /**
      * system property name for the non-editable JMQ home location

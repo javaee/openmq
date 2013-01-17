@@ -961,9 +961,14 @@ public class DBConnectionPool {
         }
 
         if (!dedicated || reapCnt != 0) {
-            logger.log(logger.INFO, br.getKString(
-                       br.I_DB_REAP_EXCESSIVE_CONNS,
-                       Integer.valueOf(reapCnt))+toString());
+            boolean log = true; 
+            if (reapCnt == 0 && !(dbmgr.getDEBUG() || DEBUG)) {
+                log = false;
+            }
+            if (log) {
+                logger.log(logger.INFO, br.getKString(
+                br.I_DB_REAP_EXCESSIVE_CONNS, Integer.valueOf(reapCnt))+toString());
+            }
         }
 
         if (!timeoutIdle) { 

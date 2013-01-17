@@ -594,8 +594,8 @@ public  class ClusterBroadcaster implements ClusterBroadcast,
            String brokerHost, UID brokerSession) throws BrokerException {
         protocol.preTakeover(brokerID, storeSession, brokerHost, brokerSession);
     }
-    public void postTakeover(String brokerID, UID storeSession, boolean aborted) {
-        protocol.postTakeover(brokerID, storeSession, aborted);
+    public void postTakeover(String brokerID, UID storeSession, boolean aborted, boolean notify) {
+        protocol.postTakeover(brokerID, storeSession, aborted, notify);
     }
  
     //-----------------------------------------------

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -916,9 +916,34 @@ public class TransactionList implements ClusterListener, PartitionListener
         detachedTxnReaper.addDetachedTID(tid);
     }
 
-    public void addMessage(TransactionUID id, SysMessageID sysid)
+    public void addMessage(PacketReference ref)
         throws BrokerException {
-        addMessage(id, sysid, false);
+
+        TransactionUID tid = ref.getTransactionID();
+        if (tid == null) {
+            return;
+        }
+        SysMessageID sysid = ref.getSysMessageID(); 
+
+        boolean delaypersist = false;
+        if (ref.isPersistent() && !ref.getNeverStore() &&
+            Globals.isMinimumPersistLevel2()) {
+            TransactionState ts = retrieveState(tid, true);
+            if (ts == null) {
+                throw new BrokerException(Globals.getBrokerResources().getKString(
+                    br.X_RECEIVED_MSG_WITH_UNKNOWN_TID, sysid, tid), Status.GONE);
+            }
+            if (ts.getType() != AutoRollbackType.NEVER) {
+                delaypersist = true;
+            }
+        }
+        if (Globals.isNewTxnLogEnabled()) {
+            delaypersist = true;
+        }
+        if (!delaypersist) {
+            ref.store(); 
+        }
+        addMessage(tid, sysid, false);
     }
 
     public void addMessage(TransactionUID id, SysMessageID sysid, boolean anyState)
@@ -1058,19 +1083,19 @@ public class TransactionList implements ClusterListener, PartitionListener
      * @return true if XA transaction
      */
     public boolean addAcknowledgement(TransactionUID tid,
-        SysMessageID sysid, ConsumerUID id, ConsumerUID sid)
-        throws BrokerException
-    {
+        SysMessageID sysid, ConsumerUID intid, ConsumerUID sid)
+        throws BrokerException {
+
         PacketReference pr = DL.get(null, sysid);
         if (pr == null) { 
             if (!DL.isLocked(pstore, sysid)) {
             throw new BrokerException(Globals.getBrokerResources().getKString(
             BrokerResources.I_ACK_FAILED_MESSAGE_GONE, 
-            ""+sysid+"["+id+":"+sid+"]TUID="+tid), Status.CONFLICT);
+            ""+sysid+"["+intid+":"+sid+"]TUID="+tid), Status.CONFLICT);
             } else {
             throw new BrokerException(Globals.getBrokerResources().getKString(
             BrokerResources.I_ACK_FAILED_MESSAGE_LOCKED, 
-            ""+sysid+"["+id+":"+sid+"]TUID="+tid), Status.CONFLICT);
+            ""+sysid+"["+intid+":"+sid+"]TUID="+tid), Status.CONFLICT);
             }
         }
         boolean persist = sid.shouldStore() && pr != null &&
@@ -1078,11 +1103,11 @@ public class TransactionList implements ClusterListener, PartitionListener
                           (!DL.isPartitionMode() || 
                            pr.getPartitionedStore().getPartitionID().
                                equals(pstore.getPartitionID()));
-        return addAcknowledgement(tid, sysid, id, sid, false, persist);
+        return addAcknowledgement(tid, sysid, intid, sid, false, persist);
     }
 
     public boolean addAcknowledgement(TransactionUID tid, 
-        SysMessageID sysid, ConsumerUID id, ConsumerUID sid,
+        SysMessageID sysid, ConsumerUID intid, ConsumerUID sid,
         boolean anystate, boolean persist)
         throws BrokerException
     {
@@ -1103,9 +1128,11 @@ public class TransactionList implements ClusterListener, PartitionListener
                 Status.GONE);
         }
 
+        TransactionState ts = null;
         // lock TransactionInformation object
         synchronized (info) {
-            int state = info.getState().getState();
+            ts = info.getState();
+            int state = ts.getState();
             if (state == TransactionState.TIMED_OUT) {
                 // bad state
                 throw new BrokerException(Globals.getBrokerResources().getString(
@@ -1122,11 +1149,18 @@ public class TransactionList implements ClusterListener, PartitionListener
                     Status.PRECONDITION_FAILED);
 
             }
-            info.addConsumedMessage(sysid, id, sid);
+            info.addConsumedMessage(sysid, intid, sid);
             isXA = info.getState().isXA();
         }
 
-        if (persist) {
+        boolean delaypersist = false;
+        if ((ts.getType() != AutoRollbackType.NEVER &&
+             Globals.isMinimumPersistLevel2()) || 
+            Globals.isNewTxnLogEnabled()) {
+            delaypersist = true;
+        }
+
+        if (persist && !delaypersist) {
             if (fi.FAULT_INJECTION) { 
                 try {
                 fi.checkFaultAndThrowBrokerException(FaultInjection.FAULT_TXN_ACK_1_3, null);
@@ -1136,7 +1170,7 @@ public class TransactionList implements ClusterListener, PartitionListener
                 }
             }
             pstore.storeTransactionAck(tid, 
-                 new TransactionAcknowledgement(sysid, id, sid), false);
+                 new TransactionAcknowledgement(sysid, intid, sid), false);
         }
         return isXA;
     }
@@ -1355,41 +1389,186 @@ public class TransactionList implements ClusterListener, PartitionListener
         return ti.getState();
     }
 
-    public TransactionState
-           updateState(TransactionUID id, int state, boolean persist)
-           throws BrokerException {
-        return updateState(id, state, TransactionState.NULL, 
-                           false, TransactionState.NULL, persist);
+    public TransactionWork[] getTransactionWork(TransactionUID tid)
+    throws BrokerException {
+
+        List plist = retrieveSentMessages(tid);
+        HashMap cmap = retrieveConsumedMessages(tid);
+        HashMap sToCmap = retrieveStoredConsumerUIDs(tid);
+
+        TransactionWork localwork = new TransactionWork();
+        TransactionWork remotework = new TransactionWork();
+        TransactionWork[] txnworks = new TransactionWork[2];
+        txnworks[0] = localwork;
+        txnworks[1] = remotework;
+
+        //iterate produced messages
+        for (int i = 0; plist != null && i < plist.size(); i++) {
+            SysMessageID sysid = (SysMessageID) plist.get(i);
+            PacketReference ref = DL.get(pstore, sysid);
+            if (ref == null || ref.isDestroyed()) {
+                logger.log(Logger.WARNING,
+                    Globals.getBrokerResources().getKString(
+                    BrokerResources.W_MSG_REMOVED_BEFORE_SENDER_COMMIT, sysid));
+                    continue;
+            }
+            if (ref.isPersistent() && !ref.getNeverStore() && !ref.isStored()) {
+                TransactionWorkMessage txnmsg = new TransactionWorkMessage();
+                Destination dest = ref.getDestination();
+                txnmsg.setDestUID(dest.getDestinationUID());
+                txnmsg.setPacketReference(ref);
+                localwork.addMessage(txnmsg);
+            }
+        }
+
+        //iterate consumed messages
+        if (cmap != null && cmap.size() > 0) {
+            Iterator itr = cmap.entrySet().iterator();
+            while (itr.hasNext()) {
+                Map.Entry entry = (Map.Entry) itr.next();
+                SysMessageID sysid = (SysMessageID) entry.getKey();
+                List interests = (List) entry.getValue();
+                if (sysid == null) {
+                    continue;
+                }
+                PacketReference ref = DL.get(null, sysid);
+                if (ref == null) {
+                    ConsumerUID intid = null;
+                    ConsumerUID sid = null;
+                    if (interests.size() > 0) {
+                        intid = (ConsumerUID)interests.get(0);
+                        sid = (ConsumerUID)sToCmap.get(intid);
+                        if (sid == null) {
+                            sid = intid;
+                        }
+                    }
+                    if (!DL.isLocked(pstore, sysid)) {
+                         throw new BrokerException(Globals.getBrokerResources().getKString(
+                         BrokerResources.I_ACK_FAILED_MESSAGE_GONE,
+                         ""+sysid+"["+intid+":"+sid+"]TUID="+tid), Status.CONFLICT);
+                    } else {
+                        throw new BrokerException(Globals.getBrokerResources().getKString(
+                            BrokerResources.I_ACK_FAILED_MESSAGE_LOCKED,
+                            ""+sysid+"["+intid+":"+sid+"]TUID="+tid), Status.CONFLICT);
+                    }
+                }
+                Destination[] ds = DL.getDestination(ref.getPartitionedStore(),
+                                                     ref.getDestinationUID());
+                Destination dst = ds[0];
+
+                for (int i = 0; i < interests.size(); i++) {
+                    ConsumerUID intid = (ConsumerUID) interests.get(i);
+                    ConsumerUID sid = (ConsumerUID) sToCmap.get(intid);
+                    if (sid == null) {
+                        sid = intid;
+                    }
+                    if (sid.shouldStore() && ref.isPersistent()) {
+                        TransactionAcknowledgement ta = new TransactionAcknowledgement(sysid, intid, sid);
+                        if (ref.isLocal() &&
+                            (!DL.isPartitionMode() ||
+                             ref.getPartitionedStore().getPartitionID().equals(pstore.getPartitionID()))) {
+                            if (ref.isDestroyed() || ref.isInvalid()) {
+                                // already been deleted .. ignore
+                                continue;
+                            }
+                            TransactionWorkMessageAck txnack = new TransactionWorkMessageAck();
+                            txnack.setConsumerID(sid);
+                            txnack.setDest(dst.getDestinationUID());
+                            txnack.setSysMessageID(sysid);
+                            txnack.setTransactionAcknowledgement(ta);
+                            localwork.addMessageAcknowledgement(txnack);
+                        } else {
+                            TransactionWorkMessageAck txnack = new TransactionWorkMessageAck();
+                            txnack.setConsumerID(sid);
+                            txnack.setDest(dst.getDestinationUID());
+                            txnack.setSysMessageID(sysid);
+                            txnack.setTransactionAcknowledgement(ta);
+                            remotework.addMessageAcknowledgement(txnack);
+                        }
+                    }
+                }
+            }
+        }
+        return txnworks;
     }
 
     public TransactionState
-           updateState(TransactionUID id, int state, boolean onephasePrepare, boolean persist)
-           throws BrokerException {
-        return updateState(id, state, TransactionState.NULL, 
-                           onephasePrepare, TransactionState.NULL, persist);
+    updateState(TransactionUID tid, int state, boolean persist)
+    throws BrokerException {
+        return updateState(tid, state, TransactionState.NULL, 
+                           false, TransactionState.NULL, persist, null);
+    }
+
+    public TransactionState
+    updateStateCommitWithWork(TransactionUID tid, int state, boolean persist)
+    throws BrokerException {
+
+        if (state != TransactionState.COMMITTED) {
+            throw new BrokerException("Unexpected call TransactionList.updateStateCommitWithWork(tid="+
+                                       tid+", "+TransactionState.toString(state)+", "+persist+")");
+        }    
+        TransactionWork[] txnworks = getTransactionWork(tid);
+        TransactionState ts = updateState(tid, state, TransactionState.NULL, 
+                                  false, TransactionState.NULL, persist, txnworks[0]);
+
+        Iterator<TransactionWorkMessage> itr = txnworks[0].getSentMessages().iterator();
+        while (itr.hasNext()) {
+            PacketReference ref = itr.next().getPacketReference();
+            ref.setIsStored();
+        }
+        return ts;
+    }
+
+    public TransactionState
+    updateState(TransactionUID tid, int state, boolean onephasePrepare, boolean persist)
+    throws BrokerException {
+        return updateState(tid, state, TransactionState.NULL, 
+                           onephasePrepare, TransactionState.NULL, persist, null);
+    }
+
+    public TransactionState 
+    updateStatePrepareWithWork(TransactionUID tid, int state, 
+                               boolean onephasePrepare, boolean persist)
+                               throws BrokerException {
+
+        if (state != TransactionState.PREPARED) {
+            throw new BrokerException("Unexpected call TransactionList.updateStatePrepareWithWork(tid="+
+                          tid+", "+TransactionState.toString(state)+", "+onephasePrepare+", "+persist+")");
+        }    
+        TransactionWork[] txnworks = getTransactionWork(tid);
+        TransactionState ts = updateState(tid, state, TransactionState.NULL, 
+                                  onephasePrepare, TransactionState.NULL, persist, txnworks[0]);
+
+        Iterator<TransactionWorkMessage> itr = txnworks[0].getSentMessages().iterator();
+        while (itr.hasNext()) {
+            PacketReference ref = itr.next().getPacketReference();
+            ref.setIsStored();
+        }
+        return ts;
     }
 
     // Update the state of a transaction.
     // If persist is true, then the state is updated in the persistent store
     // as well.
     public TransactionState
-           updateState(TransactionUID id, int state, int oldstate, boolean persist)
-           throws BrokerException {
-        return updateState(id, state, oldstate, false, TransactionState.NULL, persist);
+    updateState(TransactionUID tid, int state, int oldstate, boolean persist)
+    throws BrokerException {
+        return updateState(tid, state, oldstate, false, TransactionState.NULL, persist, null);
     }
 
     public TransactionState
-           updateState(TransactionUID id, int state, boolean onephasePrepare, 
-                       int failedToState,  boolean persist)
-           throws BrokerException {
-        return updateState(id, state, TransactionState.NULL, 
-                           onephasePrepare, failedToState, persist);
+    updateState(TransactionUID tid, int state, boolean onephasePrepare, 
+                int failedToState,  boolean persist)
+                throws BrokerException {
+        return updateState(tid, state, TransactionState.NULL, 
+                           onephasePrepare, failedToState, persist, null);
     }
 
     public TransactionState
-           updateState(TransactionUID id, int state, int oldstate, 
-                       boolean onephasePrepare, int failToState, boolean persist)
-           throws BrokerException {
+    updateState(TransactionUID id, int state, int oldstate, 
+                boolean onephasePrepare, int failToState, 
+                boolean persist, TransactionWork txnwork)
+                throws BrokerException {
 
         TransactionInformation ti = null;
 
@@ -1464,7 +1643,11 @@ public class TransactionList implements ClusterListener, PartitionListener
             }
 
             try {
-                pstore.updateTransactionState(id, ts, Destination.PERSIST_SYNC);
+                if (txnwork == null) {
+                    pstore.updateTransactionState(id, ts, Destination.PERSIST_SYNC);
+                } else {
+                    pstore.updateTransactionStateWithWork(id, ts, txnwork, Destination.PERSIST_SYNC);
+                }
             } catch (IOException e) {
                 throw new BrokerException(null, e);
             }
@@ -2861,7 +3044,7 @@ public class TransactionList implements ClusterListener, PartitionListener
     /**
      * @param partitionID the partition id
      */
-    public void partitionRemoved(UID partitionID, Object source) {
+    public void partitionRemoved(UID partitionID, Object source, Object destinedTo) {
     }
 }
 

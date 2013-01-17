@@ -345,8 +345,24 @@ javax.jms.TopicConnection, JMSRAConnectionAdapter, ContextableConnection {
 		String code = "2";
 		checkClosed();
 		throw new com.sun.messaging.jms.JMSException("MQRA:CA:Unsupported-createDurableConnectionConsumer", code, uoex);
-		// return xac.createDurableConnectionConsumer(topic, subscriptionName,
-		// messageSelector, sessionPool, maxMessages);
+	}
+	
+	@Override
+	public ConnectionConsumer createSharedConnectionConsumer(Topic topic, String subscriptionName,
+			String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+		UnsupportedOperationException uoex = new UnsupportedOperationException("createSharedConnectionConsumer");
+		String code = "2";
+		checkClosed();
+		throw new com.sun.messaging.jms.JMSException("MQRA:CA:Unsupported-createSharedConnectionConsumer", code, uoex);
+	}
+
+	@Override
+	public ConnectionConsumer createSharedDurableConnectionConsumer(Topic topic, String subscriptionName,
+			String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+		UnsupportedOperationException uoex = new UnsupportedOperationException("createSharedDurableConnectionConsumer");
+		String code = "2";
+		checkClosed();
+		throw new com.sun.messaging.jms.JMSException("MQRA:CA:Unsupported-createSharedDurableConnectionConsumer", code, uoex);
 	}
 
 	/*

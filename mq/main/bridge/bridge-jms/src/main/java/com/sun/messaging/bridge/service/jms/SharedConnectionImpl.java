@@ -109,6 +109,7 @@ public class SharedConnectionImpl extends SharedConnection
     _conn.close();
     }
     
+	@Override
     public ConnectionConsumer
     createConnectionConsumer(Destination destination,
                              String messageSelector,
@@ -119,7 +120,8 @@ public class SharedConnectionImpl extends SharedConnection
                                           sessionPool, maxMessages);
     }
 
-    public ConnectionConsumer
+	@Override
+	public ConnectionConsumer
     createDurableConnectionConsumer(Topic topic,
                                     String subscriptionName,
                                     String messageSelector,
@@ -129,4 +131,16 @@ public class SharedConnectionImpl extends SharedConnection
     return _conn.createDurableConnectionConsumer(topic, subscriptionName, 
                                 messageSelector, sessionPool, maxMessages);
     }
+    
+	@Override
+	public ConnectionConsumer createSharedConnectionConsumer(Topic topic, String subscriptionName,
+			String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+		return _conn.createSharedConnectionConsumer(topic, subscriptionName, messageSelector, sessionPool, maxMessages);
+	}
+
+	@Override
+	public ConnectionConsumer createSharedDurableConnectionConsumer(Topic topic, String subscriptionName,
+			String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+		return _conn.createSharedDurableConnectionConsumer(topic, subscriptionName, messageSelector, sessionPool, maxMessages);
+	}
 }

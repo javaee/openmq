@@ -136,6 +136,8 @@ public class ClusterSubscriptionInfo
                 String clientID = subscription.getClientID();
                 gp.putProp("I", (clientID == null ? "":clientID));
                 gp.putProp("M", Boolean.valueOf(true));
+                gp.putProp("shared", Boolean.valueOf(subscription.getShared()));
+                gp.putProp("jmsshared", Boolean.valueOf(subscription.getJMSShared()));
             }  else {
                 ChangeRecordInfo cri = subscription.getCurrentChangeRecordInfo(
                                                  ProtocolGlobals.G_NEW_INTEREST);
@@ -287,6 +289,18 @@ public class ClusterSubscriptionInfo
             return null;
         }
         return clientID;
+    }
+
+    //only used for change record
+    public Boolean getShared() {
+        assert ( pkt != null );
+        return (Boolean)pkt.getProp("shared");
+    }
+
+    //only used for change record
+    public Boolean getJMSShared() {
+        assert ( pkt != null );
+        return (Boolean)pkt.getProp("jmsshared");
     }
 
     public String getNDSubscriptionName() {

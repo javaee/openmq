@@ -152,7 +152,8 @@ public class BrokerMonitor
                        try {
                            timer.schedule(task, METRICS_TIME, METRICS_TIME);
                        } catch (IllegalStateException ex) {
-                           Globals.getLogger().log(Logger.INFO,"Internal Error: Shutting down metrics, timer has been canceled", ex);
+                           Globals.getLogger().log(Logger.WARNING, 
+                           "Update metrics timer schedule: "+ex, ex);
                        }
                     }
                 }

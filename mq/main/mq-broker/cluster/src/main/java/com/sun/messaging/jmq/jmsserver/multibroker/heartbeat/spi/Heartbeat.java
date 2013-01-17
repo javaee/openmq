@@ -97,8 +97,9 @@ public interface Heartbeat {
     addEndpoint(Object key, InetSocketAddress iaddr, int dataLength) throws IOException;
 
     /**
+     * @return true if end point, iaddr, is removed
      */
-    void
+    boolean 
     removeEndpoint(Object key, InetSocketAddress iaddr) throws IOException;
 
     /**

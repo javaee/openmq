@@ -1666,7 +1666,7 @@ public class ClusterManagerImpl implements ClusterManager, ConfigListener
    /**
     * @param partitionID the partition id
     */
-   public void partitionRemoved(UID partitionID, Object source) {
+   public void partitionRemoved(UID partitionID, Object source, Object destinedTo) {
        synchronized(supportedSessionMap) {
            if (Globals.getDestinationList().isPartitionMode()) {
                if (partitionID != null) {

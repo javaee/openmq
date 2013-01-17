@@ -53,6 +53,10 @@ public class ChangeRecordInfo {
 
     public static final int FLAG_LOCK = 1; 
 
+    //bits in flag for new interest (durable sub)
+    public static final int SHARED    = 0x00000001;
+    public static final int JMSSHARED = 0x00000002;
+
     private Long seq = null;
     private String uuid = null;
     private String resetUUID = null;
@@ -62,6 +66,7 @@ public class ChangeRecordInfo {
     private boolean isduraAdd = false;
     private long timestamp = 0;
     private boolean isSelectAll = false;
+    private int flag = 0; 
 
     public ChangeRecordInfo() {}
     
@@ -147,6 +152,23 @@ public class ChangeRecordInfo {
     public void setDuraAdd(boolean b) {
         isduraAdd = b;
     }
+
+    public void setFlagBit(int bit) {
+        flag |= bit;
+    }
+
+    public int getFlag() {
+        return flag;
+    }
+    public static String getFlagString(int f) {
+        if ((f & SHARED) == SHARED) {
+            if ((f & JMSSHARED) == JMSSHARED) {
+                return "jms";
+            } 
+            return "mq";
+        }
+        return "";
+    }   
 
     public void setIsSelectAll(boolean b) {
         isSelectAll = b;

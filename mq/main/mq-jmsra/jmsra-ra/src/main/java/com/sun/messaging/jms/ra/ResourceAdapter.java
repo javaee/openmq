@@ -436,7 +436,7 @@ public class ResourceAdapter implements javax.resource.spi.ResourceAdapter,
 	 * {@inheritDoc}
 	 */
 	public void endpointActivation(MessageEndpointFactory endpointFactory, javax.resource.spi.ActivationSpec spec)
-			throws NotSupportedException {
+			throws ResourceException {
 		Object params[] = new Object[2];
 		params[0] = endpointFactory;
 		params[1] = spec;

@@ -98,9 +98,7 @@ public class ClientIDHandler extends PacketHandler
         try {
             props = msg.getProperties();
         } catch (Exception ex) {
-            logger.log(Logger.INFO,"Internal Error: unable to retrieve "+
-                " properties from clientID message " + msg, ex);
-            // JMQClientID props is required
+            logger.logStack(Logger.WARNING, "SET-CLIENTID Packet.getProperties()", ex);
             assert false;
         }
 

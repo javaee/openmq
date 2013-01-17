@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -484,8 +484,16 @@ public class Globals extends CommGlobals
         return StoreManager.isConfiguredCoherenceServer();
     }
 
+    public static boolean isFileStore() {
+        return StoreManager.isConfiguredFileStore();
+    }
+
     public static boolean isBDBStore() {
         return StoreManager.isConfiguredBDBStore();
+    }
+
+    public static boolean isJDBCStore() {
+        return StoreManager.isConfiguredJDBCStore();
     }
 
     public static boolean getBDBREPEnabled() {
@@ -1047,22 +1055,66 @@ public class Globals extends CommGlobals
     /**
      * whether to use minimum write optimisations
      */
-    private static Boolean _minimizeWrites = null;
+    private static Boolean _minimizeWritesFileStore = null;
+    private static Boolean _minimizePersist = null;
+    private static Boolean _minimizePersistLevel2 = null;
 
-    public static final String MINIMIZE_WRITES_PROP =
+    public static final String MINIMIZE_WRITES_FILESTORE_PROP =
         Globals.IMQ + ".persist.file.minimizeWrites";
 
-    public static boolean isMinimumWrites() {
+    public static final String MINIMIZE_PERSIST_PROP =
+        Globals.IMQ + ".persist.minimizeWrites";
 
-        if (_minimizeWrites == null) {
-        	_minimizeWrites = Boolean.valueOf(
-                getConfig().getBooleanProperty(MINIMIZE_WRITES_PROP,false));
-         getLogger().log(Logger.INFO, "imq.persist.file.minimizeWrites="+_minimizeWrites);
+    public static final String MINIMIZE_PERSIST_LEVEL2_PROP =
+        Globals.IMQ + ".persist.minimizeWritesLevel2";
+
+    public static boolean isMinimumWritesFileStore() {
+        synchronized(lock) {
+            if (_minimizeWritesFileStore == null) {
+                _minimizeWritesFileStore = Boolean.valueOf(getConfig().
+                    getBooleanProperty(MINIMIZE_WRITES_FILESTORE_PROP, false));
+                getLogger().log(Logger.INFO, MINIMIZE_WRITES_FILESTORE_PROP+
+                                "="+_minimizeWritesFileStore);
+            }
         }
-        return _minimizeWrites.booleanValue();
+        return _minimizeWritesFileStore.booleanValue();
     }
-    
-    
+
+    public static boolean isMinimumPersist() {
+        synchronized(lock) {
+            if (_minimizePersist == null) {
+                _minimizePersist = Boolean.valueOf(
+                    getConfig().getBooleanProperty(MINIMIZE_PERSIST_PROP, true));
+                getLogger().log(Logger.INFO, MINIMIZE_PERSIST_PROP+"="+_minimizePersist);
+            }
+        }
+        if (isFileStore() && isMinimumWritesFileStore()) {
+            return true;
+        }
+        return _minimizePersist.booleanValue();
+    }
+
+    public static boolean isMinimumPersistLevel2() {
+        synchronized(lock) {
+            if (_minimizePersistLevel2 == null) {
+                _minimizePersistLevel2 = Boolean.valueOf(
+                    getConfig().getBooleanProperty(MINIMIZE_PERSIST_LEVEL2_PROP, false));
+                if ((isNewTxnLogEnabled() ||  //for self doc
+                     (!isBDBStore() && !isJDBCStore())) &&
+                    _minimizePersistLevel2.booleanValue()) {
+                    getLogger().log(Logger.INFO, Globals.getBrokerResources().getKString(
+                        BrokerResources.W_IGNORE_PROP_SETTING, 
+                        MINIMIZE_PERSIST_LEVEL2_PROP+"="+_minimizePersistLevel2));
+                    _minimizePersistLevel2 = Boolean.valueOf(false);
+                } else {
+                    getLogger().log(Logger.INFO, MINIMIZE_PERSIST_LEVEL2_PROP+"="+_minimizePersistLevel2);
+                }
+            }
+        }
+        return _minimizePersistLevel2.booleanValue();
+    }
+
+
     /**
      * whether delivery data is persisted
      */

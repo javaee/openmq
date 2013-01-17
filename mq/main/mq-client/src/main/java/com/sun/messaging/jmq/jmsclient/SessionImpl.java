@@ -910,7 +910,6 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
                     }
                     if (cb.isCompleted() || cb.isExceptioned()) {
                         calls.add(cb);
-                        itr.remove();
                     } else {
                         if (!cb.isOnAckWait()) { 
                             break;
@@ -921,7 +920,6 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
                             break;
                         } else {
                             calls.add(cb);
-                            itr.remove();
                         }
                     }
                 }

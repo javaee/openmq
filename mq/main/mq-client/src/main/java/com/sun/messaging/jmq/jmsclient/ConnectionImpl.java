@@ -70,6 +70,8 @@ import com.sun.messaging.jms.notification.*;
 
 import com.sun.messaging.jmq.jmsclient.notification.*;
 import com.sun.messaging.jmq.jmsclient.resources.*;
+import com.sun.messaging.jms.MQIllegalStateRuntimeException;
+import com.sun.messaging.jms.MQInvalidClientIDRuntimeException;
 
 //import java.util.List;
 
@@ -2632,14 +2634,18 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
      * Set clientID to the specified value, bypassing any checks as to whether calling setClientID is allowed
      * @param clientID
      */
-	@Override
-	public void _setClientIDForContext(String clientID) {
+    @Override
+    public void _setClientIDForContext(String clientID) {
         try {
-			_setClientID(clientID);
-		} catch (JMSException e) {
-			throw new MQRuntimeException(e);
-		}
-	}
+            _setClientID(clientID);
+        } catch (javax.jms.IllegalStateException e) {
+            throw new MQIllegalStateRuntimeException(e);
+        } catch (javax.jms.InvalidClientIDException e) {
+            throw new MQInvalidClientIDRuntimeException(e);
+        } catch (JMSException e) {
+            throw new MQRuntimeException(e);
+        }
+    }
 
     public synchronized String
     _getClientID()
@@ -3016,6 +3022,7 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
       * @exception InvalidSelectorException if the message selector is invalid.
       * @see javax.jms.ConnectionConsumer
       */
+    @Override 
     public ConnectionConsumer
     createConnectionConsumer(Destination destination,
                              String messageSelector,
@@ -3148,7 +3155,6 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
       * @exception InvalidSelectorException if the message selector is invalid.
       * @see javax.jms.ConnectionConsumer
       */
-
     public ConnectionConsumer
     createConnectionConsumer(Topic topic,
                              String messageSelector,
@@ -3182,6 +3188,7 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
       *
       * @see javax.jms.ConnectionConsumer
       */
+    @Override
     public ConnectionConsumer
     createDurableConnectionConsumer(Topic topic,
                                     String subscriptionName,
@@ -3196,7 +3203,7 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
 
     }
 
-    //@Override 
+    @Override 
     public ConnectionConsumer
     createSharedConnectionConsumer(Topic topic,
                                    String subscriptionName,
@@ -3210,7 +3217,7 @@ public class ConnectionImpl implements com.sun.messaging.jms.Connection,Traceabl
                        maxMessages, subscriptionName, false, true);
     }
 
-    //@Override 
+    @Override 
     public ConnectionConsumer
     createSharedDurableConnectionConsumer(Topic topic,
                                     String subscriptionName,
