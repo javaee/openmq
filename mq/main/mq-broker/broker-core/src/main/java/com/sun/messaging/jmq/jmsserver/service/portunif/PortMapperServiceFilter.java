@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -59,12 +59,6 @@ public class PortMapperServiceFilter extends BaseFilter {
 
     private PortMapper pm = null;
 
-    public PortMapperServiceFilter() {} 
-
-    public PortMapperServiceFilter(PortMapper pm) { 
-        this.pm = pm;
-    }
-
     /**
      *
      * @param ctx Context of {@link FilterChainContext} processing
@@ -82,11 +76,19 @@ public class PortMapperServiceFilter extends BaseFilter {
                 if (pm == null) {//XXX
                     throw new IOException("Broker portmapper not ready yet");
                 }
-                pm.getPortMapTable().write(bos);
             }
+            pm.getPortMapTable().write(bos);
         }
         byte[] reply = bos.toByteArray();
         bos.close();
+
+        final Logger logger = Globals.getLogger();
+
+        if (PortMapperMessageFilter.DEBUG) {
+            logger.log(logger.INFO, 
+            "PortMapperServiceFilter.handleRead() write data size "+reply.length+
+            " to connection "+ctx.getConnection());
+        }
 
         final MemoryManager mm = ctx.getConnection().
                             getTransport().getMemoryManager();
@@ -94,7 +96,6 @@ public class PortMapperServiceFilter extends BaseFilter {
         output.put(reply);
         output.allowBufferDispose();
 
-        final Logger logger = Globals.getLogger();
         final CloseCompletionHandler cch = new CloseCompletionHandler(ctx);
         ctx.write(output, new CompletionHandler<WriteResult>() {
                           @Override

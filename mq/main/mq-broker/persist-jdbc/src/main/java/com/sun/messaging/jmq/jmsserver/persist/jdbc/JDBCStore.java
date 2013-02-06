@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -64,6 +64,7 @@ import com.sun.messaging.jmq.jmsserver.persist.api.*;
 import com.sun.messaging.jmq.jmsserver.cluster.api.ha.TakingoverTracker;
 import com.sun.messaging.jmq.jmsserver.resources.*;
 import com.sun.messaging.jmq.jmsserver.Broker;
+import com.sun.messaging.jmq.jmsserver.FaultInjection;
 import com.sun.messaging.jmq.jmsserver.cluster.api.BrokerState;
 import com.sun.messaging.jmq.jmsserver.persist.jdbc.comm.BaseDAO;
 import java.io.*;
@@ -155,11 +156,16 @@ public class JDBCStore extends Store implements DBConstants, PartitionedStore {
                           new ArrayList<StoreSessionReaperListener>();
 
     private ReentrantLock partitionLock = new ReentrantLock();
+
+    private FaultInjection FI = null;
+
     /**
      * When instantiated, the object configures itself by reading the
      * properties specified in BrokerConfig.
      */
     public JDBCStore() throws BrokerException {
+
+        FI = FaultInjection.getInjection();
 
         partitionMode = StoreManager.isConfiguredPartitionMode(
                                          PARTITION_MODE_DEFAULT);
@@ -1855,6 +1861,7 @@ public class JDBCStore extends Store implements DBConstants, PartitionedStore {
             conn = dbmgr.getConnection(false);
             Util.RetryStrategy retry = null;
             do {
+                boolean inside = false;
                 try {
                     Iterator<TransactionWorkMessage> itr1 = txnwork.getSentMessages().iterator();
                     while (itr1.hasNext()) {
@@ -1863,9 +1870,21 @@ public class JDBCStore extends Store implements DBConstants, PartitionedStore {
                         if (m == null) {
                             continue;
                         }
+                        inside = true;
                         daoFactory.getMessageDAO().insert(conn, txnmsg.getDestUID(), 
                             m, null, null, storeSessionID, m.getTimestamp(), true, false);
+                        inside = false;
                     }
+                    if (FI.FAULT_INJECTION) {
+                        try {
+                            FI.checkFaultAndThrowBrokerException(
+                                FaultInjection.FAULT_TXN_PERSIST_WORK_1_5, null);
+                        } catch (BrokerException e) {
+                            FI.unsetFault(FI.FAULT_TXN_PERSIST_WORK_1_5);
+                            throw e;
+                        }
+                    }
+
                     List<TransactionWorkMessageAck> txnacks = txnwork.getMessageAcknowledgments();
                     if (txnacks != null) {
                         Iterator<TransactionWorkMessageAck> itr2 = txnacks.iterator();
@@ -1873,15 +1892,28 @@ public class JDBCStore extends Store implements DBConstants, PartitionedStore {
                             TransactionWorkMessageAck txnack = itr2.next();
                             TransactionAcknowledgement ta = txnack.getTransactionAcknowledgement();
                             if (ta != null) {
+                                inside = true;
                                 daoFactory.getConsumerStateDAO().updateTransaction(conn,
                                     ta.getSysMessageID(), ta.getStoredConsumerUID(), tid);
+                                inside = false;
                             }
                         }
                     }
+                    inside = true;
                     daoFactory.getTransactionDAO().updateTransactionState(conn, tid, ts, false);
+                    inside = false;
                     conn.commit();
                     return;
                 } catch ( Exception e ) {
+                    if (!inside) {
+                        try {
+                            conn.rollback();
+                        } catch ( SQLException rbe ) {
+                            logger.logStack(Logger.WARNING, 
+                            BrokerResources.X_DB_ROLLBACK_FAILED, rbe);
+                        }
+                    }
+
                     if ( retry == null ) {
                         retry = new Util.RetryStrategy();
                     }

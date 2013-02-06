@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -77,6 +77,8 @@ public class EndpointConsumer implements
     com.sun.messaging.jms.notification.EventListener,
     JMSRAEndpointConsumer
 {
+    private static final String QUEUE = "javax.jms.Queue";
+    private static final String TOPIC = "javax.jms.Topic";
 
     /** Resource Adapter holding this epConsumer */
     protected com.sun.messaging.jms.ra.ResourceAdapter ra = null;
@@ -299,15 +301,28 @@ public class EndpointConsumer implements
             //Will throw NotSupportedException if clientId not set properly
             setIsDurable();
         }
-        if (!this.isDurable){
+
+        checkSubscriptionScopeAndClientId();
+        if (this.isDurable) {
+            if (!aSpec.isUseSharedSubscriptionInClusteredContainer())
+                throw new NotSupportedException("MQRA:EC:Error:Must not set useSharedSubscriptionInClusteredContainer flag for durable subscriptions");
+
+            if (this.clientId == null && aSpec.getSubscriptionScope() == null) {
+                // automatically generate client identifier
+                if (aSpec._getGroupName() != null) {
+                    this.clientId = aSpec._getGroupName() + "{m:" + mName + "}";
+                } else {
+                    this.clientId = "{m:" + mName + "}";
+                }
+            }
+        } else {
             if ((aSpec._isNoAckDeliverySet()) && 
                 (this.destination instanceof com.sun.messaging.Topic) &&
                 (!this.isDeliveryTransacted)) {
                 this.noAckDelivery = true;
             }
-            String mName = aSpec.getMdbName();
             if (aSpec._isInClusteredContainerSet() && aSpec.isUseSharedSubscriptionInClusteredContainer()) {
-                if (this.clientId == null) {
+                if (this.clientId == null && aSpec.getSubscriptionScope() == null) {
                     if ((mName == null) || ("".equals(mName))) {
                         throw new NotSupportedException(
                             "MQRA:EC:Error:Clustered Message Consumer requires"+
@@ -474,7 +489,7 @@ public class EndpointConsumer implements
      *  @param spec The ActivationSpec instance. This must be an instance
      *         of the MQ RA Activation spec implementation class.
      */  
-	public void createRemoteMessageConsumer() throws NotSupportedException {
+	public void createRemoteMessageConsumer() throws ResourceException {
   	
 		try {
 			xac = (com.sun.messaging.jmq.jmsclient.XAConnectionImpl) xacf.createXAConnection();
@@ -522,32 +537,46 @@ public class EndpointConsumer implements
                 }
             }
             ((com.sun.messaging.jmq.jmsclient.XASessionImpl)xas)._setRAEndpointSession();
-            if (this.isDurable) {
-                msgConsumer = xas.createDurableSubscriber((Topic)destination,
-                        aSpec.getSubscriptionName(),
-                        aSpec.getMessageSelector(), false);
+
+            if (aSpec.getSubscriptionScope() != null) {
+                subscriptionName = getSubscriptionName();
+                if (this.isDurable){
+	                msgConsumer = xas.createSharedDurableConsumer((Topic)destination,
+	                        subscriptionName,
+	                        aSpec.getMessageSelector(), false);
+                } else {
+                    msgConsumer = xas.createSharedConsumer((Topic)destination,
+                            subscriptionName,
+                            aSpec.getMessageSelector(), false);
+                }
             } else {
-                msgConsumer = xas.createConsumer(destination, aSpec.getMessageSelector());
-                //test to see if Queue is enabled for more than one consumer when InClustered true
-                if (destination instanceof javax.jms.Queue && aSpec._isInClusteredContainerSet()) {
-                    //Fail activation if it is not
-                    try {
-                        msgConsumer2 = xas.createConsumer(destination, aSpec.getMessageSelector());
-                        msgConsumer2.close();
-                        msgConsumer2 = null;
-                    } catch (JMSException jmse) {
-                        if (xac != null) {
-                            try {
-                                xac.close();
-                            } catch (JMSException jmsecc) {
-                                //System.out.println("MQRA:EC:closed xac on conn creation exception-"+jmsecc.getMessage());
+                if (this.isDurable) {
+                    msgConsumer = xas.createDurableSubscriber((Topic)destination,
+                            aSpec.getSubscriptionName(),
+                            aSpec.getMessageSelector(), false);
+                } else {
+                    msgConsumer = xas.createConsumer(destination, aSpec.getMessageSelector());
+                    //test to see if Queue is enabled for more than one consumer when InClustered true
+                    if (destination instanceof javax.jms.Queue && aSpec._isInClusteredContainerSet()) {
+                        //Fail activation if it is not
+                        try {
+                            msgConsumer2 = xas.createConsumer(destination, aSpec.getMessageSelector());
+                            msgConsumer2.close();
+                            msgConsumer2 = null;
+                        } catch (JMSException jmse) {
+                            if (xac != null) {
+                                try {
+                                    xac.close();
+                                } catch (JMSException jmsecc) {
+                                    //System.out.println("MQRA:EC:closed xac on conn creation exception-"+jmsecc.getMessage());
+                                }
+                                xac = null;
                             }
-                            xac = null;
+                            NotSupportedException nse = new NotSupportedException(
+                                   "MQRA:EC:Error clustering multiple consumers on Queue:\n"+jmse.getMessage());
+                            nse.initCause(jmse);
+                            throw nse;
                         }
-                        NotSupportedException nse = new NotSupportedException(
-                               "MQRA:EC:Error clustering multiple consumers on Queue:\n"+jmse.getMessage());
-                        nse.initCause(jmse);
-                        throw nse;
                     }
                 }
             }
@@ -771,15 +800,13 @@ public class EndpointConsumer implements
      */
     private void setIsDurable()
     throws NotSupportedException {
-        //If durable subscription, validate subscriptionName,clientID
+        //If durable subscription, validate subscriptionName
         if (aSpec._isDurableSet()) {
-            String sName = this.subscriptionName;
-            if ((sName == null) || ((sName != null) && (sName.length() <= 0))) {
-                throw new NotSupportedException("MQRA:EC:Need Valid SubscriptionName-"+sName);
-            }
-            String cID = this.clientId;
-            if ((cID == null) || ((cID != null) && (cID.length() <= 0))) {
-                throw new NotSupportedException("MQRA:EC:Need Valid ClientID-"+cID);
+            if (aSpec.getSubscriptionScope() == null) {
+                String sName = this.subscriptionName;
+                if ((sName == null) || ((sName != null) && (sName.length() <= 0))) {
+                    throw new NotSupportedException("MQRA:EC:Need Valid SubscriptionName-"+sName);
+                }
             }
             //Setting this indicates everything is valid
             this.isDurable = true;
@@ -807,14 +834,29 @@ public class EndpointConsumer implements
             
             //Set the Session to be an MDB Session
             this.ds._setMDBSession(true);
-            if (this.isDurable) {
-                this.msgConsumer = this.ds.createDurableSubscriber(
-                        (Topic)this.destination,
-                        this.subscriptionName,
-                        this.selector, false);
+            if (aSpec.getSubscriptionScope() != null) {
+                subscriptionName = getSubscriptionName();
+                if (this.isDurable) {
+                    this.msgConsumer = this.ds.createSharedDurableConsumer(
+                            (Topic)this.destination,
+                            subscriptionName,
+                            this.selector, false);
+                } else {
+                    this.msgConsumer = this.ds.createSharedConsumer(
+                            (Topic)this.destination,
+                            subscriptionName,
+                            this.selector, false);
+                }
             } else {
-                this.msgConsumer = this.ds.createConsumer(
-                        this.destination, this.selector);
+                if (this.isDurable) {
+                    this.msgConsumer = this.ds.createDurableSubscriber(
+                            (Topic)this.destination,
+                            this.subscriptionName,
+                            this.selector, false);
+                } else {
+                    this.msgConsumer = this.ds.createConsumer(
+                            this.destination, this.selector);
+                }
             }
             this.msgListener = new MessageListener(this, this.endpointFactory,
                     this.aSpec, this.noAckDelivery, this.useRADirect);
@@ -877,6 +919,67 @@ public class EndpointConsumer implements
                     re.initCause(jmse);
                     throw re;
                 }
+            }
+        }
+    }
+
+    /**
+     * Get or generate the subscription name
+     */
+    protected String getSubscriptionName() {
+        if (aSpec.getSubscriptionScope() == null)
+            return aSpec.getSubscriptionName();
+
+        String subscriptionName = null;
+        if (aSpec.getSubscriptionName() == null) {
+            // user doesn't specify activationSpec property subscriptionName,
+            // so we generate a name according to chapter 12.1 of jms20 spec
+            String activationName = this.endpointFactory.getActivationName();
+            if (aSpec.getSubscriptionScope().equals("Cluster")) {
+                // Cluster scope
+                subscriptionName = activationName;
+            } else {
+                // Instance scope
+                if (aSpec._isInClusteredContainerSet()) {
+                    // it is in a glassfish cluster
+                    String instanceName = this.ra.getBootstrapContext().getInstanceName();
+                    subscriptionName = instanceName + "_" + activationName;
+                } else {
+                    // it is standalone glassfish instance
+                    subscriptionName = activationName;
+                }
+            }
+        } else {
+            // user specifies activationSpec property subscriptionName
+            if (aSpec.getSubscriptionScope().equals("Instance")) {
+                // Instance scope
+                if (aSpec._isInClusteredContainerSet()) {
+                    // it is in a glassfish cluster
+                    String instanceName = this.ra.getBootstrapContext().getInstanceName();
+                    subscriptionName = instanceName + "_" + aSpec.getSubscriptionName();
+                } else {
+                    // it is standalone glassfish instance
+                    subscriptionName = aSpec.getSubscriptionName();
+                }
+            } else {
+                // Cluster scope
+                subscriptionName = aSpec.getSubscriptionName();
+            }
+        }
+        _loggerIM.fine("MQRA:EC:Use subscription name '" + subscriptionName + "' for endpoint activation");
+        return subscriptionName;
+    }
+
+    protected void checkSubscriptionScopeAndClientId() throws NotSupportedException {
+        if (aSpec.getSubscriptionScope() != null) {
+            if (QUEUE.equals(aSpec.getDestinationType())) {
+                NotSupportedException nse = new NotSupportedException("MQRA:EC:Error:Bad parameter");
+                nse.initCause(new InvalidPropertyException(_lgrMID_EXC + "subscriptionScope must not be set if destinationType is " + QUEUE));
+                throw nse;
+            } else if (TOPIC.equals(aSpec.getDestinationType()) && clientId != null) {
+                NotSupportedException nse = new NotSupportedException("MQRA:EC:Error:Bad parameter");
+                nse.initCause(new InvalidPropertyException(_lgrMID_EXC + "clientId must not be set if subscriptionScope is set"));
+                throw nse;
             }
         }
     }

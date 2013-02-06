@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,7 @@
 
 package com.sun.messaging.portunif;
 
+import java.nio.charset.Charset;
 import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.portunif.PUContext;
 import org.glassfish.grizzly.portunif.ProtocolFinder;
@@ -49,6 +50,7 @@ import org.glassfish.grizzly.filterchain.FilterChainContext;
 public class PortMapperProtocolFinder implements ProtocolFinder {
 
     private static boolean DEBUG = false;
+    public static final int PORTMAPPER_VERSION_MAX_LEN = 128;
 
     public PortMapperProtocolFinder() {
     }
@@ -60,39 +62,42 @@ public class PortMapperProtocolFinder implements ProtocolFinder {
 
         final Buffer input = ctx.getMessage();
 
-        if (DEBUG) {
-            System.out.println(this+": input="+input.toStringContent());
-        }
-
         int pos = input.position();
         int len = input.remaining();
         if (len <= 0) {
             return Result.NEED_MORE_DATA;
         }
-        byte b = input.get(len-1);
-        if (b != '\n') {
-            return Result.NEED_MORE_DATA;
+        String data = input.toStringContent(Charset.forName("UTF-8"), 0,
+                                Math.min(PORTMAPPER_VERSION_MAX_LEN, len));
+        int ind1 = data.indexOf("\r");
+        int ind2 = data.indexOf("\n");
+        if (DEBUG) {
+            System.out.println(this+": input="+input.toStringContent()+", newline index: "+ind1+", "+ind2);
         }
-        if (len >= 2) {
-            len--;
+
+        if (ind1 == 0 || ind2 == 0) {
+            return Result.NOT_FOUND;
         }
-        b = input.get(len-1);
-        if (b == '\r') {
-            len--;
-        }
-        input.position(pos);
-        for (int i = 0; i < len; i++) {
-            if (!Character.isDigit(input.get(i))) {
+        int indmax = Math.max(ind1, ind2);
+        if (indmax < 0) {
+            if (len >= PORTMAPPER_VERSION_MAX_LEN) {
                 return Result.NOT_FOUND;
             }
+            return Result.NEED_MORE_DATA;
         }
-        input.position(pos);
+        
+        int indmin = Math.min(ind1, ind2);
+        if (!data.substring(0, (indmin < 0 ? indmax:indmin)).matches("\\d+")) {
+            if (DEBUG) {
+                System.out.println(this+": data not all digits before newline:["+
+                           data.substring(0, (indmin < 0 ? indmax:indmin))+"]");
+            }
+            return Result.NOT_FOUND;
+        }
         if (DEBUG) {
             System.out.println(this+": FOUND input="+input.toStringContent());
         }
-
         return Result.FOUND;
     }
-
 }
 

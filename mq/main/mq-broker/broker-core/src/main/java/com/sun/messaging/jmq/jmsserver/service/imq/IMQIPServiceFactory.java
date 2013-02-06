@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -261,9 +261,8 @@ public abstract class IMQIPServiceFactory extends ServiceFactory
 
         Protocol proto = null;
         try {
-            proto = (Protocol)
-                      Class.forName(pclass).newInstance();
-           
+            proto = (Protocol)Class.forName(pclass).newInstance();
+
         } catch (Exception ex) {
             String args[] = { protocol, instancename};
             throw new BrokerException(Globals.getBrokerResources().getKString(
@@ -290,6 +289,8 @@ public abstract class IMQIPServiceFactory extends ServiceFactory
         String serviceprefix = SERVICE_PREFIX+instancename +"."+protocol;
 
         Map params = getProtocolParams(protocol, serviceprefix);
+        params.put("serviceFactoryHandlerName", getFactoryHandlerName());
+
         // check the parameters are OK
         proto.checkParameters(params);
         // set the parameters

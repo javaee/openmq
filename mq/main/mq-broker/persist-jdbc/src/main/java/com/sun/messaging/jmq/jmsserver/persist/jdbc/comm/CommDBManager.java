@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1283,6 +1283,14 @@ public abstract class CommDBManager {
         // set table option
         String key = vendorPropPrefix + "." + TABLEOPTION_NAME_VARIABLE;
         String value = config.getProperty(key, "").trim();
+        if (isMysql) {
+            if (value.toUpperCase().matches(".*ENGINE\\s*=\\s*MYISAM.*")) { 
+                String emsg = Globals.getBrokerResources().getKString(
+                              BrokerResources.X_UNSUPPORTED_PROPERTY_VALUE,
+                              value, key+"="+value);
+                throw new BrokerException(emsg);
+            }
+        }
         vars.setProperty( TABLEOPTION_NAME_VARIABLE, value );
 
         if (value != null && !value.equals("")) {

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -124,14 +124,14 @@ Cleanup:
  * The format of the data is:
  *
  *  <PRE>
- *  <portmapper version><SP><broker instance name><SP>broker version><NL>
+ *  <portmapper version><SP><broker instance name><SP>packet version><NL>
  *  <service name><SP><protocol><SP><type><SP><port><NL>
  *  <.><NL>
  *
  *  Where:
  *
  *  <portmapper version>Portmapper numeric version string (ie "100").
- *  <broker version>    Broker version string (ie "2.0").
+ *  <packet version>    Packet version string (e.g. "2.0").
  *  <NL>                Newline character (octal 012)
  *  <service name>      Alphanumeric string. No embedded whitespace.
  *  <space>             A single space character
@@ -164,7 +164,7 @@ PortMapperTable::parse(const UTF8String * const portServerOutput)
   UTF8String *       serviceLine          = NULL;
   UTF8String *       portMapperVersionStr = NULL;
   UTF8String *       brokerInstanceName   = NULL;
-  UTF8String *       brokerVersionStr     = NULL;
+  UTF8String *       packetVersionStr     = NULL;
   PortMapperEntry *  portmapperEntry      = NULL;
   iMQError           errorCode            = IMQ_SUCCESS;
 
@@ -188,7 +188,7 @@ PortMapperTable::parse(const UTF8String * const portServerOutput)
   // Now get the portmapper version, broker instance name, broker version
   ERRCHK( fieldVector->remove(0, (void**)&portMapperVersionStr) );
   ERRCHK( fieldVector->remove(0, (void**)&brokerInstanceName) );
-  ERRCHK( fieldVector->remove(0, (void**)&brokerVersionStr) );
+  ERRCHK( fieldVector->remove(0, (void**)&packetVersionStr) );
 
   // Return if the portMapperVersion isn't what we expect
   CNDCHK( STRCMP( portMapperVersionStr->getCharStr(), PORTMAPPER_VERSION ) != 0,
@@ -221,7 +221,7 @@ PortMapperTable::parse(const UTF8String * const portServerOutput)
   // Set member variables
   this->brokerVersion  = portMapperVersionStr;
   this->brokerInstance = brokerInstanceName;
-  this->version        = brokerVersionStr;
+  this->version        = packetVersionStr;
 
   return IMQ_SUCCESS;
 
@@ -234,7 +234,7 @@ PortMapperTable::parse(const UTF8String * const portServerOutput)
   DELETE( serviceLine );
   DELETE( portMapperVersionStr );
   DELETE( brokerInstanceName );
-  DELETE( brokerVersionStr );
+  DELETE( packetVersionStr );
   DELETE( portmapperEntry );
 
   reset();

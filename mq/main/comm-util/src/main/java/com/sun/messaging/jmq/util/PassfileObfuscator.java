@@ -74,4 +74,10 @@ public interface PassfileObfuscator {
      */
     public InputStream retrieveObfuscatedFile(String source, String prefix) throws IOException; 
 
+    /**
+     * @param source the fully qualified file name of the passfile
+     * @return true if the passfile is identified as obfuscated by the PassfileObfuscator
+     */
+    public boolean isobfuscated(String source) throws IOException;
+
 }

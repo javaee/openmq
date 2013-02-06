@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -143,6 +143,7 @@ public class StompBridgeResources extends MQResourceBundle {
     final public static String W_TXNACK_UNDELIVERED_MSG_ON_ROLLBACK_FAIL = "BSS2013";
     final public static String W_TXNSESSION_ROLLBACK_FAIL = "BSS2014";
     final public static String W_UNABLE_DELIVER_MSG_TO_TXNSUB = "BSS2015";
+    final public static String W_PROPERTY_SETTING_OVERRIDE_BY_BROKER = "BSS2016";
 
     // 3000-3999 Error Messages
     final public static String E_ONEXCEPTION_JMS_CONN = "BSS3000";

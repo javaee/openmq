@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -569,6 +569,11 @@ public class DirectConnectionFactory extends ConnectionCreator
         try {
             dc = (DirectConnection)this.cm.allocateConnection(mcf, crinfo);
             return dc;
+        } catch (javax.resource.spi.SecurityException se) {
+            //XXX:Fix codes
+            String code = "2";
+            throw new com.sun.messaging.jms.JMSSecurityException(
+                "MQRA:DCF:allocation failure:createConnection:"+se.getMessage(), code, se);
         } catch (ResourceException re) {
             //XXX:Fix codes
             String code = "1";

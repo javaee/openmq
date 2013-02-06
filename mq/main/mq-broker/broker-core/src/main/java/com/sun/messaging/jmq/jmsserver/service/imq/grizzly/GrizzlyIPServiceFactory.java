@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -54,10 +54,20 @@ import com.sun.messaging.jmq.jmsserver.util.BrokerException;
 
 public class GrizzlyIPServiceFactory extends IMQIPServiceFactory
 {
+
     public GrizzlyIPServiceFactory() {
     }
 
-  
+    @Override
+    public void checkFactoryHandlerName(String handlerName)
+    throws IllegalAccessException {
+        String myname = "shared";
+        if (!myname.equals(handlerName)) {
+            throw new IllegalAccessException(
+            "Unexpected service Handler name "+handlerName+", expected "+myname);
+        }
+    }
+
     @Override
     public  void updateService(Service s) throws BrokerException {
         GrizzlyIPService ss = (GrizzlyIPService)s;

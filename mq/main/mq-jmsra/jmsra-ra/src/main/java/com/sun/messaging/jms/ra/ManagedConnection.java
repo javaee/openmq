@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -198,13 +198,13 @@ implements javax.resource.spi.ManagedConnection, JMSRAManagedConnection
             }
             
         } catch (JMSException jmse) {
-            ResourceAdapterInternalException raie = new ResourceAdapterInternalException(
+            javax.resource.spi.SecurityException se = new javax.resource.spi.SecurityException(
                     _lgrMID_EXC+"constructor:Aborting:JMSException on createConnection="+jmse.getMessage(),jmse.getErrorCode());
-            raie.initCause(jmse);
-            _loggerOC.severe(raie.getMessage());
+            se.initCause(jmse);
+            _loggerOC.severe(se.getMessage());
             jmse.printStackTrace();
-            _loggerOC.throwing(_className, "constructor()", raie);
-            throw raie;
+            _loggerOC.throwing(_className, "constructor()", se);
+            throw se;
         }
         if (true) {
         } else { //XXX:tharakan REMOVE

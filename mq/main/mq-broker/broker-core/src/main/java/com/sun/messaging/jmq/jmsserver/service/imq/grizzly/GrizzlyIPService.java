@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -127,7 +127,8 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
         try {
 
             Map params = parent.getProtocolParams(p, serviceprefix);
-            protocol = new GrizzlyProtocolImpl(this, p); 
+            params.put("serviceFactoryHandlerName", parent.getFactoryHandlerName());
+            protocol = new GrizzlyProtocolImpl(this, p);
             protocol.checkParameters(params);
             protocol.setParameters(params);
             protocol.setMinMaxThreads(min, max, getName());
@@ -170,10 +171,11 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
             filterChainBuilder.add(new GrizzlyMQPacketFilter());
             filterChainBuilder.add(new GrizzlyMQPacketDispatchFilter());
             transport = TCPNIOTransportBuilder.newInstance().build();
+            transport.setReadBufferSize(protocol.getInputBufferSize());
+            transport.setWriteBufferSize(protocol.getOutputBufferSize());
             transport.setWorkerThreadPool(pool);
             transport.setProcessor(filterChainBuilder.build());
-            bindTransport();
-
+            bindTransport(false);
         } catch (Exception e) {
             String emsg = br.getKString(br.X_INIT_TRANSPORT_FOR_SERVICE, name, e.getMessage());
             logger.logStack(logger.ERROR, emsg, e);
@@ -203,26 +205,38 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
         return dedicatedWriter;
     }
 
-    private void bindTransport() throws Exception {
+    private void unbindTransport() throws Exception {
+        if (DEBUG) {
+            logger.log(Logger.INFO, 
+            "GrizzlyIPService.unbindTransport() for service "+name);
+        }
         if (serverConn != null) {
             try {
+                serverConn.preClose();
                 serverConn.close();
             } catch (Exception e) {
-                if (DEBUG) {
                 logger.logStack(Logger.WARNING,
                 "Exception closing server socket connection for service "+getName(), e);
-                }
             }
             serverConn = null;
-
             try {
                 transport.unbindAll();
+                logger.log(Logger.INFO, br.getKString(
+                    br.I_UNBOUND_TRANSPORT_FOR_SERVICE,
+                    getName()+"["+protocol.getType()+"]"));
             } catch (IOException ee) {
                 logger.logStack(Logger.WARNING,
                 "Unable to unbind transport for service "+getName(), ee);
             }
         }
+    }
 
+    private void bindTransport(boolean checkpause) throws Exception {
+        if (DEBUG) {
+            logger.log(Logger.INFO, 
+            "GrizzlyIPService.bindTransport("+checkpause+") for service "+name);
+        }
+        unbindTransport();
         transport.setReuseAddress(true);
         transport.setTcpNoDelay(protocol.getNoDelay());
         int v = protocol.getTimeout();
@@ -236,6 +250,12 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
         String hostn = protocol.getHostName();
         int portn = protocol.getPort();
         int backlog = protocol.getBacklog();
+
+        logger.log(Logger.INFO, br.getKString(br.I_BINDING_TRANSPORT_FOR_SERVICE, 
+            getName()+"["+protocol.getType()+", "+(hostn == null ? "*":hostn)+", "+portn+"]"));
+        if (getState() == ServiceState.PAUSED) {
+            transport.resume(); //Grizzly: need resume to bind
+        }
         if (hostn == null) {
             serverConn =  transport.bind(new InetSocketAddress(portn), backlog);
         } else {
@@ -244,7 +264,19 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
         }
         int lportn = getLocalPort();
         logger.log(Logger.INFO, br.getKString(br.I_BIND_TRANSPORT_FOR_SERVICE, 
-                   getName()+"["+protocol.getType()+"]", (hostn == null ? "":hostn)+":"+lportn));
+            getName()+"["+protocol.getType()+"]", (hostn == null ? "":hostn)+":"+lportn+"("+portn+")"));
+
+        if (checkpause &&
+            (getState() == ServiceState.PAUSED || 
+             getState() == ServiceState.QUIESCED)) {
+            try {
+                unbindTransport();
+            } finally {
+                if (getState() == ServiceState.PAUSED) {
+                    transport.pause();
+                }
+            }
+        }
         Globals.getPortMapper().addService(getName(), protocol.getType(),
             Globals.getConfig().getProperty(
                 GrizzlyIPServiceFactory.SERVICE_PREFIX+getName()+".servicetype"),
@@ -339,7 +371,11 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
     }
 
 
-    public synchronized  void startService(boolean startPaused) {
+    public synchronized void startService(boolean startPaused) {
+        if (DEBUG) {
+            logger.log(Logger.INFO, 
+            "GrizzlyIPService.startService("+startPaused+") for service "+getName());
+        }
         if (isServiceRunning()) {
             logger.log(Logger.DEBUG, 
                        BrokerResources.E_INTERNAL_BROKER_ERROR, 
@@ -348,8 +384,12 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
         }
         setState(ServiceState.STARTED);
         try {       
-            if (serverConn == null) {
-                throw new IOException("No server connection");
+            if (startPaused) {
+                unbindTransport(); 
+            } else {
+                if (serverConn == null) {
+                    throw new IOException("No server connection");
+                }
             }
             transport.start(); 
             String args[] = { getName(), 
@@ -392,7 +432,6 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
         }
         if (startPaused) {
             try {
-                transport.pause();
                 setServiceRunning(false);
                 setState(ServiceState.PAUSED);
             } catch (Exception e) {
@@ -406,7 +445,12 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
         }
     }
 
+    @Override
     public void stopService(boolean all) { 
+        if (DEBUG) {
+            logger.log(Logger.INFO, 
+            "GrizzlyIPService.stopService("+all+") for service "+getName());
+        }
         synchronized (this) {
 
             if (isShuttingDown()) {
@@ -424,23 +468,10 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
             setShuttingDown(true);
 
             try {
-                if (serverConn != null) {
-                    try {
-                        serverConn.close();
-                    } catch (Exception e) {
-                        if (DEBUG) {
-                        logger.logStack(Logger.INFO,
-                        "Exception closing server socket connection for service "+getName(), e);
-                        }
-                    }
-                    serverConn = null;
-                }
-                transport.stop();
+                unbindTransport();
             } catch (Exception ex) {
-                if (DEBUG) {
-                logger.logStack(Logger.INFO, "Exception shutting down "
-                + " protocol, ignoring since we are exiting", ex);
-                }
+                logger.logStack(Logger.WARNING, 
+                "Exception unbinding transport for service "+getName()+"["+getProtocol()+"]", ex);
             }
         }
 
@@ -472,6 +503,13 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
                         BrokerResources.M_SERVICE_SHUTDOWN));
             }
         }
+        try {
+            transport.stop();
+        } catch (Exception e)  {
+            logger.logStack(Logger.WARNING, 
+            "Exception stopping transport for service "+getName()+"["+getProtocol()+"]"+
+             ", ignoring since we are exiting", e);
+        }
 
         synchronized (this) {
             setState(ServiceState.STOPPED);
@@ -498,46 +536,67 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
                                TimeUnit.MILLISECONDS);
                 }
             } catch (Exception e) { 
-                if (DEBUG) {  
-                    logger.logStack(Logger.INFO, 
-                    "Exception in waiting reader thread pool terminate for service "+getName(), e);
-                }
+                logger.logStack(Logger.INFO, 
+                "Exception in waiting reader thread pool terminate on stopping service "+getName(), e);
             }
         }
 
         if (DEBUG) {
             logger.log(Logger.INFO, 
-            "Destroying Service {0} with protocol {1} ", getName(), getProtocol());
+            "Stopped Service {0} with protocol {1} ", getName(), getProtocol());
         }
     }
 
+    @Override
     public synchronized void stopNewConnections() 
     throws IOException, IllegalStateException {
+        if (DEBUG) {
+            logger.log(Logger.INFO, 
+            "GrizzlyIPService.stopNewConnections() for service "+getName());
+        }
 
         if (getState() != ServiceState.RUNNING) {
             throw new IllegalStateException(
                Globals.getBrokerResources().getKString(
                    BrokerResources.X_CANT_STOP_SERVICE));
         }
-        transport.pause();
+        try {
+            unbindTransport();
+        } catch (Exception e) {
+            throw new IOException("Unable to unbind transport for service "+name, e);
+        }
         setState(ServiceState.QUIESCED);
         Globals.getPortMapper().updateServicePort(name, 0);
     }
 
+    @Override
     public synchronized void startNewConnections() 
     throws IOException {
+        if (DEBUG) {
+            logger.log(Logger.INFO, 
+            "GrizzlyIPService.startNewConnections() for service "+getName());
+        }
 
         if (getState() != ServiceState.QUIESCED && getState() != ServiceState.PAUSED) {
             throw new IllegalStateException(
                Globals.getBrokerResources().getKString(
                    BrokerResources.X_CANT_START_SERVICE));
         }
-        transport.resume(); 
+        try {
+            bindTransport(false); 
+        } catch (Exception e) {
+            throw new IOException("Unable to bind transport for service "+name, e);
+        }
         setState(ServiceState.RUNNING);
         Globals.getPortMapper().updateServicePort(name, getProtocol().getLocalPort());
     }
 
+    @Override
     public synchronized void pauseService(boolean all) {
+        if (DEBUG) {
+            logger.log(Logger.INFO, 
+            "GrizzlyIPService.pauseService("+all+") for service "+getName());
+        }
 
         if (!isServiceRunning()) {
             logger.log(Logger.DEBUG, BrokerResources.E_INTERNAL_BROKER_ERROR, 
@@ -550,6 +609,7 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
 
         try {
             stopNewConnections();
+            transport.pause();
         } catch (Exception ex) {
             logger.logStack(Logger.WARNING, Globals.getBrokerResources().
                 getKString(BrokerResources.X_PAUSE_SERVICE, 
@@ -559,7 +619,12 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
         setServiceRunning(false);
     }
 
+    @Override
     public synchronized void resumeService() {
+        if (DEBUG) {
+            logger.log(Logger.INFO, 
+            "GrizzlyIPService.resumeService() for service "+getName());
+        }
         if (isServiceRunning()) {
              logger.log(Logger.DEBUG, BrokerResources.E_INTERNAL_BROKER_ERROR, 
                         "unable to resume service " + name + ", already running.");
@@ -569,6 +634,7 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
         logger.log(Logger.DEBUG, BrokerResources.I_SERVICE_RESUME, strings);
         try {
             startNewConnections();
+            transport.resume();
         } catch (Exception ex) {
             logger.logStack(Logger.WARNING, Globals.getBrokerResources().
                 getKString(BrokerResources.X_RESUME_SERVICE, 
@@ -591,6 +657,11 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
     protected synchronized void updateService(int port, int min, int max, boolean store) 
     throws IOException, PropertyUpdateException, BrokerException {
 
+        if (DEBUG) {
+            logger.log(logger.INFO, 
+            "GrizzlyIPService.updateService("+port+", "+min+", "+max+", "+store+
+            ") for service "+getName());
+        }
         String args[] = { getName(),
                           String.valueOf(port),
                           String.valueOf(min),
@@ -598,19 +669,21 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
 	logger.log(Logger.INFO, BrokerResources.I_UPDATE_SERVICE_REQ, args);
 
         try {
-            protocol.setMinMaxThreads(min, max, getName());
-            this.setMinMaxThreadpool(protocol.getMinThreads(), 
-                                     protocol.getMaxThreads());
-            if (store) {
-                if (min > -1) {
-                    Globals.getConfig().updateProperty(
+            if (min > -1 || max > -1) {
+                protocol.setMinMaxThreads(min, max, getName());
+                this.setMinMaxThreadpool(protocol.getMinThreads(), 
+                                         protocol.getMaxThreads());
+                if (store) {
+                    if (min > -1) {
+                        Globals.getConfig().updateProperty(
                         IMQIPServiceFactory.SERVICE_PREFIX + name +
-                        ".min_threads", String.valueOf(protocol.getMinThreads()));
-                }
-                if (max > -1) {
-                    Globals.getConfig().updateProperty(
+                        ".min_threads", String.valueOf(2*protocol.getMinThreads()));
+                    }
+                    if (max > -1) {
+                        Globals.getConfig().updateProperty(
                         IMQIPServiceFactory.SERVICE_PREFIX + name +
-                        ".max_threads", String.valueOf(protocol.getMaxThreads()));
+                        ".max_threads", String.valueOf(2*protocol.getMaxThreads()));
+                   }
                 }
             }
         } catch (IllegalArgumentException e) {
@@ -621,6 +694,7 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
         }
 
        	if (port > -1) {
+            boolean dostore = store;
             Map params = new HashMap();
             params.put("port", String.valueOf(port));
             protocol.checkParameters(params);
@@ -628,14 +702,15 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
             if (oldparams != null) {
                 Globals.getPortMapper().removeService(name);
                 try {
-                    bindTransport();
+                    bindTransport(true);
                 } catch (Exception e) {
+                    dostore = false;
                     String emsg = br.getKString(br.X_BIND_TRANSPORT_FOR_SERVICE, getName(), e.getMessage());
                     logger.logStack(Logger.ERROR, emsg, e);
                     protocol.setParameters(oldparams);
                     Globals.getPortMapper().removeService(name);
                     try {
-                        bindTransport();
+                        bindTransport(true);
                     } catch (Exception ee) {
                         emsg = br.getKString(br.X_BIND_TRANSPORT_FOR_SERVICE, getName(), e.getMessage());
                         logger.logStack(Logger.ERROR, emsg, ee);
@@ -643,7 +718,7 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
                     }
                 }
             }
-            if (store) {
+            if (dostore) {
                 Globals.getConfig().updateProperty(IMQIPServiceFactory.SERVICE_PREFIX +
                     name + "." +protocol.getType()+".port", String.valueOf(port));
             }

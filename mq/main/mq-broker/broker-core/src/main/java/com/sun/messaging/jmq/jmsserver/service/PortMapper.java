@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,13 +48,18 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.channels.SocketChannel;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Enumeration;
+import java.util.Collections;
 import javax.net.ServerSocketFactory;
 
+import com.sun.messaging.jmq.io.Packet;
 import com.sun.messaging.jmq.io.MQAddress;
 import com.sun.messaging.jmq.io.PortMapperTable;
 import com.sun.messaging.jmq.io.PortMapperEntry;
@@ -72,6 +77,8 @@ import com.sun.messaging.jmq.jmsserver.core.BrokerMQAddress;
 import com.sun.messaging.jmq.util.net.MQServerSocketFactory;
 import com.sun.messaging.portunif.PUService;
 import com.sun.messaging.jmq.jmsserver.service.portunif.PortMapperMessageFilter;
+import com.sun.messaging.jmq.jmsserver.tlsutil.KeystoreUtil;
+import com.sun.messaging.portunif.PortMapperProtocolFinder;
 
 
 /**
@@ -82,28 +89,36 @@ import com.sun.messaging.jmq.jmsserver.service.portunif.PortMapperMessageFilter;
  */
 public class PortMapper implements Runnable, ConfigListener, PortMapperClientHandler {
 
+    private static final int PORTMAPPER_VERSION_MAX_LEN = 
+        PortMapperProtocolFinder.PORTMAPPER_VERSION_MAX_LEN;
+
     public static final int PORTMAPPER_DEFAULT_PORT = 7676;
 
     public static final String SERVICE_NAME = "portmapper";
 
     // Hostname can not be dynamically updated
-    public static final String HOSTNAME_PROPERTY = Globals.IMQ +
-                                                   ".portmapper.hostname";
+    public static final String HOSTNAME_PROPERTY = Globals.IMQ+".portmapper.hostname";
 
-    private static final String IMQHOSTNAME_PROPERTY = Globals.IMQ +
-                                                    ".hostname";
+    private static final String IMQHOSTNAME_PROPERTY = Globals.IMQ+".hostname";
 
-    private static final String PORT_PROPERTY = Globals.IMQ +
-                                                    ".portmapper.port";
-    public static final String BIND_PROPERTY = Globals.IMQ +
-    												".portmapper.bind";
-    private static final String BACKLOG_PROPERTY = Globals.IMQ +
-                                                    ".portmapper.backlog";
-    private static final String SOTIMEOUT_PROPERTY = Globals.IMQ +
-                                                    ".portmapper.sotimeout";
-    private static final String SOLINGER_PROPERTY = Globals.IMQ +
-                                                    ".portmapper.solinger";
+    private static final String PORT_PROPERTY = Globals.IMQ+".portmapper.port";
+    public static final String BIND_PROPERTY = Globals.IMQ+".portmapper.bind";
+    private static final String BACKLOG_PROPERTY = Globals.IMQ+".portmapper.backlog";
+    private static final String SOTIMEOUT_PROPERTY = Globals.IMQ+".portmapper.sotimeout";
+    private static final String SOLINGER_PROPERTY = Globals.IMQ+".portmapper.solinger";
 
+    public static final String SSL_ENABLED_PROPERTY = 
+                  Globals.IMQ+".portmapper.tls.enabled";
+    public static final String SSL_CLIENTAUTH_PROPERTY = 
+                  Globals.IMQ+".portmapper.tls.requireClientAuth";
+    public static final boolean SSL_ENABLED_PROPERTY_DEFAULT = false;
+    public static final boolean SSL_CLIENTAUTH_PROPERTY_DEFAULT = false;
+
+    public static final String TCP_ALLOWED_HOSTNAMES_PROPERTY = 
+                  Globals.IMQ+".portmapper.tls.tcpAllowedHostNames";
+
+    private List<InetAddress> allowedhosts = 
+          Collections.synchronizedList(new ArrayList<InetAddress>()); 
 
     private static boolean DEBUG = false;
 
@@ -120,23 +135,26 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
     // or whether some other component will do that on our behalf 
     private boolean doBind = true;
 
-	private int backlog = 100;
+    private int backlog = 100;
     private int sotimeout = 100;
     private int solinger = -1;
     private InetAddress bindAddr = null;
     private String hostname = null;
+
     private HashMap portmapperMap = null;
 
     private MQAddress mqaddress = null;
+
+    private boolean sslEnabled = false;
+    private boolean sslClientAuth = false;
 
     private boolean running = false;
 
     private static MQServerSocketFactory ssf = (MQServerSocketFactory)MQServerSocketFactory.getDefault();
 
-
     public boolean getDEBUG() {
         return DEBUG;
-	}
+    }
 
     /**
      * updates the portmapper service
@@ -169,23 +187,31 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
      * @param instance  Instance name of this broker
      */
     public PortMapper(String instance) {
-		running = true;
-		bc = Globals.getConfig();
-		if (!bc.getBooleanProperty("imq.portmapper.reuseAddress", true)) {
-			ssf.setReuseAddress(false);
-		}
-		portMapTable = new PortMapperTable();
-		portMapTable.setBrokerInstanceName(instance);
-		portMapTable.setBrokerVersion(Globals.getVersion().getProductVersion());
-		logger = Globals.getLogger();
-		rb = Globals.getBrokerResources();
+        running = true;
+        bc = Globals.getConfig();
+        if (!bc.getBooleanProperty("imq.portmapper.reuseAddress", true)) {
+            ssf.setReuseAddress(false);
+        }
+        if (bc.getBooleanProperty(SSL_ENABLED_PROPERTY, 
+                   SSL_ENABLED_PROPERTY_DEFAULT)) {
+            sslEnabled = true;
+            if (bc.getBooleanProperty(SSL_CLIENTAUTH_PROPERTY, 
+                       SSL_ENABLED_PROPERTY_DEFAULT)) {
+                sslClientAuth = true;
+            }
+        }
+        portMapTable = new PortMapperTable();
+        portMapTable.setBrokerInstanceName(instance);
+        portMapTable.setPacketVersion(String.valueOf(Packet.CURRENT_VERSION));
+        logger = Globals.getLogger();
+        rb = Globals.getBrokerResources();
 
-		addService(SERVICE_NAME, "tcp", "PORTMAPPER", port, portmapperMap);
-		addService("cluster_discovery", "tcp", "CLUSTER_DISCOVERY", 0, null);
+        addService(SERVICE_NAME, "tcp", "PORTMAPPER", port, portmapperMap);
+        addService("cluster_discovery", "tcp", "CLUSTER_DISCOVERY", 0, null);
 
-		bc.addListener(PORT_PROPERTY, this);
-		bc.addListener(BACKLOG_PROPERTY, this);
-	}
+        bc.addListener(PORT_PROPERTY, this);
+        bc.addListener(BACKLOG_PROPERTY, this);
+    }
 
     public void destroy() {
         running = false;
@@ -519,6 +545,13 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
         return portMapTable.toString();
     }
 
+    public boolean isPeerAddressAllowed(InetSocketAddress sa) {
+        if (!sslClientAuth) {
+            return true;
+        }
+        return allowedhosts.contains(sa.getAddress());
+    }
+
     /**
      * Bind the portmapper to the port
      * unless we have configured the portmapper to expect some other component to do this on our behalf
@@ -527,19 +560,24 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
         PUService pu = Globals.getPUService();
     	if (doBind) {
             if (pu == null) {
-    		    serverSocket = createPortMapperServerSocket(this.port, this.bindAddr);
+                serverSocket = createPortMapperServerSocket(this.port, this.bindAddr);
             } else {
                 try {
                     pu.register(PortMapperMessageFilter.
                                 configurePortMapperProtocol(pu));
+                    if (sslEnabled) {
+                        Properties props = KeystoreUtil.getDefaultSSLContextConfig(
+                                                        "Broker[portpapper]", null);
+                        pu.registerSSL(PortMapperMessageFilter.
+                            configurePortMapperSSLProtocol(pu, props, sslClientAuth));
+                    }
                     pu.bind(new InetSocketAddress(this.bindAddr, this.port));
-                    pu.start();
                     logger.log(logger.INFO, "Grizzly PU service on ["+
                         (this.bindAddr == null ? "":this.bindAddr)+":"+this.port+"] is ready");
+
                 } catch (Exception e) {
                     String emsg = "PU service failed to init";
                     logger.logStack(logger.ERROR, emsg, e);
-                    pu.stop();
                     throw new BrokerException(emsg);
                 }
             }
@@ -547,6 +585,24 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
             throw new BrokerException(
                 Globals.PUSERVICE_ENABLED_PROP+"=true setting not allowed if nobind");
         }
+    }
+
+    public synchronized void startPUService() throws Exception {
+        PUService pu = Globals.getPUService();
+        if (pu == null) { 
+            return;
+        }
+        if (sslClientAuth) {
+            List hosts = Globals.getConfig().getList(TCP_ALLOWED_HOSTNAMES_PROPERTY);
+            if (hosts != null) {
+                Iterator itr = hosts.iterator();
+                while (itr.hasNext()) {
+                    String host = (String)itr.next();
+                    allowedhosts.add(BrokerMQAddress.createAddress(host, 7676).getHost());
+                }
+            }
+        }
+        pu.start();
     }
 
     /**
@@ -731,17 +787,38 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
 				 */
 				socket.setSoTimeout(sotimeout);
 				if (solinger > 0) {
-					socket.setSoLinger(true, solinger);
+                                    socket.setSoLinger(true, solinger);
 				}
 				InputStream is = socket.getInputStream();
 				BufferedReader br = new BufferedReader(new InputStreamReader(is));
-				String version = "";// "101";
+				StringBuffer version = new StringBuffer();
 				try {
-					version = br.readLine();
+                                    int cnt = 0;
+                                    Character cc = null;
+                                    Character cr = Character.valueOf('\r');
+                                    Character lf = Character.valueOf('\n');
+                                    while (true) {
+                                        int c = br.read();
+                                        if (c < 0) {
+                                            break;
+                                        }
+                                        cc = Character.valueOf((char)c);
+                                        if (cc.equals(cr) || cc.equals(lf)) {
+                                            break;
+                                        }
+                                        version.append((char)c);
+                                        cnt++;
+                                        if (cnt > PORTMAPPER_VERSION_MAX_LEN) {
+                                            throw new IOException(
+                                            Globals.getBrokerResources().getKString(
+                                            BrokerResources.W_UNEXPECTED_READ_DATA_SIZE, 
+                                            String.valueOf(cnt), SERVICE_NAME));
+                                        }
+                                    } 
 				} catch (SocketTimeoutException e) {
 					// 2.0 client did not send version
 				}
-				// System.out.println("Version = " + version);
+				// System.out.println("Version = " + version.toString());
 
 				portMapTable.write(socket.getOutputStream());
 

@@ -54,7 +54,7 @@
     <groupId>org.glassfish.mq</groupId>
     <artifactId>mq</artifactId>
     <packaging>pom</packaging>
-    <version> 5.0-b09 </version>
+    <version> 5.0-b10 </version>
     <name>MQ Main Project</name>
 
     <scm>
@@ -69,8 +69,8 @@
 
     <properties>
 	<!-- Change these for each build -->
-	<build.number>9</build.number>
-        <build.letter> h </build.letter>
+	<build.number>10</build.number>
+        <build.letter> f </build.letter>
 
 	<!-- Product-specific -->
         <full.name>Open Message Queue / Oracle GlassFish(tm) Server Message Queue</full.name>
@@ -83,18 +83,19 @@
         <product.name>Message Queue</product.name>
         <product.abbrevname>MQ</product.abbrevname>
         <product.copyright>Copyright (c) 2012, Oracle and/or its affiliates.  All rights reserved.</product.copyright>
-        <javax-jms.version>2.0-b09</javax-jms.version>
+        <javax-jms.version>2.0-b10</javax-jms.version>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 	<!-- Versions of dependencies -->
-        <hk2.version>2.1.45</hk2.version>
-        <hk2.plugin.version>2.1.45</hk2.plugin.version>
+        <hk2.version>2.1.54</hk2.version>
+        <hk2.plugin.version>2.1.54</hk2.plugin.version>
         <glassfishbuild.version>3.2.4</glassfishbuild.version>
         <old.glassfish.version>4.0-b33</old.glassfish.version>
         <glassfish.version>4.0-b64</glassfish.version>
-        <grizzly.version>2.3-beta8</grizzly.version>
-        <servlet-api.version>3.1-b02</servlet-api.version>
-        <jsp-api.version>2.2.1</jsp-api.version>
+        <grizzly.version>2.3-rc2</grizzly.version>
+        <servlet-api.version>3.1-b05</servlet-api.version>
+        <jsp-api.version>2.3.0</jsp-api.version>
+        <javax-resource.version>1.7-b01</javax-resource.version>
         <javahelp.version>2.0.05</javahelp.version>
 
         <jaf.version>1.1.1</jaf.version>
@@ -712,9 +713,9 @@
             </dependency>
 -->
             <dependency>
-                <groupId>org.glassfish.main</groupId>
-                <artifactId>javax.resource</artifactId>
-                <version>${glassfish.version}</version>
+                <groupId>javax.resource</groupId>
+                <artifactId>javax.resource-api</artifactId>
+                <version>${javax-resource.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>

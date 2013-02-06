@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -590,7 +590,9 @@ public class AdminResources extends MQResourceBundle {
     final public static String I_JMQCMD_DESTROY_DUR_SUC         = "A1555";
     final public static String I_JMQCMD_DESTROY_DUR_FAIL        = "A1556";
     final public static String I_JMQCMD_DESTROY_DUR_NOOP        = "A1557";
-    final public static String I_OFF        			= "A1558";
+
+    /** REMOVED A1558 I_OFF from here and AdminResources.properties  
+     */
 
     final public static String I_JMQCMD_METRICS_SVC_FAIL	= "A1559";
     final public static String I_JMQCMD_METRICS_SVC		= "A1560";
@@ -606,79 +608,19 @@ public class AdminResources extends MQResourceBundle {
     final public static String I_CLS_CONFIG_SERVER		= "A1574";
     final public static String I_CLS_URL			= "A1575";
 
-    /*
+    /****************
      * NO LONGER USED:
      * Start of title strings for imqcmd metrics.
-    final public static String I_METRICS_TTL_MSGS_IN1		= "A1576";
-    final public static String I_METRICS_TTL_MSGS_IN2		= "A1577";
-
-    final public static String I_METRICS_TTL_MSGS_OUT1		= "A1578";
-    final public static String I_METRICS_TTL_MSGS_OUT2		= "A1579";
-
-    final public static String I_METRICS_TTL_MSG_BYTES_IN1	= "A1580";
-    final public static String I_METRICS_TTL_MSG_BYTES_IN2	= "A1581";
-
-    final public static String I_METRICS_TTL_MSG_BYTES_OUT1	= "A1582";
-    final public static String I_METRICS_TTL_MSG_BYTES_OUT2	= "A1583";
-
-    final public static String I_METRICS_TTL_MSG_PKTS_IN1	= "A1584";
-    final public static String I_METRICS_TTL_MSG_PKTS_IN2	= "A1585";
-
-    final public static String I_METRICS_TTL_MSG_PKTS_OUT1	= "A1586";
-    final public static String I_METRICS_TTL_MSG_PKTS_OUT2	= "A1587";
-
-    final public static String I_METRICS_TTL_MSG_PKT_BYTES_IN1	= "A1588";
-    final public static String I_METRICS_TTL_MSG_PKT_BYTES_IN2	= "A1589";
-
-    final public static String I_METRICS_TTL_MSG_PKT_BYTES_OUT1	= "A1590";
-    final public static String I_METRICS_TTL_MSG_PKT_BYTES_OUT2	= "A1591";
-
-    final public static String I_METRICS_RTS_MSGS_IN1		= "A1592";
-    final public static String I_METRICS_RTS_MSGS_IN2		= "A1593";
-
-    final public static String I_METRICS_RTS_MSGS_OUT1		= "A1594";
-    final public static String I_METRICS_RTS_MSGS_OUT2		= "A1595";
-
-    final public static String I_METRICS_RTS_MSG_BYTES_IN1	= "A1596";
-    final public static String I_METRICS_RTS_MSG_BYTES_IN2	= "A1597";
-
-    final public static String I_METRICS_RTS_MSG_BYTES_OUT1	= "A1598";
-    final public static String I_METRICS_RTS_MSG_BYTES_OUT2	= "A1599";
-
-    final public static String I_METRICS_RTS_MSG_PKTS_IN1	= "A1600";
-    final public static String I_METRICS_RTS_MSG_PKTS_IN2	= "A1601";
-
-    final public static String I_METRICS_RTS_MSG_PKTS_OUT1	= "A1602";
-    final public static String I_METRICS_RTS_MSG_PKTS_OUT2	= "A1603";
-
-    final public static String I_METRICS_RTS_MSG_PKT_BYTES_IN1	= "A1604";
-    final public static String I_METRICS_RTS_MSG_PKT_BYTES_IN2	= "A1605";
-
-    final public static String I_METRICS_RTS_MSG_PKT_BYTES_OUT1	= "A1606";
-    final public static String I_METRICS_RTS_MSG_PKT_BYTES_OUT2	= "A1607";
+     * A1576 - A1607 inclusive - removed from here and AdminResources.properties 
      */
-
 
     final public static String I_METRICS_CON_NUM_CON1		= "A1608";
     final public static String I_METRICS_CON_NUM_CON2		= "A1609";
 
-    /*
+    /****************
      * NO LONGER USED:
-    final public static String I_METRICS_CON_JVM_TOTAL1		= "A1610";
-    final public static String I_METRICS_CON_JVM_TOTAL2		= "A1611";
-
-    final public static String I_METRICS_CON_JVM_FREE1		= "A1612";
-    final public static String I_METRICS_CON_JVM_FREE2		= "A1613";
-
-    final public static String I_METRICS_CON_THREADS_ACTIVE1	= "A1614";
-    final public static String I_METRICS_CON_THREADS_ACTIVE2	= "A1615";
-
-    final public static String I_METRICS_CON_THREADS_LOW1	= "A1616";
-    final public static String I_METRICS_CON_THREADS_LOW2	= "A1617";
-
-    final public static String I_METRICS_CON_THREADS_HIGH1	= "A1618";
-    final public static String I_METRICS_CON_THREADS_HIGH2	= "A1619";
-    */
+     * A1610 - A1619 inclusive removed from here and AdminResources.properties 
+     */
 
     /*
      * End of title strings for imqcmd metrics.

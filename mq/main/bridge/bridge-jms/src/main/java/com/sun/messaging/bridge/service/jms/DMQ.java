@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -261,8 +261,9 @@ public class DMQ {
         String val = _dmqAttrs.getProperty(JMSBridgeXMLConstant.DMQ.CLIENTID);
         if (_stayConnected || val != null) {
 
-            String[] param = {"DMQ", this.toString(), 
-                              (val == null ? "":_jbr.getString(_jbr.M_WITH_CLIENTID, val))};
+            String[] param = {"DMQ", 
+                              (val == null ? "":"[ClientID="+val+"]"),
+                              this.toString()};
             _logger.log(Level.INFO, _jbr.getString(_jbr.I_CREATE_DEDICATED_CONN, param));
 
             EventListener l = new EventListener(this);

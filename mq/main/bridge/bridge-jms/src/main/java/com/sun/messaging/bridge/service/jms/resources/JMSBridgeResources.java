@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -98,7 +98,10 @@ public class JMSBridgeResources extends MQResourceBundle {
      */
 
     // 0-999     Miscellaneous messages
-    final public static String M_WITH_CLIENTID = "BSJ0000";
+
+    /**
+     * commneted out M_WITH_CLIENTID=BSJ0000, no longer used 
+     */
     final public static String M_SOURCE = "BSJ0001";
     final public static String M_TARGET = "BSJ0002";
     final public static String M_SOURCE_1 = "BSJ0003";
@@ -109,7 +112,9 @@ public class JMSBridgeResources extends MQResourceBundle {
     final public static String M_STARTING_SOURCE_CONN = "BSJ0008";
     final public static String M_RESUME = "BSJ0009";
     final public static String M_START = "BSJ0010";
-    final public static String M_WITH_USERNAME = "BSJ0011";
+    /**
+     * commented out M_WITH_USERNAME = "BSJ0011", no longer used
+     */
     final public static String M_BRIDGE = "BSJ0012";
     final public static String M_LINK = "BSJ0013";
     final public static String M_PAUSE = "BSJ0014";
@@ -184,7 +189,10 @@ public class JMSBridgeResources extends MQResourceBundle {
     final public static String I_INSTRUCTED_NO_TRANSFER_AND_CONSUME = "BSJ1065";
     final public static String I_TRANSFER_TO_GETJMSDESTINATION = "BSJ1066";
     final public static String I_TRANSFORMER_TRANSFER_TO_GETJMSDESTINATION = "BSJ1067";
-    final public static String I_TRANSFORMER_TRANSFER_TO_GETJMSDESTINATION_DIFF = "BSJ1068";
+    /**
+     * removed I_TRANSFORMER_TRANSFER_TO_GETJMSDESTINATION_DIFF = "BSJ1068";
+     * from here and JMSBridgeResources.properties, not used 
+     */
     final public static String I_TRANSFORMER_BRANCHTO = "BSJ1069";
     final public static String I_UPDATE_RECOVER_INFO_GXIDS = "BSJ1070";
     final public static String I_UPDATE_RECOVER_INFO_FOR = "BSJ1071";
@@ -238,8 +246,9 @@ public class JMSBridgeResources extends MQResourceBundle {
     final public static String E_UNABLE_STOP_AFTER_POSTSTART_FAILURE = "BSJ3012";
     final public static String E_UNABLE_PAUSE_SOURCE_CONN = "BSJ3013";
     final public static String E_UNABLE_STOP_AFTER_PAUSE_FAILURE = "BSJ3014";
-    final public static String E_UNABLE_SOURCE_CONN = "BSJ3015";
+    final public static String E_UNABLE_RESUME_SOURCE_CONN = "BSJ3015";
     final public static String E_UNABLE_STOP_LINK_AFTER = "BSJ3016";
+    final public static String E_UNABLE_START_SOURCE_CONN = "BSJ3017";
 
     // 4000-4999 Exception Messages
     final public static String X_LINKOP_ALLOWED_STATE = "BSJ4000";
@@ -264,7 +273,7 @@ public class JMSBridgeResources extends MQResourceBundle {
     final public static String X_LINK_NOT_FOUND = "BSJ4019";
     final public static String X_LOOKUP_RETURN_NULL = "BSJ4020";
     final public static String X_SOURCE_TARGET_NO_INFO = "BSJ4021";
-    final public static String X_REQUIRED_FOR = "BSJ4022";
+    final public static String X_REQUIRED_FOR_LINK = "BSJ4022";
     final public static String X_HAS_STATE = "BSJ4023";
     final public static String X_PAUSE_NOT_ALLOWED_IN_STATE = "BSJ4024";
     final public static String X_NOT_ALLOWED_IN_STATE = "BSJ4025";
@@ -273,11 +282,11 @@ public class JMSBridgeResources extends MQResourceBundle {
     final public static String X_SHARED_CF_CLOSED = "BSJ4028";
     final public static String X_XML_IS_RESERVED = "BSJ4029";
     final public static String X_XML_NO_LOOKUP_NO_NAME_ELEMENT = "BSJ4030";
-    final public static String X_XML_NOT_SPECIFIED = "BSJ4031";
-    final public static String X_XML_ALREADY_EXIST = "BSJ4032";
-    final public static String X_XML_DONOT_EXIST = "BSJ4033";
+    final public static String X_XML_ATTR_NOT_SPECIFIED = "BSJ4031";
+    final public static String X_XML_ELEMENT_ALREADY_EXIST = "BSJ4032";
+    final public static String X_XML_ELEMENT_DONOT_EXIST = "BSJ4033";
     final public static String X_NULL_RETURN_FROM_FOR_MESSAGE = "BSJ4034";
-    final public static String X_XML_INVALID_NAME_VALUE_FOR = "BSJ4035";
+    final public static String X_XML_INVALID_USERNAME_FOR_CF = "BSJ4035";
     final public static String X_XML_NAME_NOT_SPECIFIED_FOR = "BSJ4036";
     final public static String X_OPENCONNECTION_INTERRUPTED = "BSJ4037";
     final public static String X_DMQ_SENDRETRY_INTERRUPTED = "BSJ4038";

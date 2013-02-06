@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -123,7 +123,7 @@ public final class DBManager extends CommDBManager implements DBConstants {
 
     private static final String BROKERID_PROP = Globals.IMQ + ".brokerid";
 
-    private static final int LONGEST_TABLENAME_LEN = 13;
+    private static final int LONGEST_TABLENAME_LEN = 17; //add index
 
     // cluster id to make table names unique per cluster
     private String clusterID = null;

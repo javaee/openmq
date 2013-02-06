@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -185,6 +185,12 @@ public class GrizzlyMQIPConnection extends IMQIPConnection implements Runnable
     @Override
     protected void handleBigPacketException(Packet pkt, BigPacketException e) {
         super.handleBigPacketException(pkt, e);
+    }
+
+    @Override
+    protected void handleIllegalArgumentExceptionPacket(
+        Packet pkt, IllegalArgumentException e) {
+        super.handleIllegalArgumentExceptionPacket(pkt, e);
     }
 
     @Override

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -99,21 +99,24 @@ public class StompProtocolHandler {
 
     public void close(boolean spawnthread) {
 
-        _logger.log(Level.INFO, _sbr.getString(_sbr.I_CLOSE_STOMP_CONN, _stompConnection));
+        _logger.log(Level.INFO, _sbr.getKString(_sbr.I_CLOSE_STOMP_CONN,
+                                  _stompConnection)+"("+spawnthread+")");
         if (!spawnthread) {
             try {
             _stompConnection.disconnect(false);
+            return;
 
             } catch (Throwable t) {
             _logger.log(Level.WARNING, _sbr.getKString(
                     _sbr.W_CLOSE_STOMP_CONN_FAILED, _stompConnection.toString(), t.getMessage()));
             }
-            return;
         }
         Thread thr = new Thread (new Runnable() {
                           public void run() {
                               try {
-                              _stompConnection.disconnect(false);
+                               _logger.log(Level.INFO, _sbr.getKString(
+                                    _sbr.I_CLOSE_STOMP_CONN, _stompConnection));
+                               _stompConnection.disconnect(false);
 
                               } catch (Throwable t) {
                               _logger.log(Level.WARNING, _sbr.getKString(

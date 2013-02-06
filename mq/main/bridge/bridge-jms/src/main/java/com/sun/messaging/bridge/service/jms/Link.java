@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -194,12 +194,12 @@ public class Link implements Runnable {
         if (_isTransacted && 
             !(_sourceCF instanceof XAConnectionFactory)) {
             String[] eparam = {"XAConnectionFactory", _jbr.getString(_jbr.M_TRANSACTED), this.toString()};
-            throw new IllegalArgumentException(_jbr.getKString(_jbr.X_REQUIRED_FOR, eparam));
+            throw new IllegalArgumentException(_jbr.getKString(_jbr.X_REQUIRED_FOR_LINK, eparam));
         }
         if (!_isTransacted && 
             (_sourceCF instanceof XAConnectionFactory)) {
             String[] eparam = {"ConnectionFactory", _jbr.getString(_jbr.M_NONTRANSACTED), this.toString()};
-            throw new IllegalArgumentException(_jbr.getKString(_jbr.X_REQUIRED_FOR, eparam));
+            throw new IllegalArgumentException(_jbr.getKString(_jbr.X_REQUIRED_FOR_LINK, eparam));
         }
 
         String cn = _tgtAttrs.getProperty(JMSBridgeXMLConstant.Target.MTFCLASS);
@@ -433,8 +433,11 @@ public class Link implements Runnable {
         try {
             _sourceConn.start();
         } catch (Exception e) {
-            _logger.log(Level.SEVERE, _jbr.getKString(_jbr.E_UNABLE_SOURCE_CONN,
-                    (resume ? _jbr.getString(_jbr.M_RESUME):_jbr.getString(_jbr.M_START)), this.toString()), e);
+            if (resume) {
+            _logger.log(Level.SEVERE, _jbr.getKString(_jbr.E_UNABLE_RESUME_SOURCE_CONN, this.toString()), e);
+            } else {
+            _logger.log(Level.SEVERE, _jbr.getKString(_jbr.E_UNABLE_START_SOURCE_CONN, this.toString()), e);
+            }
             try {
             stop(); 
             } catch (Exception e1) {
@@ -522,8 +525,8 @@ public class Link implements Runnable {
 
         String val = _srcAttrs.getProperty(JMSBridgeXMLConstant.Source.CLIENTID);
         _sourceConnType = "D";
-        _logger.log(Level.INFO, _jbr.getString(_jbr.I_CREATE_DEDICATED_SOURCE_CONN, this.toString(),
-                                     (val == null ? "":_jbr.getString(_jbr.M_WITH_CLIENTID, val))));
+        _logger.log(Level.INFO, _jbr.getString(_jbr.I_CREATE_DEDICATED_SOURCE_CONN, 
+                          (val == null ? "":"[ClientID="+val+"]"), this.toString()));
 
         EventListener l = new EventListener(this);
         try {
@@ -638,9 +641,9 @@ public class Link implements Runnable {
         if (val != null || _targetStayConnected) {
 
             _targetConnType = "D";
-            _logger.log(Level.INFO, _jbr.getString(_jbr.I_CREATE_DEDICATED_TARGET_CONN, this.toString(),
-                                     (val == null ? "":_jbr.getString(_jbr.M_WITH_CLIENTID, val))));
-
+            _logger.log(Level.INFO, _jbr.getString(_jbr.I_CREATE_DEDICATED_TARGET_CONN,
+                             (val == null ? "":"[ClientID="+val+"]"), this.toString()));
+  
             EventListener l = new EventListener(this);
             try {
                 _notifier.addEventListener(EventListener.EventType.LINK_STOP, l);

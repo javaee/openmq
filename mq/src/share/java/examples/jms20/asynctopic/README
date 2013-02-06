@@ -1,0 +1,80 @@
+
+asynctopic example
+-------------------
+
+Description
+-----------
+This example illustrates how to write an application that uses a
+JMS2.0 simplified API to send messages and asynchronously receive messages  
+to/from topic. It also illustrates the use of jdk7 feature try-with-resources in JMS application.
+
+Files
+-----
+AsyncTopicConsumer.java           Source file for this example.
+SendMsgsToTopic.java              Source file for this example.
+*.class                 	  Prebuilt Java class files for this example.
+README                            This file.
+
+Configuring the environment
+---------------------------
+To recompile or run this example, you need to set CLASSPATH
+to include at least:
+    jms.jar
+    imq.jar
+    directory containing this example
+
+A detailed guideline on configuring your enrivonment and setting CLASSPATH
+is found in the top-level README file of the examples (demo) directory of
+the Message Queue installation (<IMQ_HOME>/examples/README) as well as in
+the "Quick Start Tutorial" in the Oracle GlassFish(tm) Server Message Queue
+Developer's Guide.
+
+Building the example
+--------------------
+Run the following:
+
+    javac AsyncTopicConsumer.java
+    javac SendMsgsToTopic.java
+
+Running the example
+-------------------
+
+Start a broker
+
+   imqbrokerd -tty
+
+Run the following command first on one terminal:
+
+   java AsyncTopicConsumer <topic_name> [<number_of_messages>]
+
+Run the following command on another terminal:
+
+   java SendMsgsToTopic <topic_name> [<number_of_messages>]
+  
+
+The output of AsyncTopicConsumer looks like this:
+
+java AsyncTopicConsumer topic1 5
+
+Topic name is topic1
+Created jms context successfully
+Created topic successfully
+Message Received :Here is a message 1
+Message Received :Here is a message 2
+Message Received :Here is a message 3
+Message Received :Here is a message 4
+Message Received :Here is a message 5
+
+The output of SendMsgsToTopic looks like this:
+
+java SendMsgsToTopic topic1 5
+
+Topic name is topic1
+Created jms context successfully
+Created topic successfully
+Sending message: Here is a message 1
+Sending message: Here is a message 2
+Sending message: Here is a message 3
+Sending message: Here is a message 4
+Sending message: Here is a message 5
+

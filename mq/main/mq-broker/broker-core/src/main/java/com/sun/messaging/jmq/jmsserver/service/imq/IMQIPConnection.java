@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1237,21 +1237,7 @@ public class IMQIPConnection extends IMQBasicConnection
                        convertPkt.handleReadPacket(readpkt); 
     
                } catch (IllegalArgumentException ex) {
-                   logger.log(Logger.INFO,"Internal Error ", ex);
-                   // queue a HELLO_REPLY w/ error
-                   Packet pkt = new Packet(useDirectBuffers());
-                   pkt.setIP(ipAddress);
-                   pkt.setPort(getLocalPort());
-    
-                   pkt.setPacketType(PacketType.HELLO_REPLY);
-                   Hashtable hash = new Hashtable();
-                   hash.put("JMQStatus", new Integer(Status.BAD_VERSION));
-                   pkt.setProperties(hash);
-                   sendControlMessage(pkt);
-                   flushControl(1000);
-                   destroyConnection(true, GoodbyeReason.CON_FATAL_ERROR,
-                           (getDestroyReason() == null ? ex.toString()
-                          : getDestroyReason()));
+                   handleIllegalArgumentExceptionPacket(readpkt, ex);
                    throw ex;
                        
                } catch (OutOfMemoryError ex) {
@@ -1760,9 +1746,30 @@ public class IMQIPConnection extends IMQBasicConnection
                             pkt.toString(),
                             String.valueOf(pkt.getMaxPacketSize())
                           };
-        logger.log(Logger.WARNING,
+        logger.log(Logger.ERROR,
                    BrokerResources.X_IND_PACKET_SIZE_EXCEEDED, params, e);
         sendReply(pkt, Status.ENTITY_TOO_LARGE);
+    }
+
+    protected void handleIllegalArgumentExceptionPacket(
+        Packet pkt, IllegalArgumentException e) {
+
+        logger.log(Logger.ERROR, 
+        "Bad version packet received: "+e.getMessage()+", reject connection ["+this+"]"); 
+
+        // queue a HELLO_REPLY w/ error
+        Packet reply = new Packet(useDirectBuffers());
+        reply.setIP(ipAddress);
+        reply.setPort(getLocalPort());
+
+        reply.setPacketType(PacketType.HELLO_REPLY);
+        Hashtable hash = new Hashtable();
+        hash.put("JMQStatus", new Integer(Status.BAD_VERSION));
+        reply.setProperties(hash);
+        sendControlMessage(reply);
+        flushControl(1000);
+        destroyConnection(true, GoodbyeReason.CON_FATAL_ERROR,
+            (getDestroyReason() == null ? e.toString():getDestroyReason()));
     }
 
     /**

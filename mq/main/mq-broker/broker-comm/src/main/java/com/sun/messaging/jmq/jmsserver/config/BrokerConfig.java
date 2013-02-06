@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1103,10 +1103,10 @@ public class BrokerConfig extends UpdateProperties
         + IMQ + ".service_handler.mqdirect.class=com.sun.messaging.jmq.jmsserver.service.imq.IMQEmbeddedServiceFactory\n"
         + IMQ + ".service_handler.mqdirect2.class=com.sun.messaging.jmq.jmsserver.service.imq.IMQDualThreadServiceFactory\n"
         + IMQ + ".service_handler.dedicated.class=com.sun.messaging.jmq.jmsserver.service.imq.dedicated.DedicatedServiceFactory\n"
-        + IMQ + ".service_handler.shared.class=com.sun.messaging.jmq.jmsserver.service.imq.group.GroupServiceFactory\n"
-        + IMQ + ".service_handler.group.class=com.sun.messaging.jmq.jmsserver.service.imq.group.GroupServiceFactory\n"
+        + IMQ + ".service_handler.shared_old.class=com.sun.messaging.jmq.jmsserver.service.imq.group.GroupServiceFactory\n"
+        + IMQ + ".service_handler.group_old.class=com.sun.messaging.jmq.jmsserver.service.imq.group.GroupServiceFactory\n"
         + IMQ + ".service_handler.direct.class=com.sun.messaging.jmq.jmsserver.service.imq.IMQDirectServiceFactory\n"
-        + IMQ + ".service_handler.grizzly.class=com.sun.messaging.jmq.jmsserver.service.imq.grizzly.GrizzlyIPServiceFactory\n"
+        + IMQ + ".service_handler.shared.class=com.sun.messaging.jmq.jmsserver.service.imq.grizzly.GrizzlyIPServiceFactory\n"
         + IMQ + ".selectors.limit=16\n"
         + IMQ + ".cluster.port=0\n"
         + IMQ + ".cluster.masterbroker.enforce=true\n"

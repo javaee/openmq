@@ -892,11 +892,20 @@ public class Broker implements GlobalErrorHandler, CommBroker {
 
         pm.updateProperties();
 
-        if (pm.isDoBind() && Globals.getPUService() == null) {
-        	// start the PortMapper thread
-        	Thread portMapperThread = new MQThread(pm, "JMQPortMapper");
-        	portMapperThread.setDaemon(true);
-        	portMapperThread.start();
+        if (pm.isDoBind()) {
+            if (Globals.getPUService() == null) {
+                // start the PortMapper thread
+                Thread portMapperThread = new MQThread(pm, "JMQPortMapper");
+                portMapperThread.setDaemon(true);
+                portMapperThread.start();
+            } else {
+                try {
+                     pm.startPUService();
+                } catch (Exception e) {
+                    logger.logStack(logger.ERROR, e.getMessage(), e);
+                    return (1);
+                }
+            }
         }
 
         // Try to acquire the lock file. This makes sure no other copy

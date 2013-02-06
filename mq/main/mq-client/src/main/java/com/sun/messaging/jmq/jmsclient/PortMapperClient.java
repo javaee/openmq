@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,6 +44,13 @@
 
 package com.sun.messaging.jmq.jmsclient;
 
+import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Hashtable;
+import java.util.Map;
 import javax.jms.*;
 import com.sun.messaging.jmq.Version;
 import com.sun.messaging.jmq.io.PortMapperTable;
@@ -52,13 +59,7 @@ import com.sun.messaging.jmq.io.Packet;
 import com.sun.messaging.jmq.io.ReadOnlyPacket;
 import com.sun.messaging.AdministeredObject;
 import com.sun.messaging.ConnectionConfiguration;
-import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Hashtable;
-import java.util.Map;
+import com.sun.messaging.jmq.jmsclient.protocol.ssl.SSLUtil;
 
 /**
  *
@@ -153,8 +154,7 @@ public class PortMapperClient {
     protected void init() throws JMSException {
         try {
             readBrokerPorts();
-
-            checkBrokerVersion();
+            checkPacketVersion();
         } catch (JMSException jmse) {
 
             String str = this.getHostName() + ":" + this.getHostPort();
@@ -164,15 +164,15 @@ public class PortMapperClient {
         }
     }
 
-    protected void checkBrokerVersion() throws JMSException {
-        String bkrversion = portMapperTable.getBrokerVersion();
+    private void checkPacketVersion() throws JMSException {
+        String pktversion = portMapperTable.getPacketVersion();
         String clientMVersion = version.getImplementationVersion();
 
         // Raptor (3.5) clients can talk to a Falcon (3.0) broker.
-        if (Version.compareVersions(bkrversion, "3.0") < 0) {
+        if (Version.compareVersions(pktversion, "3.0") < 0) {
             String errorString = AdministeredObject.cr.getKString(
                 AdministeredObject.cr.X_VERSION_MISMATCH,
-                 clientMVersion, bkrversion);
+                 clientMVersion, pktversion);
 
             JMSException jmse =
             new com.sun.messaging.jms.JMSException
@@ -182,23 +182,37 @@ public class PortMapperClient {
         }
 
         // Use Packet version 200 for brokers older than 3.5
-        if (Version.compareVersions(bkrversion, "3.0.1", false) < 0) {
+        if (Version.compareVersions(pktversion, "3.0.1", false) < 0) {
             ReadOnlyPacket.setDefaultVersion(Packet.VERSION2);
         }
     }
 
     private String getHostName() {
-        if (useMQAddress)
+        if (useMQAddress) {
             return addr.getHostName();
-
+        }
         return connection.getProperty(
             ConnectionConfiguration.imqBrokerHostName);
     }
 
-    public int getHostPort() {
-        if (useMQAddress)
-            return addr.getPort();
+    private boolean getHostPortSSLEnabled() {
+        if (useMQAddress) {
+            return addr.isSSLPortMapperScheme();
+        }
+        return false;
+    }
 
+    private boolean getIsHostTrusted() {
+        if (useMQAddress) {
+            return addr.getIsSSLHostTrustedSet();
+        }
+        return false;
+    }
+
+    public int getHostPort() {
+        if (useMQAddress) {
+            return addr.getPort();
+        }
         String prop = connection.getProperty(
             ConnectionConfiguration.imqBrokerHostPort);
         return Integer.parseInt(prop);
@@ -209,9 +223,11 @@ public class PortMapperClient {
         String host = getHostName();
         //port mapper port
         int port = getHostPort();
+        boolean ssl = getHostPortSSLEnabled();
+        boolean isHostTrusted = getIsHostTrusted();
 
         if ( debug ) {
-            Debug.println("PortMapper connecting to host: " + host + "  port: " + port);
+            Debug.println("Connecting to portmapper host: "+host+"  port: "+ port+" ssl: "+ssl);
         }
 
         InputStream is = null;
@@ -224,7 +240,8 @@ public class PortMapperClient {
             // bug 6696742 - add ability to set connect timeout 
             int timeout = connection.getSocketConnectTimeout();
             Integer sotimeout = connection.getPortMapperSoTimeout();
-            socket = makePortMapperClientSocketWithTimeout(host, port, timeout, sotimeout);
+            socket = makePortMapperClientSocket(host, port, timeout, 
+                                         sotimeout, ssl, isHostTrusted);
             
             is = socket.getInputStream();
             os = socket.getOutputStream();
@@ -264,20 +281,31 @@ public class PortMapperClient {
     }
     
     
-    private Socket makePortMapperClientSocketWithTimeout (String host, int port, 
-                                          int timeout, Integer sotimeout)
-                                          throws IOException {
+    private Socket makePortMapperClientSocket(String host, int port, 
+                                              int timeout, Integer sotimeout,
+                                              boolean ssl, boolean isHostTrusted)
+                                              throws Exception {
         Socket socket = null;
         if (timeout > 0) {
-            ConnectionImpl.getConnectionLogger().fine ("connecting with timeout=" + timeout);
+            ConnectionImpl.getConnectionLogger().fine(
+                "Connecting to portmapper with timeout=" + timeout);
 
-            socket = new Socket();
+            if (ssl) {
+                socket = SSLUtil.makeSSLSocket(null, 0, isHostTrusted);
+            } else {
+                socket = new Socket();
+            }
             InetSocketAddress socketAddr = new InetSocketAddress (host, port);
             socket.connect(socketAddr, timeout);
             socket.setSoTimeout(0);
         } else {
-            ConnectionImpl.getConnectionLogger().fine ("connecting with no timeout ...");
-            socket = new Socket(host, port);
+            ConnectionImpl.getConnectionLogger().fine(
+                "Connecting to portmapper without timeout ...");
+            if (ssl) {
+                socket = SSLUtil.makeSSLSocket(host, port, isHostTrusted);
+            } else {
+                socket = new Socket(host, port);
+            }
         }
         if (sotimeout !=  null) {
             socket.setSoTimeout(sotimeout.intValue());

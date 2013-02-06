@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -177,7 +177,7 @@ public class CmdRunner implements BridgeMgrOptions, AdminEventListener {
 	} else if (CmdArg.BRIDGE.equals(commandArg)) {
 
         if (broker == null)  {
-            Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD_FAIL, getLocalizedCmding(cmd)));
+            Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD_FAIL, getLocalizedCmd(cmd)));
             return (1);
         }
 
@@ -188,16 +188,16 @@ public class CmdRunner implements BridgeMgrOptions, AdminEventListener {
 
 	    if ((bn == null) || (bn.trim().equals("")))  {
 	        if ((bt == null) || (bt.trim().equals("")))  {
-                Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_ALL_BRIDGES_CMD_ON_BKR, getLocalizedCmding(cmd)));
+                    Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_ALL_BRIDGES_CMD_ON_BKR, getLocalizedCmd(cmd)));
 		    } else  {
-                    Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_ALL_TYPE_BRIDGES_CMD, getLocalizedCmding(cmd)));
+                    Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_ALL_TYPE_BRIDGES_CMD, getLocalizedCmd(cmd)));
                     printBridgeInfo(false);
 
                     Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_SPECIFY_BKR));
 		    }
 
 	    } else  {
-            Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD, getLocalizedCmding(cmd) ));
+            Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD, getLocalizedCmd(cmd) ));
             printBridgeInfo();
             Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_SPECIFY_BKR));
             single = true;
@@ -211,9 +211,9 @@ public class CmdRunner implements BridgeMgrOptions, AdminEventListener {
             } catch (BrokerAdminException bae)  {
                 handleBrokerAdminException(bae);
                 if (single) {
-                Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD_FAIL, getLocalizedCmding(cmd)));
+                Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD_FAIL, getLocalizedCmd(cmd)));
                 } else {
-                Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_BRIDGES_CMD_FAIL, getLocalizedCmding(cmd)));
+                Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_BRIDGES_CMD_FAIL, getLocalizedCmd(cmd)));
                 }
                 return (1);
             }
@@ -222,7 +222,7 @@ public class CmdRunner implements BridgeMgrOptions, AdminEventListener {
                 force = true;
             }
             if (!force) {
-                input = getUserInput(ar.getString(ar.Q_BRIDGE_CMD_OK, getLocalizedcmd(cmd)), noShort);
+                input = getUserInput(ar.getString(ar.Q_BRIDGE_CMD_OK, getLocalizedCmd(cmd)), noShort);
                 Globals.stdOutPrintln("");
             }
 
@@ -276,31 +276,31 @@ public class CmdRunner implements BridgeMgrOptions, AdminEventListener {
                     if (cmd.equals(Cmd.START) && !startRet) {
                         Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGE_ASYNC_STARTED));
                     } else {
-                        Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD_SUC, getLocalizedcmded(cmd)));
+                        Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD_SUC, getLocalizedCmd(cmd)));
                     }
                 } else {
                     if (cmd.equals(Cmd.START) && !startRet) {
                         Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGES_ASYNC_STARTED));
                     } else {
-                        Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGES_CMD_SUC, getLocalizedcmded(cmd)));
+                        Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGES_CMD_SUC, getLocalizedCmd(cmd)));
                     }
                 }
 
                 } catch (BrokerAdminException bae)  {
                     handleBrokerAdminException(bae);
                     if (single) {
-                    Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD_FAIL, getLocalizedCmding(cmd)));
+                    Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD_FAIL, getLocalizedCmd(cmd)));
                     } else {
-                    Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_BRIDGES_CMD_FAIL, getLocalizedCmding(cmd)));
+                    Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_BRIDGES_CMD_FAIL, getLocalizedCmd(cmd)));
                     }
                     return (1);
                 }
 
             } else if (noShort.equalsIgnoreCase(input) || no.equalsIgnoreCase(input)) {
                 if (single) {
-                Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD_NOOP, getLocalizedcmded(cmd)));
+                Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD_NOOP, getLocalizedCmd(cmd)));
                 } else {
-                Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGES_CMD_NOOP, getLocalizedcmded(cmd)));
+                Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGES_CMD_NOOP, getLocalizedCmd(cmd)));
                 }
                 return (0);
 
@@ -308,9 +308,9 @@ public class CmdRunner implements BridgeMgrOptions, AdminEventListener {
                 Globals.stdOutPrintln(ar.getString(ar.I_UNRECOGNIZED_RES, input));
                 Globals.stdOutPrintln("");
                 if (single) {
-                Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD_NOOP, getLocalizedcmded(cmd)));
+                Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGE_CMD_NOOP, getLocalizedCmd(cmd)));
                 } else {
-                Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGES_CMD_NOOP, getLocalizedcmded(cmd)));
+                Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_BRIDGES_CMD_NOOP, getLocalizedCmd(cmd)));
                 }
                 return (1);
             }
@@ -318,13 +318,13 @@ public class CmdRunner implements BridgeMgrOptions, AdminEventListener {
 	} else if (CmdArg.LINK.equals(commandArg)) {
 
             if (broker == null)  {
-                Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_LINK_CMD_FAIL, getLocalizedCmding(cmd)));
+                Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_LINK_CMD_FAIL, getLocalizedCmd(cmd)));
                 return (1);
             }
 
             if (!force) broker = (BridgeAdmin)CommonCmdRunnerUtil.promptForAuthentication(broker);
 
-            Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_LINK_CMD, getLocalizedCmding(cmd)));
+            Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_LINK_CMD, getLocalizedCmd(cmd)));
             printLinkInfo();
 
             Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_SPECIFY_BKR));
@@ -335,7 +335,7 @@ public class CmdRunner implements BridgeMgrOptions, AdminEventListener {
 
             } catch (BrokerAdminException bae)  {
                 handleBrokerAdminException(bae);
-                Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_LINK_CMD_FAIL, getLocalizedCmding(cmd)));
+                Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_LINK_CMD_FAIL, getLocalizedCmd(cmd)));
                 return (1);
             }
 
@@ -343,7 +343,7 @@ public class CmdRunner implements BridgeMgrOptions, AdminEventListener {
                 force = true;
             }
             if (!force) {
-                input = getUserInput(ar.getString(ar.Q_LINK_CMD_OK, getLocalizedcmd(cmd)), noShort);
+                input = getUserInput(ar.getString(ar.Q_LINK_CMD_OK, getLocalizedCmd(cmd)), noShort);
                 Globals.stdOutPrintln("");
             }
 
@@ -397,22 +397,22 @@ public class CmdRunner implements BridgeMgrOptions, AdminEventListener {
                 if (cmd.equals(Cmd.START) && !startRet) {
                     Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_LINK_ASYNC_STARTED));
                 } else {
-                    Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_LINK_CMD_SUC, getLocalizedcmded(cmd)));
+                    Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_LINK_CMD_SUC, getLocalizedCmd(cmd)));
                 }
 
                 } catch (BrokerAdminException bae)  {
 		        handleBrokerAdminException(bae);
-                Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_LINK_CMD_FAIL, getLocalizedCmding(cmd)));
+                Globals.stdErrPrintln(ar.getString(ar.I_BGMGR_LINK_CMD_FAIL, getLocalizedCmd(cmd)));
                 return (1);
                 }
             } else if (noShort.equalsIgnoreCase(input) || no.equalsIgnoreCase(input)) {
-                Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_LINK_CMD_NOOP, getLocalizedcmded(cmd)));
+                Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_LINK_CMD_NOOP, getLocalizedCmd(cmd)));
                 return (0);
 
             } else {
                 Globals.stdOutPrintln(ar.getString(ar.I_UNRECOGNIZED_RES, input));
                 Globals.stdOutPrintln("");
-                Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_LINK_CMD_NOOP, getLocalizedcmded(cmd)));
+                Globals.stdOutPrintln(ar.getString(ar.I_BGMGR_LINK_CMD_NOOP, getLocalizedCmd(cmd)));
                 return (1);
             }
 	    }
@@ -589,23 +589,7 @@ public class CmdRunner implements BridgeMgrOptions, AdminEventListener {
     }
     }
 
-
-    private String getLocalizedCmding(String cmd) {
-	if (cmd.equals(Cmd.LIST))  {
-           return ar.getString(ar.I_BGMGR_CMD_Listing);
-	} else if (cmd.equals(Cmd.PAUSE))  {
-           return ar.getString(ar.I_BGMGR_CMD_Pausing);
-	} else if (cmd.equals(Cmd.RESUME))  {
-           return ar.getString(ar.I_BGMGR_CMD_Resuming);
-	} else if (cmd.equals(Cmd.START))  {
-           return ar.getString(ar.I_BGMGR_CMD_Starting);
-	} else if (cmd.equals(Cmd.STOP))  {
-           return ar.getString(ar.I_BGMGR_CMD_Stopping);
-	}
-	return (cmd);
-    }
-
-    private String getLocalizedcmd(String cmd) {
+    private String getLocalizedCmd(String cmd) {
 	if (cmd.equals(Cmd.LIST))  {
            return ar.getString(ar.I_BGMGR_CMD_list);
 	} else if (cmd.equals(Cmd.PAUSE))  {
@@ -616,21 +600,6 @@ public class CmdRunner implements BridgeMgrOptions, AdminEventListener {
            return ar.getString(ar.I_BGMGR_CMD_start);
 	} else if (cmd.equals(Cmd.STOP))  {
            return ar.getString(ar.I_BGMGR_CMD_stop);
-	}
-	return (cmd);
-    }
-
-    private String getLocalizedcmded(String cmd) {
-	if (cmd.equals(Cmd.LIST))  {
-           return ar.getString(ar.I_BGMGR_CMD_listed);
-	} else if (cmd.equals(Cmd.PAUSE))  {
-           return ar.getString(ar.I_BGMGR_CMD_paused);
-	} else if (cmd.equals(Cmd.RESUME))  {
-           return ar.getString(ar.I_BGMGR_CMD_resumed);
-	} else if (cmd.equals(Cmd.START))  {
-           return ar.getString(ar.I_BGMGR_CMD_started);
-	} else if (cmd.equals(Cmd.STOP))  {
-           return ar.getString(ar.I_BGMGR_CMD_stopped);
 	}
 	return (cmd);
     }

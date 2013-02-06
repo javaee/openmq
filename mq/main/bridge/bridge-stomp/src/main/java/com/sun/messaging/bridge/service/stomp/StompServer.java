@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -265,7 +265,14 @@ public class StompServer {
                     if (v != null && Boolean.valueOf(v).booleanValue()) {
                         reqcauth = true;
                     }
-                    pu.initializeSSL(sslprops, reqcauth, reqcauth);
+                    if (!pu.initializeSSL(sslprops, reqcauth)) {
+                        if (pu.getSSLClientAuthRequired() != reqcauth) {
+                            _logger.log(Level.WARNING, getStompBridgeResources().getString(
+                                StompBridgeResources.W_PROPERTY_SETTING_OVERRIDE_BY_BROKER,
+                                domain+PROP_SSL_REQUIRE_CLIENTAUTH_SUFFIX+"="+reqcauth,
+                                domain+PROP_SSL_REQUIRE_CLIENTAUTH_SUFFIX+"="+pu.getSSLClientAuthRequired()));
+                        }
+                    }
                     final FilterChain puProtocolFilterChain =
                                   pu.getSSLPUFilterChainBuilder()
                                   .add(new StompMessageFilter(bc, jmsprop))

@@ -817,7 +817,7 @@
      <copy file="${packager.artifacts}/grizzly-framework.jar" tofile="${classes.dir}/grizzly-framework.jar"/>  
      <copy file="${packager.artifacts}/grizzly-portunif.jar" tofile="${classes.dir}/grizzly-portunif.jar"/>  
      <copy file="${packager.artifacts}/javax.servlet-api.jar" tofile="${classes.dir}/javax.servlet-api.jar"/>  
-     <copy file="${packager.artifacts}/javax.resource.jar" tofile="${classes.dir}/javax.resource.jar"/>  
+     <copy file="${packager.artifacts}/javax.resource-api.jar" tofile="${classes.dir}/javax.resource-api.jar"/>  
      <copy file="${packager.artifacts}/javax.transaction.jar" tofile="${classes.dir}/javax.transaction.jar"/>  
      <copy file="${packager.artifacts}/jhall.jar" tofile="${classes.dir}/jhall.jar"/>  
      <copy file="${packager.artifacts}/glassfish-api.jar" tofile="${classes.dir}/glassfish-api.jar"/>  
@@ -828,7 +828,7 @@
           description="Copies the depend jar files">
      <copy file="${packager.artifacts}/grizzly-framework.jar" tofile="${classes.dir}/grizzly-framework.jar"/>
      <copy file="${packager.artifacts}/grizzly-portunif.jar" tofile="${classes.dir}/grizzly-portunif.jar"/>
-     <copy file="${packager.artifacts}/javax.resource.jar" tofile="${classes.dir}/javax.resource.jar"/>
+     <copy file="${packager.artifacts}/javax.resource-api.jar" tofile="${classes.dir}/javax.resource-api.jar"/>
      <copy file="${packager.artifacts}/hk2-api.jar" tofile="${classes.dir}/hk2-api.jar"/>
    </target>
 

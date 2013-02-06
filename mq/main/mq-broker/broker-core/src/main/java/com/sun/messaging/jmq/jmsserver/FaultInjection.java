@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -105,6 +105,8 @@ public class FaultInjection extends RuntimeFaultInjection
      public static final String FAULT_TXN_ROLLBACK_3 = "txn.rollback.3";
      public static final String FAULT_TXN_PREPARE_3_KILL_CLIENT = "txn.prepare.3_kill_client";
      public static final String FAULT_TXN_PREPARE_3_CLOSE_CLIENT = "txn.prepare.3_close_client";
+
+     public static final String FAULT_TXN_PERSIST_WORK_1_5 = "txn.persist_work.1_5";
 
      // after db update but before reply
      public static final String FAULT_TXN_COMMIT_4 = "txn.commit.4";

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -118,6 +118,11 @@ public class DirectConnection
      *  Holds the DirectSession created in this DirectConnection
      */
     private DirectSession ds = null;
+
+    /**
+     * Flags whether further creation of session is allowed
+     */
+    private boolean sessions_allowed = true;
 
     /**
      *  DirectSessions made by this DirectConnection
@@ -380,6 +385,7 @@ public class DirectConnection
                 "isTransacted=" + isTransacted + ":" +
                 "acknowledgeMode=" + acknowledgeMode);
         _checkIfClosed("createSession():");
+        checkSessionsAllowed("createSession():");
         this.setUsed();
         
         SessionAckMode ackMode;
@@ -670,6 +676,7 @@ public class DirectConnection
                 "isTransacted=" + isTransacted + ":" +
                 "acknowledgeMode=" + acknowledgeMode);
         _checkIfClosed("createQueueSession():");
+        checkSessionsAllowed("createQueueSession():");
         this.setUsed();   
         
         SessionAckMode ackMode;
@@ -738,6 +745,7 @@ public class DirectConnection
                 "isTransacted=" + isTransacted + ":" +
                 "acknowledgeMode=" + acknowledgeMode);
         _checkIfClosed("createTopicSession():");
+        checkSessionsAllowed("createTopicSession():");
         this.setUsed();
 
         SessionAckMode ackMode;
@@ -1053,6 +1061,24 @@ public class DirectConnection
     }
 
     /**
+     *  Check if the DirectConnection has one active Session object
+     *  and throw a JMSException if an active Session object already exists.
+     *
+     *  @param methodName The name of the method from which this check is called
+     *
+     *  @throws JMSException if an active Session object already exists for this connection
+     */
+    private void checkSessionsAllowed(String methodName) throws JMSException {
+        if (!sessions_allowed) {
+            String disallowed = _lgrMID_EXC + methodName +
+                    "An active Session object already exists for this connection, " +
+                    "only one active Session object allowed per connection.";
+            _loggerJC.warning(disallowed);
+            throw new JMSException(disallowed);
+        }
+    }
+
+    /**
      *  Throw a JMSException with the appropriate message for unsupported
      *  operations.
      *
@@ -1209,6 +1235,10 @@ public class DirectConnection
     protected void addSession(DirectSession session) {
         this.sessions.add(session);
         ds = session;
+        if (!inACC) {
+            // no more sessions if we are not in the application client container
+            sessions_allowed = false;
+        }
     }
 
     /**
@@ -1222,6 +1252,9 @@ public class DirectConnection
         //This session *has* to be in the list else something went wrong :)
         assert (result == true);
         ds = null;
+        if (!sessions_allowed && sessions.isEmpty()) {
+            sessions_allowed = true;
+        }
     }
 
     /**
@@ -1547,6 +1580,8 @@ public class DirectConnection
             }
         }
         this.sessions.clear();
+        sessions_allowed = true;
+        this.ds = null;
     }
 
     /**

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -85,6 +85,7 @@ public class Packet implements JMSPacket {
     public static final short VERSION1 = 103;
     public static final short VERSION2 = 200;
     public static final short VERSION3 = 301;
+    public static final short CURRENT_VERSION = VERSION3;
 
     // Number of bytes in fixed header portion of packet
     public static final int  HEADER_SIZE = 72;

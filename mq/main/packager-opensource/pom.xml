@@ -48,7 +48,7 @@
     <parent>
        <groupId>org.glassfish.mq</groupId>
        <artifactId>mq</artifactId>
-       <version>5.0-b09</version>
+       <version>5.0-b10</version>
        <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -525,7 +525,7 @@
 			    <include name="saaj-impl.jar"/>
 			    <include name="activation.jar"/>
 			    <include name="mail.jar"/>
-			    <include name="javax.resource.jar"/>
+			    <include name="javax.resource-api.jar"/>
 			</fileset>
                     </copy>
 
@@ -751,11 +751,11 @@
              <groupId>junit</groupId>
              <artifactId>junit</artifactId>
          </dependency>
-<!--
         <dependency>
-             <groupId>org.glassfish.main</groupId>
-             <artifactId>javax.resource</artifactId>
+             <groupId>javax.resource</groupId>
+             <artifactId>javax.resource-api</artifactId>
          </dependency>
+<!--
          <dependency>
              <groupId>org.glassfish.main.transaction</groupId>
              <artifactId>jta</artifactId>

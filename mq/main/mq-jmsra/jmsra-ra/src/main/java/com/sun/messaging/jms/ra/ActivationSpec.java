@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -69,6 +69,8 @@ implements javax.resource.spi.ActivationSpec,
     private static transient final String NOACKNOWLEDGE = "No-acknowledge";
     private static transient final String DURABLE = "Durable";
     private static transient final String NONDURABLE = "NonDurable";
+    private static transient final String INSTANCE = "Instance";
+    private static transient final String CLUSTER = "Cluster";
     private static transient final String QUEUE = "javax.jms.Queue";
     private static transient final String TOPIC = "javax.jms.Topic";
 
@@ -114,6 +116,8 @@ implements javax.resource.spi.ActivationSpec,
     /** The subscription name of the MessageEndpoint consumer */
     private String subscriptionName = null;
 
+    /** The subscription scope of the MessageEndpoint consumer */
+    private String subscriptionScope = null;
 
     /* ActivationSpec attributes for the GlassFish(tm) MQ JMS Resource Adapter */
 
@@ -238,25 +242,35 @@ implements javax.resource.spi.ActivationSpec,
     {
         InvalidPropertyException ipe;
         _loggerIM.entering(_className, "validate()", this);
-        //Require destinationName to be valid
-        if (!DestinationName.isSyntaxValid(destination)) {
+        //Require destinationName to be valid if destinationLookup is not set
+        if (destinationLookup == null && !DestinationName.isSyntaxValid(destination)) {
             ipe = new InvalidPropertyException(_lgrMID_EXC+"validate:Invalid destination name=" + destination);
             _loggerIM.throwing(_className, "validate()", ipe);
             throw ipe;
         }
 
-        //Require both subscriptionName and clientId to be
-        //valid for durable subscriptions
-        if (destinationType.equals(TOPIC) &&
-            subscriptionDurability.equals(DURABLE)) {
-            if ((subscriptionName == null) ||
-                ("".equals(subscriptionName)) ||
-                (clientId == null) ||
-                ("".equals(clientId))) {
-                    ipe = new InvalidPropertyException(_lgrMID_EXC+"validate:Both subscriptionName and clientId must be non-null"+
-                        "\n\tsubscriptionName="+subscriptionName+"\n\tclientId="+clientId);
-                    _loggerIM.throwing(_className, "validate()", ipe);
-                    throw ipe;
+        if (destinationType.equals(QUEUE) && subscriptionScope != null) {
+            ipe = new InvalidPropertyException(_lgrMID_EXC + "validate:subscriptionScope must not be set if destinationType is " + QUEUE);
+            _loggerIM.throwing(_className, "validate()", ipe);
+            throw ipe;
+        }
+
+        if (destinationType.equals(TOPIC)) {
+            if (subscriptionScope != null && clientId != null) {
+                ipe = new InvalidPropertyException(_lgrMID_EXC + "validate:clientId must not be set if subscriptionScope is set");
+                _loggerIM.throwing(_className, "validate()", ipe);
+                throw ipe;
+            }
+            //Require subscriptionName to be
+            //valid for durable subscriptions
+            if (subscriptionDurability.equals(DURABLE)) {
+                if ((subscriptionName == null) ||
+                    ("".equals(subscriptionName))) {
+                        ipe = new InvalidPropertyException(_lgrMID_EXC+"validate:subscriptionName must be non-null"+
+                            "\n\tsubscriptionName="+subscriptionName);
+                        _loggerIM.throwing(_className, "validate()", ipe);
+                        throw ipe;
+                }
             }
         }
         //Require valid values of endpoint properties
@@ -607,6 +621,43 @@ implements javax.resource.spi.ActivationSpec,
     {
         _loggerIM.entering(_className, "getSubscriptionName()", subscriptionName);
         return subscriptionName;
+    }
+
+    /** Sets the subscription scope for the MessageEndpoint consumer
+     *
+     *  @param subscriptionScope The scope of the subscription
+     *         valid values are "Instance" and "Cluster"
+     *
+     *  @throws IllegalArgumentException If subscriptionScope is not valid
+     */
+    public void
+    setSubscriptionScope(String subscriptionScope)
+    {
+        _loggerIM.entering(_className, "setSubscriptionScope()", subscriptionScope);
+        //Must be Instance or Cluster
+        if (INSTANCE.equals(subscriptionScope) ||
+            CLUSTER.equals(subscriptionScope)) {
+
+            this.subscriptionScope = subscriptionScope;
+
+        } else {
+            IllegalArgumentException iae = new IllegalArgumentException(_lgrMID_EXC + "setSubscriptionScope:Invalid subscriptionScope=" + subscriptionScope);
+            _loggerIM.warning(iae.getMessage());
+            _loggerIM.throwing(_className, "setSubscriptionScope()", iae);
+            throw iae;
+        }
+    }
+
+    /** Returns the subscription scope for the MessageEndpoint consumer
+     *
+     *  @return The scope of the subscription
+     *          one of either "Instance" or "Cluster" or null
+     */
+    public String
+    getSubscriptionScope()
+    {
+        _loggerIM.entering(_className, "getSubscriptionScope()", subscriptionScope);
+        return subscriptionScope;
     }
 
     /** Sets the connectionFactoryJNDIName for the MessageEndpoint consumer

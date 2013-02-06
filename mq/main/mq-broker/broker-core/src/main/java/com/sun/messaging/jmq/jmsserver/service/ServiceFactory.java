@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -72,7 +72,24 @@ public abstract class ServiceFactory implements ConfigListener
 
     private final Logger logger = Globals.getLogger();
 
+    private String factoryHandlerName = null;
+
     ConnectionManager conmgr = null;
+
+    protected final void setFactoryHandlerName(String handlerName) {
+        factoryHandlerName = handlerName;
+    }
+
+    public final String getFactoryHandlerName() {
+        return factoryHandlerName;
+    }
+
+    /**
+     * @param handlerName for the ServiceFactory
+     * @throws IllegalAccessException if the handlerName not supported
+     */
+    protected abstract void checkFactoryHandlerName(String handlerName)
+    throws IllegalAccessException;
 
     public void setConnectionManager(ConnectionManager conmgr)
     {

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -129,17 +129,10 @@ public class BridgeAdminResources extends MQResourceBundle {
     final public static String I_BGMGR_HELP_EXAMPLES14           = "BA1022";
     final public static String I_BGMGR_HELP_EXAMPLES15           = "BA1023";
     final public static String I_BGMGR_HELP_EXAMPLES16           = "BA1024";
-
-    final public static String I_BGMGR_CMD_Listing  = "BA1050";
-	final public static String I_BGMGR_CMD_Starting = "BA1051";
-    final public static String I_BGMGR_CMD_Stopping = "BA1052";
-	final public static String I_BGMGR_CMD_Resuming = "BA1053";
-	final public static String I_BGMGR_CMD_Pausing  = "BA1054";
-    final public static String I_BGMGR_CMD_listed   = "BA1055";
-	final public static String I_BGMGR_CMD_started  = "BA1056";
-    final public static String I_BGMGR_CMD_stopped   = "BA1057";
-	final public static String I_BGMGR_CMD_resumed  = "BA1058";
-	final public static String I_BGMGR_CMD_paused   = "BA1059";
+    /**
+     * removed BA1050 - BA1059 inclusive from here and BridgeAdminResources.properties
+     * no longer used
+     */
     final public static String I_BGMGR_ALL_BRIDGES_CMD_ON_BKR = "BA1060";
     final public static String I_BGMGR_ALL_TYPE_BRIDGES_CMD = "BA1061";
 	final public static String I_BGMGR_SPECIFY_BKR = "BA1062";
@@ -180,7 +173,10 @@ public class BridgeAdminResources extends MQResourceBundle {
     // 4000-4999 Exception Messages
 
     // 5000-5999 Question Messages
-    final public static String Q_BRIDGES_CMD_OK = "BA5000";
+    /**
+     * removed Q_BRIDGES_CMD_OK = "BA5000";
+     * from here and BridgeAdminResources.properties, not used
+     */
     final public static String Q_BRIDGE_CMD_OK = "BA5001";
     final public static String Q_LINK_CMD_OK = "BA5002";
 

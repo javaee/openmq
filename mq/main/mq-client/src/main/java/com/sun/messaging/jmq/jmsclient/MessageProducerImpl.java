@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -563,20 +563,26 @@ public class MessageProducerImpl implements MessageProducer {
         return timeToLive;
     }
 
-    /** Sets the default minimum length of time in milliseconds from its dispatch time
-     * before a produced message becomes visible on the target destination and available
-     * for delivery to consumers.  
+    /**
+     * Sets the minimum length of time in milliseconds that must elapse after a
+     * message is sent before the JMS provider may deliver the message to a
+     * consumer.
+     * <p>
+     * For transacted sends, this time starts when the client sends the message,
+     * not when the transaction is committed.
+     * <p>
+     * deliveryDelay is set to zero by default.
      *
-     * <P>deliveryDelay is set to zero by default.
+     * @param deliveryDelay
+     *            the delivery delay in milliseconds.
      *
-     * @param deliveryDelay the delivery delay in milliseconds.
-     *
-     * @exception JMSException if the JMS provider fails to set the delivery
-     *                         delay due to some internal error.
+     * @exception JMSException
+     *                if the JMS provider fails to set the delivery delay due to
+     *                some internal error.
      *
      * @see javax.jms.MessageProducer#getDeliveryDelay
      * @see javax.jms.Message#DEFAULT_DELIVERY_DELAY
-     * 
+     *
      * @since 2.0
      */
     public void 
@@ -592,21 +598,23 @@ public class MessageProducerImpl implements MessageProducer {
 
         this.deliveryDelay = deliveryDelay;
     }
-   
-    /** Gets the default minimum length of time in milliseconds from its dispatch time
-    * before a produced message becomes visible on the target destination and available
-    * for delivery to consumers.  
-    *
-    * @return the delivery delay in milliseconds.
-    *
-    * @exception JMSException if the JMS provider fails to get the delivery 
-    *                         delay due to some internal error.
-    *
-    * @see javax.jms.MessageProducer#setDeliveryDelay
-    * 
-    * @since 2.0
-    */ 
-    public long 
+
+    /**
+     * Gets the minimum length of time in milliseconds that must elapse after a
+     * message is sent before the JMS provider may deliver the message to a
+     * consumer.
+     *
+     * @return the delivery delay in milliseconds.
+     *
+     * @exception JMSException
+     *                if the JMS provider fails to get the delivery delay due to
+     *                some internal error.
+     *
+     * @see javax.jms.MessageProducer#setDeliveryDelay
+     *
+     * @since 2.0
+     */
+    public long
     getDeliveryDelay() throws JMSException {
         checkState();
         return deliveryDelay;

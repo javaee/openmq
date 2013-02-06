@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -61,6 +61,7 @@ public class PUService {
     private PUFilter sslpuf = null;
     private TCPNIOTransport puTransport = null; 
     private SocketAddress bindAddr = null;
+    private boolean sslClientAuthRequired = false;
 
     public PUService() {
         rootpuf = new PUFilter();
@@ -69,7 +70,7 @@ public class PUService {
                                    .add(new TransportFilter())
                                    .add(rootpuf);
         puTransport = TCPNIOTransportBuilder.newInstance().build();
-            puTransport.setProcessor(puFilterChainBuilder.build());
+        puTransport.setProcessor(puFilterChainBuilder.build());
 
     }
 
@@ -118,7 +119,10 @@ public class PUService {
     }
 
     public void setBacklog(int backlog) throws IOException {
-        //to be implemented
+        if (puTransport == null) {
+            throw new IOException("Illegal call: PUService not initialized");
+        }
+        puTransport.setServerConnectionBackLog(backlog);
     }
 
     public synchronized void register(PUProtocol pp) throws IOException {
@@ -191,15 +195,21 @@ public class PUService {
 
     /**
      */
-    public synchronized void initializeSSL(Properties props,
-        boolean needClientAuth, boolean wantClientAuth)
+    public synchronized boolean getSSLClientAuthRequired() {
+        return sslClientAuthRequired;
+    }
+
+    /**
+     */
+    public synchronized boolean initializeSSL(
+        Properties props, boolean clientAuthRequired)
         throws IOException { 
 
         if (rootpuf == null) {
             throw new IOException("Illegal call: PUService not initialized");
         }
-        if (sslpuf != null) { //XXX ? allow > 1
-            return;
+        if (sslpuf != null) { 
+            return false;
         }
 
         SSLContextConfigurator sslcf = createSSLContextConfigrattor(props);
@@ -208,18 +218,30 @@ public class PUService {
         }
         SSLEngineConfigurator clientc = new SSLEngineConfigurator(sslcf.createSSLContext());
         SSLEngineConfigurator serverc = new SSLEngineConfigurator(sslcf.createSSLContext(),
-                                            false, needClientAuth, wantClientAuth);
+                                            false, clientAuthRequired, clientAuthRequired);
 
         sslpuf = new PUFilter();
         FilterChain sslProtocolFilterChain = rootpuf.getPUFilterChainBuilder()
                                .add(new SSLFilter(serverc, clientc))
                                .add(sslpuf).build();
+        PUProtocol pu = new PUProtocol(new SSLProtocolFinder(serverc),
+                                       sslProtocolFilterChain);
         try {
-            register(new PUProtocol(new SSLProtocolFinder(serverc),
-                                    sslProtocolFilterChain));
-        } catch (IOException e) { 
+            register(pu);
+            this.sslClientAuthRequired = clientAuthRequired;
+            return true;
+        } catch (Exception e) { 
+            try {
+                deregister(pu);
+            } catch (Exception ee) {
+                //ignore
+            }
             sslpuf = null;
-            throw e;
+            this.sslClientAuthRequired = false;
+            if (e instanceof IOException) {
+                throw (IOException)e;
+            }
+            throw new IOException(e.toString(), e);
         }
     }
 

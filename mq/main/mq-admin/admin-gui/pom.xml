@@ -47,7 +47,7 @@
     <parent>
        <groupId>org.glassfish.mq</groupId>
        <artifactId>mq-admin</artifactId>
-       <version>5.0-b09</version>
+       <version>5.0-b10</version>
        <relativePath>../pom.xml</relativePath>
     </parent>
 

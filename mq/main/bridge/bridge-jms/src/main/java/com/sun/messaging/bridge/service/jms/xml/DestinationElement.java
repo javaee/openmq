@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -65,7 +65,7 @@ public class DestinationElement
                 refname.equals(JMSBridgeXMLConstant.Target.DESTINATIONREF_AS_SOURCE)) {
                 throw new IllegalArgumentException(
                     JMSBridge.getJMSBridgeResources().getKString(
-                    JMSBridgeResources.X_XML_IS_RESERVED, JMSBridgeXMLConstant.Destination.REFNAME, refname));
+                    JMSBridgeResources.X_XML_IS_RESERVED, JMSBridgeXMLConstant.Destination.REFNAME+"="+refname));
             }
             if (a.getProperty(JMSBridgeXMLConstant.Destination.LOOKUPNAME) == null) {
                 String name =  a.getProperty(JMSBridgeXMLConstant.Destination.NAME);
@@ -79,7 +79,7 @@ public class DestinationElement
                 if (name.equals(DMQElement.BUILTIN_DMQ_DESTNAME)) {
                     throw new IllegalArgumentException(
                         JMSBridge.getJMSBridgeResources().getKString(
-                        JMSBridgeResources.X_XML_IS_RESERVED,JMSBridgeXMLConstant.Destination.NAME, name));
+                        JMSBridgeResources.X_XML_IS_RESERVED,JMSBridgeXMLConstant.Destination.NAME+"="+name));
                 }
             }
         } 
@@ -107,9 +107,10 @@ public class DestinationElement
         }
         if (name == null) {
             throw new IllegalArgumentException(
-            JMSBridge.getJMSBridgeResources().getKString(JMSBridgeResources.X_XML_NOT_SPECIFIED,
-                      JMSBridgeXMLConstant.Element.DESTINATION,
-                      JMSBridgeXMLConstant.Destination.NAME));
+            JMSBridge.getJMSBridgeResources().getKString(
+                JMSBridgeResources.X_XML_ATTR_NOT_SPECIFIED,
+                JMSBridgeXMLConstant.Destination.NAME,
+                JMSBridgeXMLConstant.Element.DESTINATION));
         }
         return name;
     }
@@ -132,9 +133,10 @@ public class DestinationElement
         }
         if (_type == null) {
             throw new IllegalArgumentException(
-            JMSBridge.getJMSBridgeResources().getKString(JMSBridgeResources.X_XML_NOT_SPECIFIED,
-                      JMSBridgeXMLConstant.Element.DESTINATION,
-                      JMSBridgeXMLConstant.Destination.TYPE));
+            JMSBridge.getJMSBridgeResources().getKString(
+                JMSBridgeResources.X_XML_ATTR_NOT_SPECIFIED,
+                JMSBridgeXMLConstant.Destination.TYPE,
+                JMSBridgeXMLConstant.Element.DESTINATION));
         }
         _type = _type.trim().toLowerCase();
         return !_type.equals(JMSBridgeXMLConstant.Destination.TOPIC);

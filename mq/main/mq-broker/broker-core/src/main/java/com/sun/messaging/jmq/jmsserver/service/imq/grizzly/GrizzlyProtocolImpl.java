@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -72,6 +72,7 @@ public class GrizzlyProtocolImpl implements Protocol
 
     private GrizzlyIPService service = null;
     private String proto = null;
+    private String modelName = null;
     private int readTimeout = defaultReadTimeout;
     private int lingerTimeout = defaultLingerTimeout;
     private int backlog = defaultBacklog;
@@ -148,13 +149,11 @@ public class GrizzlyProtocolImpl implements Protocol
     }
 
     public int getInputBufferSize() {
-        throw new UnsupportedOperationException(
-        "Unsupported call: "+getClass().getName()+".getInputBufferSize");
+        return inputBufferSize;
     }
 
     public int getOutputBufferSize() {
-        throw new UnsupportedOperationException(
-        "Unsupported call: "+getClass().getName()+".getOutputBufferSize");
+        return outputBufferSize;
     }
 
     public boolean getBlocking() {
@@ -215,6 +214,10 @@ public class GrizzlyProtocolImpl implements Protocol
      * @return old params if param change cause rebind
      */
     public Map setParameters(Map params) throws IOException {
+        if (params.get("serviceFactoryHandlerName") != null) {
+            this.modelName = (String)params.get("serviceFactoryHandlerName");
+	}
+
         HashMap oldparams =  null;
 
         int newport = TcpProtocol.getIntValue("port", params, port);
@@ -228,8 +231,8 @@ public class GrizzlyProtocolImpl implements Protocol
         if (newhostname == null ||  newhostname.trim().length() == 0) {
             newhostname = Globals.HOSTNAME_ALL;
         }
-	    int oldport = port;
-	    int oldbacklog = backlog;
+        int oldport = port;
+        int oldbacklog = backlog;
 
         boolean newhost = (newhostname == null && hostname != null) ||
                    (newhostname != null && hostname == null) ||
@@ -276,13 +279,17 @@ public class GrizzlyProtocolImpl implements Protocol
 
     protected void setMinMaxThreads(int min, int max, String svcname) 
     throws IllegalArgumentException {
-        int tmpmin = min/2;
-        int tmpmax = (max == 1 ? 1:max/2);
+        int tmpmin = min;
+        int tmpmax = max;
         if (tmpmin <= -1) {
             tmpmin = minThreads;
+        } else {
+           tmpmin = (int)(float)(min/2);
         }
 	if (tmpmax <= -1) {
             tmpmax = maxThreads;
+        } else {
+           tmpmax = (int)(float)(max/2);
         }
 
         if (tmpmax == 0) {
@@ -311,6 +318,6 @@ public class GrizzlyProtocolImpl implements Protocol
 
     public String toString() {
         return getType()+"(host = "+(hostname == null ? Globals.HOSTNAME_ALL  : hostname)
-                 + ", port="+port+ ", mode=grizzly)";
+                 + ", port="+port+ ", mode="+modelName+")";
     }
 }

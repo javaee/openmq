@@ -45,7 +45,7 @@ DOCDEFS 	= $(TOPDIR)/src/buildcfg/Doc.gmk
 #
 # If you add an example, add the subdirectory here:
 #
-SUBDIRS         = jms jaxm monitoring helloworld applications jmx
+SUBDIRS         = jms jms20 jaxm monitoring helloworld applications jmx
 
 include $(MAKEDEFS)
 

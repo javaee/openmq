@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -117,7 +117,7 @@ public class SSLConnectionHandler extends SocketConnectionHandler {
             ConnectionImpl.checkHostPort (host, port);
 
             // Create the connection
-            this.sslSocket = makeSSLSocket(host, port, isHostTrusted);
+            this.sslSocket = SSLUtil.makeSSLSocket(host, port, isHostTrusted);
         } catch (JMSException jmse) {
             throw jmse;
         } catch (Exception e) {
@@ -181,7 +181,7 @@ public class SSLConnectionHandler extends SocketConnectionHandler {
             ConnectionImpl.checkHostPort (host, port);
 
             // Create the connection
-            this.sslSocket = makeSSLSocket(host, port, isHostTrusted);
+            this.sslSocket = SSLUtil.makeSSLSocket(host, port, isHostTrusted);
         } catch (JMSException jmse) {
             throw jmse;
         } catch (Exception e) {
@@ -206,56 +206,6 @@ public class SSLConnectionHandler extends SocketConnectionHandler {
                 isRegistered = true;
             }
         }
-    }
-
-    private SSLSocket makeSSLSocket(String host, int port,
-        boolean isHostTrusted) throws Exception {
-        SSLSocketFactory sslFactory;
-
-        if (isHostTrusted) {
-            sslFactory = getTrustSocketFactory();
-
-            if ( debug ) {
-                Debug.println("Broker is trusted ...");
-            }
-        } else {
-            sslFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-        }
-
-        //This is here for QA to verify that SSL is used ...
-        //XXX chiaming REMOVE
-        if ( debug ) {
-            Debug.println ("Create connection using SSL protocol ...");
-            Debug.println ("Broker Host: " + host);
-            Debug.println ("Broker Port: " + port);
-        }
-
-        SSLSocket sslSocket = (SSLSocket) sslFactory.createSocket (host, port);
-
-        //tcp no delay flag
-        boolean tcpNoDelay = true;
-        String prop = System.getProperty("imqTcpNoDelay", "true");
-        if ( prop.equals("false") ) {
-            tcpNoDelay = false;
-        } else {
-            sslSocket.setTcpNoDelay(tcpNoDelay);
-        }
-
-        return sslSocket;
-    }
-
-    private SSLSocketFactory getTrustSocketFactory() throws Exception {
-        SSLSocketFactory factory = null;
-
-        SSLContext ctx;
-        ctx = SSLContext.getInstance("TLS");
-        TrustManager[] tm = new TrustManager [1];
-        tm[0] = new DefaultTrustManager();
-
-        ctx.init(null, tm, null);
-        factory = ctx.getSocketFactory();
-
-        return factory;
     }
 
     /*

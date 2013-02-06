@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -136,7 +136,7 @@ public class UpdateServiceHandler extends AdminCmdHandler
                             info.name);
                     }
                 } catch (Exception ex) {
-                    logger.log(Logger.WARNING, rb.W_ERROR_UPDATING_SERVICE,
+                    logger.logStack(Logger.WARNING, rb.W_ERROR_UPDATING_SERVICE,
 			svc.getName(), ex);
                     status = Status.ERROR;
 		    errMsg = getMessageFromException(ex);

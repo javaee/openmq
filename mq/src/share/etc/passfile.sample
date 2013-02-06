@@ -1,7 +1,7 @@
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2000-2010 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
 #
 # The contents of this file are subject to the terms of either the GNU
 # General Public License Version 2 only ("GPL") or the Common Development
@@ -54,21 +54,22 @@
 # e.g.
 # % imqcmd ............. -u <username> -p <password>
 # 
-#   The above command line operation no longer accepts 
-#   the  -p  option.
-#   However, the  -passfile  option can be used in it's
-#   place as shown below.
+# The above command line operation no longer accepts the -p option.
+# However, the -passfile option can be used in it's place as shown below.
 #
 # e.g.
 # % imqcmd ............. -u <username> -passfile <password_filename>
 # 
 # 
-# A passfile is not encrypted, so you should set the file permissions
-# to restrict access in order to protect the passwords. Alternatively,
-# when you interactively enter a command you can let the system prompt 
-# you for a password. 
+# After you add password(s) to a passfile,  you should run
 #
+# imqusermgr encode -src <original-passfile> -target <new-passfile> 
 #
+# to encode the password(s) in the passfile and save the <new-passfile>
+# for MQ command line use.  The <new-passfile> is not encrypted, so you
+# should set the file permissions to protected it from unauthorized access.
+# Alternatively, when you interactively enter a command you can let the 
+# system prompt you for a password. 
 #
 # The following passwords can be stored in a passfile --
 # 
@@ -86,9 +87,7 @@
 # 
 #   o By the broker when the broker is configured to do so.
 #
-#   o By an MQ command when the -passfile option is specified
-#
-# 
+#   o By a MQ command when the -passfile option is specified
 #
 #
 # To configure the broker to use a passfile, do one of the following: 
@@ -99,7 +98,7 @@
 #          imq.passfile.name=<name of the passfile>
 # 
 #    o Use the -passfile option of the broker:  
-#	   imqbrokerd -passfile <full name of the passfile>
+#	   imqbrokerd -passfile <full name of the encoded passfile>
 #
 #
 #
@@ -123,7 +122,8 @@
 #       imq.bridge.admin.password
 #                - Used by the broker's bridge service manager
 #
-# Passwords are stored in name=value format. For example:
+#
+# You add password in name=value format to a passfile, for example:
 #
 #       imq.keystore.password=<keystore password>
 #       imq.user_repository.ldap.password=<ldap user repository password>
@@ -141,11 +141,11 @@ imq.keystore.password=mypassword
 
 #
 #---------------------------------------------------------------------
-# The default administration password for broker administration
-# tasks using imqcmd
+# The administration password for broker administration tasks using imqcmd
+# A dummy password has been configured as an example
 # 
 
-imq.imqcmd.password=admin
+imq.imqcmd.password=myadminpassword
 
 #
 # Note: imqcmd is a remote administration tool. A passfile used by 

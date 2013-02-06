@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1207,23 +1207,19 @@ public class PacketReference implements Sized, Ordered
             assert pkt != null;
             headers = new HashMap();
             if (pkt == null) {
-				// Fix for CR 6891615
-				// reload packet if it has been GCd
-				pkt = getPacket();
-				if (DEBUG) {
-					Globals.getLogger().log(
-							Logger.DEBUG, 
-							"reloaded packet for non-destroyed message "
-									+ msgid);
-				}
-				if (pkt == null) {
-					Globals.getLogger().log(
-							Logger.ERROR,
-							"could not reload packet for non-destroyed message "
-									+ msgid);
-					return headers;
-				}
-			 }
+                // Fix for CR 6891615
+                // reload packet if it has been GCd
+                pkt = getPacket();
+                if (DEBUG) {
+                    Globals.getLogger().log(Logger.DEBUG, 
+                        "reloaded packet for non-destroyed message "+msgid);
+                }
+                if (pkt == null) {
+                    Globals.getLogger().log(Logger.ERROR,
+                        "could not reload packet for non-destroyed message "+msgid);
+                        return headers;
+                }
+            }
             headers.put("JMSPriority", new Integer(priority));
 
             /*
@@ -1232,7 +1228,7 @@ public class PacketReference implements Sized, Ordered
              */
             headers.put("JMSMessageID",
                (PREPEND_ID ? "ID:" : "") + msgid.toString());
-            headers.put("JMSTimestamp", new Long(timestamp));
+            headers.put("JMSTimestamp", Long.valueOf(timestamp));
             headers.put("JMSDeliveryMode",
                  (pkt.getPersistent() ? "PERSISTENT" :
                      "NON_PERSISTENT"));

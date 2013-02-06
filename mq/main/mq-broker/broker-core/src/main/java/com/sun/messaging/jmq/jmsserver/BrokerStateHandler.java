@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -88,7 +88,6 @@ import java.util.List;
 
 public class BrokerStateHandler
 {
-
      private Logger logger = Globals.getLogger();
      private BrokerResources br = Globals.getBrokerResources();
 
@@ -598,7 +597,7 @@ public class BrokerStateHandler
                 // XXX should this be updated to include why ???
                 Globals.getLogger().logToAll(Logger.INFO,
                     Globals.getBrokerResources().getKString(
-                     BrokerResources.I_SHUTDOWN_BROKER)+"["+requestedBy+"]");
+                    BrokerResources.I_SHUTDOWN_BROKER)+"["+requestedBy+":"+Thread.currentThread()+"]");
 
                 if (Broker.getBroker().getDiagInterval() == 0) {
                     // Log diagnostics at shutdown

@@ -850,7 +850,9 @@ public class MessageConsumerImpl extends Consumer
 
         }
 
-        session.checkPermission();
+        //Comment out MQ-249 change for JMS 2.0 spec needs 
+        //fix for Consumer.close 
+        //session.checkPermission();
 
         try {
 

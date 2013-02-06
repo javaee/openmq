@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -63,21 +63,21 @@ public class ConnectionFactoryElement
             if (refname.equals(DMQElement.BUILTIN_DMQ_NAME) ||
                 refname.equals(DMQElement.BUILTIN_DMQ_DESTNAME)) {
                 throw new IllegalArgumentException(JMSBridge.getJMSBridgeResources().getKString(
-                    JMSBridgeResources.X_XML_IS_RESERVED, JMSBridgeXMLConstant.Common.REFNAME, refname));
+                    JMSBridgeResources.X_XML_IS_RESERVED, JMSBridgeXMLConstant.Common.REFNAME+"="+refname));
             }
             String username = a.getProperty(JMSBridgeXMLConstant.CF.USERNAME);
             if (username != null) {
                 if (username.trim().equals("")) {
-                    String[] eparam = { JMSBridgeXMLConstant.CF.USERNAME, username, 
-                                        JMSBridgeXMLConstant.Element.CF, refname };
+                    String[] eparam = { JMSBridgeXMLConstant.CF.USERNAME+"="+username, 
+                                        JMSBridgeXMLConstant.Element.CF+"="+refname };
                     throw new IllegalArgumentException(JMSBridge.getJMSBridgeResources().getKString(
-                                             JMSBridgeResources.X_XML_INVALID_NAME_VALUE_FOR, eparam));
+                                     JMSBridgeResources.X_XML_INVALID_USERNAME_FOR_CF, eparam));
                 }
                 a.setProperty(JMSBridgeXMLConstant.CF.USERNAME, username.trim());
                 String password = a.getProperty(JMSBridgeXMLConstant.CF.PASSWORD);
                 if (password == null) {
                     String[] eparam = { JMSBridgeXMLConstant.CF.PASSWORD, 
-                                        JMSBridgeXMLConstant.Element.CF, refname };
+                                        JMSBridgeXMLConstant.Element.CF+" "+refname };
                     throw new IllegalArgumentException(JMSBridge.getJMSBridgeResources().getKString(
                                              JMSBridgeResources.X_XML_NAME_NOT_SPECIFIED_FOR, eparam));
                 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -100,14 +100,14 @@ public class JMSBridgeElement
             name.equals(JMSBridge.BRIDGE_NAME_PROPERTY)) {
             throw new IllegalArgumentException(
             JMSBridge.getJMSBridgeResources().getKString(
-            JMSBridgeResources.X_XML_IS_RESERVED, JMSBridgeXMLConstant.Element.LINK+" "+JMSBridgeXMLConstant.Common.NAME, name));
+            JMSBridgeResources.X_XML_IS_RESERVED, JMSBridgeXMLConstant.Element.LINK+" "+JMSBridgeXMLConstant.Common.NAME+"="+name));
         }
         LinkElement pre = _links.get(name);
         if (pre != null) {
             throw new IllegalArgumentException(
             JMSBridge.getJMSBridgeResources().getKString(
-            JMSBridgeResources.X_XML_ALREADY_EXIST,
-            JMSBridgeXMLConstant.Element.LINK+" "+JMSBridgeXMLConstant.Common.NAME, name));
+            JMSBridgeResources.X_XML_ELEMENT_ALREADY_EXIST,
+            JMSBridgeXMLConstant.Element.LINK, JMSBridgeXMLConstant.Common.NAME+"="+name));
         }
         
         _links.put(name, l);
@@ -122,14 +122,14 @@ public class JMSBridgeElement
         if (name.equals(DMQElement.BUILTIN_DMQ_DESTNAME)) {
             throw new IllegalArgumentException(
             JMSBridge.getJMSBridgeResources().getKString(
-            JMSBridgeResources.X_XML_IS_RESERVED, JMSBridgeXMLConstant.Element.DMQ+" "+JMSBridgeXMLConstant.Common.NAME, name));
+            JMSBridgeResources.X_XML_IS_RESERVED, JMSBridgeXMLConstant.Element.DMQ+" "+JMSBridgeXMLConstant.Common.NAME+"="+name));
         }
         DMQElement pre = _dmqs.get(name);
         if (pre != null) {
             throw new IllegalArgumentException(
             JMSBridge.getJMSBridgeResources().getKString(
-            JMSBridgeResources.X_XML_ALREADY_EXIST,
-            JMSBridgeXMLConstant.Element.DMQ+" "+JMSBridgeXMLConstant.Common.NAME, name));
+            JMSBridgeResources.X_XML_ELEMENT_ALREADY_EXIST,
+            JMSBridgeXMLConstant.Element.DMQ, JMSBridgeXMLConstant.Common.NAME+"="+name));
         }
         
         _dmqs.put(name, d);
@@ -165,8 +165,8 @@ public class JMSBridgeElement
         if (pre != null) {
             throw new IllegalArgumentException(
             JMSBridge.getJMSBridgeResources().getKString(
-            JMSBridgeResources.X_XML_ALREADY_EXIST,
-            JMSBridgeXMLConstant.Element.CF+" "+JMSBridgeXMLConstant.Common.REFNAME, ref));
+            JMSBridgeResources.X_XML_ELEMENT_ALREADY_EXIST,
+            JMSBridgeXMLConstant.Element.CF, JMSBridgeXMLConstant.Common.REFNAME+"="+ref));
         }
         
         _cfs.put(ref, ecf); 
@@ -177,8 +177,8 @@ public class JMSBridgeElement
         if (ecf == null) {
             throw new IllegalArgumentException(
             JMSBridge.getJMSBridgeResources().getKString(
-            JMSBridgeResources.X_XML_DONOT_EXIST,
-            JMSBridgeXMLConstant.Element.CF+" "+JMSBridgeXMLConstant.Common.REFNAME, ref));
+            JMSBridgeResources.X_XML_ELEMENT_DONOT_EXIST,
+            JMSBridgeXMLConstant.Element.CF, JMSBridgeXMLConstant.Common.REFNAME+"="+ref));
         }
         return ecf;
     }
@@ -198,14 +198,14 @@ public class JMSBridgeElement
             throw new IllegalArgumentException(
             JMSBridge.getJMSBridgeResources().getKString(
             JMSBridgeResources.X_XML_IS_RESERVED, JMSBridgeXMLConstant.Element.DESTINATION+" "+
-            JMSBridgeXMLConstant.Common.REFNAME, ref));
+            JMSBridgeXMLConstant.Common.REFNAME+"="+ref));
         }
         DestinationElement pre = _dests.get(ref);
         if (pre != null) {
             throw new IllegalArgumentException(
             JMSBridge.getJMSBridgeResources().getKString(
-            JMSBridgeResources.X_XML_ALREADY_EXIST,
-            JMSBridgeXMLConstant.Element.DESTINATION+" "+JMSBridgeXMLConstant.Common.REFNAME, ref));
+            JMSBridgeResources.X_XML_ELEMENT_ALREADY_EXIST,
+            JMSBridgeXMLConstant.Element.DESTINATION, JMSBridgeXMLConstant.Common.REFNAME+"="+ref));
         }
         
         _dests.put(ref, ed); 
@@ -216,8 +216,8 @@ public class JMSBridgeElement
         if (ed == null) {
             throw new IllegalArgumentException(
             JMSBridge.getJMSBridgeResources().getKString(
-            JMSBridgeResources.X_XML_DONOT_EXIST,
-            JMSBridgeXMLConstant.Element.DESTINATION+" "+JMSBridgeXMLConstant.Common.REFNAME, ref));
+            JMSBridgeResources.X_XML_ELEMENT_DONOT_EXIST,
+            JMSBridgeXMLConstant.Element.DESTINATION, JMSBridgeXMLConstant.Common.REFNAME+"="+ref));
         }
         return ed;
     }

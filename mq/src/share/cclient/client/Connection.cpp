@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1277,7 +1277,6 @@ Connection::exitConnection(const MQError errorCode,
              "Connection::exitConnection finished" ));
 }
 
-
 MQError
 Connection::ping()
 {
@@ -1404,7 +1403,6 @@ Connection::close()
   CHECK_OBJECT_VALIDITY();
 
   MQError errorCode = MQ_SUCCESS;
-
   
   monitor.enter();
     if (isClosed) {
@@ -1424,6 +1422,7 @@ Connection::close()
 
     errorCode = this->stop();
     if (errorCode != MQ_SUCCESS && errorCode != MQ_BROKER_CONNECTION_CLOSED) {
+      cleanupConnection();
       monitor.exit();
       return errorCode;
     }
@@ -1431,6 +1430,7 @@ Connection::close()
     // Close all the sessions (this will close all producers and consumers too)
     errorCode = this->closeSessions();
     if (errorCode != MQ_SUCCESS && errorCode != MQ_BROKER_CONNECTION_CLOSED) {
+      cleanupConnection();
       monitor.exit();
       return errorCode;
     }
@@ -1455,9 +1455,22 @@ Connection::close()
                "Connection closed" ));
     
     this->isClosed = PR_TRUE;
-  monitor.exit();
+    monitor.exit();
 
   return MQ_SUCCESS;
+}
+
+//must only be called in monitor
+void
+Connection::cleanupConnection() 
+{
+    // Shutdown the reader thread and the socket
+    this->exitConnection(MQ_SUCCESS, PR_FALSE, PR_FALSE);
+
+    // Close the transport connection to the broker.  This closes the socket.
+    if (transport != NULL) {
+      transport->close();
+    }
 }
 
 MQError

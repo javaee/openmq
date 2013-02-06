@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -71,7 +71,7 @@ public final class ShareConfigChangeDBManager extends CommDBManager {
     static final String JDBC_PROP_PREFIX = ShareConfigChangeStore.STORE_TYPE_PROP+
                                            "."+Store.JDBC_STORE_TYPE;
 
-    static final int LONGEST_TABLENAME_LEN = 11;
+    static final int LONGEST_TABLENAME_LEN = 15; //add index
 
     private BrokerResources br = Globals.getBrokerResources();
 
@@ -148,13 +148,10 @@ public final class ShareConfigChangeDBManager extends CommDBManager {
         if (maxTableNameLength > 0) {
             // We do know the max number of chars allowed for a table
             // name so verify brokerID or clusterID is within limit.
-            int longest = LONGEST_TABLENAME_LEN;
-            if (isOracle()) {
-                longest += 4;
-            }
-            if ((clusterID.length()+longest+1) > maxTableNameLength) {
+            int baselen = LONGEST_TABLENAME_LEN+1;
+            if ((clusterID.length()+baselen) > maxTableNameLength) {
                 Object[] args = { clusterID, Integer.valueOf(maxTableNameLength),
-                                  Integer.valueOf(longest+1) };
+                                  Integer.valueOf(baselen) };
                 throw new BrokerException(br.getKString(
                     BrokerResources.E_CLUSTER_ID_TOO_LONG, args));
             }

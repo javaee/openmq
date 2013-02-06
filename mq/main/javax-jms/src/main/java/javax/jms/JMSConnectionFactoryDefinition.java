@@ -135,14 +135,7 @@ public @interface JMSConnectionFactoryDefinition {
 	 * connection pool.
 	 * <p>
 	 * Default is vendor-specific.
-	 */
+	 */ 
 	int minPoolSize() default -1;
 
-	/**
-	 * The number of seconds that a physical connection should remain unused in
-	 * the pool before the connection is closed for a connection pool.
-	 * <p>
-	 * Default is vendor-specific
-	 */
-	int maxIdleTime() default -1;
 }

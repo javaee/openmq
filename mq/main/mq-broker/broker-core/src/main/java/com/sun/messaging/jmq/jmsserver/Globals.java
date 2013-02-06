@@ -442,7 +442,7 @@ public class Globals extends CommGlobals
 	if (portMapper == null) {
         synchronized(lock) {
 	        if (portMapper == null) {
-		        portMapper = new PortMapper(configName);
+                    portMapper = new PortMapper(configName);
                 try {
                      portMapper.setParameters(getConfig());
                      // Force portmapper to attempt to bind to port
@@ -1098,7 +1098,7 @@ public class Globals extends CommGlobals
         synchronized(lock) {
             if (_minimizePersistLevel2 == null) {
                 _minimizePersistLevel2 = Boolean.valueOf(
-                    getConfig().getBooleanProperty(MINIMIZE_PERSIST_LEVEL2_PROP, false));
+                    getConfig().getBooleanProperty(MINIMIZE_PERSIST_LEVEL2_PROP, true));
                 if ((isNewTxnLogEnabled() ||  //for self doc
                      (!isBDBStore() && !isJDBCStore())) &&
                     _minimizePersistLevel2.booleanValue()) {

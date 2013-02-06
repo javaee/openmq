@@ -197,6 +197,10 @@ public class PassfileObfuscatorImpl implements PassfileObfuscator
           return pipeis;
     }
 
+    public boolean isobfuscated(String source) throws IOException {
+        return true;
+    }
+
     public static void main(String args[]) {
         try {
         PassfileObfuscator po = new PassfileObfuscatorImpl();

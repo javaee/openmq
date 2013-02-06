@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,7 @@
 
 package com.sun.messaging.jmq.jmsserver.service.portunif;
 
+import java.util.Properties;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import org.glassfish.grizzly.Buffer;
@@ -58,9 +59,7 @@ import com.sun.messaging.jmq.jmsserver.service.PortMapper;
 
 public class PortMapperMessageFilter extends BaseFilter {
    
-    private static boolean DEBUG = false;
-
-    public PortMapperMessageFilter() {}
+    protected static boolean DEBUG = false;
 
     /**
      * @param ctx Context of {@link FilterChainContext} processing
@@ -76,8 +75,9 @@ public class PortMapperMessageFilter extends BaseFilter {
         String data = input.toStringContent(Charset.forName("UTF-8"));
         if (DEBUG) {
             Globals.getLogger().log(Logger.INFO,
-            "PortMapperMessageFilter.handleRead called with data="+data);
-         }
+            "PortMapperMessageFilter.handleRead called with data="+data+
+            " from connection "+ctx.getConnection());
+        }
         input.tryDispose();
 
         return ctx.getInvokeAction();
@@ -93,7 +93,14 @@ public class PortMapperMessageFilter extends BaseFilter {
     throws IOException {
 
         final Buffer output = ctx.getMessage();
-        ctx.setMessage(output.flip());
+        output.flip();
+
+        if (DEBUG) {
+            Globals.getLogger().log(Logger.INFO,
+            "PortMapperMessageFilter.handleWrite called with data size "+output.remaining()+
+            " for connection "+ctx.getConnection());
+        }
+        ctx.setMessage(output);
 
         return ctx.getInvokeAction();
     }
@@ -102,11 +109,31 @@ public class PortMapperMessageFilter extends BaseFilter {
 
         final FilterChain pmProtocolFilterChain =
                 pu.getPUFilterChainBuilder()
+                    .add(new PortMapperConnectionFilter())
                     .add(new PortMapperMessageFilter())
                     .add(new PortMapperServiceFilter())
                     .build();
         return new PUProtocol(new PortMapperProtocolFinder(),
                               pmProtocolFilterChain);
+    }
+
+    public static PUProtocol configurePortMapperSSLProtocol(PUService pu, 
+        Properties sslprops, boolean clientAuthRequired)
+        throws IOException {
+
+        if (!pu.initializeSSL(sslprops, clientAuthRequired)) {
+            throw new IOException(
+            "Unexpected: Someone initialized SSL PUService before PortMapper service");
+        }
+
+        final FilterChain pmSSLProtocolFilterChain =
+                pu.getSSLPUFilterChainBuilder()
+                    .add(new PortMapperConnectionFilter())
+                    .add(new PortMapperMessageFilter())
+                    .add(new PortMapperServiceFilter())
+                    .build();
+        return new PUProtocol(new PortMapperProtocolFinder(),
+                              pmSSLProtocolFilterChain);
     }
 }
 

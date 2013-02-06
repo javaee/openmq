@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -69,7 +69,7 @@ public class PortMapperTable {
     public final static byte SPACE_BYTE = 32;
 
     private String    brokerInstance = "???";
-    private String    brokerVersion = "???";
+    private String    packetVersion = "???";
     private String    version = "???";
 
     private Map  table = null;
@@ -132,8 +132,8 @@ public class PortMapperTable {
     /**
      * Set the broker version string
      */
-    public void setBrokerVersion(String s) {
-        brokerVersion = s;
+    public void setPacketVersion(String s) {
+        packetVersion = s;
     }
 
     /**
@@ -153,8 +153,8 @@ public class PortMapperTable {
     /**
      * Get the broker version number
      */
-    public String getBrokerVersion() {
-        return brokerVersion;
+    public String getPacketVersion() {
+        return packetVersion;
     }
 
     /**
@@ -181,7 +181,7 @@ public class PortMapperTable {
     }
 
     public String toString() {
-        return version + " " + brokerInstance + " " + brokerVersion +
+        return version + " " + brokerInstance + " " + packetVersion +
             table.toString();
     }
 
@@ -231,7 +231,7 @@ public class PortMapperTable {
         Integer port;
 
         data.append(PORTMAPPER_VERSION + SPACE + brokerInstance + SPACE +
-		    brokerVersion + NEWLINE);
+		    packetVersion + NEWLINE);
 
         for (Iterator e = table.keySet().iterator(); e.hasNext() ;) {
             name = (String)e.next();
@@ -284,7 +284,7 @@ public class PortMapperTable {
 
         brokerInstance = st.nextToken();
 
-	brokerVersion = st.nextToken();
+	packetVersion = st.nextToken();
 
         // Read service name/port number value pairs
         while (true) {

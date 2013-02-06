@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -209,6 +209,10 @@ public class ConnectionFactoryAdapter
         ConnectionAdapter ca;
         try {
             ca = (ConnectionAdapter)cm.allocateConnection(mcf, crinfo);
+        } catch (javax.resource.spi.SecurityException se) {
+            String code = "2";
+            throw new com.sun.messaging.jms.JMSSecurityException(
+                "MQRA:CFA:allocation failure:createConnection:"+se.getMessage(), code, se);
         } catch (ResourceException re) {
             throw new com.sun.messaging.jms.JMSException(
                 "MQRA:CFA:allocation failure:createConnection:"+re.getMessage(), re.getErrorCode(), re);
@@ -265,6 +269,10 @@ public class ConnectionFactoryAdapter
         ConnectionAdapter ca;
         try {
             ca = (ConnectionAdapter)cm.allocateConnection(mcf, crinfo);
+        } catch (javax.resource.spi.SecurityException se) {
+            String code = "2";
+            throw new com.sun.messaging.jms.JMSSecurityException(
+                "MQRA:CFA:allocation failure:createConnection:"+se.getMessage(), code, se);
         } catch (ResourceException re) {
             //XXX:Fix codes
             String code = "1";
@@ -324,6 +332,10 @@ public class ConnectionFactoryAdapter
         try {
             ca = (ConnectionAdapter)cm.allocateConnection(mcf, crinfo);
             return (TopicConnection)ca;
+        } catch (javax.resource.spi.SecurityException se) {
+            String code = "2";
+            throw new com.sun.messaging.jms.JMSSecurityException(
+                "MQRA:CFA:allocation failure:createConnection:"+se.getMessage(), code, se);
         } catch (ResourceException re) {
             //XXX:Fix exception logs
             String code = "1";

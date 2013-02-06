@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -98,6 +98,8 @@ public class TcpProtocol implements Protocol
     private boolean useChannels = false;
 
     Object protocolLock = new Object();
+
+    private String modelName = null;
 
 
     public TcpProtocol() {
@@ -393,9 +395,12 @@ public class TcpProtocol implements Protocol
         checkIntValue("backlog", params, one, null);
     }
 
-    public Map setParameters(Map params)
-        throws IOException
-    {
+    public Map setParameters(Map params) throws IOException {
+
+        if (params.get("serviceFactoryHandlerName") != null) {
+            this.modelName = (String)params.get("serviceFactoryHandlerName");
+        }
+
         boolean active = serversocket != null;
 
         int newport = getIntValue("port", params, port);
@@ -406,14 +411,16 @@ public class TcpProtocol implements Protocol
         useChannels = getBooleanValue("useChannels", params, useChannels);
         String newhostname = (String) params.get("hostname");
 
-        if (newhostname == null)
+        if (newhostname == null) {
             newhostname =  Globals.getHostname();
+        }
 
-        if (newhostname == null ||  newhostname.trim().length() == 0)
+        if (newhostname == null ||  newhostname.trim().length() == 0) {
             newhostname = Globals.HOSTNAME_ALL;
+        }
 
-	int oldport = port;
-	int oldbacklog = backlog;
+        int oldport = port;
+        int oldbacklog = backlog;
 
         boolean newhost = (newhostname == null && hostname != null) ||
                    (newhostname != null && hostname == null) ||
@@ -450,8 +457,8 @@ public class TcpProtocol implements Protocol
                  oldserversocket.close();
              } catch (IOException ex) {
                  serversocket = oldserversocket;
-		 port = oldport;
-		 backlog = oldbacklog;
+                 port = oldport;
+                 backlog = oldbacklog;
                  throw ex;
              }
         }
@@ -555,8 +562,7 @@ public class TcpProtocol implements Protocol
         boolean blockednio = (nio && blocking);
         return "tcp(host = " 
                  + (hostname == null ? Globals.HOSTNAME_ALL  : hostname) 
-                 + ", port=" + port 
-                 + ", mode="+ (nio ? "shared" : "dedicated")
+                 + ", port=" + port + ", mode="+ modelName
                  + (blockednio ? " [blocked i/o]" : "") + ")";
     }
 

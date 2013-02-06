@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -682,6 +682,8 @@ public class BrokerResources extends MQResourceBundle {
     final public static String I_WAITING_FOR_BROKER_LINK_DEACTIVATED = "B1485";
     final public static String I_STORE_SESSION_REAPER_SCHEDULED = "B1486";
     final public static String I_REMOVE_CACHED_TAKEOVER_NOTIFICATION_ENTRY = "B1487";
+    final public static String I_BINDING_TRANSPORT_FOR_SERVICE = "B1488";
+    final public static String I_UNBOUND_TRANSPORT_FOR_SERVICE = "B1489";
 
     // 2000-2999 Warning Messages
     final public static String W_AUTH_FAILED	 	= "B2000";
@@ -992,6 +994,8 @@ public class BrokerResources extends MQResourceBundle {
     final public static String W_FORCE_CLOSE_BROKER_LINK_TAKEOVER = "B2282";
     final public static String W_FORCE_CLOSE_BROKER_LINK_BEING_TAKEOVER = "B2283";
     final public static String W_CANNOT_SCHEDULE_STORE_SESSION_REAPER = "B2284";
+    final public static String W_REJECT_PEER_ADDRESS_ACCESS_PORTMAPPER = "B2285";
+    final public static String W_UNEXPECTED_READ_DATA_SIZE = "B2286";
 
     // 3000-3999 Error Messages
     final public static String E_PERSISTENT_OPEN 	= "B3000";
