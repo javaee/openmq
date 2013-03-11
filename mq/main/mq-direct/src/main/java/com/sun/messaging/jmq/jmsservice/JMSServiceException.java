@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -72,11 +72,14 @@ public class JMSServiceException extends java.lang.Exception {
     }
 
     /**
-     *  Creates a new instance of JMSServiceException with a message and a cause
+     *  Creates a new instance of JMSServiceException 
+     *  with the specified message
+     *  that was caused by the specified Throwable.
+     *  This method appends the cause's own message to the specified message.
      */
     public JMSServiceException(String message, Throwable cause,
             Map <? extends String, ? extends Object> replyProps) {
-        super (message, cause);
+        super (""+message+" Caused by:"+cause, cause);
         reply = new JMSServiceReply(replyProps, null);
     }
 

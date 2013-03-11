@@ -170,7 +170,9 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
             filterChainBuilder.add(new GrizzlyMQConnectionFilter(this));
             filterChainBuilder.add(new GrizzlyMQPacketFilter());
             filterChainBuilder.add(new GrizzlyMQPacketDispatchFilter());
-            transport = TCPNIOTransportBuilder.newInstance().build();
+            TCPNIOTransportBuilder niobuilder = TCPNIOTransportBuilder.newInstance();
+            niobuilder.getSelectorThreadPoolConfig().setDaemon(false);
+            transport = niobuilder.build();
             transport.setReadBufferSize(protocol.getInputBufferSize());
             transport.setWriteBufferSize(protocol.getOutputBufferSize());
             transport.setWorkerThreadPool(pool);
@@ -687,10 +689,11 @@ public class GrizzlyIPService extends IMQService implements NotificationInfo
                 }
             }
         } catch (IllegalArgumentException e) {
-            throw new BrokerException(
-                Globals.getBrokerResources().getKString(
-                    BrokerResources.X_THREADPOOL_BAD_SET,
-                    String.valueOf(min), String.valueOf(max))+": "+e.getMessage(), e);
+            String emsg = Globals.getBrokerResources().getKString(
+                BrokerResources.X_THREADPOOL_BAD_SET,
+                String.valueOf(min), String.valueOf(max))+": "+e.getMessage();
+            logger.logStack(logger.ERROR, emsg, e);
+            throw new BrokerException(emsg, e);
         }
 
        	if (port > -1) {

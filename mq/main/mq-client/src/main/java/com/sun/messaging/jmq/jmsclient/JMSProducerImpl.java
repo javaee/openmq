@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,11 +42,13 @@ package com.sun.messaging.jmq.jmsclient;
 
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.jms.BytesMessage;
 import javax.jms.CompletionListener;
@@ -647,11 +649,11 @@ public class JMSProducerImpl implements JMSProducer, Traceable {
     	Object obj = properties.get(name);
     	return obj;
 	}
+	
 
 	@Override
-	public Enumeration<String> getPropertyNames() {
-		contextImpl.checkNotClosed();
-		return properties.keys();
+	public Set<String> getPropertyNames() {
+		return Collections.unmodifiableSet(properties.keySet());
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -391,6 +391,7 @@ public interface JMSService {
      *
      *  @param  connectionId The Id of the connection
      *  @param  sessionId The Id of the session on which to stop delivery
+     *  @param  dowait if true wait for stopped before return
      *
      *  @return The JMSServiceReply of the request to stop the session
      *
@@ -399,6 +400,12 @@ public interface JMSService {
      *
      *  @see JMSServiceReply.Status#ERROR
      *
+     */
+    public JMSServiceReply stopSession(long connectionId, long sessionId, boolean dowait)
+    throws JMSServiceException;
+
+    /**
+     * Stop a session with no wait
      */
     public JMSServiceReply stopSession(long connectionId, long sessionId)
     throws JMSServiceException;
@@ -610,8 +617,9 @@ public interface JMSService {
      *
      */
     public JMSServiceReply deleteConsumer(long connectionId, long sessionId,
-            long consumerId, SysMessageID lastMessageSeen, String durableName, String clientId)
-    throws JMSServiceException;
+        long consumerId, SysMessageID lastMessageSeen, 
+        boolean lastMessageSeenInTransaction, String durableName, String clientId)
+        throws JMSServiceException;
 
     /**
      *  Configure a consumer for async or sync message consumption.<p>

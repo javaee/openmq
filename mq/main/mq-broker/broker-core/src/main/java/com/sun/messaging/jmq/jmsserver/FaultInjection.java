@@ -145,6 +145,7 @@ public class FaultInjection extends RuntimeFaultInjection
      public static final String FAULT_SEND_MSG_1_EXCEPTION = "msg.send.1.exception";
      public static final String FAULT_SEND_MSG_1_SLEEP = "msg.send.1.sleep";
      public static final String FAULT_SEND_MSG_1_SLEEP_EXCEPTION = "msg.send.1.sleep.exception";
+     public static final String FAULT_PACKET_ROUTER_1_SLEEP = "pkt.router.1.sleep";
 
      public static final String FAULT_LOAD_DST_1_5 = "load.dst.1_5";
 

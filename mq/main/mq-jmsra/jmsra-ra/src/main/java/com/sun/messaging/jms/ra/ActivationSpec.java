@@ -630,6 +630,9 @@ implements javax.resource.spi.ActivationSpec,
      *
      *  @throws IllegalArgumentException If subscriptionScope is not valid
      */
+// Disable the feature of JMS_SPEC-73 temporarily for it is removed from JMS 2.0.
+// It will be added back in future release.
+/*
     public void
     setSubscriptionScope(String subscriptionScope)
     {
@@ -647,7 +650,7 @@ implements javax.resource.spi.ActivationSpec,
             throw iae;
         }
     }
-
+*/
     /** Returns the subscription scope for the MessageEndpoint consumer
      *
      *  @return The scope of the subscription

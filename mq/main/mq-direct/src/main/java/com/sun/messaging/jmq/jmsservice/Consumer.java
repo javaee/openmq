@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -52,8 +52,10 @@ public interface Consumer {
 
     /**
      *  Deliver a message to the consumer to be processed.<p>
-     *  The implementation of this method must not throw any exceptions.
-     *  It must catch any exceptions, and either redeliver the message
+     *  Except in the special case of consumer in closing and the message is
+     *  neither delivered nor acked to throw a ConsumerClosedNoDeliveryException,
+     *  the implementation of this method must not throw any exceptions, and 
+     *  it must catch any exceptions, and either redeliver the message
      *  according to the redelivery configuration or it must acknowledge this
      *  message. It can acknowledge this message to the dead message queue if
      *  the redelivery attempts are unsuccessful.
@@ -64,7 +66,8 @@ public interface Consumer {
      *          upon returning from this method.<br>
      *          If this is {@code null} then the message will be acknowledged
      *          separately.
+     * @throw ConsumerClosedRuntimeException
      */
-    public JMSAck deliver(JMSPacket msgPkt);
+    public JMSAck deliver(JMSPacket msgPkt) throws ConsumerClosedNoDeliveryException;
 
 }

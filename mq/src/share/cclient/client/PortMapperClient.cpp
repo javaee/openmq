@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -64,24 +64,40 @@ PortMapperClient::readBrokerPorts(const Properties * const connectionProperties)
 
   // Get the host name property
   const char * brokerName = NULL;
-  RETURN_IF_UNEXPECTED_ERROR(
-      connectionProperties->getStringProperty(MQ_BROKER_HOST_PROPERTY, 
-                                              &brokerName) );
+  errorCode = connectionProperties->getStringProperty(
+                MQ_BROKER_HOST_PROPERTY, &brokerName);
+  if (errorCode != MQ_SUCCESS) {
+    MQ_ERROR_TRACE( "readBrokerPort", errorCode );
+    return errorCode;
+  }
 
   // Get the host port property
   PRInt32 brokerPort = 0;
-  RETURN_IF_UNEXPECTED_ERROR(
-      connectionProperties->getIntegerProperty(
-                              MQ_BROKER_PORT_PROPERTY, 
-                              &brokerPort) );
+  errorCode = connectionProperties->getIntegerProperty(
+                MQ_BROKER_PORT_PROPERTY, &brokerPort);
+  if (errorCode != MQ_SUCCESS) {
+    MQ_ERROR_TRACE( "readBrokerPort", errorCode );
+    return errorCode;
+  }
   if ((brokerPort < 0) || (brokerPort > PORT_MAPPER_CLIENT_MAX_PORT_NUMBER)) {
     return MQ_TCP_INVALID_PORT;
+  }
+
+  PRBool useIPV6 = PR_FALSE;
+  errorCode = connectionProperties->getBooleanProperty(
+                MQ_ENABLE_IPV6_PROPERTY, &useIPV6);
+  if (errorCode != MQ_SUCCESS && errorCode != MQ_NOT_FOUND) {
+    MQ_ERROR_TRACE( "readBrokerPort", errorCode );
+    return errorCode;
+  }
+  if (errorCode == MQ_NOT_FOUND) {
+    useIPV6 = PR_FALSE;
   }
 
   // Open up a new connection to the broker
   TCPSocket brokerSocket;
   RETURN_IF_ERROR_TRACE( brokerSocket.connect(brokerName,
-                                        (PRUint16)brokerPort,
+                                        (PRUint16)brokerPort, useIPV6,
                                         PORT_MAPPER_CLIENT_CONNECT_MICROSEC_TIMEOUT), "readBrokerPorts", "mq");
 
   PRInt32 numBytesWritten = 0;
@@ -143,11 +159,17 @@ PortMapperClient::getPortForProtocol(const UTF8String * const protocol,
 {
   CHECK_OBJECT_VALIDITY();
 
+  MQError errorCode = MQ_SUCCESS;
+
   // Get the port entry
   const PortMapperEntry * portMapperEntry = NULL;
-  RETURN_IF_ERROR( portMapperTable.getPortForProtocol(protocol, 
-                                                      type,  
-                                                      &portMapperEntry) );
+  errorCode = portMapperTable.getPortForProtocol(
+                protocol, type, &portMapperEntry);
+  if (errorCode != MQ_SUCCESS) {
+    LOG_SEVERE(( CODELOC, SOCKET_LOG_MASK, NULL_CONN_ID, errorCode,
+                 "Failed to get port for protocol %s", protocol->getCharStr() ));
+    return errorCode;
+  }
 
   ASSERT( portMapperEntry != NULL );
   *port = portMapperEntry->getPort();

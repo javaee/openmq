@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,98 +38,57 @@
  * holder.
  */
 
-/*
- * @(#)TopicSessionImpl.java	1.26 06/27/07
- */ 
-
 package com.sun.messaging.jmq.jmsclient;
 
-import javax.jms.*;
+import javax.jms.JMSException;
+import javax.jms.Queue;
+import javax.jms.QueueBrowser;
+import javax.jms.TemporaryQueue;
+import javax.jms.TopicSession;
 
 import com.sun.messaging.AdministeredObject;
 
-/** A TopicSession provides methods for creating TopicPublisher's,
-  * TopicSubscriber's and TemporaryTopics. It also provides a method for
-  * deleting its client's durable subscribers.
-  *
-  * @see         javax.jms.Session
-  * @see	 javax.jms.TopicConnection#createTopicSession(boolean, int)
-  * @see         javax.jms.XATopicSession#getTopicSession()
-  */
+/**
+ * A TopicSession provides methods for creating TopicPublisher's,
+ * TopicSubscriber's and TemporaryTopics. It also provides a method for deleting
+ * its client's durable subscribers.
+ * 
+ * @see javax.jms.Session
+ * @see javax.jms.TopicConnection#createTopicSession(boolean, int)
+ * @see javax.jms.XATopicSession#getTopicSession()
+ */
 
 public class TopicSessionImpl extends UnifiedSessionImpl implements TopicSession {
 
-    public TopicSessionImpl (ConnectionImpl connection, boolean transacted, int ackMode) throws JMSException {
-        super (connection, transacted, ackMode);
-    }
+	public TopicSessionImpl(ConnectionImpl connection, boolean transacted, int ackMode) throws JMSException {
+		super(connection, transacted, ackMode);
+	}
 
-    public TopicSessionImpl (ConnectionImpl connection, int ackMode)
-        throws JMSException {
-        super (connection, ackMode);
-    }
+	public TopicSessionImpl(ConnectionImpl connection, int ackMode) throws JMSException {
+		super(connection, ackMode);
+	}
 
-    /**
-    * Throws an IllegalStateException as it is an invalid method for this domain.
-    *
-    * @param queueName the name of this queue
-    *
-    * @return a Queue with the given name.
-    *
-    * @exception IllegalStateException Always, since it is an invalid method for
-    *            this domain.
-    */
-    public Queue createQueue(String queueName) throws JMSException {
+	@Override
+	public Queue createQueue(String queueName) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createQueue");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
-        String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                                                              "createQueue");
-        throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
+	@Override
+	public TemporaryQueue createTemporaryQueue() throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createTemporaryQueue");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
-    /**
-    * Throws an IllegalStateException as it is an invalid method for this domain.
-    *
-    * @return a temporary queue identity
-    *
-    * @exception IllegalStateException Always, since it is an invalid method for
-    *            this domain.
-    */
-    public TemporaryQueue
-    createTemporaryQueue() throws JMSException {
+	@Override
+	public QueueBrowser createBrowser(Queue queue) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createBrowser");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
-        String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                                                              "createTemporaryQueue");
-        throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
-
-    /**
-    * Throws an IllegalStateException as it is an invalid method for this domain.
-    *
-    * @param queue the queue to access
-    *
-    * @exception IllegalStateException Always, since it is an invalid method for
-    *            this domain.
-    */
-    public QueueBrowser
-    createBrowser(Queue queue) throws JMSException {
-
-        String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                                                              "createBrowser");
-        throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
-
-    /**
-    * Throws an IllegalStateException as it is an invalid method for this domain.
-    *
-    * @param queue the queue to access
-    * @param selector the selector to use
-    *
-    * @exception IllegalStateException Always, since it is an invalid method for
-    *            this domain.
-    */
-    public QueueBrowser
-    createBrowser(Queue queue, String selector) throws JMSException {
-        String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                                                              "createBrowser");
-        throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
+	@Override
+	public QueueBrowser createBrowser(Queue queue, String selector) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createBrowser");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 }

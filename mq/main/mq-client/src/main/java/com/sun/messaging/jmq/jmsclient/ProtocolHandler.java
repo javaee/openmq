@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -2502,6 +2502,8 @@ public class ProtocolHandler {
         if (consumer instanceof MessageConsumerImpl) {
             SysMessageID lastID =
                 ((MessageConsumerImpl) consumer).getLastDeliveredID();
+            boolean lastIDInTransaction =
+                ((MessageConsumerImpl) consumer).getLastDeliveredIDInTransaction();
             if (lastID != null) {
                 ByteArrayOutputStream bos =
                     new ByteArrayOutputStream(ACK_MESSAGE_BODY_SIZE);
@@ -2517,6 +2519,9 @@ public class ProtocolHandler {
                     pkt.setMessageBody(lastIDBody);
                     props.put("JMQBodyType",
                               new Integer(PacketType.SYSMESSAGEID));
+                    if (lastIDInTransaction) {
+                        props.put("JMQLastDeliveredIDInTransaction", Boolean.valueOf(true));
+                    }
                 } catch (IOException ioe) {
                     ExceptionHandler.handleException(ioe,
                         ClientResources.X_CAUGHT_EXCEPTION);
@@ -4250,7 +4255,7 @@ public class ProtocolHandler {
                     Long tid = (Long)replyProps.get("JMQTransactionID");
                     String errorString = AdministeredObject.cr
                         .getKString(ClientResources.X_BROKER_TXN_PREPARE_FAILED, 
-                                    (tid == null ?"":tid));
+                                    (tid == null ?"":tid.longValue()));
                     TransactionPrepareStateFAILEDException be = 
                         new TransactionPrepareStateFAILEDException(errorString,
                             ClientResources.X_BROKER_TXN_PREPARE_FAILED);

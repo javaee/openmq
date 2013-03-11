@@ -52,12 +52,19 @@ import org.glassfish.grizzly.CompletionHandler;
 import org.glassfish.grizzly.memory.MemoryManager;
 import com.sun.messaging.jmq.jmsserver.service.PortMapper;
 import com.sun.messaging.jmq.jmsserver.Globals;
+import com.sun.messaging.jmq.jmsserver.resources.BrokerResources;
 import com.sun.messaging.jmq.util.log.Logger;
 
 
 public class PortMapperServiceFilter extends BaseFilter {
 
     private PortMapper pm = null;
+
+    private boolean ssl = false;
+
+    public PortMapperServiceFilter(boolean ssl) {
+        this.ssl = ssl;
+    }
 
     /**
      *
@@ -68,6 +75,14 @@ public class PortMapperServiceFilter extends BaseFilter {
     @Override
     public NextAction handleRead(final FilterChainContext ctx)
     throws IOException {
+
+        final Logger logger = Globals.getLogger();
+
+        if (ssl) {
+            logger.log(logger.INFO, Globals.getBrokerResources().getKString(
+                BrokerResources.I_PORTMAPPER_GOT_CONNECTION, "SSL/TLS",
+                ctx.getConnection().getPeerAddress())); 
+        }
 
         ByteArrayOutputStream bos =  new ByteArrayOutputStream();
         synchronized(this) {
@@ -81,8 +96,6 @@ public class PortMapperServiceFilter extends BaseFilter {
         }
         byte[] reply = bos.toByteArray();
         bos.close();
-
-        final Logger logger = Globals.getLogger();
 
         if (PortMapperMessageFilter.DEBUG) {
             logger.log(logger.INFO, 

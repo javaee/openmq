@@ -477,11 +477,10 @@ class DstMsgStore extends RandomAccessStore {
 
         MessageInfo info = (MessageInfo)messageMap.get(mid);
         if (info == null) {
-            logger.log(logger.ERROR, br.E_MSG_NOT_FOUND_IN_STORE,
-                mid, myDestination);
-            throw new BrokerException(
-                br.getString(br.E_MSG_NOT_FOUND_IN_STORE,
-                    mid, myDestination));
+            String emsg = br.getKString(
+                br.E_MSG_NOT_FOUND_IN_STORE, mid, myDestination);
+            logger.log(logger.ERROR, emsg);
+            throw new BrokerException(emsg);
         }
 
         return info;
@@ -755,11 +754,10 @@ class DstMsgStore extends RandomAccessStore {
     Packet getMessage(SysMessageID mid) throws IOException, BrokerException {
         MessageInfo msginfo = (MessageInfo)messageMap.get(mid);
         if (msginfo == null) {
-            logger.log(logger.ERROR, br.E_MSG_NOT_FOUND_IN_STORE,
-                mid, myDestination);
-            throw new BrokerException(
-                br.getString(br.E_MSG_NOT_FOUND_IN_STORE,
-                    mid, myDestination));
+            String emsg =  br.getKString(
+                br.E_MSG_NOT_FOUND_IN_STORE, mid, myDestination);
+            logger.log(logger.ERROR, emsg);
+            throw new BrokerException(emsg);
         } else {
             return msginfo.getMessage();
         }

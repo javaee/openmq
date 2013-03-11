@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,13 +38,11 @@
  * holder.
  */
 
-/*
- * @(#)TopicSubscriberImpl.java	1.9 06/27/07
- */ 
-
 package com.sun.messaging.jmq.jmsclient;
 
-import javax.jms.*;
+import javax.jms.JMSException;
+import javax.jms.Topic;
+import javax.jms.TopicSubscriber;
 
 /** A client uses a TopicSubscriber for receiving messages that have been
   * published to a topic. TopicSubscriber is the Pub/Sub variant of a JMS
@@ -103,7 +101,9 @@ public class TopicSubscriberImpl extends MessageConsumerImpl implements TopicSub
 
     private Topic topic = null;
 
-
+    /**
+     * Create an unshared non-durable consumer
+     */
     public TopicSubscriberImpl(SessionImpl session, Topic topic,
                                 String selector, boolean noLocal)
                                 throws JMSException {
@@ -111,10 +111,15 @@ public class TopicSubscriberImpl extends MessageConsumerImpl implements TopicSub
         this.topic = topic;
     }
 
+    /**
+     * Create a shared or unshared durable consumer
+     */
     public TopicSubscriberImpl(SessionImpl session, Topic topic,
                                String durableName, String selector,
                                boolean noLocal, boolean shared)
                               throws JMSException {
+    	
+    	// if shared then noLocal MUST be false 
 
         super (session, topic);
         this.topic = topic;
@@ -128,8 +133,11 @@ public class TopicSubscriberImpl extends MessageConsumerImpl implements TopicSub
         init();
     }
 
+    /**
+     * Create a shared non-durable consumer
+     */
     public TopicSubscriberImpl(SessionImpl session, Topic topic,
-                               String selector, boolean noLocal, 
+                               String selector,  
                                String sharedSubscriptionName)
                                throws JMSException {
 
@@ -137,7 +145,7 @@ public class TopicSubscriberImpl extends MessageConsumerImpl implements TopicSub
         this.topic = topic;
 
         setMessageSelector (selector);
-        setNoLocal (noLocal);
+        setNoLocal (false);
         setShared( true );
         setSharedSubscriptionName( sharedSubscriptionName );
 

@@ -534,9 +534,8 @@ public class Broker implements GlobalErrorHandler, CommBroker {
         // if a password file is specified, read it
         try {
             parsePassfile();
-        } catch (FileNotFoundException ex) {
-            logger.log(Logger.FORCE,
-                  rb.E_OPTION_VALID_ERROR, ex);
+        } catch (IOException ex) {
+            logger.log(Logger.FORCE, rb.E_OPTION_VALID_ERROR, ex);
             return (1);
         }
         // Initialize any possible debug settings
@@ -843,8 +842,9 @@ public class Broker implements GlobalErrorHandler, CommBroker {
         }
 
         PortMapper pm = Globals.getPortMapper();
-        if (pm.getServerSocket() == null && pm.isDoBind() 
-            && Globals.getPUService() == null ) {
+        if (pm == null || 
+            (pm.getServerSocket() == null && pm.isDoBind() 
+             && Globals.getPUService() == null)) {
             // PortMapper failed to bind to port. Port is probably already
             // in use. An error message has already been logged so just exit
             System.err.println(rb.getString(rb.M_BROKER_EXITING));
@@ -1835,9 +1835,11 @@ public class Broker implements GlobalErrorHandler, CommBroker {
             throw new EmptyStackException(); // LKS XXX
         } else if (args[n].equals("-license")) {
         if (++n >= args.length || args[n].startsWith("-")) {
-            printLicenses();
+            //printLicenses();
+            printLicenseOptionObsoleteExit();
         } else {
-            licenseToUse = args[n];
+            //licenseToUse = args[n];
+            printLicenseOptionObsoleteWarn(args[n]);
         }
         } else if (args[n].equals("-remove")) {
         if (++n >= args.length) 
@@ -2025,9 +2027,23 @@ public class Broker implements GlobalErrorHandler, CommBroker {
     String usage() {
         return rb.getString(rb.M_BROKER_USAGE);
     }
+    private void printLicenseOptionObsoleteExit() {
+        
+        String msg =  Globals.getBrokerResources().getKString(
+                      BrokerResources.W_LICENSE_OPTION_OBSOLETE);
+        println(msg);
+        getBroker().exit(0, msg, BrokerEvent.Type.SHUTDOWN);
+    }
+
+    private void printLicenseOptionObsoleteWarn(String licenseArg) {
+        
+        String msg =  Globals.getBrokerResources().getKString(
+            BrokerResources.W_LICENSE_OPTION_OBSOLETE_IGNORE, licenseArg);
+        println(msg);
+    }
 
     private void printLicenses() {
-    LicenseBase[] licenses =
+        LicenseBase[] licenses =
         Globals.getLicenseManager().loadLicenses();
         //Bug Fix 4963961
 	if (licenses.length == 0) {
@@ -2050,9 +2066,8 @@ public class Broker implements GlobalErrorHandler, CommBroker {
 		println("\t" + pkg + "\t-  "+ description);
             }
             println(rb.getString(rb.M_LICENSE_MESSAGE_SUBFIX));
-    }
-            getBroker().exit(0, "Displayed Licenses", 
-             BrokerEvent.Type.SHUTDOWN);
+        }
+        getBroker().exit(0, "Displayed Licenses", BrokerEvent.Type.SHUTDOWN);
     }
 
     /**
@@ -2320,7 +2335,7 @@ public class Broker implements GlobalErrorHandler, CommBroker {
     }
 
 
-    private void parsePassfile() throws FileNotFoundException {
+    private void parsePassfile() throws IOException {
     	    	
         BrokerConfig bcfg = Globals.getConfig(); 
 
@@ -2347,8 +2362,16 @@ public class Broker implements GlobalErrorHandler, CommBroker {
                     PassfileObfuscator po = new PassfileObfuscatorImpl();
                     InputStream fis = po.retrieveObfuscatedFile(passfile_location, Globals.IMQ);
                     props.load(fis);
-                } catch (IOException ioex) {
-                    logger.log(Logger.ERROR, rb.getKString(BrokerResources.X_READ_PASSFILE), ioex);
+                    if (!po.isObfuscated(passfile_location, Globals.IMQ)) {
+                        logger.log(Logger.WARNING, rb.getKString(
+                            rb.W_UNENCODED_ENTRY_IN_PASSFILE, 
+                            passfile_location, "'imqusermgr encode'"));
+                    }
+                } catch (IOException e) {
+                    String emsg = rb.getKString(BrokerResources.X_READ_PASSFILE,
+                                                passfile_location); 
+                    logger.logStack(Logger.ERROR, emsg, e);
+                    throw new IOException(emsg, e);
                 }
             } else {
                 throw new FileNotFoundException(rb.getKString(rb.E_GET_PASSFILE, passfile_location));

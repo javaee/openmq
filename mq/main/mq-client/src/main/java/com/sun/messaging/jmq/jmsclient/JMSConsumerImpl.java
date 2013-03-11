@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -168,11 +168,11 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		if (context.getAutoStart()) context.start();
 	}
 
-	protected void initialiseSharedDurableConsumer(JMSContextImpl context, Topic topic, String name, String messageSelector, boolean noLocal) {
+	protected void initialiseSharedDurableConsumer(JMSContextImpl context, Topic topic, String name, String messageSelector) {
 		context.checkNotClosed();
 		this.context=context;
 		try {
-			messageConsumer = (MQMessageConsumer) context._getSession().createSharedDurableConsumer(topic,name,messageSelector,noLocal);
+			messageConsumer = (MQMessageConsumer) context._getSession().createSharedDurableConsumer(topic,name,messageSelector);
 		} catch (InvalidDestinationException e) {
 			throw new MQInvalidDestinationRuntimeException(e);
 		} catch (InvalidSelectorException e) {
@@ -212,24 +212,7 @@ public class JMSConsumerImpl implements JMSConsumer, Traceable {
 		}
 		if (context.getAutoStart()) context.start();
 	}
-	
-	protected void initialiseSharedConsumer(JMSContextImpl context, Topic topic, String sharedSubscriptionName, String messageSelector, boolean noLocal) {
-		context.checkNotClosed();
-		this.context=context;
-		try {
-			messageConsumer = (MQMessageConsumer) context._getSession().createSharedConsumer(topic,sharedSubscriptionName,messageSelector,noLocal);
-		} catch (InvalidDestinationException e) {
-			throw new MQInvalidDestinationRuntimeException(e);
-		} catch (InvalidSelectorException e) {
-			throw new MQInvalidSelectorRuntimeException(e);			
-		} catch (IllegalStateException e) {
-			throw new MQIllegalStateRuntimeException(e);		
-		} catch (JMSException e) {
-			throw new MQRuntimeException(e);
-		}
-		if (context.getAutoStart()) context.start();
-	}
-	
+		
 	@Override
 	public void dump(PrintStream ps) {
 		ps.println ("------ JMSConsumerImpl dump start ------");

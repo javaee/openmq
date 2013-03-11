@@ -89,7 +89,7 @@ To compile the examples,
      <IMQ_HOME>/lib/jms.jar
      <IMQ_HOME>/lib/imq.jar
      <IMQ_HOME>/lib/imqxm.jar
-     saaj-api.jar  (http://download.oracle.com/docs/cd/E17802_01/webservices/webservices/docs/1.5/)
+     javax.xml.soap-api.jar  (http://search.maven.org/remotecontent?filepath=javax/xml/soap/javax.xml.soap-api/1.3.5/javax.xml.soap-api-1.3.5.jar; rename to javax.xml.soap-api.jar)
      activation.jar  (http://java.sun.com/products/archive/javabeans/jaf11.html)
 
    You will also need to include the javax.servlet classes in your

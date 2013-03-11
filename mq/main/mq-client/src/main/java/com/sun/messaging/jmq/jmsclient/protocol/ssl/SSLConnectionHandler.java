@@ -117,7 +117,12 @@ public class SSLConnectionHandler extends SocketConnectionHandler {
             ConnectionImpl.checkHostPort (host, port);
 
             // Create the connection
-            this.sslSocket = SSLUtil.makeSSLSocket(host, port, isHostTrusted);
+            this.sslSocket = SSLUtil.makeSSLSocket(host, port, isHostTrusted,
+                                 connection.getProperty(
+                                     ConnectionConfiguration.imqKeyStore, null),
+                                 connection.getProperty(
+                                     ConnectionConfiguration.imqKeyStorePassword, null),
+                                 connection.getConnectionLogger(), AdministeredObject.cr);
         } catch (JMSException jmse) {
             throw jmse;
         } catch (Exception e) {
@@ -181,7 +186,12 @@ public class SSLConnectionHandler extends SocketConnectionHandler {
             ConnectionImpl.checkHostPort (host, port);
 
             // Create the connection
-            this.sslSocket = SSLUtil.makeSSLSocket(host, port, isHostTrusted);
+            this.sslSocket = SSLUtil.makeSSLSocket(host, port, isHostTrusted,
+                                 connection.getProperty(
+                                     ConnectionConfiguration.imqKeyStore, null),
+                                 connection.getProperty(
+                                     ConnectionConfiguration.imqKeyStorePassword, null),
+                                 connection.getConnectionLogger(), AdministeredObject.cr);
         } catch (JMSException jmse) {
             throw jmse;
         } catch (Exception e) {

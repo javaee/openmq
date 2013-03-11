@@ -628,7 +628,7 @@ public class BrokerResources extends MQResourceBundle {
     final public static String I_DB_CONN_EX_TOBE_DESTROYED = "B1431";
     final public static String I_SET_TXN_TIMEOUT = "B1432";
     final public static String I_USE_JDBC_DRIVER = "B1433";
-    final public static String I_LOAD_STORED_DESTINATIONS = "B1434";
+    final public static String I_RETRIEVE_STORED_DESTINATIONS = "B1434";
     final public static String I_LOAD_STORED_DURA = "B1435";
     final public static String I_CONN_REQUEST_PARTITION_NOT_FOUND = "B1436";
     final public static String I_PARTITION_IS_CLOSING = "B1437";
@@ -684,6 +684,20 @@ public class BrokerResources extends MQResourceBundle {
     final public static String I_REMOVE_CACHED_TAKEOVER_NOTIFICATION_ENTRY = "B1487";
     final public static String I_BINDING_TRANSPORT_FOR_SERVICE = "B1488";
     final public static String I_UNBOUND_TRANSPORT_FOR_SERVICE = "B1489";
+    final public static String I_ENCODING_PASSFILE_WHERE = "B1490";
+    final public static String I_ENCODING_PASSFILE_CONFIRM_QUESTION = "B1491";
+    final public static String I_PASSFILE_WAS_NOT_ENCODED = "B1492";
+    final public static String I_ENCODE_PASSFILE_SUCCESSFUL = "B1493";
+    final public static String I_DECODING_PASSFILE_WHERE = "B1494";
+    final public static String I_DECODING_PASSFILE_CONFIRM_QUESTION = "B1495";
+    final public static String I_PASSFILE_WAS_NOT_DECODED = "B1496";
+    final public static String I_DECODE_PASSFILE_SUCCESSFUL = "B1497";
+    final public static String I_WAIT_FOR_SESSION_STOP = "B1498";
+    final public static String I_PU_SERVICE_READY = "B1499";
+    final public static String I_PORTMAPPER_GOT_CONNECTION = "B1500";
+    final public static String I_PASSFILE_ENCODE_SOURCE_FILE = "B1501";
+    final public static String I_PASSFILE_DECODE_TARGET_FILE = "B1502";
+    final public static String I_RETRIEVED_STORED_DESTINATIONS = "B1503";
 
     // 2000-2999 Warning Messages
     final public static String W_AUTH_FAILED	 	= "B2000";
@@ -996,6 +1010,10 @@ public class BrokerResources extends MQResourceBundle {
     final public static String W_CANNOT_SCHEDULE_STORE_SESSION_REAPER = "B2284";
     final public static String W_REJECT_PEER_ADDRESS_ACCESS_PORTMAPPER = "B2285";
     final public static String W_UNEXPECTED_READ_DATA_SIZE = "B2286";
+    final public static String W_UNENCODED_ENTRY_IN_PASSFILE = "B2287";
+    final public static String W_WAIT_FOR_SESSION_STOP_TIMED_OUT = "B2288";
+    final public static String W_LICENSE_OPTION_OBSOLETE = "B2289";
+    final public static String W_LICENSE_OPTION_OBSOLETE_IGNORE = "B2290";
 
     // 3000-3999 Error Messages
     final public static String E_PERSISTENT_OPEN 	= "B3000";
@@ -1314,6 +1332,9 @@ public class BrokerResources extends MQResourceBundle {
     final public static String E_CLUSTER_LOCK_ACTIVE_DURA_SUB = "B3307";
     final public static String E_DELETE_MSG_IN_REPLACING = "B3308";
     final public static String E_DELETE_CONSUMER_NO_SESSION = "B3309";
+    final public static String E_ENCODE_DECODE_NO_SRC_PASSFILE = "B3310";
+    final public static String E_PROPERTY_SETTING_REQUIRES_PROPERTY = "B3311";
+    final public static String E_CLIENT_PROTOCOL_ERROR = "B3312";
 
     // 4000-4999 Exception Messages
     final public static String X_NO_FILE 		= "B4000";
@@ -1765,6 +1786,9 @@ public class BrokerResources extends MQResourceBundle {
     final public static String X_NON_DURA_SUB_CONFLICT = "B4441";
     final public static String X_REPLACE_PROPS_FOR_REPLACE_MSG = "B4442";
     final public static String X_CLEANUP_MSG_CLOSE_SESSION = "B4443";
+    final public static String X_CANNOT_DELIVER_MESSAGE_TO_CONSUMER = "B4444";
+    final public static String X_SERVICE_TYPE_NOT_FOUND_FOR_SERVICE = "B4445";
+    final public static String X_PU_SERVICE_REBIND = "B4446";
 
     /***************** End of message key constants *******************/
 

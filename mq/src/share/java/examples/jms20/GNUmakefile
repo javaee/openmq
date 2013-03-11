@@ -45,7 +45,7 @@ DOCDEFS 	= $(TOPDIR)/src/buildcfg/Doc.gmk
 #
 # If you add an example, add the subdirectory here:
 #
-SUBDIRS         = asynctopic
+SUBDIRS         = asynctopicconsumer syncqueue deliverydelay messagegetbody messageproperties messageheader deliverycount selector asyncsend sharedsub
 
 include $(MAKEDEFS)
 

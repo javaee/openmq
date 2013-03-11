@@ -48,7 +48,7 @@
     <parent>
        <groupId>org.glassfish.mq</groupId>
        <artifactId>mq</artifactId>
-       <version>5.0-b10</version>
+       <version>5.0-b12</version>
        <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -520,8 +520,8 @@
 			    <include name="glassfish-api.jar"/>
 			    <include name="hk2-api.jar"/>
 			    <include name="jhall.jar"/>
-			    <include name="javax.transaction.jar"/>
-			    <include name="saaj-api.jar"/>
+			    <include name="javax.transaction-api.jar"/>
+			    <include name="javax.xml.soap-api.jar"/>
 			    <include name="saaj-impl.jar"/>
 			    <include name="activation.jar"/>
 			    <include name="mail.jar"/>

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -56,11 +56,11 @@ package javax.jms;
   * deliver new messages until a {@code ServerSession} is 
   * eventually returned.
   *
-  * @version     1.0 - 9 March 1998
-  * @author      Mark Hapner
-  * @author      Rich Burridge
-  *
   * @see javax.jms.ServerSession
+  * 
+  * @version JMS 2.0
+  * @since JMS 1.0
+  * 
   */
 
 public interface ServerSessionPool {

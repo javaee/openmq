@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -85,12 +85,14 @@ package javax.jms;
   * message delivery while they are still in the process of setting up.
   *
   * <P>A message producer can send messages while a connection is stopped.
-  *
-  * @version 2.0
-  *
+  * 
   * @see         javax.jms.ConnectionFactory
   * @see         javax.jms.QueueConnection
   * @see         javax.jms.TopicConnection
+  * 
+  * @version JMS 2.0
+  * @since JMS 1.0
+  *
   */
 
 public interface Connection extends AutoCloseable {
@@ -184,7 +186,7 @@ public interface Connection extends AutoCloseable {
      *                         <li>because this method is being called in a Java EE web or EJB application 
      *                         and an active session already exists for this connection.
      *                         </ul>
-     * @since 1.1
+     * @since JMS 1.1
      *
      * @see Session#AUTO_ACKNOWLEDGE 
      * @see Session#CLIENT_ACKNOWLEDGE 
@@ -273,7 +275,7 @@ public interface Connection extends AutoCloseable {
      *                         <li>because this method is being called in a Java EE web or EJB application 
      *                         and an active session already exists for this connection.
      *                         </ul>
-     * @since 2.0
+     * @since JMS 2.0
      *
      * @see Session#SESSION_TRANSACTED 
      * @see Session#AUTO_ACKNOWLEDGE 
@@ -332,7 +334,7 @@ public interface Connection extends AutoCloseable {
      *                         and an active session already exists for this connection.
      *                         </ul>
      *                       
-     * @since 2.0
+     * @since JMS 2.0
      *
      * @see Session#AUTO_ACKNOWLEDGE 
      * 
@@ -679,7 +681,8 @@ public interface Connection extends AutoCloseable {
 	 *                is thrown in this case)
 	 *                </ul>
 	 * 
-	 * @since 1.1
+	 * @since JMS 1.1
+	 * 
 	 * @see javax.jms.ConnectionConsumer
 	 */
 	ConnectionConsumer createConnectionConsumer(Destination destination,
@@ -733,7 +736,8 @@ public interface Connection extends AutoCloseable {
 	 *                is thrown in this case)
 	 *                </ul>
 	 * 
-	 * @since 2.0
+	 * @since JMS 2.0
+	 * 
 	 * @see javax.jms.ConnectionConsumer
 	 */
 	ConnectionConsumer createSharedConnectionConsumer(Topic topic,
@@ -788,7 +792,8 @@ public interface Connection extends AutoCloseable {
 	 *                application (though it is not guaranteed that an exception
 	 *                is thrown in this case)
 	 *                </ul>
-	 * @since 1.1
+	 * @since JMS 1.1
+	 * 
 	 * @see javax.jms.ConnectionConsumer
 	 */
 	ConnectionConsumer createDurableConnectionConsumer(Topic topic, String subscriptionName, String messageSelector,
@@ -840,7 +845,8 @@ public interface Connection extends AutoCloseable {
 	 *                application (though it is not guaranteed that an exception
 	 *                is thrown in this case)
 	 *                </ul>
-	 * @since 2.0
+	 * @since JMS 2.0
+	 * 
 	 * @see javax.jms.ConnectionConsumer
 	 */
 	ConnectionConsumer createSharedDurableConnectionConsumer(Topic topic, String subscriptionName, String messageSelector,

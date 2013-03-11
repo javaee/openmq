@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -55,7 +55,7 @@ import com.sun.messaging.jmq.jmsservice.JMSAck;
 import com.sun.messaging.jmq.jmsservice.JMSService;
 import com.sun.messaging.jmq.jmsservice.JMSServiceException;
 import com.sun.messaging.jmq.jmsservice.JMSServiceReply;
-//import com.sun.messaging.jmq.jmsservice.JMSServiceReply.Status;
+import com.sun.messaging.jmq.jmsservice.ConsumerClosedNoDeliveryException;
 
 /**
  *  DirectConsumer encapsulates JMS MessageConsumer behavior for MQ DIRECT mode
@@ -144,6 +144,7 @@ public class DirectConsumer
      * then the  message is considered to have been "seen" unless the session mode was auto-ack or dups-ok mode.   
      */
     SysMessageID lastMessageSeen;
+    boolean lastMessageSeenInTransaction = false;
 
 	/**
      *  Logging
@@ -195,17 +196,22 @@ public class DirectConsumer
      * @return the last message seen by the application
      */
     private SysMessageID getLastMessageSeen() {
-		return lastMessageSeen;
-	}
+        return lastMessageSeen;
+    }
 
-	/**
-	 * Set the last message seen by the application
-	 * 
-	 * @param lastMessageSeen
-	 */
-	protected void setLastMessageSeen(SysMessageID lastMessageSeen) {
-		this.lastMessageSeen = lastMessageSeen;
-	}
+    private boolean getLastMessageSeenInTransaction() {
+        return lastMessageSeenInTransaction;
+    }
+
+    /**
+     * Set the last message seen by the application
+     * 
+     * @param lastMessageSeen
+     */
+    protected void setLastMessageSeen(SysMessageID lastMessageSeen) {
+        this.lastMessageSeen = lastMessageSeen;
+        this.lastMessageSeenInTransaction = this.ds.getTransactedNoCheck();
+    }
 
     /////////////////////////////////////////////////////////////////////////
     //  methods that implement javax.jms.MessageConsumer
@@ -420,7 +426,8 @@ public class DirectConsumer
     /**
      *  Deliver a JMSPacket to the JMS MessageListener endpoint
      */
-    public JMSAck deliver(JMSPacket jmsPacket){
+    public JMSAck deliver(JMSPacket jmsPacket) 
+    throws ConsumerClosedNoDeliveryException {
         //Delivery must be serialized at the session level
         return this.ds._deliverMessage(this.msgListener, jmsPacket,
                 this.consumerId);
@@ -542,7 +549,8 @@ public class DirectConsumer
             //System.out.println("DC:Destroying cnsumerId="+consumerId+":connectionId="+connectionId);
             //jmsservice.deleteConsumer(connectionId, sessionId, consumerId, null, clientId);
             
-            jmsservice.deleteConsumer(connectionId, sessionId, consumerId, getLastMessageSeen(), null, clientId);
+            jmsservice.deleteConsumer(connectionId, sessionId, consumerId, 
+                getLastMessageSeen(), getLastMessageSeenInTransaction(), null, clientId);
             
         } catch (JMSServiceException jmsse){
             _loggerJMC.warning(_lgrMID_WRN+

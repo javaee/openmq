@@ -74,12 +74,14 @@ import com.sun.messaging.jmq.jmsserver.resources.*;
 import com.sun.messaging.jmq.jmsserver.util.LockFile;
 import com.sun.messaging.jmq.jmsserver.util.BrokerException;
 import com.sun.messaging.jmq.jmsserver.core.BrokerMQAddress;
+import com.sun.messaging.jmq.jmsserver.cluster.api.ClusterManager;
+import com.sun.messaging.jmq.jmsserver.cluster.api.ClusteredBroker;
 import com.sun.messaging.jmq.util.net.MQServerSocketFactory;
 import com.sun.messaging.portunif.PUService;
 import com.sun.messaging.jmq.jmsserver.service.portunif.PortMapperMessageFilter;
 import com.sun.messaging.jmq.jmsserver.tlsutil.KeystoreUtil;
 import com.sun.messaging.portunif.PortMapperProtocolFinder;
-
+import com.sun.messaging.portunif.PUServiceCallback;
 
 /**
  * The PortMapper is a simple service that hands out service/port pairs.
@@ -87,7 +89,8 @@ import com.sun.messaging.portunif.PortMapperProtocolFinder;
  * the PortMapper dumps the port map to the socket, closes the connection
  * and goes back to listening on the socket.
  */
-public class PortMapper implements Runnable, ConfigListener, PortMapperClientHandler {
+public class PortMapper implements Runnable, ConfigListener, 
+    PortMapperClientHandler, PUServiceCallback {
 
     private static final int PORTMAPPER_VERSION_MAX_LEN = 
         PortMapperProtocolFinder.PORTMAPPER_VERSION_MAX_LEN;
@@ -109,15 +112,12 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
 
     public static final String SSL_ENABLED_PROPERTY = 
                   Globals.IMQ+".portmapper.tls.enabled";
-    public static final String SSL_CLIENTAUTH_PROPERTY = 
-                  Globals.IMQ+".portmapper.tls.requireClientAuth";
     public static final boolean SSL_ENABLED_PROPERTY_DEFAULT = false;
-    public static final boolean SSL_CLIENTAUTH_PROPERTY_DEFAULT = false;
 
     public static final String TCP_ALLOWED_HOSTNAMES_PROPERTY = 
-                  Globals.IMQ+".portmapper.tls.tcpAllowedHostNames";
+                  Globals.IMQ+".portmapper.tls.tcpAllowHostNames";
 
-    private List<InetAddress> allowedhosts = 
+    private List<InetAddress> allowedHosts = 
           Collections.synchronizedList(new ArrayList<InetAddress>()); 
 
     private static boolean DEBUG = false;
@@ -129,7 +129,7 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
     protected PortMapperTable portMapTable = null;
 
     private ServerSocket   serverSocket = null;
-    private int port = 0;
+    private int port = 7676;
     
     // specifies whether the portmapper should bind to the portmapper port,
     // or whether some other component will do that on our behalf 
@@ -145,8 +145,7 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
 
     private MQAddress mqaddress = null;
 
-    private boolean sslEnabled = false;
-    private boolean sslClientAuth = false;
+    private boolean sslEnabled = false; //always require client auth
 
     private boolean running = false;
 
@@ -195,10 +194,6 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
         if (bc.getBooleanProperty(SSL_ENABLED_PROPERTY, 
                    SSL_ENABLED_PROPERTY_DEFAULT)) {
             sslEnabled = true;
-            if (bc.getBooleanProperty(SSL_CLIENTAUTH_PROPERTY, 
-                       SSL_ENABLED_PROPERTY_DEFAULT)) {
-                sslClientAuth = true;
-            }
         }
         portMapTable = new PortMapperTable();
         portMapTable.setBrokerInstanceName(instance);
@@ -236,7 +231,7 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
     /**
      * Configure the portmapper with its properties
      */
-    public void setParameters(BrokerConfig params)
+    public void configure(BrokerConfig params)
         throws PropertyUpdateException {
     	
     	// doBind must be checked first
@@ -249,33 +244,33 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
             value = (String)params.getProperty(IMQHOSTNAME_PROPERTY);
         }
         validate(HOSTNAME_PROPERTY, value);
-        update(HOSTNAME_PROPERTY, value);
+        update(HOSTNAME_PROPERTY, value, true);
 
         value = (String)params.getProperty(PORT_PROPERTY);
         validate(PORT_PROPERTY, value);
-        update(PORT_PROPERTY, value);
+        update(PORT_PROPERTY, value, true);
 
         value = (String)params.getProperty(BACKLOG_PROPERTY);
         validate(BACKLOG_PROPERTY, value);
-        update(BACKLOG_PROPERTY, value);
+        update(BACKLOG_PROPERTY, value, true);
 
         value = (String)params.getProperty(SOTIMEOUT_PROPERTY);
         if (value != null) {
             validate(SOTIMEOUT_PROPERTY, value);
-            update(SOTIMEOUT_PROPERTY, value);
+            update(SOTIMEOUT_PROPERTY, value, true);
         }
 
         value = (String)params.getProperty(SOLINGER_PROPERTY);
         if (value != null) {
             validate(SOLINGER_PROPERTY, value);
-            update(SOLINGER_PROPERTY, value);
+            update(SOLINGER_PROPERTY, value, true);
         }
     }
 
     /**
      * Change the portmapper service's port
      */
-    private synchronized void setPort(int port) {
+    private synchronized void setPort(int port, boolean initOnly) {
 
         if (port == this.port) {
             return;
@@ -305,10 +300,12 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
         PUService pu = Globals.getPUService();
         if (pu != null) { 
             try {
-                pu.rebind(new InetSocketAddress(bindAddr, port));
+                pu.rebind(new InetSocketAddress(bindAddr, port), backlog);
             } catch (IOException e) {
                 logger.logStack(logger.ERROR,
-                "Failed to reconfigure PU service port to "+port, e);
+                    Globals.getBrokerResources().getKString(
+                        BrokerResources.X_PU_SERVICE_REBIND, 
+                        (bindAddr == null ? "":bindAddr.getHostAddress())+":"+port), e);
             }
         }
     }
@@ -320,7 +317,7 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
     /**
      * Change the portmapper service's host interface
      */
-    public synchronized void setHostname(String hostname)
+    private synchronized void setHostname(String hostname, boolean initOnly)
         throws PropertyUpdateException {
 
         MQAddress mqaddr = null;
@@ -343,13 +340,17 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
             this.hostname = null;
             this.bindAddr = null;
             mqaddress = mqaddr;
-            PUService pu = Globals.getPUService();
-            if (pu != null) {
-                try {
-                    pu.rebind(new InetSocketAddress(bindAddr, port));
-                } catch (IOException e) {
-                    logger.logStack(logger.ERROR, 
-                        "Failed to reconfigure PU service to "+bindAddr, e);
+            if (!initOnly) {
+                PUService pu = Globals.getPUService();
+                if (pu != null) {
+                    try {
+                        pu.rebind(new InetSocketAddress(bindAddr, port), backlog);
+                    } catch (IOException e) {
+                        logger.logStack(logger.ERROR, 
+                            Globals.getBrokerResources().getKString(
+                            BrokerResources.X_PU_SERVICE_REBIND, 
+                           (bindAddr == null ? "":bindAddr.getHostAddress())+":"+port), e);
+                    }
                 }
             }
             return;
@@ -398,13 +399,17 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
             }
         }
 
-        PUService pu = Globals.getPUService();
-        if (pu != null) {
-            try {
-                pu.rebind(new InetSocketAddress(bindAddr, port));
-            } catch (IOException e) {
-                logger.logStack(logger.ERROR,
-                "Failed to reconfigure PU service to "+bindAddr, e);
+        if (!initOnly) {
+            PUService pu = Globals.getPUService();
+            if (pu != null) {
+                try {
+                    pu.rebind(new InetSocketAddress(bindAddr, port), backlog);
+                } catch (IOException e) {
+                    logger.logStack(logger.ERROR,
+                        Globals.getBrokerResources().getKString(
+                        BrokerResources.X_PU_SERVICE_REBIND, 
+                        (bindAddr == null ? "":bindAddr.getHostAddress())+":"+port), e);
+                }
             }
         }
     }
@@ -439,7 +444,7 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
     /**
      * Set the backlog parameter on the socket the portmapper is running on
      */
-    public synchronized void setBacklog(int backlog) {
+    private synchronized void setBacklog(int backlog, boolean initOnly) {
         this.backlog = backlog;
 
         if (serverSocket != null) {
@@ -451,13 +456,15 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
             }
         }
 
-        PUService pu = Globals.getPUService();
-        if (pu != null) {
-            try {
-                pu.setBacklog(backlog);
-            } catch (IOException e) {
-                logger.logStack(logger.WARNING, 
-                "Failed to set PU service backlog to "+backlog, e);
+        if (!initOnly) {
+            PUService pu = Globals.getPUService();
+            if (pu != null) {
+                try {
+                    pu.setBacklog(backlog);
+                } catch (IOException e) {
+                    logger.logStack(logger.WARNING, 
+                    "Failed to set PU service backlog to "+backlog, e);
+                }
             }
         }
     }
@@ -545,35 +552,36 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
         return portMapTable.toString();
     }
 
-    public boolean isPeerAddressAllowed(InetSocketAddress sa) {
-        if (!sslClientAuth) {
-            return true;
-        }
-        return allowedhosts.contains(sa.getAddress());
-    }
-
     /**
      * Bind the portmapper to the port
      * unless we have configured the portmapper to expect some other component to do this on our behalf
      */
     public synchronized void bind() throws Exception {
         PUService pu = Globals.getPUService();
+        if (sslEnabled && pu  == null) {
+            throw new BrokerException(Globals.getBrokerResources().
+                getKString(BrokerResources.E_PROPERTY_SETTING_REQUIRES_PROPERTY,
+                SSL_ENABLED_PROPERTY+"=true",  Globals.PUSERVICE_ENABLED_PROP+"=true"));
+        }
     	if (doBind) {
             if (pu == null) {
                 serverSocket = createPortMapperServerSocket(this.port, this.bindAddr);
             } else {
                 try {
                     pu.register(PortMapperMessageFilter.
-                                configurePortMapperProtocol(pu));
+                        configurePortMapperProtocol(pu, this), this);
                     if (sslEnabled) {
                         Properties props = KeystoreUtil.getDefaultSSLContextConfig(
                                                         "Broker[portpapper]", null);
                         pu.registerSSL(PortMapperMessageFilter.
-                            configurePortMapperSSLProtocol(pu, props, sslClientAuth));
+                            configurePortMapperSSLProtocol(pu, this,
+                            props, true /*require client auth */), this);
                     }
-                    pu.bind(new InetSocketAddress(this.bindAddr, this.port));
-                    logger.log(logger.INFO, "Grizzly PU service on ["+
-                        (this.bindAddr == null ? "":this.bindAddr)+":"+this.port+"] is ready");
+                    pu.bind(new InetSocketAddress(this.bindAddr, this.port), backlog);
+                    logger.logToAll(logger.INFO, Globals.getBrokerResources().getKString(
+                        BrokerResources.I_PU_SERVICE_READY,  "["+
+                        (this.bindAddr == null ? "":this.bindAddr)+":"+this.port+"]"+
+                        (sslEnabled ? "TCP/SSL/TLS":"TCP")));
 
                 } catch (Exception e) {
                     String emsg = "PU service failed to init";
@@ -592,13 +600,13 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
         if (pu == null) { 
             return;
         }
-        if (sslClientAuth) {
+        if (sslEnabled) {
             List hosts = Globals.getConfig().getList(TCP_ALLOWED_HOSTNAMES_PROPERTY);
             if (hosts != null) {
                 Iterator itr = hosts.iterator();
                 while (itr.hasNext()) {
                     String host = (String)itr.next();
-                    allowedhosts.add(BrokerMQAddress.createAddress(host, 7676).getHost());
+                    allowedHosts.add(BrokerMQAddress.createAddress(host, 7676).getHost());
                 }
             }
         }
@@ -912,48 +920,55 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
         int n = getIntProperty(name, value);
 
         if (name.equals(PORT_PROPERTY)) {
-	    if (n == this.port)  {
-		return;
+            if (n == this.port)  {
+                return;
             }
-	    	if (isDoBind()){
-	            // Check if we will be able to bind to this port
-	            try {
-	                canBind(n, this.bindAddr);
-	            } catch (BindException e) {
-	                throw new PropertyUpdateException(
-	                    rb.getKString(rb.E_BROKER_PORT_BIND, SERVICE_NAME, String.valueOf(value))+
-                        "\n"+e.toString());
-	            } catch (IOException e) {
-	                throw new PropertyUpdateException(
-	                    rb.getKString(rb.E_BAD_SERVICE_START, SERVICE_NAME, String.valueOf(value)) +
-	                    "\n"+e.toString());
-	            }
-	    	}
+            if (n == 0) {
+                throw new PropertyUpdateException(
+                    PropertyUpdateException.InvalidSetting,
+                    rb.getString(rb.X_BAD_PROPERTY_VALUE, name+"="+value));
+            }
+            if (isDoBind()){
+                // Check if we will be able to bind to this port
+                try {
+                    canBind(n, this.bindAddr);
+                } catch (BindException e) {
+                    throw new PropertyUpdateException(
+                        rb.getKString(rb.E_BROKER_PORT_BIND, SERVICE_NAME,
+                            String.valueOf(value))+"\n"+e.toString());
+                } catch (IOException e) {
+                     throw new PropertyUpdateException(
+                         rb.getKString(rb.E_BAD_SERVICE_START, SERVICE_NAME,
+                             String.valueOf(value)) + "\n"+e.toString());
+                }
+            }
         }
     }
 
     public boolean update(String name, String value) {
+        return update(name, value, false);
+    }
+
+    private boolean update(String name, String value, boolean initOnly) {
         try {
             if (name.equals(PORT_PROPERTY)) {
-                setPort(getIntProperty(name, value));
+                setPort(getIntProperty(name, value), initOnly);
                 if (mqaddress != null) {
                     mqaddress = MQAddress.getMQAddress(
                         mqaddress.getHostName()+":"+getPort());
                 }
             } else if (name.equals(BACKLOG_PROPERTY)) {
-                setBacklog(getIntProperty(name, value));
+                setBacklog(getIntProperty(name, value), initOnly);
             } else if (name.equals(SOTIMEOUT_PROPERTY)) {
                 sotimeout = getIntProperty(name, value);
             } else if (name.equals(SOLINGER_PROPERTY)) {
                 solinger = getIntProperty(name, value);
             } else {
-                setHostname(value);
+                setHostname(value, initOnly);
             }
         } catch (Exception e) {
-            logger.log(
-                Logger.ERROR,
-                rb.getString(rb.X_BAD_PROPERTY_VALUE, name + "=" + value),
-                e);
+            logger.log(Logger.ERROR,
+                rb.getString(rb.X_BAD_PROPERTY_VALUE, name + "=" + value), e);
             return false;
         }
         return true;
@@ -1001,8 +1016,66 @@ public class PortMapper implements Runnable, ConfigListener, PortMapperClientHan
      * @return
      */
     public boolean isDoBind() {
-		return doBind;
-	}
+        return doBind;
+    }
+  
+    /*******************************************************
+     * Implement PUServiceCallback interface
+     ********************************************************************/
+    public boolean allowConnection(InetSocketAddress sa, boolean ssl) {
+        if (DEBUG) {
+            logger.log(logger.INFO, 
+            "PortMapper.alllowConnection("+sa+", "+ssl+"), sslEnabled="+sslEnabled+
+            ",  allowedHosts="+allowedHosts+", broker="+
+             Globals.getBrokerInetAddress());
+        }
+        if (!sslEnabled) {
+            return true;
+        }
+        if (ssl) {
+            return true;
+        }
+        if (sa.getAddress().equals(Globals.getBrokerInetAddress())) {
+            return true;
+        }
+        if (sa.getAddress().isLoopbackAddress()) {
+            return true;
+        }
+        if (allowedHosts.contains(sa.getAddress())) {
+            return true;
+        }
+
+        ClusterManager cm = Globals.getClusterManager();   
+        Iterator itr = cm.getConfigBrokers();
+	ClusteredBroker cb = null;
+        BrokerMQAddress addr = null;
+        while (itr.hasNext()) {
+            cb = (ClusteredBroker)itr.next();
+            addr = (BrokerMQAddress)cb.getBrokerURL();
+            if (DEBUG) {
+                logger.log(logger.INFO, 
+                "PortMapper.allowConnection("+sa+"), check configured cluster broker "+ addr);
+            }
+            if (addr.getHost().equals(sa.getAddress())) {
+                return true;
+            }
+        } 
+        return false;
+    }
+
+    public void logInfo(String msg) {
+        logger.log(Logger.INFO, msg);
+    }
+    public void logWarn(String msg, Throwable e) {
+        if (e != null) {
+            logger.logStack(Logger.WARNING, msg, e);
+        } else {
+            logger.log(Logger.WARNING, msg);
+        }
+    }
+    public void logError(String msg, Throwable e) {
+        logger.logStack(Logger.ERROR, msg, e);
+    }
 
 }
 

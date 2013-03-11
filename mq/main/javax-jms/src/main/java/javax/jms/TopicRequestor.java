@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,16 +48,17 @@ package javax.jms;
   * {@code TemporaryTopic} for the responses and provides a 
   * {@code request} method that sends the request message and waits 
   * for its reply.
-  *
-  * <P>This is a basic request/reply abstraction that should be sufficient 
-  * for most uses. JMS providers and clients are free to create more 
-  * sophisticated versions.
-  *
-  * @version     1.0 - 8 July 1998
-  * @author      Mark Hapner
-  * @author      Rich Burridge
-  *
-  * @see         javax.jms.QueueRequestor
+  * <p>
+  * This is a very basic request/reply abstraction which assumes the session 
+  * is non-transacted with a delivery mode of either AUTO_ACKNOWLEDGE or 
+  * DUPS_OK_ACKNOWLEDGE. It is expected that most applications will create 
+  * less basic implementations.
+  * 
+  * @see javax.jms.QueueRequestor
+  * 
+  * @version JMS 2.0
+  * @since JMS 1.0
+  * 
   */
 
 public class TopicRequestor {

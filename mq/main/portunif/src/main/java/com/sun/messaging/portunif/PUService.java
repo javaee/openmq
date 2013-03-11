@@ -48,6 +48,7 @@ import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
+import org.glassfish.grizzly.nio.transport.TCPNIOServerConnection; 
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.ssl.SSLFilter;
@@ -62,6 +63,9 @@ public class PUService {
     private TCPNIOTransport puTransport = null; 
     private SocketAddress bindAddr = null;
     private boolean sslClientAuthRequired = false;
+    private PUProtocol endPUProtocol = null;
+    private PUProtocol endPUProtocolSSL = null;
+    private TCPNIOServerConnection serverConn = null;
 
     public PUService() {
         rootpuf = new PUFilter();
@@ -74,28 +78,30 @@ public class PUService {
 
     }
 
-    public synchronized void bind(SocketAddress saddr) throws IOException {
+    public synchronized void bind(SocketAddress saddr, int backlog)
+    throws IOException {
 
         if (puTransport == null) {
             throw new IOException("Illegal call: PUService not initialized");
         }
         if (bindAddr == null) {
-            puTransport.bind(saddr);
+            serverConn = puTransport.bind(saddr, backlog);
             bindAddr = saddr;
         } else if (!bindAddr.equals(saddr)) {
             puTransport.stop();
-            puTransport.bind(saddr);
+            serverConn = puTransport.bind(saddr, backlog);
             bindAddr = saddr;
         }
     }
 
-    public synchronized void rebind(SocketAddress saddr) throws IOException {
+    public synchronized void rebind(SocketAddress saddr, int backlog)
+    throws IOException {
         if (puTransport == null) {
             throw new IOException("Illegal call: PUService not initialized");
         }
         if (!saddr.equals(bindAddr)) {
             puTransport.stop();
-            puTransport.bind(saddr);
+            serverConn = puTransport.bind(saddr, backlog);
             bindAddr = saddr;
         }
     }
@@ -108,7 +114,8 @@ public class PUService {
         return bindAddr;
     }
 
-    public synchronized SocketAddress getBindSocketAddress() throws IOException {
+    public synchronized SocketAddress getBindSocketAddress() 
+    throws IOException {
         if (puTransport == null) {
             throw new IOException("Illegal call: PUService not initialized");
         }
@@ -125,28 +132,68 @@ public class PUService {
         puTransport.setServerConnectionBackLog(backlog);
     }
 
-    public synchronized void register(PUProtocol pp) throws IOException {
-       if (rootpuf == null) {
-           throw new IOException("Illegal call: PUService not initialized");
-       }
-       rootpuf.register(pp);
+    private synchronized void preRegister(PUServiceCallback cb)
+    throws IOException {
+        if (endPUProtocol == null) {
+            endPUProtocol = new PUProtocol(new EndProtocolFinder(cb),
+                            rootpuf.getPUFilterChainBuilder().build());
+        }
+        rootpuf.deregister(endPUProtocol);
+    }
+
+    private synchronized void postRegister()
+    throws IOException {
+        rootpuf.register(endPUProtocol);
+    }
+
+    private synchronized void preRegisterSSL(PUServiceCallback cb)
+    throws IOException {
+        if (endPUProtocolSSL == null) {
+            endPUProtocolSSL = new PUProtocol(new EndProtocolFinder(cb),
+                               sslpuf.getPUFilterChainBuilder().build());
+        }
+        sslpuf.deregister(endPUProtocolSSL);
+    }
+
+    private synchronized void postRegisterSSL()
+    throws IOException {
+        sslpuf.register(endPUProtocolSSL);
+    }
+
+    public synchronized void register(PUProtocol pp, PUServiceCallback cb)
+    throws IOException {
+        if (rootpuf == null) {
+            throw new IOException("Illegal call: PUService not initialized");
+        }
+        preRegister(cb);
+        try {
+            rootpuf.register(pp);
+        } finally {
+            postRegister();
+        }
     }
 
     public synchronized void deregister(PUProtocol pp) throws IOException {
-       if (rootpuf == null) {
-           throw new IOException("Illegal call: PUService not initialized");
-       }
-       rootpuf.deregister(pp);
+        if (rootpuf == null) {
+            throw new IOException("Illegal call: PUService not initialized");
+        }
+        rootpuf.deregister(pp);
     }
 
-    public synchronized void registerSSL(PUProtocol pp) throws IOException {
-       if (rootpuf == null) {
-           throw new IOException("Illegal call: PUService not initialized");
-       }
-       if (sslpuf == null) {
-           throw new IOException("Illegal call: PUService SSL not initialized");
-       }
-       sslpuf.register(pp);
+    public synchronized void registerSSL(PUProtocol pp, PUServiceCallback cb)
+    throws IOException {
+        if (rootpuf == null) {
+            throw new IOException("Illegal call: PUService not initialized");
+        }
+        if (sslpuf == null) {
+            throw new IOException("Illegal call: PUService SSL not initialized");
+        }
+        preRegisterSSL(cb);
+        try {
+            sslpuf.register(pp);
+        } finally { 
+            postRegisterSSL();
+        }
     }
 
     public synchronized void deregisterSSL(PUProtocol pp) throws IOException {
@@ -202,7 +249,7 @@ public class PUService {
     /**
      */
     public synchronized boolean initializeSSL(
-        Properties props, boolean clientAuthRequired)
+        Properties props, boolean clientAuthRequired, PUServiceCallback cb)
         throws IOException { 
 
         if (rootpuf == null) {
@@ -227,15 +274,10 @@ public class PUService {
         PUProtocol pu = new PUProtocol(new SSLProtocolFinder(serverc),
                                        sslProtocolFilterChain);
         try {
-            register(pu);
+            register(pu, cb);
             this.sslClientAuthRequired = clientAuthRequired;
             return true;
         } catch (Exception e) { 
-            try {
-                deregister(pu);
-            } catch (Exception ee) {
-                //ignore
-            }
             sslpuf = null;
             this.sslClientAuthRequired = false;
             if (e instanceof IOException) {

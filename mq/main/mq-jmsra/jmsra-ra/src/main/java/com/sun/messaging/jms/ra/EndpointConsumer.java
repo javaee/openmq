@@ -543,11 +543,11 @@ public class EndpointConsumer implements
                 if (this.isDurable){
 	                msgConsumer = xas.createSharedDurableConsumer((Topic)destination,
 	                        subscriptionName,
-	                        aSpec.getMessageSelector(), false);
+	                        aSpec.getMessageSelector());
                 } else {
                     msgConsumer = xas.createSharedConsumer((Topic)destination,
                             subscriptionName,
-                            aSpec.getMessageSelector(), false);
+                            aSpec.getMessageSelector());
                 }
             } else {
                 if (this.isDurable) {
@@ -840,12 +840,12 @@ public class EndpointConsumer implements
                     this.msgConsumer = this.ds.createSharedDurableConsumer(
                             (Topic)this.destination,
                             subscriptionName,
-                            this.selector, false);
+                            this.selector);
                 } else {
                     this.msgConsumer = this.ds.createSharedConsumer(
                             (Topic)this.destination,
                             subscriptionName,
-                            this.selector, false);
+                            this.selector);
                 }
             } else {
                 if (this.isDurable) {
@@ -942,8 +942,8 @@ public class EndpointConsumer implements
                 // Instance scope
                 if (aSpec._isInClusteredContainerSet()) {
                     // it is in a glassfish cluster
-                    String instanceName = this.ra.getBootstrapContext().getInstanceName();
-                    subscriptionName = instanceName + "_" + activationName;
+//                    String instanceName = this.ra.getBootstrapContext().getInstanceName();
+//                    subscriptionName = instanceName + "_" + activationName;
                 } else {
                     // it is standalone glassfish instance
                     subscriptionName = activationName;
@@ -955,8 +955,8 @@ public class EndpointConsumer implements
                 // Instance scope
                 if (aSpec._isInClusteredContainerSet()) {
                     // it is in a glassfish cluster
-                    String instanceName = this.ra.getBootstrapContext().getInstanceName();
-                    subscriptionName = instanceName + "_" + aSpec.getSubscriptionName();
+//                    String instanceName = this.ra.getBootstrapContext().getInstanceName();
+//                    subscriptionName = instanceName + "_" + aSpec.getSubscriptionName();
                 } else {
                     // it is standalone glassfish instance
                     subscriptionName = aSpec.getSubscriptionName();

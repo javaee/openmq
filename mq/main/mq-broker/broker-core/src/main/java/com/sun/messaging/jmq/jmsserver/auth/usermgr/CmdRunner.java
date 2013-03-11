@@ -408,7 +408,7 @@ public class CmdRunner implements UserMgrOptions  {
 	    targetFile = srcFile + DEFAULT_ENCODE_PREFIX;
 	}
 
-	Output.stdOutPrintln("Encoding file where:\n");
+	Output.stdOutPrintln(br.getString(br.I_ENCODING_PASSFILE_WHERE));
 	printSrcTarget(srcFile, targetFile);
 
 	try  {
@@ -416,14 +416,13 @@ public class CmdRunner implements UserMgrOptions  {
 		String noShort = br.getString(br.M_RESPONSE_NO_SHORT);
 
 	        input = UserMgrUtils.getUserInput(null,
-			"Are you sure you want to encode this file ? (y/n)[n] ",
+			br.getString(br.I_ENCODING_PASSFILE_CONFIRM_QUESTION),
 			noShort);
 
 	        if (noShort.equalsIgnoreCase(input))  {
 	            Output.stdErrPrintln("");
 	            Output.stdErrPrintln(
-			"File was not encoded."
-			);
+			br.getString(br.I_PASSFILE_WAS_NOT_ENCODED));
 
 	            return (0);
 	        }
@@ -451,7 +450,7 @@ public class CmdRunner implements UserMgrOptions  {
 	    return (1);
 	}
 
-	Output.stdOutPrintln("Encode operation successful.");
+	Output.stdOutPrintln(br.getString(br.I_ENCODE_PASSFILE_SUCCESSFUL));
 
 	return (0);
     }
@@ -466,7 +465,7 @@ public class CmdRunner implements UserMgrOptions  {
 	    targetFile = srcFile + DEFAULT_DECODE_PREFIX;
 	}
 
-	Output.stdOutPrintln("Decoding file where:\n");
+	Output.stdOutPrintln(br.getString(br.I_DECODING_PASSFILE_WHERE));
 	printSrcTarget(srcFile, targetFile);
 
 	try  {
@@ -474,15 +473,13 @@ public class CmdRunner implements UserMgrOptions  {
 		String noShort = br.getString(br.M_RESPONSE_NO_SHORT);
 
 	        input = UserMgrUtils.getUserInput(null,
-			"Are you sure you want to decode this file ? (y/n)[n] ",
+                        br.getString(br.I_DECODING_PASSFILE_CONFIRM_QUESTION),
 			noShort);
 
 	        if (noShort.equalsIgnoreCase(input))  {
 	            Output.stdErrPrintln("");
 	            Output.stdErrPrintln(
-			"File was not decoded."
-			);
-
+                        br.getString(br.I_PASSFILE_WAS_NOT_DECODED));
 	            return (0);
 	        }
 	    }
@@ -509,7 +506,7 @@ public class CmdRunner implements UserMgrOptions  {
 	    return (1);
 	}
 
-	Output.stdOutPrintln("Decode operation successful.");
+	Output.stdOutPrintln(br.getString(br.I_DECODE_PASSFILE_SUCCESSFUL));
 
 	return (0);
     }
@@ -519,11 +516,11 @@ public class CmdRunner implements UserMgrOptions  {
 	String[] row = new String[2];
 
 
-	row[0] = "Source File";
+	row[0] = br.getString(br.I_PASSFILE_ENCODE_SOURCE_FILE);
 	row[1] = srcFile;
 	up.add(row);
 
-	row[0] = "Target File";
+	row[0] = br.getString(br.I_PASSFILE_DECODE_TARGET_FILE);
 	row[1] = targetFile;
 	up.add(row);
 

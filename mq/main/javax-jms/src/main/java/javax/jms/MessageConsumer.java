@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -68,11 +68,12 @@ package javax.jms;
  * <p>
  * It is a client programming error for a {@code MessageListener} to throw an exception.
  *
- * @version     2.0
- *
  * @see         javax.jms.QueueReceiver
  * @see         javax.jms.TopicSubscriber
  * @see         javax.jms.Session
+ * 
+ * @version JMS 2.0
+ * @since JMS 1.0
  */
 public interface MessageConsumer extends AutoCloseable{
 
@@ -195,24 +196,27 @@ public interface MessageConsumer extends AutoCloseable{
 
 	/**
 	 * Closes the message consumer.
-	 * 
-	 * <P>
+	 * <p>
 	 * Since a provider may allocate some resources on behalf of a
 	 * {@code MessageConsumer} outside the Java virtual machine, clients should
 	 * close them when they are not needed. Relying on garbage collection to
 	 * eventually reclaim these resources may not be timely enough.
 	 * <P>
-	 * This call blocks until a {@code receive} or message listener in progress
-	 * has completed. A blocked message consumer {@code receive} call returns
-	 * null when this message consumer is closed.
+	 * This call will block until a {@code receive} call in progress on this
+	 * consumer has completed. A blocked {@code receive} call returns null when
+	 * this message consumer is closed.
 	 * <p>
-	 * A {@code MessageListener} must not attempt to close its own
-	 * {@code MessageConsumer} as this would lead to deadlock. The JMS provider
-	 * must detect this and throw a {@code IllegalStateException}.
+	 * If this method is called whilst a message listener is in progress in
+	 * another thread then it will block until the message listener has
+	 * completed.
+	 * <p>
+	 * This method may be called from a message listener's {@code onMessage}
+	 * method on its own consumer. After this method returns the
+	 * {@code onMessage} method will be allowed to complete normally. 
+	 * <p>
+	 * This method is the only {@code MessageConsumer} method that can be called
+	 * concurrently.
 	 * 
-	 * @exception IllegalStateException
-	 *                this method has been called by a {@code MessageListener}
-	 *                on its own {@code MessageConsumer}
 	 * @exception JMSException
 	 *                if the JMS provider fails to close the consumer due to
 	 *                some internal error.

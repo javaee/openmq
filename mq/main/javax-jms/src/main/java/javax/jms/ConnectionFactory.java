@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -91,14 +91,13 @@ package javax.jms;
   * Looking them up should not have any hidden side effects or use surprising 
   * amounts of local resources.
   *
-  * @version     1.1 - February 1, 2002
-  * @author      Mark Hapner
-  * @author      Rich Burridge
-  * @author      Kate Stout
-  *
   * @see         javax.jms.Connection
   * @see         javax.jms.QueueConnectionFactory
   * @see         javax.jms.TopicConnectionFactory
+  * 
+  * @version JMS 2.0
+  * @since JMS 1.0
+  *
   */
 
 public interface ConnectionFactory {
@@ -113,7 +112,7 @@ public interface ConnectionFactory {
       *                         connection due to some internal error.
       * @exception JMSSecurityException  if client authentication fails due to 
       *                         an invalid user name or password.
-       * @since 1.1 
+      * @since JMS 1.1 
      */ 
 
     Connection
@@ -134,7 +133,7 @@ public interface ConnectionFactory {
       *                         connection due to some internal error.
       * @exception JMSSecurityException  if client authentication fails due to 
       *                         an invalid user name or password.
-      * @since 1.1  
+      * @since JMS 1.1  
       */ 
 
     Connection
@@ -183,7 +182,7 @@ public interface ConnectionFactory {
      *                         JMSContext due to some internal error.
      * @exception JMSSecurityRuntimeException  if client authentication fails due to 
      *                         an invalid user name or password.
-     * @since 2.0 
+     * @since JMS 2.0 
      * 
      * @see JMSContext#AUTO_ACKNOWLEDGE 
      * 
@@ -239,7 +238,7 @@ public interface ConnectionFactory {
      *                         JMSContext due to some internal error.
      * @exception JMSSecurityRuntimeException  if client authentication fails due to 
      *                         an invalid user name or password.
-     * @since 2.0 
+     * @since JMS 2.0 
      * 
      * @see JMSContext#AUTO_ACKNOWLEDGE 
      * 
@@ -323,7 +322,8 @@ public interface ConnectionFactory {
      *                         JMSContext due to some internal error.
      * @exception JMSSecurityRuntimeException  if client authentication fails due to 
      *                         an invalid user name or password.
-     * @since 2.0  
+     * @since JMS 2.0  
+     * 
      * @see JMSContext#SESSION_TRANSACTED 
      * @see JMSContext#CLIENT_ACKNOWLEDGE 
      * @see JMSContext#AUTO_ACKNOWLEDGE 
@@ -408,7 +408,7 @@ public interface ConnectionFactory {
      *                         JMSContext due to some internal error.
      * @exception JMSSecurityRuntimeException  if client authentication fails due to 
      *                         an invalid user name or password.
-     * @since 2.0 
+     * @since JMS 2.0 
      * 
      * @see JMSContext#SESSION_TRANSACTED 
      * @see JMSContext#CLIENT_ACKNOWLEDGE 

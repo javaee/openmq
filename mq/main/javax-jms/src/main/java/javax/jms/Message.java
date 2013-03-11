@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -41,7 +41,6 @@
 package javax.jms;
 
 import java.util.Enumeration;
-import java.util.Properties;
 
 /** The {@code Message} interface is the root interface of all JMS 
   * messages. It defines the message header and the {@code acknowledge} 
@@ -547,9 +546,10 @@ import java.util.Properties;
   *    approximate numeric values).
   *
   * <P>SQL comments are not supported.
-  *
-  * @version     2.0 April 2, 2002
-  *
+  * 
+  * @version JMS 2.0
+  * @since JMS 1.0
+  * 
   * @see         javax.jms.MessageConsumer#receive()
   * @see         javax.jms.MessageConsumer#receive(long)
   * @see         javax.jms.MessageConsumer#receiveNoWait()
@@ -579,7 +579,7 @@ public interface Message {
     static final long DEFAULT_TIME_TO_LIVE = 0;
     
     /** The message producer's default delivery delay is zero.
-     * @since 2.0
+     * @since JMS 2.0
      */
     static final long DEFAULT_DELIVERY_DELAY = 0;    
 
@@ -1118,7 +1118,7 @@ public interface Message {
 	 * 
 	 * @see javax.jms.Message#setJMSDeliveryTime(long)
 	 * 
-	 * @since 2.0
+	 * @since JMS 2.0
 	 */ 
    long getJMSDeliveryTime() throws JMSException;
 
@@ -1140,7 +1140,7 @@ public interface Message {
 	 * 
 	 * @see javax.jms.Message#getJMSDeliveryTime()
 	 * 
-	 * @since 2.0
+	 * @since JMS 2.0
 	 */ 
    void setJMSDeliveryTime(long deliveryTime) throws JMSException;    
 
@@ -1642,6 +1642,8 @@ public interface Message {
 	 * @exception JMSException
 	 *                if the JMS provider fails to get the message body due to
 	 *                some internal error.
+	 *                
+	 * @since JMS 2.0                
 	 */
 	<T> T getBody(Class<T> c) throws JMSException;
 

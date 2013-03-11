@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -47,8 +47,10 @@ package com.sun.messaging.jmq.jmsserver.data;
 
 import com.sun.messaging.jmq.io.*;
 import java.security.AccessControlException;
+import com.sun.messaging.jmq.util.ServiceType;
 import com.sun.messaging.jmq.jmsserver.service.*;
 import com.sun.messaging.jmq.jmsserver.service.imq.IMQConnection;
+import com.sun.messaging.jmq.jmsserver.service.imq.IMQService;
 import com.sun.messaging.jmq.jmsserver.util.BrokerException;
 import com.sun.messaging.jmq.jmsserver.util.ServiceRestrictionException;
 import com.sun.messaging.jmq.jmsserver.util.ServiceRestrictionWaitException;
@@ -56,6 +58,7 @@ import com.sun.messaging.jmq.io.PacketUtil;
 import com.sun.messaging.jmq.jmsserver.auth.AccessController;
 import com.sun.messaging.jmq.jmsserver.resources.BrokerResources;
 import com.sun.messaging.jmq.jmsserver.Globals;
+import com.sun.messaging.jmq.jmsserver.FaultInjection;
 import com.sun.messaging.jmq.util.log.Logger;
 
 /**
@@ -88,11 +91,14 @@ public class PacketRouter
      */
     private ErrHandler defaultHandler = null;
 
+    private FaultInjection fi = null;
+
     /**
      * Constructor for PacketRouter class.
      */
     public PacketRouter() {
 	defaultHandler = new DefaultHandler();
+        fi = FaultInjection.getInjection();
     }
 
     /**
@@ -184,6 +190,11 @@ public class PacketRouter
                 if (!checkAccessControl(msg, con, handler, id)) {
                     return;
                 }
+            }
+            if (fi.FAULT_INJECTION && 
+                ((IMQService)con.getService()).getServiceType() != ServiceType.ADMIN &&
+                fi.checkFaultAndSleep(FaultInjection.FAULT_PACKET_ROUTER_1_SLEEP, null, true)) {
+                fi.unsetFault(FaultInjection.FAULT_PACKET_ROUTER_1_SLEEP);
             }
             boolean freepkt = handler.handle(con, msg);
             if (freepkt == true) {

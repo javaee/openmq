@@ -808,10 +808,9 @@ class MsgStore {
 	}
 
         if (dstMsgStore == null) {
-            logger.log(logger.ERROR,
-                br.E_DESTINATION_NOT_FOUND_IN_STORE, dst);
-            throw new BrokerException(
-                br.getString(br.E_DESTINATION_NOT_FOUND_IN_STORE, dst));
+            String emsg = br.getKString(br.E_DESTINATION_NOT_FOUND_IN_STORE, dst);
+            logger.log(logger.ERROR, emsg);
+            throw new BrokerException(emsg);
         } else {
             return dstMsgStore;
         }

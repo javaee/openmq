@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,55 +40,59 @@
 
 package javax.jms;
 
-/** The {@code XAConnection} interface extends the capability of 
-  * {@code Connection} by providing an {@code XASession} (optional).
-  *
-  *<P>The {@code XAConnection} interface is optional. JMS providers 
-  * are not required to support this interface. This interface is for 
-  * use by JMS providers to support transactional environments. 
-  * Client programs are strongly encouraged to use the transactional support
-  * available in their environment, rather than use these XA
-  * interfaces directly. 
-  *
-  * @version     1.1 February 2, 2002
-  * @author      Mark Hapner
-  * @author      Rich Burridge
-  * @author      Kate Stout
-  *
-  * @see         javax.jms.XAQueueConnection
-  * @see         javax.jms.XATopicConnection
-  */
+/**
+ * The {@code XAConnection} interface extends the capability of
+ * {@code Connection} by providing an {@code XASession} (optional).
+ * 
+ * <P>
+ * The {@code XAConnection} interface is optional. JMS providers are not required
+ * to support this interface. This interface is for use by JMS providers to
+ * support transactional environments. Client programs are strongly encouraged
+ * to use the transactional support available in their environment, rather than
+ * use these XA interfaces directly.
+ * 
+ * @see javax.jms.XAQueueConnection
+ * @see javax.jms.XATopicConnection
+ * 
+ * @version JMS 2.0
+ * @since JMS 1.0
+ * 
+ */
 
-public interface XAConnection extends Connection{
-    
-    /** Creates an {@code XASession} object.
-      *  
-      * @return a newly created {@code XASession}
-      *  
-      * @exception JMSException if the {@code XAConnection} object 
-      *                         fails to create an {@code XASession} due to
-      *                         some internal error.
-      *
-      * @since 1.1
-      */ 
+public interface XAConnection extends Connection {
 
-    XASession
-    createXASession() throws JMSException;
+	/**
+	 * Creates an {@code XASession} object.
+	 * 
+	 * @return a newly created {@code XASession}
+	 * 
+	 * @exception JMSException
+	 *                if the {@code XAConnection} object fails to create an
+	 *                {@code XASession} due to some internal error.
+	 * 
+	 * @since JMS 1.1
+	 * 
+	 */
 
-    /** Creates an {@code Session} object.
-      *
-      * @param transacted       usage undefined
-      * @param acknowledgeMode  usage undefined
-      *  
-      * @return a {@code Session} object
-      *  
-      * @exception JMSException if the {@code XAConnection} object 
-      *                         fails to create an {@code Session} due to
-      *                         some internal error.
-      *
-      * @since 1.1
-      */ 
-    Session
-    createSession(boolean transacted,
-                       int acknowledgeMode) throws JMSException;
+	XASession createXASession() throws JMSException;
+
+	/**
+	 * Creates an {@code Session} object.
+	 * 
+	 * @param transacted
+	 *            usage undefined
+	 * @param acknowledgeMode
+	 *            usage undefined
+	 * 
+	 * @return a newly created {@code Session}
+	 * 
+	 * @exception JMSException
+	 *                if the {@code XAConnection} object fails to create a
+	 *                {@code Session} due to some internal error.
+	 * 
+	 * @since JMS 1.1
+	 * 
+	 */
+	Session createSession(boolean transacted, int acknowledgeMode)
+			throws JMSException;
 }

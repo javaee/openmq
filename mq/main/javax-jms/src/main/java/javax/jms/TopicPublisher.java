@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -89,15 +89,13 @@ package javax.jms;
   * interface. Using the {@code send} methods will have the same
   * effect as using the
   * {@code publish} methods: they are functionally the same.
-  * 
-  *
-  * @version    1.1 February 2, 2002
-  * @author      Mark Hapner
-  * @author      Rich Burridge
-  * @author      Kate Stout
   *
   * @see Session#createProducer(Destination) 
   * @see TopicSession#createPublisher(Topic)
+  * 
+  * @version JMS 2.0
+  * @since JMS 1.0
+  * 
   */
 
 public interface TopicPublisher extends MessageProducer {

@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -270,7 +270,7 @@
     <pathelement location="${packager.artifacts}/grizzly-portunif.jar"/>
     <pathelement location="${packager.artifacts}/javax.servlet-api.jar"/>
     <pathelement location="${packager.artifacts}/javax.resource-api.jar"/>
-    <pathelement location="${packager.artifacts}/javax.transaction.jar"/>
+    <pathelement location="${packager.artifacts}/javax.transaction-api.jar"/>
     <pathelement location="${packager.artifacts}/jhall.jar"/>
     <pathelement location="${packager.artifacts}/glassfish-api.jar"/>
     <pathelement location="${packager.artifacts}/hk2-api.jar"/>
@@ -338,7 +338,7 @@
           <classpath refid="platform.classpath"/>
    	  <doctitle><![CDATA[<h1>${JMQ_SOFTWARE_NAME_SHORT}, 5.0 API Specification</h1>]]></doctitle>
    	  <header><![CDATA[${JMQ_SOFTWARE_NAME_SHORT}, 5.0 API Specification]]></header>
-    	  <bottom><![CDATA[<font size="-1"><i>Copyright (c) 2010-2011, Oracle and/or its affiliates.  All rights reserved.</i></font>]]></bottom>
+    	  <bottom><![CDATA[<font size="-2"><i>Copyright (c) 2010-2013, Oracle and/or its affiliates.  All rights reserved.</i></font>]]></bottom>
     	  <tag name="todo" scope="all" description="To do:"/>
     	  <link href="http://download.oracle.com/javase/6/docs/api/"/>
 	</javadoc>

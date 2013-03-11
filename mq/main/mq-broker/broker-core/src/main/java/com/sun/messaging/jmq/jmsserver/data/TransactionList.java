@@ -471,7 +471,9 @@ public class TransactionList implements ClusterListener, PartitionListener
     }
 
     public void destroy() {
-        logger.log(Logger.INFO,  "XXXI18N-Closing transaction list "+this);
+        if (DEBUG) {
+            logger.log(Logger.INFO,  "Closing transaction list "+this);
+        }
         if (txnReaper != null) {
             txnReaper.destroy();
         }

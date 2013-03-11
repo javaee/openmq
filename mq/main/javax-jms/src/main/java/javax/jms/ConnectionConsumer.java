@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -57,15 +57,15 @@ package javax.jms;
   * message. This reduces the thread context switches and minimizes resource 
   * use at the expense of some serialization of message processing.
   *
-  * @version     1.1 February 8, 2002
-  * @author      Mark Hapner
-  * @author      Rich Burridge
-  *
   * @see javax.jms.Connection#createConnectionConsumer
   * @see javax.jms.Connection#createDurableConnectionConsumer
   * @see javax.jms.QueueConnection#createConnectionConsumer
   * @see javax.jms.TopicConnection#createConnectionConsumer
   * @see javax.jms.TopicConnection#createDurableConnectionConsumer
+  * 
+  * @version JMS 2.0
+  * @since JMS 1.0
+  *
   */
 
 public interface ConnectionConsumer {

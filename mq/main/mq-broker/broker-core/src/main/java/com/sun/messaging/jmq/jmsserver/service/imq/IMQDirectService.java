@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -74,7 +74,6 @@ import com.sun.messaging.jmq.jmsserver.data.TransactionList;
 import com.sun.messaging.jmq.jmsserver.data.AutoRollbackType;
 import com.sun.messaging.jmq.jmsserver.data.handlers.AckHandler;
 import com.sun.messaging.jmq.jmsserver.data.protocol.Protocol;
-import com.sun.messaging.jmq.jmsserver.data.protocol.ProtocolImpl;
 import com.sun.messaging.jmq.jmsserver.core.PacketReference;
 import com.sun.messaging.jmq.util.lists.*;
 import com.sun.messaging.jmq.util.selector.Selector;
@@ -94,11 +93,11 @@ import com.sun.messaging.jmq.jmsservice.*;
 public class IMQDirectService extends IMQService implements JMSService
 {
 
-    private static boolean DEBUG = false;
+    protected static boolean DEBUG = false;
 
     private boolean acEnabled = false;
 
-    Map	localConnectionList = Collections.synchronizedMap(new HashMap());
+    Map localConnectionList = Collections.synchronizedMap(new HashMap()); 
     Map		queueBrowseList = Collections.synchronizedMap(new HashMap());
     Protocol	protocol;
 
@@ -317,67 +316,55 @@ public class IMQDirectService extends IMQService implements JMSService
         return authCacheData;     
     }  
 
-    public IMQConnection createDirectConnection(String username, String password) 
+    private IMQConnection createDirectConnection(String username, String password) 
 		throws BrokerException {
-	IMQDirectConnection con = null;
-	/*
-	System.err.println("#### CREATE DIRECT CXN: username: " 
-		+ username
-		+ ", passwd: "
-		+ password);
-	*/
+        IMQDirectConnection con = null;
+	
+        //System.err.println("#### CREATE DIRECT CXN: username: " +username+", passwd: "+password);
 
-	con = new IMQDirectConnection(this);
-	connectionList.addConnection(con);
-	localConnectionList.put(con.getConnectionUID(), con);
+        con = new IMQDirectConnection(this);
+        connectionList.addConnection(con);
+        localConnectionList.put(con.getConnectionUID(), con);
 
-	try  {
-	    con.authenticate(username, password);
+        try {
+            con.authenticate(username, password);
             con.setClientProtocolVersion(con.getHighestSupportedProtocol());
-	    /*
-	    System.err.println("#### CREATE DIRECT CXN: AUTH SUCCESSFULL");
-	    System.err.println("#### DIRECT CXN authenticated name: " + con.getAuthenticatedName());
-	    */
-	} catch(Exception e)  {
-	    e.printStackTrace();
-	    String errStr = "Authentication failed for username " 
-			+ username
-			+ " in service "
-			+ getName()
-			+ ": " 
-			+ e;
-	    logger.log(Logger.WARNING, errStr);
-	    logger.log(Logger.WARNING, BrokerResources.W_LOGIN_FAILED, e);
-	    connectionList.removeConnection(con.getConnectionUID(),
-			       true, GoodbyeReason.CON_FATAL_ERROR, errStr);
-	    localConnectionList.remove(con.getConnectionUID());
+            
+            //System.err.println("#### CREATE DIRECT CXN: AUTH SUCCESSFULL");
+            //System.err.println("#### DIRECT CXN authenticated name: " + con.getAuthenticatedName());
+        } catch(Exception e)  {
+            e.printStackTrace();
+            String errStr = "Authentication failed for username "+
+                             username+" in service "+getName()+": "+e;
 
-	    throw new SecurityException(errStr);
-	}
+            logger.log(Logger.WARNING, errStr);
+            logger.log(Logger.WARNING, BrokerResources.W_LOGIN_FAILED, e);
+            connectionList.removeConnection(con.getConnectionUID(),
+                           true, GoodbyeReason.CON_FATAL_ERROR, errStr);
+            localConnectionList.remove(con.getConnectionUID());
+            throw new SecurityException(errStr);
+        }
 
-	Agent agent = Globals.getAgent();
-	if (agent != null)  {
-	    agent.registerConnection(con.getConnectionUID().longValue());
-	    agent.notifyConnectionOpen(con.getConnectionUID().longValue());
-	}
+        Agent agent = Globals.getAgent();
+        if (agent != null)  {
+            agent.registerConnection(con.getConnectionUID().longValue());
+            agent.notifyConnectionOpen(con.getConnectionUID().longValue());
+        }
 
-	/*
-	System.err.println("#### CREATE DIRECT CXN: returning: " + con);
-	System.err.println("#### CREATE DIRECT CXN: service from cxn info: " + con.getConnectionInfo().service);
-	*/
+        //System.err.println("#### CREATE DIRECT CXN: returning: " + con);
+        //System.err.println("#### CREATE DIRECT CXN: service from cxn info: " + con.getConnectionInfo().service);
 
-	return (con);
+        return (con);
     }
 
+    @Override
     public void removeConnection(ConnectionUID uid, int reason, String str) {
-    /*
-    System.err.println(">>>>>>>>> IMQDirectConnection: REMOVE CONNECTION: " + uid);
-    */
-         connectionList.removeConnection(uid,
-             true, reason, str);
-	 localConnectionList.remove(uid);
+        //System.err.println(">>>>>>>>> IMQDirectConnection: REMOVE CONNECTION: " + uid);
+        connectionList.removeConnection(uid, true, reason, str);
+        localConnectionList.remove(uid);
     }
 
+    @Override
     public boolean isDirect() {
         return (true);
     }
@@ -426,8 +413,12 @@ public class IMQDirectService extends IMQService implements JMSService
 	HashMap props = new HashMap();
         IMQConnection cxn = null;
 
-	try  {
+        try {
             cxn = createDirectConnection(username, password);
+            if (DEBUG || protocol.getDEBUG()) {       
+                logger.log(logger.INFO, "IMQDirectService:createConnection("+
+                           username+"): ["+cxn.getConnectionUID()+", "+cxn+"]");
+            } 
 	} catch (BrokerException be)  {
 	    String errStr = "Failed to create direct connection for user: "
 			+ username;
@@ -456,31 +447,30 @@ public class IMQDirectService extends IMQService implements JMSService
      *          {@link JMSServiceReply.Status#OK}
      */
     public JMSServiceReply destroyConnection(long connectionId) throws JMSServiceException {
-		IMQConnection cxn;
-		HashMap props = new HashMap();
-		JMSServiceReply reply;
+        if (DEBUG || protocol.getDEBUG()) {
+            logger.log(logger.INFO, "IMQDirectService.destroyConnection("+connectionId+")");
+        } 
+        IMQConnection cxn;
+        HashMap props = new HashMap();
+        JMSServiceReply reply;
 
-		if (getState() == ServiceState.STOPPED) {
-			// too late to do anything
-		} else {
+        if (getState() == ServiceState.STOPPED) {
+            // too late to do anything
+        } else {
+            cxn = checkConnectionId(connectionId, "destroyConnection");
+            
+            //Remove connection reference in local list
+            localConnectionList.remove(cxn.getConnectionUID()); 
+            cxn.destroyConnection(false /* no reply */, 
+                 GoodbyeReason.CLIENT_CLOSED, 
+                 Globals.getBrokerResources()
+                    .getKString(BrokerResources.M_CLIENT_SHUTDOWN));
+        }
 
-			cxn = checkConnectionId(connectionId, "destroyConnection");
-
-			/*
-			 * Remove reference to connection in local list 
-			 * XXX: TBD - Should really call removeConnection() here
-			 */
-			localConnectionList.remove(cxn.getConnectionUID());
-
-			cxn.destroyConnection(false /* no reply */, GoodbyeReason.CLIENT_CLOSED, Globals.getBrokerResources()
-					.getKString(BrokerResources.M_CLIENT_SHUTDOWN));
-
-		}
-
-		props.put("JMQStatus", JMSServiceReply.Status.OK);
-		reply = new JMSServiceReply(props, null);
-		return (reply);
-	}
+        props.put("JMQStatus", JMSServiceReply.Status.OK);
+        reply = new JMSServiceReply(props, null);
+        return (reply);
+    }
 
     /**
      *  Generate a set of Unique IDs.<br>
@@ -862,11 +852,17 @@ public class IMQDirectService extends IMQService implements JMSService
 	return (reply);
     }
 
+    public JMSServiceReply stopSession(long connectionId, long sessionId)
+        throws JMSServiceException  {
+        return stopSession(connectionId, sessionId, false);
+    }
+
     /**
      *  Stop message delivery for a session.
      *
      *  @param  connectionId The Id of the connection
      *  @param  sessionId The Id of the session on which to stop delivery
+     *  @param dowait if true wait its SessionListener is stopped
      *
      *  @return The JMSServiceReply of the request to stop the session
      *
@@ -876,34 +872,29 @@ public class IMQDirectService extends IMQService implements JMSService
      *  @see JMSServiceReply.Status#ERROR
      *
      */
-    public JMSServiceReply stopSession(long connectionId, long sessionId)
-    			throws JMSServiceException  {
-	JMSServiceReply reply;
-	HashMap props = new HashMap();
-	SessionUID sUID;
-	IMQConnection cxn;
+    public JMSServiceReply stopSession(long connectionId, long sessionId, boolean dowait)
+        throws JMSServiceException  {
+        JMSServiceReply reply;
+        HashMap props = new HashMap();
+        SessionUID sUID;
+        IMQConnection cxn;
 
         cxn = checkConnectionId(connectionId, "stopSession");
-	sUID = new SessionUID(sessionId);
+        sUID = new SessionUID(sessionId);
 
-	try {
-		// CR 6935676
-	    //protocol.pauseSession(sUID);
-	    /*
-	     * TBD Verify!
-             */
-            SessionListener.getListener(sUID).stopSession();
-	} catch(Exception e)  {
-	    String errStr = "stopSession: Stop of session failed. Session ID: "
-		        + sessionId;
-
+        try {
+            // CR 6935676
+            //protocol.pauseSession(sUID);
+            SessionListener.getListener(sUID).stopSession(dowait);
+        } catch(Exception e)  {
+            String errStr = "stopSession: Stop of session failed. Session ID: "
+                             + sessionId;
             logger.logStack(Logger.ERROR, errStr, e);
-	    props.put("JMQStatus", JMSServiceReply.Status.ERROR);
-	    throw new JMSServiceException(errStr, e, props);
-	}
-
-	props.put("JMQStatus", JMSServiceReply.Status.OK);
-	reply = new JMSServiceReply(props, null);
+            props.put("JMQStatus", JMSServiceReply.Status.ERROR);
+            throw new JMSServiceException(errStr, e, props);
+        }
+        props.put("JMQStatus", JMSServiceReply.Status.OK);
+        reply = new JMSServiceReply(props, null);
 
 	return (reply);
     }
@@ -1381,8 +1372,10 @@ public class IMQDirectService extends IMQService implements JMSService
      *
      */
     public JMSServiceReply deleteConsumer(long connectionId, long sessionId,
-            long consumerId, SysMessageID lastMessageSeen, String durableName, String clientId) 
-			throws JMSServiceException  {
+        long consumerId, SysMessageID lastMessageSeen, 
+        boolean lastMessageSeenInTransaction, String durableName, String clientId) 
+        throws JMSServiceException  {
+
 	JMSServiceReply reply;
 	IMQConnection cxn;
 	Session session;
@@ -1395,7 +1388,8 @@ public class IMQDirectService extends IMQService implements JMSService
 	try  {
 	    if (durableName == null)  {
 	        ConsumerUID conUID = new ConsumerUID(consumerId);
-                protocol.destroyConsumer(conUID, session, lastMessageSeen, cxn);
+                protocol.destroyConsumer(conUID, session, 
+                    lastMessageSeen, lastMessageSeenInTransaction, cxn);
 	    } else  {
                 protocol.unsubscribe(durableName, clientId, cxn);
 	    }
@@ -2509,7 +2503,7 @@ public class IMQDirectService extends IMQService implements JMSService
      * IMQConnection object will be returned. If not, a
      * JMSServiceException will be thrown.
      */
-    IMQConnection checkConnectionId(long connectionId,
+    protected IMQConnection checkConnectionId(long connectionId,
 			String methodName) throws JMSServiceException  {
 	ConnectionManager cm = Globals.getConnectionManager();
 	IMQConnection  cxn;
@@ -2639,23 +2633,6 @@ public class IMQDirectService extends IMQService implements JMSService
 
 	return (retStatus);
     }
-
-    private void startAllConnections()  {
-        Iterator itr = localConnectionList.values().iterator();
-        while (itr.hasNext()) {
-            IMQConnection cxn = (IMQConnection)itr.next();
-	    SessionListener.startConnection(cxn);
-        }
-    }
-
-    private void stopAllConnections()  {
-        Iterator itr = localConnectionList.values().iterator();
-        while (itr.hasNext()) {
-            IMQConnection cxn = (IMQConnection)itr.next();
-	    SessionListener.stopConnection(cxn);
-        }
-    }
-
 }
 
     /**
@@ -2673,11 +2650,15 @@ public class IMQDirectService extends IMQService implements JMSService
          * listener is alive
          */
         boolean valid = false;
+        boolean destroyed = false;
 
 	/**
 	 * session is stopped ?
 	 */
         boolean stopped = true;
+
+        //async process thread in stopped position 
+        boolean islocked = true;
 
         /**
          * session associated with this listener
@@ -2936,31 +2917,44 @@ public class IMQDirectService extends IMQService implements JMSService
                // there doesnt need to be an external thread
                throw new RuntimeException("Cannot invoke SessionListener.process() when in synchronous receiving mode");
            }
-	   valid = true;
+           synchronized(sessionLock) {
+               if (destroyed) {
+                   valid = false;
+                   sessionLock.notifyAll();
+                   return;
+               }
+               valid = true;
+           }
            while (valid ) {
                    // if we are not busy, wait for the eventListener to wake us up
                 while (valid && (!session.isBusy() || stopped)) {
                    // get the lock 
                    synchronized(sessionLock) {
+                       islocked = true;
+                       sessionLock.notifyAll();
                        // we cant check isBusy in the loop so
                        // instead check the sessionLockNotify flag
-                       if (sessionLockNotify) {
+                       if (sessionLockNotify || !valid || stopped) {
                            sessionLockNotify = false;
                            continue;
                        }
                        try {
                            sessionLock.wait();
                        } catch (Exception ex) {
-                           Globals.getLogger().log(Logger.DEBUGHIGH,"Exception in sessionlock wait",
-                                     ex);
+                           Globals.getLogger().log(Logger.DEBUGHIGH,
+                               "Exception in sessionlock wait", ex);
                        }
                    }
+                }
+                if (!valid) {
+                    continue;
                 }
                 synchronized(sessionLock) {
                     // we dont care if we are about to notify
                     sessionLockNotify = false;
+                    islocked = false;
                 }
-                if (session.isBusy() && !stopped) {
+                if (session.isBusy() && !stopped && valid) {
                        // cool, we have something to do
                        Packet p = new Packet();
 
@@ -2979,7 +2973,6 @@ public class IMQDirectService extends IMQService implements JMSService
 
                            // call the deliver method
                            ack = con.deliver(p);
-
 			   if (ack != null)  {
 			       long transactionId = ack.getTransactionId(), 
 			       consumerId = ack.getConsumerId();
@@ -3003,16 +2996,28 @@ public class IMQDirectService extends IMQService implements JMSService
                                ids[0] = sysMsgId;
                                ConsumerUID cids[] = new ConsumerUID[1];
                                cids[0] = conUID;
-                               Globals.getProtocol().acknowledge(cxn, txnUID, false, AckHandler.ACKNOWLEDGE_REQUEST, null, null, 0, ids, cids);
+                               Globals.getProtocol().acknowledge(cxn, txnUID, false, 
+                                   AckHandler.ACKNOWLEDGE_REQUEST, null, null, 0, ids, cids);
 			   }
                        } catch (Exception ex) {
-                           // I have no idea what the exception might mean so just
-                           // log it and go on
-                           Globals.getLogger().log(Logger.ERROR,"Can not deliver message to " + con);
+                           if (ex instanceof ConsumerClosedNoDeliveryException) {
+                               if (parent.DEBUG) { 
+                                   Globals.getLogger().logStack(Logger.INFO, 
+                                   "DirectConsumer "+con+" is closed, message "+
+                                    p.getSysMessageID()+" can not be deliverd", ex);
+                               }
+                           } else {
+                               // I have no idea what the exception might mean so just
+                               // log it and go on
+                               Globals.getLogger().logStack(Logger.ERROR, 
+                                   Globals.getBrokerResources().getKString(
+                                   BrokerResources.X_CANNOT_DELIVER_MESSAGE_TO_CONSUMER,
+                                   p.getSysMessageID(), uid+" DirectConsumer["+con+"]"), ex);
+                           }
                        }
                    }
                    
-           }
+            }
         }
 
         /**
@@ -3103,7 +3108,7 @@ public class IMQDirectService extends IMQService implements JMSService
 	    while (itr.hasNext()) {
 		SessionUID sUID = (SessionUID)itr.next();
                 SessionListener sl = getListener(sUID);
-		sl.stopSession();
+		sl.stopSession(true);
 	    }
 	}
 
@@ -3111,30 +3116,53 @@ public class IMQDirectService extends IMQService implements JMSService
 	 * Start this session - set stopped flag to false and wake up waiting thread
 	 */
         public void startSession() {
-	    stopped = false;
              // wake up the thread (if waiting())
              synchronized (sessionLock) {
+	         stopped = false;
                  sessionLock.notify();
              }
 	}
 
+        private static final long MAX_WAIT_FOR_SESSION_STOP = 90000; //90sec
 	/*
 	 * Stop this session - set stopped flag to true
 	 */
-        public void stopSession() {
-	    stopped = true;
-             synchronized (sessionLock) {
-                 sessionLock.notify();
-             }
-	}
+        public void stopSession(boolean dowait) {
+            long totalwaited = 0L; 
+            synchronized (sessionLock) {
+                stopped = true;
+                sessionLock.notifyAll();
+                if (!dowait) {
+                    return;
+                }
+                while (valid && !islocked && totalwaited < MAX_WAIT_FOR_SESSION_STOP) {
+                    String[] args = { "DirectSession["+session+"]" };
+                    Globals.getLogger().log(Logger.INFO, 
+                        Globals.getBrokerResources().getKTString(
+                        BrokerResources.I_WAIT_FOR_SESSION_STOP, args));
+                    long starttime = System.currentTimeMillis();
+                    try {
+                    sessionLock.wait(1500L);
+                    } catch (Exception e) {}
+                    totalwaited += (System.currentTimeMillis()-starttime);
+                }
+                if (valid && !islocked) {
+                    String[] args = { "DirectSession["+session+"]" };
+                    Globals.getLogger().log(Logger.WARNING, 
+                        Globals.getBrokerResources().getKTString(
+                        BrokerResources.W_WAIT_FOR_SESSION_STOP_TIMED_OUT, args));
+                }
+            }
+        }
 
         public void destroy() {
 
              // set the shutdown flag
-             valid = false;
              // wake up the thread (if waiting())
              synchronized (sessionLock) {
-                 sessionLock.notify();
+                 valid = false;
+                 destroyed = true;
+                 sessionLock.notifyAll();
              }
 
              // remove any even listener

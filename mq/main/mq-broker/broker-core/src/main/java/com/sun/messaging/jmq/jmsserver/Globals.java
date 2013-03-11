@@ -439,23 +439,24 @@ public class Globals extends CommGlobals
     }
 
     public static PortMapper getPortMapper() {
-	if (portMapper == null) {
-        synchronized(lock) {
+        if (portMapper == null) {
+            synchronized(lock) {
 	        if (portMapper == null) {
                     portMapper = new PortMapper(configName);
-                try {
-                     portMapper.setParameters(getConfig());
-                     // Force portmapper to attempt to bind to port
-                     portMapper.bind();
-                } catch (Exception e) {
-                     Logger logger = getLogger();
-                     if (e instanceof PropertyUpdateException) {
-                         logger.log(Logger.ERROR, e.getMessage());
-                     } else {
-                         logger.logStack(Logger.ERROR, e.getMessage(), e);
-                     }
+                    try {
+                        portMapper.configure(getConfig());
+                        // Force portmapper to attempt to bind to port
+                        portMapper.bind();
+                    } catch (Exception e) {
+                        portMapper = null;
+                        Logger logger = getLogger();
+                        if (e instanceof PropertyUpdateException) {
+                            logger.log(Logger.ERROR, e.getMessage());
+                        } else {
+                            logger.logStack(Logger.ERROR, e.getMessage(), e);
+                       }
+                    }
                 }
-            }
 	    }
 	}
 	return portMapper;

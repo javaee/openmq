@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -153,7 +153,7 @@ TCPSocket::reset()
  */
 iMQError 
 TCPSocket::connect(const char * hostName, 
-                   const PRUint16 hostPort,
+                   const PRUint16 hostPort, const PRBool useIPV6,
                    const PRUint32 timeoutMicroSeconds)
 {
   CHECK_OBJECT_VALIDITY();
@@ -171,10 +171,19 @@ TCPSocket::connect(const char * hostName,
   CNDCHK( this->hostSocket != NULL, IMQ_TCP_ALREADY_CONNECTED );
 
   // Lookup the host.
-  NSPRCHK( PR_GetHostByName(hostName,    
+   
+  if (useIPV6 == PR_TRUE) {
+    NSPRCHK( PR_GetIPNodeByName(hostName, 
+                            PR_AF_INET6, PR_AI_DEFAULT, 
                             this->hostEntryData,    
                             sizeof(this->hostEntryData),
                             &(this->hostEntry)) );
+  } else {
+    NSPRCHK( PR_GetHostByName(hostName,    
+                            this->hostEntryData,    
+                            sizeof(this->hostEntryData),
+                            &(this->hostEntry)) );
+  } 
 
   // Get the host's address
   CNDCHK( PR_EnumerateHostEnt(0,
@@ -183,7 +192,7 @@ TCPSocket::connect(const char * hostName,
                               &(this->hostAddr)) == -1, NSPR_ERROR_TO_IMQ_ERROR(PR_GetError()));
   
   // Create a new socket
-  MEMCHK( this->hostSocket = PR_NewTCPSocket() );
+  MEMCHK( this->hostSocket = PR_OpenTCPSocket(this->hostAddr.raw.family) );
 
   // Make the socket non-blocking and disable Nagel's algorithm
   ERRCHK( this->setDefaultSockOpts() );
@@ -697,7 +706,11 @@ TCPSocket::cacheLocalAddr()
   this->localPort = PR_ntohs(localAddr.inet.port);
 
   // PORTABILITY: this doesn't support IPv6
-  this->localIP.setIPv4AddressFromNetOrderInt(localAddr.inet.ip);
+  if (this->localAddr.raw.family == PR_AF_INET6) {
+    this->localIP.setAddressFromIPv6Address((const PRUint8 *)&(localAddr.ipv6.ip));
+  } else {
+    this->localIP.setIPv4AddressFromNetOrderInt(localAddr.inet.ip);
+  }
 
   return IMQ_SUCCESS;
 }
@@ -814,7 +827,7 @@ TCPSocket::bind(const char * localName,
                                             &(this->localAddr)) );
   
   // Create a new socket
-  RETURN_IF_OUT_OF_MEMORY( this->hostSocket = PR_NewTCPSocket() );
+  RETURN_IF_OUT_OF_MEMORY( this->hostSocket = PR_OpenTCPSocket(this->localAddr.raw.family) );
 
   // Make the socket non-blocking and disable Nagel's algorithm
   ERRCHK( this->setDefaultSockOpts() );

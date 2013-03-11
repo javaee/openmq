@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,35 +40,35 @@
 
 package javax.jms;
 
-/** An {@code XATopicSession} provides a regular {@code TopicSession}.
-  * which can be used to create {@code TopicSubscriber} and 
-  * {@code TopicPublisher} objects (optional).
-  *
-  * <P>The {@code XATopicSession} interface is optional.  JMS providers 
-  * are not required to support this interface. This interface is for 
-  * use by JMS providers to support transactional environments. 
-  * Client programs are strongly encouraged to use the transactional support
-  * available in their environment, rather than using these XA
-  * interfaces directly. 
-  *
-  * @version     1.1 February 2, 2002
-  * @author      Mark Hapner
-  * @author      Rich Burridge
-  * @author      Kate Stout
-  *
-  * @see         javax.jms.XASession
-  * @see         javax.jms.TopicSession
-  */
+/**
+ * An {@code XATopicSession} provides a regular {@code TopicSession}. which can
+ * be used to create {@code TopicSubscriber} and {@code TopicPublisher} objects
+ * (optional).
+ * 
+ * <P>
+ * The {@code XATopicSession} interface is optional. JMS providers are not
+ * required to support this interface. This interface is for use by JMS
+ * providers to support transactional environments. Client programs are strongly
+ * encouraged to use the transactional support available in their environment,
+ * rather than using these XA interfaces directly.
+ * 
+ * @see javax.jms.XASession
+ * @see javax.jms.TopicSession
+ * 
+ * @version JMS 2.0
+ * @since JMS 1.0
+ * 
+ */
 
 public interface XATopicSession extends XASession {
 
-    /** Gets the topic session associated with this {@code XATopicSession}.
-      *   
-      * @return the topic session object
-      *   
-      * @exception JMSException if an internal error occurs.
-      */  
-  
-    TopicSession 
-    getTopicSession() throws JMSException;
+	/**
+	 * Gets the topic session associated with this {@code XATopicSession}.
+	 * 
+	 * @return the topic session object
+	 * 
+	 * @exception JMSException
+	 *                if an internal error occurs.
+	 */
+	TopicSession getTopicSession() throws JMSException;
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -73,6 +73,7 @@ import com.sun.messaging.jmq.util.selector.SelectorFormatException;
 public interface Protocol
 {
 
+    public boolean getDEBUG();
 
     /**
      * called when a new connection is created.
@@ -352,9 +353,11 @@ public interface Protocol
        *@param session session associated with the consumer.
        *@param con Connection associated with the consumer (used
        *          for retrieving protocol version).
+       *@param lastid the last delivered message's SysMessageID
+       *@param lastidInTransaction true if the lastid message was delivered in a transaction
        */
       public void destroyConsumer(ConsumerUID uid, Session session,
-          SysMessageID lastid, IMQConnection con)
+          SysMessageID lastid, boolean lastidInTransaction, IMQConnection con)
           throws BrokerException;
 
 

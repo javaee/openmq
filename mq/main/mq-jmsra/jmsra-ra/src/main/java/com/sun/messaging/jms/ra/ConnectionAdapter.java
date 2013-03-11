@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -49,6 +49,7 @@ import javax.jms.ConnectionConsumer;
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.IllegalStateRuntimeException;
+import javax.jms.InvalidClientIDException;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.QueueSession;
@@ -63,6 +64,7 @@ import com.sun.messaging.jmq.jmsclient.ContextableConnection;
 import com.sun.messaging.jmq.jmsclient.XAQueueSessionImpl;
 import com.sun.messaging.jmq.jmsclient.XASessionImpl;
 import com.sun.messaging.jmq.jmsclient.XATopicSessionImpl;
+import com.sun.messaging.jms.MQInvalidClientIDRuntimeException;
 import com.sun.messaging.jms.MQRuntimeException;
 import com.sun.messaging.jms.ra.api.JMSRAConnectionAdapter;
 import com.sun.messaging.jms.ra.api.JMSRASessionAdapter;
@@ -172,6 +174,8 @@ javax.jms.TopicConnection, JMSRAConnectionAdapter, ContextableConnection {
 		checkClosed2();
 		try {
 			xac._setClientID(clientID);
+		} catch (InvalidClientIDException ice) {
+			throw new MQInvalidClientIDRuntimeException(ice);
 		} catch (JMSException e) {
 			throw new MQRuntimeException(e);
 		}
@@ -255,7 +259,8 @@ javax.jms.TopicConnection, JMSRAConnectionAdapter, ContextableConnection {
 				while (it.hasNext()) {
 					SessionAdapter sa = it.next();
 					if (sa != null) {
-						sa.closeAdapter();
+						sa.close(true);
+						it.remove();
 					}
 				}
 				// Clear HashSet

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -71,12 +71,13 @@ package javax.jms;
  * <P>
  * A JMS provider should do its best to expire messages accurately; however, the
  * JMS API does not define the accuracy provided.
- * 
- * @version 2.0
- * 
  * @see javax.jms.TopicPublisher
  * @see javax.jms.QueueSender
  * @see javax.jms.Session#createProducer
+ * 
+ * @version JMS 2.0
+ * @since JMS 1.0
+ * 
  */
 
 public interface MessageProducer extends AutoCloseable {
@@ -278,7 +279,7 @@ public interface MessageProducer extends AutoCloseable {
 	 * @see javax.jms.MessageProducer#getDeliveryDelay
 	 * @see javax.jms.Message#DEFAULT_DELIVERY_DELAY
 	 * 
-	 * @since 2.0
+	 * @since JMS 2.0
 	 */
 
 	void setDeliveryDelay(long deliveryDelay) throws JMSException;
@@ -296,7 +297,7 @@ public interface MessageProducer extends AutoCloseable {
 	 * 
 	 * @see javax.jms.MessageProducer#setDeliveryDelay
 	 * 
-	 * @since 2.0
+	 * @since JMS 2.0
 	 */
 
 	long getDeliveryDelay() throws JMSException;
@@ -309,7 +310,8 @@ public interface MessageProducer extends AutoCloseable {
 	 * @exception JMSException
 	 *                if the JMS provider fails to get the destination for this
 	 *                {@code MessageProducer} due to some internal error.
-	 * @since 1.1
+	 *                
+	 * @since JMS 1.1
 	 */
 
 	Destination getDestination() throws JMSException;
@@ -366,7 +368,7 @@ public interface MessageProducer extends AutoCloseable {
 	 * 
 	 * @see javax.jms.Session#createProducer
 	 * 
-	 * @since 1.1
+	 * @since JMS 1.1
 	 */
 
 	void send(Message message) throws JMSException;
@@ -397,7 +399,7 @@ public interface MessageProducer extends AutoCloseable {
 	 *                destination at creation time.
 	 * 
 	 * @see javax.jms.Session#createProducer
-	 * @since 1.1
+	 * @since JMS 1.1
 	 */
 
 	void send(Message message, int deliveryMode, int priority, long timeToLive) throws JMSException;
@@ -430,7 +432,7 @@ public interface MessageProducer extends AutoCloseable {
 	 *                at creation time.
 	 * 
 	 * @see javax.jms.Session#createProducer
-	 * @since 1.1
+	 * @since JMS 1.1
 	 */
 
 	void send(Destination destination, Message message) throws JMSException;
@@ -468,7 +470,7 @@ public interface MessageProducer extends AutoCloseable {
 	 *                at creation time.
 	 *                
 	 * @see javax.jms.Session#createProducer
-	 * @since 1.1
+	 * @since JMS 1.1
 	 */
 
 	void send(Destination destination, Message message, int deliveryMode, int priority, long timeToLive)
@@ -563,9 +565,9 @@ public interface MessageProducer extends AutoCloseable {
 	 * <tt>commit</tt> or <tt>rollback</tt> to throw an
 	 * <tt>IllegalStateException</tt>.
 	 * <p>
-	 * <b>Restrictions on usage in Java EE</b> An asynchronous send is not
-	 * permitted in a Java EE EJB or web container. If the application component
-	 * violates this restriction this method may throw a JMSException.
+	 * <b>Restrictions on usage in Java EE</b> This method must not be used in a
+	 * Java EE EJB or web container. Doing so may cause a {@code JMSException} 
+	 * to be thrown though this is not guaranteed.
 	 * <p>
 	 * <b>Message headers</b> JMS defines a number of message header fields and
 	 * message properties which must be set by the "JMS provider on send". If
@@ -636,7 +638,7 @@ public interface MessageProducer extends AutoCloseable {
 	 * @see javax.jms.Session#createProducer
 	 * @see javax.jms.CompletionListener
 	 * 
-	 * @since 2.0
+	 * @since JMS 2.0
 	 */
 	void send(Message message, CompletionListener completionListener) throws JMSException;
 	
@@ -728,9 +730,9 @@ public interface MessageProducer extends AutoCloseable {
 	 * <tt>commit</tt> or <tt>rollback</tt> to throw an
 	 * <tt>IllegalStateException</tt>.
 	 * <p> 
-	 * <b>Restrictions on usage in Java EE</b> An asynchronous send is not
-	 * permitted in a Java EE EJB or web container. If the application component
-	 * violates this restriction this method may throw a JMSException.
+	 * <b>Restrictions on usage in Java EE</b> This method must not be used in a
+	 * Java EE EJB or web container. Doing so may cause a {@code JMSException} 
+	 * to be thrown though this is not guaranteed.
 	 * <p>
 	 * <b>Message headers</b> JMS defines a number of message header fields and
 	 * message properties which must be set by the "JMS provider on send". If
@@ -806,7 +808,8 @@ public interface MessageProducer extends AutoCloseable {
 	 * 
 	 * @see javax.jms.Session#createProducer
 	 * @see javax.jms.CompletionListener
-	 * @since 2.0
+	 * 
+	 * @since JMS 2.0
 	 */
 
 	void send(Message message, int deliveryMode, int priority, long timeToLive, CompletionListener completionListener)
@@ -907,9 +910,9 @@ public interface MessageProducer extends AutoCloseable {
 	 * <tt>commit</tt> or <tt>rollback</tt> to throw an
 	 * <tt>IllegalStateException</tt>.
 	 * <p>
-	 * <b>Restrictions on usage in Java EE</b> An asynchronous send is not
-	 * permitted in a Java EE EJB or web container. If the application component
-	 * violates this restriction this method may throw a JMSException.
+	 * <b>Restrictions on usage in Java EE</b> This method must not be used in a
+	 * Java EE EJB or web container. Doing so may cause a {@code JMSException} 
+	 * to be thrown though this is not guaranteed.
 	 * <p>
 	 * <b>Message headers</b> JMS defines a number of message header fields and
 	 * message properties which must be set by the "JMS provider on send". If
@@ -979,7 +982,8 @@ public interface MessageProducer extends AutoCloseable {
 	 * 
 	 * @see javax.jms.Session#createProducer
 	 * @see javax.jms.CompletionListener
-	 * @since 2.0
+	 * 
+	 * @since JMS 2.0
 	 */
 
 	void send(Destination destination, Message message, CompletionListener completionListener) throws JMSException;
@@ -1077,9 +1081,9 @@ public interface MessageProducer extends AutoCloseable {
 	 * <tt>commit</tt> or <tt>rollback</tt> to throw an
 	 * <tt>IllegalStateException</tt>.
 	 * <p>
-	 * <b>Restrictions on usage in Java EE</b> An asynchronous send is not
-	 * permitted in a Java EE EJB or web container. If the application component
-	 * violates this restriction this method may throw a JMSException.
+	 * <b>Restrictions on usage in Java EE</b> This method must not be used in a
+	 * Java EE EJB or web container. Doing so may cause a {@code JMSException} 
+	 * to be thrown though this is not guaranteed.
 	 * <p>
 	 * <b>Message headers</b> JMS defines a number of message header fields and
 	 * message properties which must be set by the "JMS provider on send". If
@@ -1157,7 +1161,8 @@ public interface MessageProducer extends AutoCloseable {
 	 * 
 	 * @see javax.jms.Session#createProducer
 	 * @see javax.jms.CompletionListener
-	 * @since 2.0
+	 * 
+	 * @since JMS 2.0
 	 */
 
 	void send(Destination destination, Message message, int deliveryMode, int priority, long timeToLive,

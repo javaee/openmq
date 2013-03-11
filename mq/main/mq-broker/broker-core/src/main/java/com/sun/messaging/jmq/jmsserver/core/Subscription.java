@@ -785,7 +785,7 @@ public class Subscription extends Consumer implements SubscriptionSpi
                  String durableName = s.getDurableName();
                  logger.log(Logger.INFO, Globals.getBrokerResources().
                      getKString(BrokerResources.I_LOAD_STORED_DURA, 
-                         getDSubLogString(clientID, durableName)));
+                     getDSubLogString(clientID, durableName))+"["+s.getDestinationUID()+"]");
                  String key = getDSubKey(clientID, durableName);
                  if (durableList.get(key) != null) {
                      logger.log(Logger.WARNING,
@@ -815,7 +815,9 @@ public class Subscription extends Consumer implements SubscriptionSpi
                               if (d == null) {
                                   continue;
                               }
-                              logger.log(logger.INFO, "XXXAdd durable subscription "+s+" to destination "+d);
+                              if (DEBUG) {
+                              logger.log(logger.INFO, "Add loaded durable subscription "+s+" to destination "+d);
+                              }
                               d.addConsumer(s, false);
                           }
                       }
@@ -825,9 +827,11 @@ public class Subscription extends Consumer implements SubscriptionSpi
                                         (duid.isQueue() ? DestType.DEST_TYPE_QUEUE
                                          : DestType.DEST_TYPE_TOPIC) , true, true);
                      for (int j = 0; j < ds.length; j++) {
-                         logger.log(logger.INFO, "XXXAdd durable subscription "+s+" to destination "+ds[j]);
                          if (ds[j] == null) {
                              continue;
+                         }
+                         if (DEBUG) {
+                         logger.log(logger.INFO, "Add loaded durable subscription "+s+" to destination "+ds[j]);
                          }
                          ds[j].addConsumer(s, false);
                      }

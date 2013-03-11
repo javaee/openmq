@@ -76,8 +76,9 @@ public interface PassfileObfuscator {
 
     /**
      * @param source the fully qualified file name of the passfile
+     * @param prefix property name prefix for all name=value pairs
      * @return true if the passfile is identified as obfuscated by the PassfileObfuscator
      */
-    public boolean isobfuscated(String source) throws IOException;
+    public boolean isObfuscated(String source, String prefix) throws IOException;
 
 }

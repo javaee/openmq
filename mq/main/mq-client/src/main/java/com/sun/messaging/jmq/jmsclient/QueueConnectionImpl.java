@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,82 +38,72 @@
  * holder.
  */
 
-/*
- * @(#)QueueConnectionImpl.java	1.22 06/27/07
- */ 
-
 package com.sun.messaging.jmq.jmsclient;
 
-import javax.jms.*;
 import java.util.Properties;
+
+import javax.jms.ConnectionConsumer;
+import javax.jms.JMSException;
+import javax.jms.QueueSession;
+import javax.jms.ServerSessionPool;
+import javax.jms.Topic;
 
 import com.sun.messaging.AdministeredObject;
 
-/** A QueueConnection is an active connection to a JMS PTP provider. A
-  * client uses a QueueConnection to create one or more QueueSessions
-  * for producing and consuming messages.
-  *
-  * @see         javax.jms.Connection
-  * @see	 javax.jms.QueueConnectionFactory
-  */
+/**
+ * A QueueConnection is an active connection to a JMS PTP provider. A client
+ * uses a QueueConnection to create one or more QueueSessions for producing and
+ * consuming messages.
+ * 
+ * @see javax.jms.Connection
+ * @see javax.jms.QueueConnectionFactory
+ */
 
 public class QueueConnectionImpl extends UnifiedConnectionImpl implements com.sun.messaging.jms.QueueConnection {
 
-    public
-    QueueConnectionImpl(Properties configuration, String username,
-                        String password, String type) throws JMSException {
-        super(configuration, username, password, type);
+	public QueueConnectionImpl(Properties configuration, String username, String password, String type) throws JMSException {
+		super(configuration, username, password, type);
 
-        //bug 6172663
-        setIsTopicConnection(false);
-        super.setIsQueueConnection(true);
-    }
+		// bug 6172663
+		setIsTopicConnection(false);
+		super.setIsQueueConnection(true);
+	}
 
-    public QueueSession
-    createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
+	public QueueSession createQueueSession(boolean transacted, int acknowledgeMode) throws JMSException {
 
-        return super.createQueueSession(transacted, acknowledgeMode);
-    }
+		return super.createQueueSession(transacted, acknowledgeMode);
+	}
 
-    public QueueSession
-    createQueueSession(int acknowledgeMode) throws JMSException {
+	public QueueSession createQueueSession(int acknowledgeMode) throws JMSException {
 
-        checkConnectionState();
+		checkConnectionState();
 
-        //disallow to set client ID after this action.
-        setClientIDFlag();
+		// disallow to set client ID after this action.
+		setClientIDFlag();
 
-        return new QueueSessionImpl ( this, acknowledgeMode );
-    }
+		return new QueueSessionImpl(this, acknowledgeMode);
+	}
 
-    /**
-    * Throws an IllegalStateException as it is an invalid method for this domain.
-    *
-    * @param topic the topic to access
-    * @param subscriptionName durable subscription name
-    * @param messageSelector only messages with properties matching the
-    * message selector expression are delivered
-    * @param sessionPool the serversession pool to associate with this
-    * durable connection consumer.
-    * @param maxMessages the maximum number of messages that can be
-    * assigned to a server session at one time.
-    *
-    * @return the durable connection consumer.
-    *
-    * @exception IllegalStateException Always, since it is an invalid method for
-    *            this domain.
-    *
-    * @see javax.jms.ConnectionConsumer
-    */
-    public ConnectionConsumer
-    createDurableConnectionConsumer(Topic topic,
-                                    String subscriptionName,
-                                    String messageSelector,
-                                    ServerSessionPool sessionPool,
-                                    int maxMessages) throws JMSException {
+	@Override
+	public ConnectionConsumer createDurableConnectionConsumer(Topic topic, String subscriptionName, String messageSelector, ServerSessionPool sessionPool,
+			int maxMessages) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createDurableConnectionConsumer");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
-        String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                                                              "createDurableConnectionConsumer");
-        throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
+	@Override
+	public ConnectionConsumer createSharedConnectionConsumer(Topic topic, String subscriptionName, String messageSelector, ServerSessionPool sessionPool,
+			int maxMessages) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createSharedConnectionConsumer");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
+
+	@Override
+	public ConnectionConsumer createSharedDurableConnectionConsumer(Topic topic, String subscriptionName, String messageSelector,
+			ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createSharedDurableConnectionConsumer");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
+	
+	
 }

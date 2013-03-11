@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,6 +48,7 @@ import java.io.*;
 import java.lang.ref.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -58,7 +59,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Collections;
 import java.util.Iterator;
-
 import com.sun.messaging.jmq.io.*;
 import com.sun.messaging.jmq.util.lists.*;
 import com.sun.messaging.jmq.jmsserver.plugin.spi.ConsumerSpi;
@@ -422,7 +422,7 @@ public class SessionOp extends SessionOpSpi
      * @param redeliverAll  ignore id and redeliver all
      * @param redeliverPendingConsume - redeliver pending messages
      */
-    public boolean detachConsumer(ConsumerSpi c, SysMessageID id,
+    public boolean detachConsumer(ConsumerSpi c, SysMessageID id, boolean idInTransaction,
            boolean redeliverPendingConsume, boolean redeliverAll, Connection conn)
     {
         if (Session.DEBUG || Session.DEBUG_CLUSTER_MSG) {
@@ -481,7 +481,7 @@ public class SessionOp extends SessionOpSpi
                 }
                 PacketReference pr = val.getReference();
                 tid = null;
-                if (session.isTransacted()) { 
+                if (session.isTransacted() || idInTransaction) { 
                     tid = translist.getConsumedInTransaction(
                               val.getSysMessageID(), val.uid);
                     if (tid == null) {
@@ -647,6 +647,25 @@ public class SessionOp extends SessionOpSpi
         }
         return ref.getBrokerAddress();
     }
+
+    @Override
+    public boolean hasDeliveredMessages(ConsumerUID cuid) {
+        List<ackEntry> list = null;
+        synchronized (deliveredMessages) {
+            list = new ArrayList<ackEntry>(
+                (Collection<ackEntry>)deliveredMessages.values());
+        }
+        ackEntry entry = null;
+        Iterator<ackEntry> itr = list.iterator();
+        while (session.isValid() && itr.hasNext()) {
+            entry = itr.next();
+            if (entry.getConsumerUID().equals(cuid)) {
+                return true;
+            }
+        }
+        return !session.isValid();
+    }
+
 
     public void close(Connection conn) {
         TransactionList[] tls = DL.getTransactionList(

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -54,7 +54,8 @@ import com.sun.messaging.jmq.jmsserver.resources.*;
 import com.sun.messaging.jmq.util.log.Logger;
 import com.sun.messaging.jmq.util.StringUtil;
 import com.sun.messaging.jmq.util.UID;
-
+import com.sun.messaging.jmq.util.PassfileObfuscator;
+import com.sun.messaging.jmq.util.PassfileObfuscatorImpl;
 import com.sun.messaging.jmq.jmsserver.persist.api.StoreManager;
 import com.sun.messaging.jmq.jmsserver.persist.api.HABrokerInfo;
 import com.sun.messaging.jmq.jmsserver.persist.api.TransactionInfo;
@@ -2214,9 +2215,8 @@ public class DBTool implements DBConstants {
      *  - A password obtained from -passfile will override a value for
      *    imq.persist.jdbc.password in config.properties.
      */
-    private void parsePassfile()
-        throws FileNotFoundException
-    {
+    private void parsePassfile() throws IOException {
+
         String	pf_value = null,
         	pf_dir = null,
 		usePassfile = null;
@@ -2253,16 +2253,21 @@ public class DBTool implements DBConstants {
 	// Check if the passfile exists else throw exception
 	File pf = new File(passfile_location);
 	if (pf.exists()) {
-	    Properties props = new Properties();
-	    // read password from passfile
-            //
-	    try {
-	        FileInputStream fis = new FileInputStream(
-				        passfile_location);
+            Properties props = new Properties();
+            try {
+                PassfileObfuscator po = new PassfileObfuscatorImpl();
+                InputStream fis = po.retrieveObfuscatedFile(passfile_location, Globals.IMQ);
                 props.load(fis);
-	    } catch (IOException ioex) {
-	        logger.log(Logger.ERROR,
-		    br.getKString(BrokerResources.X_READ_PASSFILE), ioex);
+                if (!po.isObfuscated(passfile_location, Globals.IMQ)) {
+                    logger.log(Logger.WARNING,
+                        Globals.getBrokerResources().getKString(
+                        BrokerResources.W_UNENCODED_ENTRY_IN_PASSFILE,
+                        passfile_location, "'imqusermgr encode'"));
+                }
+	    } catch (IOException e) {
+                String emsg = Globals.getBrokerResources().getKString(
+                    BrokerResources.X_READ_PASSFILE, passfile_location);
+                throw new IOException(emsg, e);
 	    }
             config.putAll(props);
         } else {
@@ -2280,7 +2285,7 @@ public class DBTool implements DBConstants {
     }
 
     void doCommand(String[] args) throws SQLException,
-			BrokerException, FileNotFoundException {
+			BrokerException, IOException {
 
 	// print all
 	if (args.length == 0) {
@@ -2316,7 +2321,7 @@ public class DBTool implements DBConstants {
 	    exit(1);
 	}
 
-    props.getProperty(DBManager.JDBC_PROP_PREFIX+
+        props.getProperty(DBManager.JDBC_PROP_PREFIX+
                       DBConnectionPool.NUM_CONN_PROP_SUFFIX, "2");
 
 	if (cliPasswdSpecified)  {
@@ -2500,11 +2505,7 @@ public class DBTool implements DBConstants {
 	try {
 	    tool.doCommand(args);
 	} catch (Exception e) {
-            if (e instanceof BrokerException) {
-                Globals.getLogger().logStack(Logger.ERROR, e.getMessage(), e);
-            } else {
-                Globals.getLogger().logStack(Logger.ERROR, e.getMessage(), e);
-            }
+            Globals.getLogger().logStack(Logger.ERROR, e.getMessage(), e);
 
             if (tool.debugSpecified) {
                 e.printStackTrace();

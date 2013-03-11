@@ -29,6 +29,8 @@ helloworld    Contains simple programs that show how
 jms           Contains sample programs that demonstrate the
               use of the JMS API with Message Queue.
 
+jms20         Contains sample programs that demonstrate the
+              use of the new JMS2.0 API with Message Queue.
 
 C             Contains sample programs that demonstrate how to
               create C language clients that use the Message Queue 
@@ -104,9 +106,9 @@ mqInstallHome is specified when you install the product.
 
 CLASSPATH
 ---------
-The Java examples have already been compiled using JDK1.5.
+The Java examples have already been compiled using JDK1.7.x.
 
-To recompile or run the examples with JDK1.5, you will need to ensure
+To recompile or run the examples with JDK1.7.x, you will need to ensure
 that the following jar files are in your CLASSPATH -
     jms.jar
     imq.jar

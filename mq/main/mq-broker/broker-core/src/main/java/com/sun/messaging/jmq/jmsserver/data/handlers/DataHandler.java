@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -158,10 +158,10 @@ public class DataHandler extends PacketHandler
                     throw new BrokerException("FAULT INJECTION: "+
                         FaultInjection.FAULT_SEND_MSG_1_EXCEPTION);
                 }
-                if (fi.checkFaultAndSleep(FaultInjection.FAULT_SEND_MSG_1_SLEEP, m)) {
+                if (fi.checkFaultAndSleep(FaultInjection.FAULT_SEND_MSG_1_SLEEP, m, true)) {
                     fi.unsetFault(FaultInjection.FAULT_SEND_MSG_1_SLEEP);
                 }
-                if (fi.checkFaultAndSleep(FaultInjection.FAULT_SEND_MSG_1_SLEEP_EXCEPTION, m)) {
+                if (fi.checkFaultAndSleep(FaultInjection.FAULT_SEND_MSG_1_SLEEP_EXCEPTION, m, true)) {
                     fi.unsetFault(FaultInjection.FAULT_SEND_MSG_1_SLEEP_EXCEPTION);
                     throw new BrokerException("FAULT INJECTION: "+
                         FaultInjection.FAULT_SEND_MSG_1_SLEEP_EXCEPTION);

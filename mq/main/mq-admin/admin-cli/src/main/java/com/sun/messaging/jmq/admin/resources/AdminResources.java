@@ -991,6 +991,7 @@ public class AdminResources extends MQResourceBundle {
      */
     final public static String W_PASSWD_OPTION_DEPRECATED	= "A2014";
     final public static String W_ECHO_PASSWORD	= "A2015";
+    final public static String W_UNENCODED_ENTRY_IN_PASSFILE    = "A2016";
 
     // 3000-3999 Error Messages
     // option parsing errors

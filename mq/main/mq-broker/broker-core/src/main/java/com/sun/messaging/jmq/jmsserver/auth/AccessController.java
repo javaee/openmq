@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -536,7 +536,9 @@ public class AccessController
             svcname = (String)itr.next();
             svctype = ServiceManager.getServiceTypeString(svcname);
             if (svctype == null) { 
-                throw new BrokerException("Can't get service type for service "+svcname);
+                throw new BrokerException(
+                    Globals.getBrokerResources().getKString(
+                    BrokerResources.X_SERVICE_TYPE_NOT_FOUND_FOR_SERVICE, svcname));
             }
            
             ac = AccessController.getInstance(svcname, ServiceType.getServiceType(svctype));

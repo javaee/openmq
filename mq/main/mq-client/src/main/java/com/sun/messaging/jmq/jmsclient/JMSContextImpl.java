@@ -170,6 +170,7 @@ public class JMSContextImpl implements JMSContext, Traceable {
 	}
 
 	public JMSContextImpl(ConnectionFactory connectionFactory, ContainerType containerType, String userName, String password, int sessionMode) {
+		validateSessionMode(sessionMode);
 		this.containerType=containerType;
 		
 		// create connection
@@ -197,6 +198,7 @@ public class JMSContextImpl implements JMSContext, Traceable {
 	}
 
 	public JMSContextImpl(ConnectionFactory connectionFactory, ContainerType containerType, int sessionMode) {
+		validateSessionMode(sessionMode);
 		this.containerType=containerType;
 		
 		// create connection
@@ -222,6 +224,8 @@ public class JMSContextImpl implements JMSContext, Traceable {
 		initializeForNewConnection();
 	}
 	
+
+
 	/**
 	 * Create a new JMSContextImpl using an existing Connection
 	 * 
@@ -230,6 +234,7 @@ public class JMSContextImpl implements JMSContext, Traceable {
 	 * @param sessionMode
 	 */
 	public JMSContextImpl(ContainerType containerType, Set<JMSContext> contextSet, Connection connection, int sessionMode) {
+		validateSessionMode(sessionMode);
 		this.containerType=containerType;
 		
 		// use the specified connection
@@ -302,6 +307,16 @@ public class JMSContextImpl implements JMSContext, Traceable {
 	}
 	
 	public JMSContextImpl() {
+	}
+	
+	private void validateSessionMode(int sessionMode) {
+		if (sessionMode != JMSContext.AUTO_ACKNOWLEDGE && sessionMode != JMSContext.CLIENT_ACKNOWLEDGE && sessionMode != JMSContext.DUPS_OK_ACKNOWLEDGE
+				&& sessionMode != JMSContext.SESSION_TRANSACTED) {
+			// "Invalid session mode {0}"
+			String errorString = AdministeredObject.cr.getKString(ClientResources.X_INVALID_SESSION_MODE,sessionMode);
+			JMSRuntimeException jmsre = new com.sun.messaging.jms.MQRuntimeException(errorString, ClientResources.X_INVALID_SESSION_MODE);
+			ExceptionHandler.throwJMSRuntimeException(jmsre);
+		}
 	}
 
 	/**
@@ -769,11 +784,11 @@ public class JMSContextImpl implements JMSContext, Traceable {
         }
 
 	@Override
-        public JMSConsumer createSharedDurableConsumer(Topic topic, String name, String messageSelector, boolean noLocal) {
+        public JMSConsumer createSharedDurableConsumer(Topic topic, String name, String messageSelector) {
 		checkNotClosed();
 		disallowSetClientID();	
 		JMSConsumerImpl consumer = new JMSConsumerImpl();
-		consumer.initialiseSharedDurableConsumer(this,topic,name,messageSelector,noLocal);
+		consumer.initialiseSharedDurableConsumer(this,topic,name,messageSelector);
 		addConsumer(consumer);
 		return consumer;
         }
@@ -794,17 +809,6 @@ public class JMSContextImpl implements JMSContext, Traceable {
 		disallowSetClientID();	
 		JMSConsumerImpl consumer = new JMSConsumerImpl();
 		consumer.initialiseSharedConsumer(this,topic,sharedSubscriptionName,messageSelector);
-		addConsumer(consumer);
-		return consumer;
-	}
-
-	@Override
-	public JMSConsumer createSharedConsumer(Topic topic, String sharedSubscriptionName, String messageSelector,
-			boolean noLocal) {
-		checkNotClosed();
-		disallowSetClientID();	
-		JMSConsumerImpl consumer = new JMSConsumerImpl();
-		consumer.initialiseSharedConsumer(this,topic,sharedSubscriptionName,messageSelector,noLocal);
 		addConsumer(consumer);
 		return consumer;
 	}

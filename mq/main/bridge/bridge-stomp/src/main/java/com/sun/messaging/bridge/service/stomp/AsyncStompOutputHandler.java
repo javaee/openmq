@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -87,9 +87,7 @@ public class AsyncStompOutputHandler implements StompOutputHandler {
             }
         }
         try {
-
-            GrizzlyFuture f = _context.getConnection().write(msg);
-            f.get();
+            _context.write(msg, true);
         } catch (Exception e) {
             if (e instanceof java.nio.channels.ClosedChannelException ||
                 e.getCause() instanceof java.nio.channels.ClosedChannelException) {

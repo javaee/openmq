@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,6 +48,8 @@ import java.util.logging.Logger;
 
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 
+import com.sun.messaging.jmq.jmsservice.ConsumerClosedNoDeliveryException;
+
 /**
  *  Holds a pool of OnMessageRunner objects.
  */
@@ -80,6 +82,8 @@ public class OnMessageRunnerPool {
 
     /** The list of available OnMessageRunner objects */
     private Vector<OnMessageRunner> available;
+
+    private volatile boolean deactivating;
 
     /* Loggers */
     private static transient final String _className =
@@ -140,7 +144,6 @@ public class OnMessageRunnerPool {
         slackCount = max - min;
     }
 
-
     /**
      * Get an OnMessageRunner from the pool
      *
@@ -153,6 +156,9 @@ public class OnMessageRunnerPool {
 
         //System.out.println("MQRA:OMRP:getOMR()");
         if (available.size() == 0) {
+            if (deactivating)
+                throw new ConsumerClosedNoDeliveryException("MQRA:OMRP:getOMR:OnMessageRunnerPool is in deactivating");
+
             //System.out.println("MQRA:OMRP:getOMR:size=0");
             if (slackCount > 0) {
                 //System.out.println("MQRA:OMRP:getOMR:adding from slack");
@@ -166,6 +172,9 @@ public class OnMessageRunnerPool {
         }
             
         while (available.size() == 0) {
+            if (deactivating)
+                throw new ConsumerClosedNoDeliveryException("MQRA:OMRP:getOMR:OnMessageRunnerPool is in deactivating");
+
             try {
                 //System.out.println("MQRA:OMRP:getOMR:Waiting...");
                 wait();
@@ -210,6 +219,7 @@ public class OnMessageRunnerPool {
         if (index != -1) {
             //System.out.println("MQRA:OMRP:removeOMR:Id="+omr.getId()+" at index="+index);
             onMessageRunners.remove(index);
+            notifyAll();
             freeCount++;
             if (slackCount < (max-min)) {
                 slackCount++;
@@ -237,12 +247,14 @@ public class OnMessageRunnerPool {
 
     public synchronized void
     releaseOnMessageRunners() {
+        this.deactivating = true;
         //System.out.println("MQRA:OMRP:releaseOMRs()");
         for (int i= 0; i<onMessageRunners.size(); i++) {
             ((OnMessageRunner)onMessageRunners.get(i)).releaseEndpoint();
         }
         onMessageRunners.clear();
         available.removeAllElements();
+        notifyAll();
         freeCount = 0;
         slackCount = max;
         //System.out.println("MQRA:OMRP:releaseOMRs-done");

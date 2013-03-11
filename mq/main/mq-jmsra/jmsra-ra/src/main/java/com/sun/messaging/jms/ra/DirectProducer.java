@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1196,8 +1196,7 @@ public class DirectProducer
 	@Override
 	public void send(Message message, CompletionListener completionListener)
 			throws JMSException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("This method is new in JMS 2.0 and is not yet implemented");
+            throw new JMSException(_lgrMID_EXC+"Method send(Message, CompletionListener) is not allowed");
 		
 	}
 
@@ -1205,25 +1204,19 @@ public class DirectProducer
 	public void send(Message message, int deliveryMode, int priority,
 			long timeToLive, CompletionListener completionListener)
 			throws JMSException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("This method is new in JMS 2.0 and is not yet implemented");
-		
+            throw new JMSException(_lgrMID_EXC+"Method send(Message, int, int, long, CompletionListener) is not allowed");
 	}
 
 	@Override
 	public void send(Destination destination, Message message,
 			CompletionListener completionListener) throws JMSException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("This method is new in JMS 2.0 and is not yet implemented");
-		
+            throw new JMSException(_lgrMID_EXC+"Method send(Destination, Message, CompletionListener) is not allowed");
 	}
 
 	@Override
 	public void send(Destination destination, Message message,
 			int deliveryMode, int priority, long timeToLive,
 			CompletionListener completionListener) throws JMSException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("This method is new in JMS 2.0 and is not yet implemented");
-		
+            throw new JMSException(_lgrMID_EXC+"Method send(Destination, Message, int, int, long, CompletionListener) is not allowed");
 	}
 }

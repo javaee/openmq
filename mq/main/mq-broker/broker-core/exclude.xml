@@ -92,6 +92,12 @@
     </Match>         
 
      <Match>
+        <Class name="com.sun.messaging.jmq.jmsserver.service.imq.IMQDirectService"/>
+        <Field name="DEBUG"/>
+        <Bug pattern="MS_SHOULD_BE_FINAL"/>
+    </Match>         
+
+     <Match>
         <Class name="com.sun.messaging.jmq.jmsserver.data.ToTxnLogConverter"/>
         <Field name="DEBUG"/>
         <Bug pattern="MS_SHOULD_BE_FINAL"/>

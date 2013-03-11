@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -260,8 +260,9 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
     // we are only interested in knowing whether the other thread is executing close() or something else
     private int inSyncStateOperation = INSYNCSTATE_NOTSET;
     private static final int INSYNCSTATE_NOTSET = 0;
-    private static final int INSYNCSTATE_CLOSING = 1;
-    private static final int INSYNCSTATE_OTHER = 2;
+    private static final int INSYNCSTATE_SESSION_CLOSING = 1;
+    private static final int INSYNCSTATE_CONSUMER_CLOSING = 2;
+    private static final int INSYNCSTATE_OTHER = 3;
     
     //session sync object to replace synchronized (this).
     //application can sync the session object and interfere the client runtime.
@@ -332,6 +333,8 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
     public static boolean autoStartTxn = Boolean.getBoolean("imq.autoStartTxn");
     public static boolean noBlockUntilTxnCompletes = Boolean.getBoolean("imq.noBlockUntilTxnCompletes");
     public static boolean noBlockOnAutoAckNPTopics = Boolean.getBoolean("imq.noBlockOnAutoAckNPTopics");
+    private static long waitTimeoutForConsumerCloseDone = (long) 
+        Integer.getInteger("imqWaitTimeoutForConsumerCloseDone", 90000).intValue();
     
     private ThreadLocal<Boolean> isMessageListener = new ThreadLocal<Boolean>();
     
@@ -870,7 +873,7 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
              SessionImpl.this.toString()+"]", e);
         }
         public void handleLogInfo(String msg) {
-            sessionLogger.log(Level.INFO, msg+"["+SessionImpl.this.toString()+"]");
+            sessionLogger.log(Level.FINE, msg+"["+SessionImpl.this.toString()+"]");
         }
         public void handleLogWarn(String msg, Throwable e) {
             sessionLogger.log(Level.WARNING, msg+"["+SessionImpl.this.toString()+"]", e);
@@ -1080,7 +1083,7 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
                                         String msg = AdministeredObject.cr.getKString(
                                             ClientResources.I_WAIT_ASYNC_SENDS_COMPLETE_PRODUCER,
                                             String.valueOf(remaining), producer);
-                                        sessionLogger.log(Level.INFO, msg);
+                                        sessionLogger.log(Level.FINE, msg);
                                         loggered = true;
                                     }
                                     asyncSendLock.wait(remaining);
@@ -2568,6 +2571,11 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
         return isTransacted;
     }
 
+    protected boolean
+    getTransactedNoCheck() {
+        return isTransacted;
+    }
+
     /** Gets value for how messages are acknowledged.
      *
      * @return one of the following values: <CODE>AUTO_ACKNOWLEDGE</CODE>,
@@ -2606,6 +2614,7 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
     commit() throws JMSException {
 
         checkSessionState();
+        checkPermissionForAsyncSend();
 
         //XXX:GT TBF
         if (isTransacted == false) {
@@ -2697,6 +2706,7 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
     rollback() throws JMSException {
 
         checkSessionState();
+        checkPermissionForAsyncSend();
 
         if ( isTransacted == false ) {
             String errorString = AdministeredObject.cr.getKString(ClientResources.X_NON_TRANSACTED);
@@ -2819,7 +2829,7 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
             consumers.values().toArray ( new MessageConsumerImpl[0] );
 
         for ( int i=0; i< consumerArray.length; i++ ) {
-            consumerArray[i].close();
+            consumerArray[i].close(true);
         }
 
         consumers.clear();
@@ -2888,13 +2898,14 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
 
         //check if called from listener
         checkPermission();
+        checkPermissionForAsyncSend();
 
         try {
         	
         	//This statement must be above synchronized block to avoid dead-lock
         	//if calling Session.rollback concurrently. bug ID 6390095 and 
         	//6390006
-        	prepareToClose();
+        	prepareToClose(true);
         	
             synchronized ( sessionSyncObj ) {
                 try {
@@ -3280,14 +3291,43 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
 
             if ( inSyncState ) {
             	
-            	// some other thread is performing an operation on this thread
-            	// this is illegal unless we are in a MessageListener thread, and the other thread is calling close()
-            	if (isIsMessageListenerThread() && inSyncStateOperation==INSYNCSTATE_CLOSING){
+            	// Some other thread is performing critical operation on this session 
+            	// which is illegal unless this thread is the MessageListener thread, 
+                // and the other thread is calling Session.close() or Consumer.close
+            	if (isIsMessageListenerThread() && 
+                    (inSyncStateOperation == INSYNCSTATE_SESSION_CLOSING ||
+                     inSyncStateOperation == INSYNCSTATE_CONSUMER_CLOSING)) {
             		// this is an onMessage() thread
             		// allow the close to continue in the other thread (it should be blocking until onMessage() returns)
             		// and carry on in this thread
             		return;
             	}
+
+                if (inSyncStateOperation == INSYNCSTATE_CONSUMER_CLOSING) {
+                    long totalwaited = 0L;
+                    long waittime = waitTimeoutForConsumerCloseDone;
+                    while (inSyncState &&
+                           inSyncStateOperation == INSYNCSTATE_CONSUMER_CLOSING &&
+                           (waittime > 0L || waitTimeoutForConsumerCloseDone == 0L)) {
+                        checkSessionState();
+                        long starttime = System.currentTimeMillis();
+                        try {
+                            syncObject.wait(waittime);
+                        } catch ( InterruptedException e ) {
+                            Debug.printStackTrace(e);
+                        }
+                        totalwaited += (System.currentTimeMillis() - starttime);
+                        waittime = waitTimeoutForConsumerCloseDone - totalwaited;
+                        if (waittime < 0L) {
+                            waittime = 0L;
+                        }
+                    }
+                    if (!inSyncState) {
+                        inSyncState = true;
+                        inSyncStateOperation = INSYNCSTATE_OTHER;
+                        return;
+                    }
+                }
             	            	
                 String errorString = AdministeredObject.cr.getKString(ClientResources.X_CONFLICT);
                 JMSException jmse =
@@ -3329,7 +3369,7 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
      *<p>Commit/rollback/recover throws JMSException if they
      * are called after close is called.
      */
-    protected void prepareToClose() {
+    protected void prepareToClose(boolean fromSessionClose) {
 
         synchronized ( syncObject ) {
             //if inSync state, wait until done
@@ -3346,7 +3386,11 @@ public class SessionImpl implements JMSRAXASession, Traceable, ContextableSessio
             inSyncState = true;
             
             // record why we've set inSyncState
-            inSyncStateOperation = INSYNCSTATE_CLOSING;
+            if (fromSessionClose) {
+                inSyncStateOperation = INSYNCSTATE_SESSION_CLOSING;
+            } else {
+                inSyncStateOperation = INSYNCSTATE_CONSUMER_CLOSING;
+            }
         }
     }
 

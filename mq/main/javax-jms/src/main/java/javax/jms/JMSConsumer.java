@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -69,9 +69,11 @@ package javax.jms;
  * It is a client programming error for a {@code MessageListener} to throw an
  * exception.
  * 
- * @version 2.0
- * 
  * @see javax.jms.JMSContext
+ * 
+ * @version JMS 2.0
+ * @since JMS 2.0
+ * 
  */
 
 public interface JMSConsumer extends AutoCloseable {
@@ -191,31 +193,33 @@ public interface JMSConsumer extends AutoCloseable {
 
 	/**
 	 * Closes the {@code JMSConsumer}.
-	 * 
-	 * <P>
-	 * Since a provider may allocate some resources on behalf of a
-	 * {@code JMSConsumer} outside the Java virtual machine,
-	 * clients should close them when they are not needed. Relying on garbage
-	 * collection to eventually reclaim these resources may not be timely
-	 * enough.
-	 * <P>
-	 * This call blocks until a {@code receive} or message listener in progress has completed.
-	 * A blocked {@code receive} call returns null when
-	 * this {@code JMSConsumer} is closed.
 	 * <p>
-	 * A {@code MessageListener} must not attempt to close its own
-	 * {@code JMSConsumer} as this would lead to deadlock. The JMS provider
-	 * must detect this and throw a {@code IllegalStateRuntimeException}.
+	 * Since a provider may allocate some resources on behalf of a
+	 * {@code JMSConsumer} outside the Java virtual machine, clients should
+	 * close them when they are not needed. Relying on garbage collection to
+	 * eventually reclaim these resources may not be timely enough.
+	 * <P>
+	 * This call will block until a {@code receive} call in progress on this
+	 * consumer has completed. A blocked {@code receive} call returns null when
+	 * this consumer is closed.
+	 * <p>
+	 * If this method is called whilst a message listener is in progress in
+	 * another thread then it will block until the message listener has
+	 * completed.
+	 * <p>
+	 * This method may be called from a message listener's {@code onMessage}
+	 * method on its own consumer. After this method returns the
+	 * {@code onMessage} method will be allowed to complete normally.
+	 * <p>
+	 * This method is the only {@code JMSConsumer} method that can be called
+	 * concurrently.
 	 * 
- 	 * @exception IllegalStateRuntimeException
-	 *                this method has been called by a {@code MessageListener}
-	 *                on its own {@code JMSConsumer}
 	 * @exception JMSRuntimeException
-	 *                if the JMS provider fails to close the {@code JMSConsumer}
-	 *                due to some internal error.
-	 */ 
+	 *                if the JMS provider fails to close the consumer due to
+	 *                some internal error.
+	 */
 
-    void close();
+	void close();
     
 	/**
 	 * Receives the next message produced for this {@code JMSConsumer} and

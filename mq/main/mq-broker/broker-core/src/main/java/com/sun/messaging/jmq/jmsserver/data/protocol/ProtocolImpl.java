@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -126,6 +126,10 @@ public class ProtocolImpl implements Protocol
     public ProtocolImpl(PacketRouter router)
     {
         pr = router;
+    }
+
+    public boolean getDEBUG() {
+        return DEBUG;
     }
 
     /**
@@ -585,7 +589,7 @@ public class ProtocolImpl implements Protocol
           ConsumerHandler handler = (ConsumerHandler)
                       pr.getHandler(PacketType.ADD_CONSUMER);
           handler.destroyConsumer(con, null, null,
-                  durableName, clientID, null, false, false);
+              durableName, clientID, null, false, false, false);
       }
 
       /**
@@ -598,12 +602,12 @@ public class ProtocolImpl implements Protocol
        *          for retrieving protocol version).
        */
       public void destroyConsumer(ConsumerUID uid, Session session,
-          SysMessageID lastid, IMQConnection con)
+          SysMessageID lastid, boolean lastidInTransaction, IMQConnection con)
           throws BrokerException {
           ConsumerHandler handler = (ConsumerHandler)
                       pr.getHandler(PacketType.ADD_CONSUMER);
           handler.destroyConsumer(con, session, uid,
-                  null, null, lastid, (lastid == null), false);
+              null, null, lastid, lastidInTransaction, (lastid == null), false);
       }
 
 
@@ -622,7 +626,9 @@ public class ProtocolImpl implements Protocol
 
           if (DEBUG) {
           logger.log(Logger.INFO,
-          "ProtocolImpl.END TRANSACTION:TID="+id+", XID="+xid+", xaFlags="+xaFlags);
+          "ProtocolImpl.END TRANSACTION:TID="+id+", XID="+xid+", xaFlags="+
+           TransactionState.xaFlagToString(xaFlags)+
+          ", conn=@"+con.hashCode()+"["+con.getConnectionUID()+", "+con+"]");
           }
           
           TransactionHandler handler = (TransactionHandler)
@@ -659,7 +665,10 @@ public class ProtocolImpl implements Protocol
      {
           if (DEBUG) {
           logger.log(Logger.INFO,
-          "ProtocolImpl.START TRANSACTION:XID="+xid+", type="+type+", conn="+con);
+          "ProtocolImpl.START TRANSACTION:XID="+xid+", xaFlags="+
+           TransactionState.xaFlagToString(xaFlags)+
+          ", type="+type+", lifetime="+lifetime+", conn=@"+con.hashCode()+
+          "["+con.getConnectionUID()+", "+con+"]");
           }
           
           List conlist = con.getTransactionListThreadSafe();
@@ -733,7 +742,9 @@ public class ProtocolImpl implements Protocol
      {
           if (DEBUG) {
           logger.log(Logger.INFO,
-          "ProtocolImpl.COMMIT TRANSACTION:TID="+id+", XID="+xid+", xaFlags="+xaFlags);
+          "ProtocolImpl.COMMIT TRANSACTION:TID="+id+", XID="+xid+", xaFlags="+
+           TransactionState.xaFlagToString(xaFlags)+
+          ", conn=@"+con.hashCode()+"["+con.getConnectionUID()+", "+con+"]");
           }
           
           List conlist = con.getTransactionListThreadSafe();
@@ -800,7 +811,9 @@ public class ProtocolImpl implements Protocol
      {
           if (DEBUG) {
           logger.log(Logger.INFO,
-          "ProtocolImpl.PREPARE TRANSACTION:TID="+id+", xaFlags="+xaFlags);
+          "ProtocolImpl.PREPARE TRANSACTION:TID="+id+", xaFlags="+
+           TransactionState.xaFlagToString(xaFlags)+
+          ", conn=@"+con.hashCode()+"["+con.getConnectionUID()+", "+con+"]");
           }
 
           TransactionHandler handler = (TransactionHandler)
@@ -839,7 +852,9 @@ public class ProtocolImpl implements Protocol
           if (DEBUG) {
           logger.log(Logger.INFO, 
           "ProtocolImpl.ROLLBACK TRANSACTION:TID="+id+", XID="+xid+
-          ", xaFlags="+xaFlags+", redeliver="+redeliver+", setRedeliver="+setRedeliver);
+          ", xaFlags="+TransactionState.xaFlagToString(xaFlags)+
+          ", conn=@"+con.hashCode()+"["+con.getConnectionUID()+", "+con+
+          "], redeliver="+redeliver+", setRedeliver="+setRedeliver);
           }
 
           List conlist = con.getTransactionListThreadSafe();

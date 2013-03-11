@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -54,6 +54,9 @@ import java.lang.annotation.Target;
  * to be used when injecting a {@code javax.jms.JMSContext} object.
  * The meaning and possible values of session mode are the same as for the 
  * {@code ConnectionFactory} method {@code createContext(int sessionMode)}.
+ * 
+ * @version JMS 2.0
+ * @since JMS 2.0
  * 
  * @see javax.jms.JMSContext#createContext(int) 
  */

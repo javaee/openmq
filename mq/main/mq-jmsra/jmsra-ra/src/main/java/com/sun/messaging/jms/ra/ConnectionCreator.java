@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -59,6 +59,12 @@ public abstract class ConnectionCreator {
     }
 
     protected abstract Connection _createConnection(String un, String pw)
+    throws JMSException;
+    
+    protected abstract Connection _createQueueConnection(String un, String pw)
+    throws JMSException;
+    
+    protected abstract Connection _createTopicConnection(String un, String pw)
     throws JMSException;
 
     protected abstract XAResource _createXAResource(ManagedConnection mc,

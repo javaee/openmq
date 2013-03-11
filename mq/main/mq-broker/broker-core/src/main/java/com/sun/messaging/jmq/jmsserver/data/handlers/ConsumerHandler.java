@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -53,6 +53,7 @@ import com.sun.messaging.jmq.jmsserver.service.Connection;
 import com.sun.messaging.jmq.jmsserver.service.imq.IMQConnection;
 import com.sun.messaging.jmq.jmsserver.service.imq.IMQBasicConnection;
 import com.sun.messaging.jmq.jmsserver.util.BrokerException;
+import com.sun.messaging.jmq.jmsserver.util.ConsumerAlreadyAddedException;
 import com.sun.messaging.jmq.jmsserver.core.Destination;
 import com.sun.messaging.jmq.jmsserver.core.DestinationList;
 import com.sun.messaging.jmq.jmsserver.core.DestinationUID;
@@ -269,13 +270,17 @@ public class ConsumerHandler extends PacketHandler
                         String emsg = br.getKString(br.X_INVALID_DEST_DURA_CONSUMER, 
                                       ""+destination, ""+subscriptionName);
                         logger.log(Logger.ERROR, emsg);
-                        throw new BrokerException(emsg, Status.PRECONDITION_FAILED);
+                        throw new BrokerException(emsg, 
+                            br.X_INVALID_DEST_DURA_CONSUMER, null,
+                            Status.PRECONDITION_FAILED);
                     }
                     if (shared) {
                         String emsg = br.getKString(br.X_INVALID_DEST_SHARE_CONSUMER, 
                                       ""+destination, ""+subscriptionName);
                         logger.log(Logger.ERROR, emsg);
-                        throw new BrokerException(emsg, Status.PRECONDITION_FAILED);
+                        throw new BrokerException(emsg, 
+                            br.X_INVALID_DEST_SHARE_CONSUMER, null,
+                            Status.PRECONDITION_FAILED);
                     }
                 }
 
@@ -291,8 +296,8 @@ public class ConsumerHandler extends PacketHandler
                 pm.nolocal = nolocal;
 
                 checkSubscriptionName(pm);
-                checkNoLocal(pm);
                 checkClientID(pm);
+                checkNoLocal(pm);
 
                 if (reconnect != null && reconnect.booleanValue()) {
                     Globals.getLogger().log(Logger.ERROR,
@@ -463,6 +468,7 @@ public class ConsumerHandler extends PacketHandler
                 int btype = (bodytype == null ? 0 : bodytype.intValue());
                 
                 SysMessageID lastid = null;
+                boolean lastidInTransaction = false;
 
                 if (btype == PacketType.SYSMESSAGEID) {
                     int size = msg.getMessageBodySize();
@@ -473,10 +479,14 @@ public class ConsumerHandler extends PacketHandler
                                 msg.getMessageBodyStream());
                          lastid = new SysMessageID();
                          lastid.readID(is);
+                         Boolean val = (Boolean)props.get("JMQLastDeliveredIDInTransaction");
+                         lastidInTransaction = (val == null ? false : val.booleanValue());
+                    
                      }
                 }
                 if (DEBUG && lastid != null) {
-                    logger.log(Logger.INFO, "ConsumerHandler: destroy consumer with lastID ["+lastid+"]"+
+                    logger.log(Logger.INFO, "ConsumerHandler: destroy consumer with lastID ["+
+                        lastid+", "+lastidInTransaction+"]"+
                         DL.get(con.getPartitionedStore(), lastid)+" for consumer "+uid);
                 }
 
@@ -487,8 +497,8 @@ public class ConsumerHandler extends PacketHandler
                     sessionPaused = true;
                     session.pause("Consumer removeconsumer");
                 }
-                destroyConsumer(con, session, uid, durableName, clientID, lastid,
-                       redeliverAll, isIndemp);
+                destroyConsumer(con, session, uid, durableName, clientID, 
+                    lastid, lastidInTransaction, redeliverAll, isIndemp);
 
             }
 
@@ -603,7 +613,7 @@ public class ConsumerHandler extends PacketHandler
 
 
     public void destroyConsumer(IMQConnection con, Session session, ConsumerUID uid, 
-               String durableName, String clientID, SysMessageID lastid,
+               String durableName, String clientID, SysMessageID lastid, boolean lastidInTransaction,
                boolean redeliverAll, boolean isIndemp)
                throws BrokerException {
 
@@ -642,10 +652,12 @@ public class ConsumerHandler extends PacketHandler
             }
 
             if (session != null) { // should only be null w/ indemp
-                Consumer c = (Consumer)session.detatchConsumer(uid, lastid, redeliver, redeliverAll);
+                Consumer c = (Consumer)session.detatchConsumer(uid, lastid,
+                                 lastidInTransaction, redeliver, redeliverAll);
                 if (DEBUG) {
                 logger.log(Logger.INFO, "ConsumerHandler: closed consumer "+c+
-                    ", with {lastid="+lastid+", redeliver="+redeliver+ ", redeliverAll="+
+                    ", with {lastid="+lastid+", lastidInTransaction="+
+                     lastidInTransaction+", redeliver="+redeliver+ ", redeliverAll="+
                      redeliverAll+", isindemp="+isIndemp+"}");
                 }
                 DestinationUID dest_uid = c.getDestinationUID();
@@ -676,8 +688,8 @@ public class ConsumerHandler extends PacketHandler
         pm.nolocal = nolocal;
 
         checkSubscriptionName(pm);
-        checkNoLocal(pm);
         checkClientID(pm);
+        checkNoLocal(pm);
 
         return _createConsumer(dest_uid, con, session, selectorstr, clientid,
             subscriptionName, durable, shared, jmsshare, nolocal,
@@ -777,7 +789,12 @@ public class ConsumerHandler extends PacketHandler
                         if (dd == null) {
                             continue;
                         }
-                        Subscription oldsub = (Subscription)dd.addConsumer(sub, notify, con);
+                        Subscription oldsub = null;
+                        try { 
+                             oldsub = (Subscription)dd.addConsumer(sub, notify, con);
+                        } catch (ConsumerAlreadyAddedException e) {
+                             logger.log(logger.INFO, e.getMessage());
+                        }
                         if (oldsub != null) {
                             oldsub.purge();
                         }
@@ -851,6 +868,10 @@ public class ConsumerHandler extends PacketHandler
         }
  
         session.attachConsumer(c);
+        if (DEBUG) {
+            logger.log(logger.INFO, "Attached consumer "+c+
+            "[prefetch="+c.getPrefetch()+", useConsumerFlowControl="+useFlowControl+"] to session "+session);
+        }
 
         Consumer[] retc = new Consumer[3];
         retc[0]=c;
@@ -870,7 +891,7 @@ public class ConsumerHandler extends PacketHandler
         try {
             if (c != null) {
                 try {
-                    session.detatchConsumer(c.getConsumerUID(), null, false, false);
+                    session.detatchConsumer(c.getConsumerUID(), null, false, false, false);
                 } catch (Exception e1) {
                     try {
                     c.destroyConsumer((new HashSet()), null, true, false, true);
@@ -958,20 +979,29 @@ public class ConsumerHandler extends PacketHandler
                 "Unsupported property on queues JMQNoLocal "+
                  "is set to " + pm.nolocal, Status.ERROR);
         }
-        if (pm.clientid == null) { //JMS 2.0
+
+        /**
+         * JMS 2.0 late update has removed noLocal for JMS 2.0 shared subscription
+         * Therefore the following should never happen after checkClientID() OK
+         */
+        if (pm.clientid == null) { //JMS 2.0 
             if (pm.durable) {
                 String emsg = Globals.getBrokerResources().getKString(
                               BrokerResources.X_NO_CLIENTID_NOLOCAL_DURA, 
                               ""+pm.subscriptionName);
                 Globals.getLogger().log(Logger.ERROR, emsg); 
-                throw new BrokerException(emsg, Status.PRECONDITION_FAILED);
+                throw new BrokerException(emsg, 
+                    BrokerResources.X_NO_CLIENTID_NOLOCAL_DURA, null, 
+                    Status.PRECONDITION_FAILED);
             }
             if (pm.shared) {
                 String emsg = Globals.getBrokerResources().getKString(
                               BrokerResources.X_NO_CLIENTID_NOLOCAL_SHARE, 
                "["+pm.clientid+":"+pm.destination+":"+pm.selector+":"+pm.subscriptionName+"]");
                 Globals.getLogger().log(Logger.ERROR, emsg); 
-                throw new BrokerException(emsg, Status.PRECONDITION_FAILED);
+                throw new BrokerException(emsg, 
+                    BrokerResources.X_NO_CLIENTID_NOLOCAL_SHARE, 
+                    null, Status.PRECONDITION_FAILED);
             }
         }
     }

@@ -265,7 +265,7 @@ public class StompServer {
                     if (v != null && Boolean.valueOf(v).booleanValue()) {
                         reqcauth = true;
                     }
-                    if (!pu.initializeSSL(sslprops, reqcauth)) {
+                    if (!pu.initializeSSL(sslprops, reqcauth, null)) {
                         if (pu.getSSLClientAuthRequired() != reqcauth) {
                             _logger.log(Level.WARNING, getStompBridgeResources().getString(
                                 StompBridgeResources.W_PROPERTY_SETTING_OVERRIDE_BY_BROKER,
@@ -348,12 +348,12 @@ public class StompServer {
         if (pu != null) {
             try {
                 if (_tcpEnabled) {
-                    pu.register(_tcppup);
+                    pu.register(_tcppup, null);
                     _logger.log(Level.INFO, getStompBridgeResources().getString(
                         StompBridgeResources.I_START_TRANSPORT, "TCP" , pu.getBindSocketAddress()));
                 }
                 if (_sslEnabled) {
-                    pu.registerSSL(_sslpup);
+                    pu.registerSSL(_sslpup, null);
                     _logger.log(Level.INFO, getStompBridgeResources().getString(
                         StompBridgeResources.I_START_TRANSPORT, "SSL/TLS" , pu.getBindSocketAddress()));
                 }

@@ -40,20 +40,25 @@
 
 package com.sun.messaging.jms.ra;
 
-import javax.jms.*;
-import javax.resource.ResourceException;
-
-import javax.transaction.xa.XAResource;
-import javax.naming.Reference;
-import javax.naming.NamingException;
-
-import java.util.Vector;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.jms.Connection;
+import javax.jms.JMSContext;
+import javax.jms.JMSException;
+import javax.jms.JMSSecurityException;
+import javax.jms.QueueConnection;
+import javax.jms.TopicConnection;
+import javax.naming.NamingException;
+import javax.naming.Reference;
+import javax.resource.ResourceException;
+import javax.transaction.xa.XAResource;
+
 import com.sun.messaging.jmq.jmsclient.ContainerType;
 import com.sun.messaging.jmq.jmsclient.JMSContextImpl;
-import com.sun.messaging.jmq.jmsservice.*;
+import com.sun.messaging.jmq.jmsservice.JMSService;
+import com.sun.messaging.jmq.jmsservice.JMSServiceException;
+import com.sun.messaging.jmq.jmsservice.JMSServiceReply;
 
 /**
  *  DirectConnectionFactory encapsulates JMS ConnectionFactory behavior for MQ
@@ -345,10 +350,10 @@ public class DirectConnectionFactory extends ConnectionCreator
         _loggerJF.fine(_lgrMID_INF+
                 "createQueueConnection(u,p):username="+username);
         if (!this._disableConnectionManagement){
-            return (QueueConnection)this._allocateConnection(username, password);
+            return (QueueConnection)this._allocateQueueConnection(username, password);
         }
         long connectionId = _createConnectionId(username, password);
-        DirectConnection dc = new DirectConnection(this, this.jmsservice,
+        DirectConnection dc = new DirectQueueConnection(this, this.jmsservice,
                 connectionId, this.inACC);
         return (QueueConnection) dc; 
     }
@@ -402,10 +407,10 @@ public class DirectConnectionFactory extends ConnectionCreator
     throws JMSException {
         _loggerJF.fine(_lgrMID_INF+"createTopicConnection(u,p):username="+username);
         if (!this._disableConnectionManagement){
-            return (TopicConnection)this._allocateConnection(username, password);
+            return (TopicConnection)this._allocateTopicConnection(username, password);
         }
         long connectionId = _createConnectionId(username, password);
-        DirectConnection dc = new DirectConnection(this, this.jmsservice,
+        DirectConnection dc = new DirectTopicConnection(this, this.jmsservice,
                 connectionId, this.inACC);
         return (TopicConnection) dc; 
     }
@@ -551,6 +556,22 @@ public class DirectConnectionFactory extends ConnectionCreator
                 connectionId, this.inACC);
         return dc;
     }
+    
+	@Override
+	protected Connection _createQueueConnection(String username, String password) throws JMSException {
+        long connectionId = _createConnectionId(username, password);
+        DirectConnection dc = new DirectQueueConnection(this, this.jmsservice,
+                connectionId, this.inACC);
+        return dc;
+	}
+
+	@Override
+	protected Connection _createTopicConnection(String username, String password) throws JMSException {
+        long connectionId = _createConnectionId(username, password);
+        DirectConnection dc = new DirectTopicConnection(this, this.jmsservice,
+                connectionId, this.inACC);
+        return dc;
+	}
 
     protected XAResource _createXAResource(ManagedConnection mc, Object conn)
     throws JMSException {
@@ -560,9 +581,10 @@ public class DirectConnectionFactory extends ConnectionCreator
     private Connection _allocateConnection(String username, String password)
     throws JMSException
     {
+    	com.sun.messaging.jms.ra.ConnectionRequestInfo.ConnectionType connectionType = com.sun.messaging.jms.ra.ConnectionRequestInfo.ConnectionType.UNIFIED_CONNECTION;
         javax.resource.spi.ConnectionRequestInfo crinfo =
             new com.sun.messaging.jms.ra.ConnectionRequestInfo(mcf,
-                username, password);
+                username, password,connectionType);
 
         //System.out.println("MQRA:CFA:createConnection:allocating connection");
         DirectConnection dc;
@@ -571,14 +593,61 @@ public class DirectConnectionFactory extends ConnectionCreator
             return dc;
         } catch (javax.resource.spi.SecurityException se) {
             //XXX:Fix codes
-            String code = "2";
             throw new com.sun.messaging.jms.JMSSecurityException(
-                "MQRA:DCF:allocation failure:createConnection:"+se.getMessage(), code, se);
+                "MQRA:DCF:allocation failure:createConnection:"+se.getMessage(), se.getErrorCode(), se);
         } catch (ResourceException re) {
             //XXX:Fix codes
-            String code = "1";
             throw new com.sun.messaging.jms.JMSException(
-                "MQRA:DCF:allocation failure:createConnection:"+re.getMessage(), code, re);
+                "MQRA:DCF:allocation failure:createConnection:"+re.getMessage(), re.getErrorCode(), re);
+        }
+    }
+    
+    private Connection _allocateQueueConnection(String username, String password)
+    throws JMSException
+    {
+    	com.sun.messaging.jms.ra.ConnectionRequestInfo.ConnectionType connectionType = com.sun.messaging.jms.ra.ConnectionRequestInfo.ConnectionType.QUEUE_CONNECTION;
+        javax.resource.spi.ConnectionRequestInfo crinfo =
+            new com.sun.messaging.jms.ra.ConnectionRequestInfo(mcf,
+                username, password,connectionType);
+
+        //System.out.println("MQRA:CFA:createConnection:allocating connection");
+        DirectConnection dc;
+        try {
+            dc = (DirectConnection)this.cm.allocateConnection(mcf, crinfo);
+            return dc;
+        } catch (javax.resource.spi.SecurityException se) {
+            //XXX:Fix codes
+            throw new com.sun.messaging.jms.JMSSecurityException(
+                "MQRA:DCF:allocation failure:createConnection:"+se.getMessage(), se.getErrorCode(), se);
+        } catch (ResourceException re) {
+            //XXX:Fix codes
+            throw new com.sun.messaging.jms.JMSException(
+                "MQRA:DCF:allocation failure:createConnection:"+re.getMessage(), re.getErrorCode(), re);
+        }
+    }
+    
+    private Connection _allocateTopicConnection(String username, String password)
+    throws JMSException
+    {
+    	com.sun.messaging.jms.ra.ConnectionRequestInfo.ConnectionType connectionType = com.sun.messaging.jms.ra.ConnectionRequestInfo.ConnectionType.TOPIC_CONNECTION;
+
+        javax.resource.spi.ConnectionRequestInfo crinfo =
+            new com.sun.messaging.jms.ra.ConnectionRequestInfo(mcf,
+                username, password,connectionType);
+
+        //System.out.println("MQRA:CFA:createConnection:allocating connection");
+        DirectConnection dc;
+        try {
+            dc = (DirectConnection)this.cm.allocateConnection(mcf, crinfo);
+            return dc;
+        } catch (javax.resource.spi.SecurityException se) {
+            //XXX:Fix codes
+            throw new com.sun.messaging.jms.JMSSecurityException(
+                "MQRA:DCF:allocation failure:createConnection:"+se.getMessage(), se.getErrorCode(), se);
+        } catch (ResourceException re) {
+            //XXX:Fix codes
+            throw new com.sun.messaging.jms.JMSException(
+                "MQRA:DCF:allocation failure:createConnection:"+re.getMessage(), re.getErrorCode(), re);
         }
     }
 
@@ -589,4 +658,6 @@ public class DirectConnectionFactory extends ConnectionCreator
     void setMCF(ManagedConnectionFactory mcf) {
         this.mcf = mcf;
     }
+
+
 }

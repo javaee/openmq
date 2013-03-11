@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -54,6 +54,7 @@ import com.sun.messaging.jmq.jmsclient.Debug;
 import com.sun.messaging.jmq.jmsservice.JMSService;
 import com.sun.messaging.jmq.jmsservice.JMSServiceReply;
 import com.sun.messaging.jmq.jmsservice.JMSServiceException;
+import com.sun.messaging.jmq.jmsservice.JMSServiceReply.Status;
 import com.sun.messaging.jms.ra.util.DirectXAResourceMap;
 import com.sun.messaging.jms.ra.api.JMSRAResourceAdapter;
 
@@ -203,7 +204,7 @@ implements XAResource {
     throws XAException {
 
         if (_logger.isLoggable(Level.FINE)){
-    		_logger.fine(_lgrMID_INF+"DirectXAResource ("+this.hashCode()+") Commit  "+printXid(foreignXid)+" (onePhase="+onePhase+")");
+    		_logger.fine(_lgrMID_INF+"DirectXAResource ("+this.hashCode()+") Commit  "+printXid(foreignXid)+" (onePhase="+onePhase+"), connectionId="+connectionId);
         }
     	
         //convert to XidImpl
@@ -233,14 +234,7 @@ implements XAResource {
              }
          } catch (JMSServiceException jse) {
              status = jse.getJMSServiceReply().getStatus();
-             String failure_cause;
-             switch (status) {
-                case CONFLICT:
-                    failure_cause = "CONFLICT: "+jse.getCause().toString();
-                    break;
-                default:
-                    failure_cause = "Unknown JMSService server error "+status+": "+jse.getCause().toString();
-             }
+             String failure_cause = getFailureCauseAsString(status, jse);
              //XXX:tharakan:This message should be in the JMSServiceException
              String exerrmsg = 
                     "commitTransaction (XA) on JMSService:" +
@@ -273,6 +267,23 @@ implements XAResource {
              DirectXAResourceMap.unregister(savedXid);
          }
     }
+
+	private String getFailureCauseAsString(JMSServiceReply.Status status, JMSServiceException jse) {
+		String failure_cause;
+		if (jse.getCause()==null){
+			failure_cause = jse.toString();
+		} else {
+			failure_cause = jse.getCause().toString();
+		}
+		switch (status) {
+		    case CONFLICT:
+		        failure_cause = "CONFLICT: "+failure_cause;
+		        break;
+		    default:
+		        failure_cause = "Unknown JMSService server error "+status+": "+failure_cause;
+		 }
+		return failure_cause;
+	}
     
     public void clearTransactionInfo() throws JMSException{
     	dc.deleteTemporaryDestinationsIfClosed();
@@ -312,7 +323,7 @@ implements XAResource {
     throws XAException {
     	
         if (_logger.isLoggable(Level.FINE)){
-    		_logger.fine(_lgrMID_INF+"DirectXAResource ("+this.hashCode()+") End     "+printXid(foreignXid)+printFlags(flags));
+    		_logger.fine(_lgrMID_INF+"DirectXAResource ("+this.hashCode()+") End     "+printXid(foreignXid)+printFlags(flags)+", connectionId="+connectionId);
         }
     	
         String methodName = "end()";
@@ -402,14 +413,7 @@ implements XAResource {
             }
         } catch (JMSServiceException jse) {
             status = jse.getJMSServiceReply().getStatus();
-            String failure_cause;
-            switch (status) {
-                case CONFLICT:
-                    failure_cause = "CONFLICT: "+jse.getCause().toString();
-                    break;
-                default:
-                    failure_cause = "Unknown JMSService server error "+status+": "+jse.getCause().toString();
-            }
+            String failure_cause = getFailureCauseAsString(status, jse);
             //XXX:tharakan:This message should be in the JMSServiceException
             String exerrmsg = 
                     "endTransaction (XA) on JMSService:" +
@@ -441,7 +445,7 @@ implements XAResource {
         //XidImpl mqxid = new XidImpl(foreignXid);
         if (_logFINE){
             _loggerJX.warning(_lgrMID_INF+"forget()UNSUPPORTED"+
-                    ":Xid="+foreignXid.toString());
+                    ":Xid="+foreignXid.toString()+", connectionId="+connectionId);
          }
         XidImpl xidToForget = new XidImpl(foreignXid);
         DirectXAResourceMap.unregister(xidToForget);
@@ -503,14 +507,19 @@ implements XAResource {
      */
     public boolean isSameRM(XAResource foreignXaRes)
     throws XAException {
-        if (_logFINE){
-            _loggerJX.fine(_lgrMID_INF+"isSameRM()");
-        }
+    	boolean result;
         if (JMSRAResourceAdapter.isSameRMAllowed() && (foreignXaRes instanceof DirectXAResource)){
-            return true;
+            result= true;
         } else {
-            return false;
+            result= false;
+            }
+        
+        if (_logger.isLoggable(Level.FINE)){
+    		_logger.fine(_lgrMID_INF+"DirectXAResource ("+this.hashCode()+") comparing with ("+foreignXaRes.hashCode()+") result="+result+", connectionId="+connectionId);
         }
+              
+        return result;
+        
     }
 
     /**
@@ -533,7 +542,7 @@ implements XAResource {
     throws XAException {
 
         if (_logger.isLoggable(Level.FINE)){
-    		_logger.fine(_lgrMID_INF+"DirectXAResource ("+this.hashCode()+") Prepare     "+printXid(foreignXid));
+    		_logger.fine(_lgrMID_INF+"DirectXAResource ("+this.hashCode()+") Prepare     "+printXid(foreignXid)+", connectionId="+connectionId);
         }
     	
         //convert to XidImpl
@@ -563,14 +572,7 @@ implements XAResource {
             }
         } catch (JMSServiceException jse) {
             status = jse.getJMSServiceReply().getStatus();
-            String failure_cause;
-            switch (status) {
-                case CONFLICT:
-                    failure_cause = "CONFLICT: "+jse.getCause().toString();
-                    break;
-                default:
-                    failure_cause = "Unknown JMSService server error "+status+": "+jse.getCause().toString();
-            }
+            String failure_cause = getFailureCauseAsString(status, jse);
             //XXX:tharakan:This message should be in the JMSServiceException
             String exerrmsg = 
                     "prepareTransaction (XA) on JMSService:" +
@@ -612,7 +614,7 @@ implements XAResource {
     throws XAException {
         if (_logFINE){
             //String methodName = "recover()";
-            _loggerJX.fine(_lgrMID_INF+"recover():flags="+flags);
+            _loggerJX.fine(_lgrMID_INF+"recover():flags="+flags+", connectionId="+connectionId);
         }
         javax.transaction.xa.Xid[] result = null;
         JMSServiceReply.Status status;
@@ -620,14 +622,7 @@ implements XAResource {
             result = jmsservice.recoverXATransactions(this.connectionId, flags);
         } catch (JMSServiceException jse) {
             status = jse.getJMSServiceReply().getStatus();
-            String failure_cause;
-            switch (status) {
-                case CONFLICT:
-                    failure_cause = "CONFLICT: "+jse.getCause().toString();
-                    break;
-                default:
-                    failure_cause = "Unknown JMSService server error "+status+": "+jse.getCause().toString();
-            }
+            String failure_cause = getFailureCauseAsString(status, jse);
             //XXX:tharakan:This message should be in the JMSServiceException
             String exerrmsg = 
                     "recoverXATransactions (XA) on JMSService:" +
@@ -654,7 +649,7 @@ implements XAResource {
     throws XAException {
     	
         if (_logger.isLoggable(Level.FINE)){
-    		_logger.fine(_lgrMID_INF+"DirectXAResource ("+this.hashCode()+") Rollback  "+printXid(foreignXid)+")");
+    		_logger.fine(_lgrMID_INF+"DirectXAResource ("+this.hashCode()+") Rollback  "+printXid(foreignXid)+"), connectionId="+connectionId);
         }  
     	
         //convert to XidImpl
@@ -684,14 +679,7 @@ implements XAResource {
             }
         } catch (JMSServiceException jse) {
             status = jse.getJMSServiceReply().getStatus();
-            String failure_cause;
-            switch (status) {
-                case CONFLICT:
-                    failure_cause = "CONFLICT: "+jse.getCause().toString();
-                    break;
-                default:
-                    failure_cause = "Unknown JMSService server error "+status+": "+jse.getCause();
-            }
+            String failure_cause = getFailureCauseAsString(status, jse);
             //XXX:tharakan:This message should be in the JMSServiceException
             String exerrmsg = 
                     "rollbackTransaction (XA) on JMSService:" +
@@ -783,7 +771,7 @@ implements XAResource {
     public synchronized void start(Xid foreignXid, int flags) throws XAException {
     	
         if (_logger.isLoggable(Level.FINE)){
-    		_logger.fine(_lgrMID_INF+"DirectXAResource ("+this.hashCode()+") Start   "+printXid(foreignXid)+printFlags(flags));
+    		_logger.fine(_lgrMID_INF+"DirectXAResource ("+this.hashCode()+") Start   "+printXid(foreignXid)+printFlags(flags)+", connectionId="+connectionId);
         }
     	
 		// convert to XidImpl
@@ -835,15 +823,10 @@ implements XAResource {
 		} catch (JMSServiceException jse) {
 			status = jse.getJMSServiceReply().getStatus();
 			String failure_cause;
-			switch (status) {
-			case NOT_IMPLEMENTED:
+			if (status==Status.NOT_IMPLEMENTED){
 				failure_cause = "TransactionAutoRollback not implemented.";
-				break;
-			case CONFLICT:
-				failure_cause = "CONFLICT: " + jse.getCause().toString();
-				break;
-			default:
-				failure_cause = "Unknown JMSService server error " + status + ": " + jse.getCause().toString();
+			} else {
+				failure_cause = getFailureCauseAsString(status, jse);
 			}
 			String exerrmsg = "startTransaction (XA) on JMSService:" + jmsservice.getJMSServiceID()
 					+ " failed for connectionId:" + connectionId +

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -76,7 +76,8 @@ import javax.transaction.xa.XAResource;
  * encouraged to use the transactional support available in their environment,
  * rather than use these XA interfaces directly.
  * 
- * @since 2.0
+ * @version JMS 2.0
+ * @since JMS 2.0
  * 
  */
 
@@ -91,12 +92,6 @@ public interface XAJMSContext extends JMSContext {
 	 * 
 	 */
 	JMSContext getContext();
-
-	/**
-	 * Returns an XA resource to the caller.
-	 * 
-	 * @return an XA resource to the caller
-	 */
 
 	/**
 	 * Returns an {@code XAResource} to the caller.

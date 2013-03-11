@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -72,7 +72,8 @@ import org.jvnet.hk2.annotations.Service;
 import javax.inject.Singleton;
 import org.glassfish.hk2.api.PostConstruct;
 import org.glassfish.hk2.api.PreDestroy;
-import org.glassfish.api.Startup;
+import org.glassfish.hk2.runlevel.RunLevel;
+import org.glassfish.api.StartupRunLevel;
 import javax.inject.Inject;
 import org.glassfish.hk2.api.ServiceLocator;
 
@@ -81,11 +82,12 @@ import org.glassfish.hk2.api.ServiceLocator;
  *
  * @author amyk
  */
+@RunLevel(StartupRunLevel.VAL+2)
 @Service
-@Singleton
+//@Singleton
 public class BridgeServiceManagerImpl extends BridgeServiceManager
                      implements ExceptionListener, MessageListener,
-                     PostConstruct, PreDestroy, Startup
+                     PostConstruct, PreDestroy
 {
 
     private static transient final String BROKER_BRIDGE_BASE_CONTEXT_CLASS_STR = 
@@ -123,10 +125,6 @@ public class BridgeServiceManagerImpl extends BridgeServiceManager
 
     @Inject    
     private ServiceLocator habitat;
-
-    public Startup.Lifecycle getLifecycle() {
-	return Startup.Lifecycle.SERVER;
-    }
 
     public void postConstruct() {
         logger.entering(className, LOGMSG_PREFIX+"postConstruct()", "");

@@ -52,6 +52,7 @@ import org.glassfish.grizzly.portunif.PUFilter;
 import org.glassfish.grizzly.portunif.PUProtocol;
 import com.sun.messaging.portunif.PUService;
 import com.sun.messaging.portunif.PortMapperProtocolFinder;
+import com.sun.messaging.portunif.PUServiceCallback;
 import com.sun.messaging.jmq.util.log.Logger;
 import com.sun.messaging.jmq.jmsserver.Globals;
 import com.sun.messaging.jmq.jmsserver.service.PortMapper;
@@ -105,36 +106,37 @@ public class PortMapperMessageFilter extends BaseFilter {
         return ctx.getInvokeAction();
     }
 
-    public static PUProtocol configurePortMapperProtocol(PUService pu) throws IOException {
+    public static PUProtocol configurePortMapperProtocol(
+        PUService pu, 
+        PUServiceCallback cb) throws IOException {
 
         final FilterChain pmProtocolFilterChain =
                 pu.getPUFilterChainBuilder()
-                    .add(new PortMapperConnectionFilter())
                     .add(new PortMapperMessageFilter())
-                    .add(new PortMapperServiceFilter())
+                    .add(new PortMapperServiceFilter(false))
                     .build();
-        return new PUProtocol(new PortMapperProtocolFinder(),
+        return new PUProtocol(new PortMapperProtocolFinder(cb, false),
                               pmProtocolFilterChain);
     }
 
-    public static PUProtocol configurePortMapperSSLProtocol(PUService pu, 
+    public static PUProtocol configurePortMapperSSLProtocol(
+        PUService pu, 
+        PUServiceCallback cb, 
         Properties sslprops, boolean clientAuthRequired)
         throws IOException {
 
-        if (!pu.initializeSSL(sslprops, clientAuthRequired)) {
+        if (!pu.initializeSSL(sslprops, clientAuthRequired, cb)) {
             throw new IOException(
             "Unexpected: Someone initialized SSL PUService before PortMapper service");
         }
 
         final FilterChain pmSSLProtocolFilterChain =
                 pu.getSSLPUFilterChainBuilder()
-                    .add(new PortMapperConnectionFilter())
                     .add(new PortMapperMessageFilter())
-                    .add(new PortMapperServiceFilter())
+                    .add(new PortMapperServiceFilter(true))
                     .build();
-        return new PUProtocol(new PortMapperProtocolFinder(),
+        return new PUProtocol(new PortMapperProtocolFinder(cb, true),
                               pmSSLProtocolFilterChain);
     }
 }
-
 

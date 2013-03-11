@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -114,15 +114,15 @@ public class Version {
      *String representing the value of the mini copyright  of the product
      */
     private String miniCopyright =
-        "Copyright (c) 2012, Oracle and/or its affiliates.  All rights reserved.";
+        "Copyright (c) 2013, Oracle and/or its affiliates.  All rights reserved.";
 
     /**
      * String representing the shortCopyright of the product
      */
     private String shortCopyright =
-        "Copyright (c) 2012, Oracle and/or its affiliates.  All rights reserved.";
+        "Copyright (c) 2013, Oracle and/or its affiliates.  All rights reserved.";
 /*
-        "Copyright (c) 2012 Sun Microsystems, Inc. All rights reserved.\n" +
+        "Copyright (c) 2013 Sun Microsystems, Inc. All rights reserved.\n" +
 	"\n" +
         "Sun Microsystems, Inc. has intellectual property rights relating\n" +
         "to technology embodied in the product that is described in this\n" +
@@ -182,9 +182,9 @@ public class Version {
      *String representing the long copyright value of the product
      */
     private String longCopyright =
-        "Copyright (c) 2012, Oracle and/or its affiliates.  All rights reserved.";
+        "Copyright (c) 2013, Oracle and/or its affiliates.  All rights reserved.";
 /*
-        "Copyright (c) 2012 Sun Microsystems, Inc., 4150 Network Circle,\n" +
+        "Copyright (c) 2013 Sun Microsystems, Inc., 4150 Network Circle,\n" +
         "Santa Clara, California 95054, U.S.A.  All rights reserved.\n" +
 	"\n" +
         "Sun Microsystems, Inc. has intellectual property rights relating\n" +
@@ -227,7 +227,7 @@ public class Version {
         "denied persons and specially designated nationals lists is\n" +
         "strictly prohibited.\n" +
 	"\n" +
-        "Copyright (c) 2012 Sun Microsystems, Inc., 4150 Network Circle,\n" +
+        "Copyright (c) 2013 Sun Microsystems, Inc., 4150 Network Circle,\n" +
         "Santa Clara, California 95054, Etats-Unis.  Tous droits r\u00e9serv\u00e9s.\n" +
 	"\n" +
         "Sun Microsystems, Inc. d\u00e9tient les droits de propri\u00e9t\u00e9\n" +

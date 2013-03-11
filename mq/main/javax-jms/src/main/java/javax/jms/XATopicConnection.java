@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,53 +40,54 @@
 
 package javax.jms;
 
-/** An {@code XATopicConnection} provides the same create options as 
-  * {@code TopicConnection} (optional). The Topic connections created are
-  * transactional.
-  *
-  * <P>The {@code XATopicConnection} interface is optional.  JMS providers 
-  * are not required to support this interface. This interface is for 
-  * use by JMS providers to support transactional environments. 
-  * Client programs are strongly encouraged to use the transactional support
-  * available in their environment, rather than use these XA
-  * interfaces directly. 
-  *
-  * @version     1.1 - February 2, 2002
-  * @author      Mark Hapner
-  * @author      Rich Burridge
-  * @author      Kate Stout
-  *
-  * @see         javax.jms.XAConnection
-  */
+/**
+ * An {@code XATopicConnection} provides the same create options as
+ * {@code TopicConnection} (optional). The Topic connections created are
+ * transactional.
+ * 
+ * <P>
+ * The {@code XATopicConnection} interface is optional. JMS providers are not
+ * required to support this interface. This interface is for use by JMS
+ * providers to support transactional environments. Client programs are strongly
+ * encouraged to use the transactional support available in their environment,
+ * rather than use these XA interfaces directly.
+ * 
+ * @see javax.jms.XAConnection
+ * 
+ * @version JMS 2.0
+ * @since JMS 1.0
+ * 
+ */
 
-public interface XATopicConnection 
-	extends XAConnection, TopicConnection {
+public interface XATopicConnection extends XAConnection, TopicConnection {
 
-    /** Creates an {@code XATopicSession} object.
-      *  
-      * @return a newly created XA topic session
-      *  
-      * @exception JMSException if the {@code XATopicConnection} object
-      *                         fails to create an XA topic session due to some 
-      *                         internal error.
-      */ 
+	/**
+	 * Creates an {@code XATopicSession} object.
+	 * 
+	 * @return a newly created {@code XATopicSession}
+	 * 
+	 * @exception JMSException
+	 *                if the {@code XATopicConnection} object fails to create an
+	 *                {@code XATopicSession} due to some internal error.
+	 */
 
-    XATopicSession
-    createXATopicSession() throws JMSException;
+	XATopicSession createXATopicSession() throws JMSException;
 
-    /** Creates an {@code XATopicSession} object.
-      *
-      * @param transacted usage undefined
-      * @param acknowledgeMode usage undefined
-      *  
-      * @return a newly created XA topic session
-      *  
-      * @exception JMSException if the {@code XATopicConnection} object
-      *                         fails to create an XA topic session due to some 
-      *                         internal error.
-      */ 
+	/**
+	 * Creates a {@code TopicSession} object.
+	 * 
+	 * @param transacted
+	 *            usage undefined
+	 * @param acknowledgeMode
+	 *            usage undefined
+	 * 
+	 * @return a newly created {@code TopicSession}
+	 * 
+	 * @exception JMSException
+	 *                if the {@code XATopicConnection} object fails to create a
+	 *                {@code TopicSession} due to some internal error.
+	 */
 
-    TopicSession
-    createTopicSession(boolean transacted,
-                       int acknowledgeMode) throws JMSException;
+	TopicSession createTopicSession(boolean transacted, int acknowledgeMode)
+			throws JMSException;
 }

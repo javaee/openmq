@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -254,7 +254,11 @@ public abstract class RuntimeFaultInjection
      protected abstract String sleepIntervalPropertyName();
      protected abstract int sleepIntervalDefault();
 
-     public boolean checkFaultAndSleep(String value, Map props)
+     public boolean checkFaultAndSleep(String value, Map props) {
+         return checkFaultAndSleep(value, props, false);
+     }
+
+     public boolean checkFaultAndSleep(String value, Map props, boolean unsetFaultBeforeSleep)
      {
          if (!FAULT_INJECTION) {
              return false;
@@ -270,8 +274,13 @@ public abstract class RuntimeFaultInjection
                  secs = Integer.valueOf(str).intValue();
              } catch (Exception e) {}
          }
-         if (secs <= 0) secs = sleepIntervalDefault();
-            logInfo("BEFORE SLEEP "+secs +"(seconds) BECAUSE OF FAULT "+value);
+         if (secs <= 0) {
+             secs = sleepIntervalDefault();
+         }
+         if (unsetFaultBeforeSleep) {
+             unsetFault(value);
+         }
+         logInfo("BEFORE SLEEP "+secs +"(seconds) BECAUSE OF FAULT "+value);
          try {
              Thread.sleep(secs*1000);
          } catch (Exception e) {

@@ -41,10 +41,15 @@
 package com.sun.messaging.portunif;
 
 import java.nio.charset.Charset;
+import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 import org.glassfish.grizzly.Buffer;
+import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.portunif.PUContext;
 import org.glassfish.grizzly.portunif.ProtocolFinder;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
+import org.glassfish.grizzly.nio.transport.TCPNIOConnection;
+
 
 
 public class PortMapperProtocolFinder implements ProtocolFinder {
@@ -52,7 +57,12 @@ public class PortMapperProtocolFinder implements ProtocolFinder {
     private static boolean DEBUG = false;
     public static final int PORTMAPPER_VERSION_MAX_LEN = 128;
 
-    public PortMapperProtocolFinder() {
+    private PUServiceCallback callback = null;
+    private boolean ssl = false;
+
+    public PortMapperProtocolFinder(PUServiceCallback callback, boolean ssl) {
+        this.callback = callback;
+        this.ssl = ssl;
     }
 
     /**
@@ -72,7 +82,13 @@ public class PortMapperProtocolFinder implements ProtocolFinder {
         int ind1 = data.indexOf("\r");
         int ind2 = data.indexOf("\n");
         if (DEBUG) {
-            System.out.println(this+": input="+input.toStringContent()+", newline index: "+ind1+", "+ind2);
+            String logmsg = this+": input="+input.toStringContent()+
+                                ", newline index: "+ind1+", "+ind2;
+            if (callback != null) {
+                callback.logInfo(logmsg);
+            } else {
+                System.out.println(logmsg);
+            }
         }
 
         if (ind1 == 0 || ind2 == 0) {
@@ -89,15 +105,37 @@ public class PortMapperProtocolFinder implements ProtocolFinder {
         int indmin = Math.min(ind1, ind2);
         if (!data.substring(0, (indmin < 0 ? indmax:indmin)).matches("\\d+")) {
             if (DEBUG) {
-                System.out.println(this+": data not all digits before newline:["+
-                           data.substring(0, (indmin < 0 ? indmax:indmin))+"]");
+                String logmsg = this+": data not all digits before newline:["+
+                                data.substring(0, (indmin < 0 ? indmax:indmin))+"]";
+                if (callback !=  null) {
+                    callback.logInfo(logmsg);
+                } else {
+                    System.out.println(logmsg);
+                }
             }
             return Result.NOT_FOUND;
         }
         if (DEBUG) {
-            System.out.println(this+": FOUND input="+input.toStringContent());
+            String logmsg = this+": FOUND input="+input.toStringContent();
+            if (callback !=  null) {
+                callback.logInfo(logmsg);
+            } else {
+                System.out.println(logmsg);
+            }
         }
-        return Result.FOUND;
+        if (callback == null) {
+            return Result.FOUND;
+        }
+        Connection c = ctx.getConnection();
+        if (c instanceof TCPNIOConnection) {
+            SocketAddress sa = ((TCPNIOConnection)c).getPeerAddress();
+            if (sa instanceof InetSocketAddress) {
+                if (callback.allowConnection((InetSocketAddress)sa, ssl)) {
+                    return Result.FOUND;
+                }
+            }
+        }
+        return Result.NOT_FOUND;
     }
 }
 

@@ -68,6 +68,7 @@ import com.sun.messaging.jmq.util.options.InvalidBasePropNameException;
 import com.sun.messaging.jmq.util.options.InvalidHardCodedValueException;
 import com.sun.messaging.jmq.util.options.MissingArgException;
 import com.sun.messaging.jmq.util.options.BadNameValueArgException;
+import com.sun.messaging.ConnectionConfiguration;
 
 
 /** 
@@ -497,10 +498,8 @@ public class CommonCmdRunnerUtil {
                 PassfileObfuscator po = new PassfileObfuscatorImpl();
                 InputStream fis = po.retrieveObfuscatedFile(
                                       passfile, Globals.IMQ);
-
                 props.load(fis);
 		ret = props.getProperty(passwdPropNameInPassFile);
-
 		fis.close();
 		if (ret == null)  {
 		    throw new RuntimeException(
@@ -508,6 +507,19 @@ public class CommonCmdRunnerUtil {
 				passwdPropNameInPassFile,
 				passfile));
 		}
+                String keystorepwd = props.getProperty(
+                    BrokerCmdOptions.PROP_NAME_KEYSTORE_PASSWD);
+                if (keystorepwd != null) {
+                    System.setProperty(
+                        ConnectionConfiguration.imqKeyStorePassword, keystorepwd);                
+                }
+                
+                if (!po.isObfuscated(passfile, Globals.IMQ)) {
+                     Globals.stdErrPrintln(
+                         ar.getString(ar.I_WARNING_MESG),
+                         ar.getKString(ar.W_UNENCODED_ENTRY_IN_PASSFILE, passfile, "'imqusermgr encode'"));
+                     Globals.stdErrPrintln("");
+                }
 	    } catch(Exception e)  {
 		CommonCmdException bce = 
 			new CommonCmdException(CommonCmdException.READ_PASSFILE_FAIL);

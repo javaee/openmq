@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -62,14 +62,13 @@ package javax.jms;
   * {@code IllegalStateException}
   * if used from {@code QueueConnection}.
   *
-  * @version     1.1 - April 9, 2002
-  * @author      Mark Hapner
-  * @author      Rich Burridge
-  * @author      Kate Stout
+  * @see javax.jms.Connection
+  * @see javax.jms.ConnectionFactory
+  * @see javax.jms.QueueConnectionFactory
+  * 
+  * @version JMS 2.0
+  * @since JMS 1.0
   *
-  * @see         javax.jms.Connection
-  * @see         javax.jms.ConnectionFactory
-  * @see	 javax.jms.QueueConnectionFactory
   */
 
 public interface QueueConnection extends Connection {

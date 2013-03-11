@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -161,7 +161,7 @@ public:
    * @return IMQ_SUCCESS if successful and an error otherwise.
    */
   virtual iMQError connect(const char * hostName, 
-                           const PRUint16 hostPort,
+                           const PRUint16 hostPort, const PRBool useIPV6,
                            const PRUint32 timeoutMicroSeconds);
 
   /**

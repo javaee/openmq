@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -56,11 +56,7 @@ import java.io.Serializable;
   * {@code MessageNotWriteableException} is thrown. If 
   * {@code clearBody} is called, the message can now be both read from and 
   * written to.
-  *
-  * @version     1.0 - 6 August 1998
-  * @author      Mark Hapner
-  * @author      Rich Burridge
-  *
+  * 
   * @see         javax.jms.Session#createObjectMessage()
   * @see         javax.jms.Session#createObjectMessage(Serializable)
   * @see         javax.jms.BytesMessage
@@ -68,6 +64,10 @@ import java.io.Serializable;
   * @see         javax.jms.Message
   * @see         javax.jms.StreamMessage
   * @see         javax.jms.TextMessage
+  * 
+  * @version JMS 2.0
+  * @since JMS 1.0
+  *
   */
 
 public interface ObjectMessage extends Message {

@@ -3916,7 +3916,7 @@ public class RaptorProtocol implements Protocol, PartitionListener, StoreSession
                         if (existcr != null) {
                             Object[] args = { "["+cr.getUniqueKey()+"]", existcr.getBroker(), sender };
                             String emsg = br.getKString(br.I_RECORD_DURA_SUB_CONCURRENT, args)+
-                                              existcr.getFlagString();
+                                              "["+existcr.getFlagString()+"]";
                             logger.log(logger.INFO, emsg);
                             if (((InterestUpdateChangeRecord)cr).getShared() != existcr.getShared() ||
                                 ((InterestUpdateChangeRecord)cr).getJMSShared() != existcr.getJMSShared()) {

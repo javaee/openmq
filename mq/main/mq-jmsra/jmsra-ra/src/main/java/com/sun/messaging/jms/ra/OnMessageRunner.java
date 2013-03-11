@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -222,7 +222,7 @@ public class OnMessageRunner implements Work, JMSRAOnMessageRunner {
         synchronized (this.xarSyncObj) {
         boolean sendUndeliverableMsgsToDMQ = spec.getSendUndeliverableMsgsToDMQ();
         if (!endpointValid) {
-            _loggerIM.fine(_lgrMID_INF +"run:msgEP invalid-Ack Undeliverable & remove OMR fr pool-omrId="+omrId+":msg="+mqmsg.toString());
+            _loggerIM.fine(_lgrMID_INF +"run:msgEP invalid-Ack Undeliverable & remove OMR fr pool-omrId="+omrId+":msg="+mqmsg);
 
             omrPool.removeOnMessageRunner(this);
             try {

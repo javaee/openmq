@@ -100,6 +100,7 @@ public class MessageConsumerImpl extends Consumer
     private boolean syncReadFlag = true;
 
     protected SysMessageID lastDeliveredID = null;
+    protected boolean lastDeliveredIDInTransaction = false;
 
     //used in onMessage().
     //private boolean successfulDelivery = true;
@@ -177,6 +178,7 @@ public class MessageConsumerImpl extends Consumer
 
     protected void setInterestId (Long id) {
         lastDeliveredID = null;
+        lastDeliveredIDInTransaction = false;
         pendingPrefetch = false;
         super.setInterestId(id);
     }
@@ -364,10 +366,18 @@ public class MessageConsumerImpl extends Consumer
                 // let the client know they are doing something wrong
                 Debug.printStackTrace(e);
 
+                boolean doredeliver = false;
+
                 int redeliveryCount = message.getIntProperty(ConnectionMetaDataImpl.JMSXDeliveryCount);;
                 // for non-transacted, auto-acknowledge session
-                if (session.getTransacted() == false && session.acknowledgeMode != Session.CLIENT_ACKNOWLEDGE) {
+                if (session.getTransacted() == false && 
+                    session.acknowledgeMode != Session.CLIENT_ACKNOWLEDGE) {
                     message.doAcknowledge = false;
+                    if (!isClosed) {
+                        doredeliver = true;
+                    } 
+                }
+                if (doredeliver) {
                     // set redeliver flag to true
                     message.setJMSRedelivered(true);
                     // redeliver to the listener
@@ -383,7 +393,7 @@ public class MessageConsumerImpl extends Consumer
                         if (!message.consumerInRA) {
                             int attemptcnt = 1;
                             int attempts = connection.onMessageExRedeliveryAttempts;
-                            while (attemptcnt < attempts) {
+                            while (attemptcnt < attempts && !isClosed) {
                                 message.doAcknowledge = false;
                                 message.setJMSRedelivered(true);
                                 if (connection.onMessageExRedeliveryIntervals > 0) {
@@ -440,8 +450,18 @@ public class MessageConsumerImpl extends Consumer
 
         // XXX PROTOCOL3.5
         // Remember the last delivered message id.
-        if (!(session.getTransacted() && connection.isAppTransactedAck())) {
-            lastDeliveredID = message.getMessageID();
+        setLastDeliveredID(message.getMessageID(), true);
+    }
+
+    private void setLastDeliveredID(SysMessageID sysid, boolean fromOnMessage) {
+        if (fromOnMessage) {
+            if (!(session.getTransactedNoCheck() && connection.isAppTransactedAck())) {
+                lastDeliveredID = sysid;
+                lastDeliveredIDInTransaction = session.getTransactedNoCheck();
+            }
+        } else {
+            lastDeliveredID = sysid;
+            lastDeliveredIDInTransaction = session.getTransactedNoCheck();
         }
     }
 
@@ -563,7 +583,7 @@ public class MessageConsumerImpl extends Consumer
 					}
 					// XXX PROTOCOL3.5
 					// Remember the last delivered message id.
-					lastDeliveredID = message.getMessageID();
+					setLastDeliveredID(message.getMessageID(), false);
 				} else {
 					// if message is null and the connection is broken, throws a JMSException 
 					// so that the MessageConsumer knows that this is caused by a MQ internal error  
@@ -643,7 +663,7 @@ public class MessageConsumerImpl extends Consumer
 					}
 					// XXX PROTOCOL3.5
 					// Remember the last delivered message id.
-					lastDeliveredID = message.getMessageID();
+					setLastDeliveredID(message.getMessageID(), false);
 				} else {
 					body = null;
 					// if message is null and the connection is broken, throws a
@@ -726,7 +746,7 @@ public class MessageConsumerImpl extends Consumer
 
                 //XXX PROTOCOL3.5
                 // Remember the last delivered message id.
-                lastDeliveredID = message.getMessageID();
+                setLastDeliveredID(message.getMessageID(), false);
             }
             break;
         } finally {
@@ -788,7 +808,7 @@ public class MessageConsumerImpl extends Consumer
 					}
 					// XXX PROTOCOL3.5
 					// Remember the last delivered message id.
-					lastDeliveredID = message.getMessageID();
+					setLastDeliveredID(message.getMessageID(), false);
 				}
 				break;
 			} finally {
@@ -834,8 +854,22 @@ public class MessageConsumerImpl extends Consumer
 
     public void
     close() throws JMSException {
+        close(false);
+    }
+
+    protected void
+    close(boolean fromSessionClose) throws JMSException {
 
         int reduceFlowCount = 0;
+
+        boolean mysyncstate = false;
+        if (!isClosed &&
+            (Thread.currentThread() != session.sessionReader.sessionThread) && 
+            !fromSessionClose) {
+            session.prepareToClose(false);
+            mysyncstate = true; 
+        }
+        try {
 
         /**
          * This is to avoid closing twice issues.
@@ -850,14 +884,10 @@ public class MessageConsumerImpl extends Consumer
 
         }
 
-        //Comment out MQ-249 change for JMS 2.0 spec needs 
-        //fix for Consumer.close 
-        //session.checkPermission();
-
         try {
 
             /**
-             * if call is not not from message listener,
+             * if call is not from message listener,
              * we need to stop session reader.
              */
             if (Thread.currentThread() != session.sessionReader.sessionThread) {
@@ -881,7 +911,10 @@ public class MessageConsumerImpl extends Consumer
                 if (session.dupsOkAckOnTimeout) {
                     session.syncedDupsOkCommitAcknowledge();
                 }
-
+                //JMS 2.0
+                if (Thread.currentThread() == session.sessionReader.sessionThread) {
+                    setLastDeliveredID(session.sessionReader.currentMessage.getMessageID(), true);
+                }
                 removeInterest();
             }
 
@@ -908,7 +941,8 @@ public class MessageConsumerImpl extends Consumer
              * (in deliverAndAcknowledge method).
              */
             if (Thread.currentThread() == session.sessionReader.sessionThread) {
-                session.sessionReader.currentMessage.doAcknowledge = false;
+                //JMS 2.0 
+                //session.sessionReader.currentMessage.doAcknowledge = false;
             } else {
                 //restart session reader
                 session.sessionQueue.start();
@@ -931,7 +965,12 @@ public class MessageConsumerImpl extends Consumer
             if (session.sessionLogger.isLoggable(Level.FINE) ) {
                 logLifeCycle(ClientResources.I_CONSUMER_CLOSED);
             }
+        }
 
+        } finally {
+            if (mysyncstate) {
+                session.releaseInSyncState();       
+            }
         }
     }
 
@@ -988,6 +1027,10 @@ public class MessageConsumerImpl extends Consumer
 
     protected SysMessageID getLastDeliveredID() {
         return lastDeliveredID;
+    }
+
+    protected boolean getLastDeliveredIDInTransaction() {
+        return lastDeliveredIDInTransaction;
     }
 
     public void dump (PrintStream ps) {

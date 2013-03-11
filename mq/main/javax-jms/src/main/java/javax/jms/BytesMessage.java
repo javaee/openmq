@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,8 +40,6 @@
  
 package javax.jms;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 
 /** A {@code BytesMessage} object is used to send a message containing a 
   * stream of uninterpreted bytes. It inherits from the {@code Message} 
@@ -88,17 +86,16 @@ import java.io.OutputStream;
   * <P>If a client attempts to write a message in read-only mode, a 
   * {@code MessageNotWriteableException} is thrown.
   *
-  * @version     1.1 April 2, 2002
-  * @author      Mark Hapner
-  * @author      Rich Burridge
-  * @author      Kate Stout
-  *
   * @see         javax.jms.Session#createBytesMessage()
   * @see         javax.jms.MapMessage
   * @see         javax.jms.Message
   * @see         javax.jms.ObjectMessage
   * @see         javax.jms.StreamMessage
   * @see         javax.jms.TextMessage
+  * 
+  * @version JMS 2.0
+  * @since JMS 1.0
+  *
   */
 
 public interface BytesMessage extends Message {
@@ -114,7 +111,7 @@ public interface BytesMessage extends Message {
        *                         due to some internal error.
        * @exception MessageNotReadableException if the message is in write-only
        *                         mode.
-       * @since 1.1 
+       * @since JMS 1.1 
        */
        
       long getBodyLength() throws JMSException;

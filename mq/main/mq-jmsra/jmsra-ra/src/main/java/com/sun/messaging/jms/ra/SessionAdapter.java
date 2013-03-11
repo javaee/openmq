@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -366,39 +366,29 @@ implements javax.jms.Session,
 	public MessageConsumer createSharedConsumer(Topic topic,
 			String sharedSubscriptionName) throws JMSException {
             return xas.createSharedConsumer(
-                topic, sharedSubscriptionName, null, false);
+                topic, sharedSubscriptionName, null);
 	}
 
 
 	@Override
 	public MessageConsumer createSharedConsumer(Topic topic,
-			String sharedSubscriptionName, String messageSelector)
-			throws JMSException {
+			String sharedSubscriptionName, String messageSelector) throws JMSException {
             return xas.createSharedConsumer(
-                topic, sharedSubscriptionName, messageSelector, false);
-	}
-
-
-	@Override
-	public MessageConsumer createSharedConsumer(Topic topic,
-			String sharedSubscriptionName, String messageSelector,
-			boolean noLocal) throws JMSException {
-            return xas.createSharedConsumer(
-                topic, sharedSubscriptionName, messageSelector, noLocal);
+                topic, sharedSubscriptionName, messageSelector);
 	}
 
         @Override 
         public MessageConsumer createSharedDurableConsumer(Topic topic, String name)
             throws JMSException {
-            return xas.createSharedDurableConsumer(topic, name, null, false);
+            return xas.createSharedDurableConsumer(topic, name, null);
         }
 
         @Override 
         public MessageConsumer createSharedDurableConsumer(
-            Topic topic, String name, String messageSelector, boolean noLocal)
+            Topic topic, String name, String messageSelector)
             throws JMSException {
             return xas.createSharedDurableConsumer(
-                topic, name, messageSelector, noLocal);
+                topic, name, messageSelector);
         }
 
     public TopicPublisher
@@ -516,15 +506,18 @@ implements javax.jms.Session,
     	xas.clientAcknowledge();
     }
  
-    public void
-    close()
-    throws JMSException
-    {
+    public void close() throws JMSException {
+         close(false);
+    }
+
+    protected void close(boolean fromConnection) throws JMSException {
         _loggerJS.entering(_className, "close()");
         if (closed) {
             return;
         }
-        ca.removeSessionAdapter(this);
+        if (!fromConnection) {
+            ca.removeSessionAdapter(this);
+        }
         xas.close();
         closed = true;
         //// This generates a ManagedConnection close event

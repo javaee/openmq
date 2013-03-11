@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -41,8 +41,8 @@
 package javax.jms;
 
 import java.io.Serializable;
-import java.util.Enumeration;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A {@code JMSProducer} is a simple object used to send messages on behalf
@@ -80,8 +80,8 @@ import java.util.Map;
  * which can be created freely and which do not consume significant resources.
  * This interface therefore does not provide a {@code close} method.
  * 
- * @version 2.0
- * @since 2.0
+ * @version JMS 2.0
+ * @since JMS 2.0
  * 
  */
 
@@ -533,9 +533,9 @@ public interface JMSProducer {
 	 * <tt>commit</tt> or <tt>rollback</tt> to throw an
 	 * <tt>IllegalStateRuntimeException</tt>.
 	 * <p>
-	 * <b>Restrictions on usage in Java EE</b> An asynchronous send is not
-	 * permitted in a Java EE EJB or web container. If the application component
-	 * violates this restriction this method may throw a JMSRuntimeException.
+	 * <b>Restrictions on usage in Java EE</b> This method must not be used in a
+	 * Java EE EJB or web container. Doing so may cause a {@code JMSRuntimeException} 
+	 * to be thrown though this is not guaranteed.
 	 * <p>
 	 * <b>Message headers</b> JMS defines a number of message header fields and
 	 * message properties which must be set by the "JMS provider on send". If
@@ -1034,20 +1034,30 @@ public interface JMSProducer {
 	Object getObjectProperty(String name);
 
 	/**
-	 * Returns an {@code Enumeration} of the names of all the message
-	 * properties that have been set on this {@code JMSProducer}.
+	 * Returns an unmodifiable {@code Set} view of the names of all the message
+	 * properties that have been set on this JMSProducer.
 	 * <p>
 	 * Note that JMS standard header fields are not considered properties and
-	 * are not returned in this enumeration.
+	 * are not returned in this Set.
+	 * <p>
+	 * The set is backed by the {@code JMSProducer}, so changes to the map are
+	 * reflected in the set. However the set may not be modified. Attempts to
+	 * modify the returned collection, whether directly or via its iterator,
+	 * will result in an {@code java.lang.UnsupportedOperationException}. Its behaviour matches
+	 * that defined in the {@code java.util.Collections} method
+	 * {@code unmodifiableSet}.
 	 * 
-	 * @return an enumeration of all the names of property values
+	 * @return a {@code Set} containing the names of all the message properties
+	 *         that have been set on this {@code JMSProducer}
 	 * 
 	 * @throws JMSRuntimeException
 	 *             if the JMS provider fails to get the property names due to
 	 *             some internal error.
+	 * 
+	 * @see java.util.Collections#unmodifiableSet
 	 */
-	Enumeration getPropertyNames();
-
+	Set<String> getPropertyNames();
+ 
 	/**
 	 * Specifies that messages sent using this {@code JMSProducer} will
 	 * have their {@code JMSCorrelationID} header value set to the

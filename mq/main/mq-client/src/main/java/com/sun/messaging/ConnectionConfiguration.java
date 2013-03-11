@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -556,6 +556,27 @@ public class ConnectionConfiguration {
      * <p>
      */
     public static final String imqPortMapperSoTimeout = "imqPortMapperSoTimeout";
+
+    /**
+     * This property specifies the key store location
+     * <p>
+     * The value of this property is not set by default.
+     * <p>
+     */
+    public static final String imqKeyStore = "imqKeyStore";
+
+    /**
+     * This property specifies the key store password. 
+     * Set this property to a non-null value will make the 
+     * connection capable of SSL client authenication if
+     * requested by broker.  If it is set to empty string, 
+     * Java system property javax.net.ssl.keyStorePassword
+     * will be used if set 
+     * <p>
+     * The value of this property is not set by default.
+     * <p>
+     */
+    public static final String imqKeyStorePassword = "imqKeyStorePassword";
 
     /**
      * If this property is set to true, the MQ Client Runtime will abort

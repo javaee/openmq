@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -73,13 +73,16 @@ import com.sun.messaging.jmq.io.JMSPacket;
 import com.sun.messaging.jmq.io.SysMessageID;
 import com.sun.messaging.jmq.jmsclient.ExceptionHandler;
 import com.sun.messaging.jmq.jmsclient.resources.ClientResources;
+import com.sun.messaging.jmq.jmsserver.util.BrokerException;
 import com.sun.messaging.jmq.jmsservice.JMSAck;
 import com.sun.messaging.jmq.jmsservice.JMSService;
 import com.sun.messaging.jmq.jmsservice.JMSService.MessageAckType;
 import com.sun.messaging.jmq.jmsservice.JMSService.SessionAckMode;
 import com.sun.messaging.jmq.jmsservice.JMSServiceException;
 import com.sun.messaging.jmq.jmsservice.JMSServiceReply;
+import com.sun.messaging.jmq.jmsservice.ConsumerClosedNoDeliveryException;
 import com.sun.messaging.jms.IllegalStateException;
+import com.sun.messaging.jms.MQIllegalStateRuntimeException;
 /**
  *  DirectSession encapsulates JMS Session behavior for MQ DIRECT mode operation
  */
@@ -401,37 +404,32 @@ public class DirectSession
     @Override
     public MessageConsumer createSharedConsumer(Topic topic,
         String sharedSubscriptionName) throws JMSException {
-        return createSharedConsumer(topic, sharedSubscriptionName, null,  false);
+        return createSharedConsumer(topic, sharedSubscriptionName, null);
     }
 
     @Override
     public MessageConsumer createSharedConsumer(Topic topic,
-        String sharedSubscriptionName, String messageSelector)
+        String sharedSubscriptionName, String messageSelector) 
         throws JMSException {
-        return createSharedConsumer(topic, sharedSubscriptionName, messageSelector,  false);
-    }
-
-    @Override
-    public MessageConsumer createSharedConsumer(Topic topic,
-        String sharedSubscriptionName, String messageSelector, boolean noLocal) 
-        throws JMSException {
+        boolean noLocal=false;
         return (TopicSubscriber)this._createAndAddConsumer(
-            "createSharedConsumer(Topic, sharedSubscriptionName, messageSelector, noLocal)",
+            "createSharedConsumer(Topic, sharedSubscriptionName, messageSelector)",
             topic, messageSelector, sharedSubscriptionName, false, true, true, noLocal);
     }    
 
     @Override
     public MessageConsumer createSharedDurableConsumer(Topic topic, String name)
     throws JMSException {
-	return createSharedDurableConsumer(topic, name, null, false);
+	return createSharedDurableConsumer(topic, name, null);
     }
 
     @Override
     public MessageConsumer createSharedDurableConsumer(Topic topic, String name,
-	String messageSelector, boolean noLocal)
+	String messageSelector)
 	throws JMSException {
+        boolean noLocal=false;
         return (TopicSubscriber)this._createAndAddConsumer(
-            "createSharedDurableConsumer(Topic, name, messageSelector, noLocal)",
+            "createSharedDurableConsumer(Topic, name, messageSelector)",
             topic, messageSelector, name, true, true, true, noLocal);
     }
 
@@ -711,6 +709,10 @@ public class DirectSession
                     sessionId+":"+methodName);
         }
         this._checkIfClosed(methodName);
+        return getTransactedNoCheck();
+    }
+
+    protected boolean getTransactedNoCheck() {
         return (this.ackMode == SessionAckMode.TRANSACTED);
     }
 
@@ -863,7 +865,7 @@ public class DirectSession
         JMSServiceReply reply = null;
         try {
             reply =  jmsservice.deleteConsumer(this.connectionId,
-                    this.sessionId, 0L, null, name, this.dc._getClientID());
+                    this.sessionId, 0L, null, false, name, this.dc._getClientID());
         } catch (JMSServiceException jmsse) {
             String exErrMsg = _lgrMID_EXC+
                     "sessionId="+sessionId+":"+methodName+
@@ -1121,7 +1123,7 @@ public class DirectSession
      */
     protected void _stop(){
         try {
-            jmsservice.stopSession(this.connectionId, this.sessionId);
+            jmsservice.stopSession(this.connectionId, this.sessionId, true);
         } catch (JMSServiceException jmsse){
             _loggerJS.warning(_lgrMID_WRN+
                     "sessionId="+sessionId+":"+"_stop():"+
@@ -1746,8 +1748,15 @@ public class DirectSession
                     exerrmsg = exerrmsg + failure_cause;
                     jmsse = new InvalidSelectorException(exerrmsg);
                     break;
+                case PRECONDITION_FAILED:
+                	if (jse.getCause()!=null && jse.getCause() instanceof BrokerException){
+                    	failure_cause = jse.getCause().getMessage();
+                    	exerrmsg = exerrmsg + failure_cause;
+                		jmsse = new IllegalStateException(exerrmsg,((BrokerException)jse.getCause()).getErrorCode());               		
+                		break;
+                	} 
                 default:
-                    failure_cause = "unkown JMSService server error.";
+                    failure_cause = "unknown JMSService server error.";
             }
             _loggerJS.severe(exerrmsg);
             if (jmsse == null){
@@ -1962,7 +1971,7 @@ public class DirectSession
      */
     protected synchronized JMSAck _deliverMessage(
             javax.jms.MessageListener msgListener, JMSPacket jmsPacket,
-            long consumerId) {
+            long consumerId) throws ConsumerClosedNoDeliveryException {
         JMSAck jmsAck = null;
         SysMessageID messageID = null;
         long xaTxnId = 0L;
@@ -2025,6 +2034,8 @@ public class DirectSession
                     unackedConsumerIDs.add(consumerId);
                 }
             }
+        } catch (ConsumerClosedNoDeliveryException e) {
+            throw e;
         } catch (Exception e){
             System.out.println(
                     "DirectConsumer:Caught Exception delivering message"

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -59,10 +59,6 @@ extends DirectSession {
         super(dc, jmsservice, sessionId, ackMode);
     }
 
-    /**
-     *  Create a TopicSubscriber for the specified Topic with the specified
-     *  subscription name
-     */
     public TopicSubscriber createDurableSubscriber(Topic topic,
             String name)
     throws JMSException {
@@ -74,11 +70,6 @@ extends DirectSession {
         throw new javax.jms.IllegalStateException(isIllegalMsg);
     }
 
-    /**
-     *  Create a TopicSubscriber for the specified Topic with the specified
-     *  subscription name and selector and specifying whether messages published
-     *  by its own connection should be delivered to it.
-     */
     public TopicSubscriber createDurableSubscriber(Topic topic,
             String name, String selector, boolean noLocal)
     throws JMSException {
@@ -90,7 +81,67 @@ extends DirectSession {
         throw new javax.jms.IllegalStateException(isIllegalMsg);
     }
 
-    /**
+    @Override
+	public MessageConsumer createDurableConsumer(Topic topic, String name) throws JMSException {
+        String methodName =
+                "createDurableConsumer(Topic topic, String name)";
+        String isIllegalMsg = _lgrMID_EXC + methodName +
+                    ":Invalid for a QueueSession:sessionId=" + sessionId;
+        _loggerJS.warning(isIllegalMsg);
+        throw new javax.jms.IllegalStateException(isIllegalMsg);
+	}
+
+	@Override
+	public MessageConsumer createDurableConsumer(Topic topic, String name, String messageSelector, boolean noLocal) throws JMSException {
+        String methodName =
+                "createDurableConsumer(Topic topic, String name, String messageSelector, boolean noLocal)";
+        String isIllegalMsg = _lgrMID_EXC + methodName +
+                    ":Invalid for a QueueSession:sessionId=" + sessionId;
+        _loggerJS.warning(isIllegalMsg);
+        throw new javax.jms.IllegalStateException(isIllegalMsg);
+	}
+
+	@Override
+	public MessageConsumer createSharedConsumer(Topic topic, String sharedSubscriptionName) throws JMSException {
+        String methodName =
+                "createSharedConsumer(Topic topic, String sharedSubscriptionName)";
+        String isIllegalMsg = _lgrMID_EXC + methodName +
+                    ":Invalid for a QueueSession:sessionId=" + sessionId;
+        _loggerJS.warning(isIllegalMsg);
+        throw new javax.jms.IllegalStateException(isIllegalMsg);
+	}
+
+	@Override
+	public MessageConsumer createSharedConsumer(Topic topic, String sharedSubscriptionName, String messageSelector) throws JMSException {
+        String methodName =
+                "createSharedConsumer(Topic topic, String sharedSubscriptionName, String messageSelector)";
+        String isIllegalMsg = _lgrMID_EXC + methodName +
+                    ":Invalid for a QueueSession:sessionId=" + sessionId;
+        _loggerJS.warning(isIllegalMsg);
+        throw new javax.jms.IllegalStateException(isIllegalMsg);
+	}
+
+	@Override
+	public MessageConsumer createSharedDurableConsumer(Topic topic, String name) throws JMSException {
+        String methodName =
+                "createSharedDurableConsumer(Topic topic, String name)";
+        String isIllegalMsg = _lgrMID_EXC + methodName +
+                    ":Invalid for a QueueSession:sessionId=" + sessionId;
+        _loggerJS.warning(isIllegalMsg);
+        throw new javax.jms.IllegalStateException(isIllegalMsg);
+	}
+
+	@Override
+	public MessageConsumer createSharedDurableConsumer(Topic topic, String name, String messageSelector) throws JMSException {
+        String methodName =
+                "createSharedDurableConsumer(Topic topic, String name, String messageSelector)";
+        String isIllegalMsg = _lgrMID_EXC + methodName +
+                    ":Invalid for a QueueSession:sessionId=" + sessionId;
+        _loggerJS.warning(isIllegalMsg);
+        throw new javax.jms.IllegalStateException(isIllegalMsg);
+	}
+
+	/**
      *  Create a TemporaryTopic identity object
      */
     public javax.jms.TemporaryTopic createTemporaryTopic()

@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -322,6 +322,110 @@
 	    </fileset>
 	</copy>
 
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/">
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/asyncsend"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/asyncsend">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/asyncsend">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/asynctopicconsumer"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/asynctopicconsumer">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/asynctopicconsumer">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/deliverycount"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/deliverycount">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/deliverycount">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/deliverydelay"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/deliverydelay">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/deliverydelay">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/messagegetbody"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/messagegetbody">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/messagegetbody">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/messageheader"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/messageheader">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/messageheader">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/messageproperties"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/messageproperties">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/messageproperties">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/selector"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/selector">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/selector">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/sharedsub"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/sharedsub">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/sharedsub">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/syncqueue"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/syncqueue">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/syncqueue">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jaas"/>
+	<copy todir="${mq.zip.installdir}/examples/jaas">
+	    <fileset dir="${base_src.dir}/share/java/examples/jaas">
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
         <mkdir dir="${mq.zip.installdir}/examples/imqobjmgr"/>
 	<copy todir="${mq.zip.installdir}/examples/imqobjmgr">
 	    <fileset dir="${base_src.dir}/share/java/examples/imqobjmgr">
@@ -361,6 +465,13 @@
 	    <fileset dir="${base_src.dir}/share/java/examples/jmx">
 	        <include name="*.java"/>
 	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/applications/"/>
+	<copy todir="${mq.zip.installdir}/examples/applications/">
+	    <fileset dir="${base_src.dir}/share/java/examples/applications/">
 	        <include name="README"/>
 	    </fileset>
 	</copy>
@@ -407,6 +518,13 @@
 	        <include name="*.java"/>
 	        <include name="*.html"/>
 	        <include name="*.xml"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/helloworld/"/>
+	<copy todir="${mq.zip.installdir}/examples/helloworld/">
+	    <fileset dir="${base_src.dir}/share/java/examples/helloworld/">
 	        <include name="README"/>
 	    </fileset>
 	</copy>
@@ -699,6 +817,104 @@
                 <include name="README"/>
             </fileset>
         </copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/">
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/asyncsend"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/asyncsend">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/asyncsend">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/asynctopicconsumer"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/asynctopicconsumer">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/asynctopicconsumer">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/deliverycount"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/deliverycount">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/deliverycount">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/deliverydelay"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/deliverydelay">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/deliverydelay">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/messagegetbody"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/messagegetbody">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/messagegetbody">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/messageheader"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/messageheader">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/messageheader">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/messageproperties"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/messageproperties">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/messageproperties">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/selector"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/selector">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/selector">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/sharedsub"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/sharedsub">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/sharedsub">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/syncqueue"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/syncqueue">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/syncqueue">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
 	<mkdir dir="${mq.zip.installdir}/examples/imqobjmgr"/>
         <copy todir="${mq.zip.installdir}/examples/imqobjmgr">
             <fileset dir="${base_src.dir}/share/java/examples/imqobjmgr">
@@ -720,6 +936,13 @@
             <fileset dir="${base_src.dir}/share/java/examples/jmx">
                 <include name="*.java"/>
                 <include name="*.class"/>
+                <include name="README"/>
+            </fileset>
+        </copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/applications/"/>
+        <copy todir="${mq.zip.installdir}/examples/applications/">
+            <fileset dir="${base_src.dir}/share/java/examples/applications/">
                 <include name="README"/>
             </fileset>
         </copy>
@@ -765,6 +988,13 @@
                 <include name="*.java"/>
                 <include name="*.html"/>
                 <include name="*.xml"/>
+                <include name="README"/>
+            </fileset>
+        </copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/helloworld/"/>
+        <copy todir="${mq.zip.installdir}/examples/helloworld/">
+            <fileset dir="${base_src.dir}/share/java/examples/helloworld/">
                 <include name="README"/>
             </fileset>
         </copy>
@@ -823,10 +1053,9 @@
         </copy>
 
 	<!--  For GFv3, add IMQ_DEFAULT_VARHOME value for GF. -->
-	<echo file="${mq.zip.installdir}/etc/imqenv.conf" append="true"># Set this for GlassFish
-	</echo>
-	<echo file="${mq.zip.installdir}/etc/imqenv.conf" append="true">IMQ_DEFAULT_VARHOME=../../glassfish/domains/domain1/imq
-        </echo>
+	<concat append="true" destfile="${mq.zip.installdir}/etc/imqenv.conf"><![CDATA[# Set this for GlassFish
+IMQ_DEFAULT_VARHOME=../../glassfish/domains/domain1/imq]]>
+	</concat>
 
         <chmod perm="444">
             <fileset dir="${mq.zip.installdir}/etc">
@@ -1319,6 +1548,103 @@
 	        <include name="*.java"/>
 	        <include name="*.dtd"/>
 	        <include name="*.xml"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/">
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/asyncsend"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/asyncsend">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/asyncsend">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/asynctopicconsumer"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/asynctopicconsumer">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/asynctopicconsumer">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/deliverycount"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/deliverycount">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/deliverycount">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/deliverydelay"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/deliverydelay">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/deliverydelay">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/messagegetbody"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/messagegetbody">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/messagegetbody">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/messageheader"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/messageheader">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/messageheader">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/messageproperties"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/messageproperties">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/messageproperties">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/selector"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/selector">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/selector">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/sharedsub"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/sharedsub">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/sharedsub">
+	        <include name="*.java"/>
+	        <include name="*.class"/>
+	        <include name="README"/>
+	    </fileset>
+	</copy>
+
+        <mkdir dir="${mq.zip.installdir}/examples/jms20/syncqueue"/>
+	<copy todir="${mq.zip.installdir}/examples/jms20/syncqueue">
+	    <fileset dir="${base_src.dir}/share/java/examples/jms20/syncqueue">
+	        <include name="*.java"/>
 	        <include name="*.class"/>
 	        <include name="README"/>
 	    </fileset>

@@ -633,6 +633,7 @@ public class MessageProducerImpl implements MessageProducer {
     //need to address this for 2.1
     public void
     close() throws JMSException {
+        session.checkPermissionForAsyncSend();
         //XXX PROTOCOL3.5 --
         // Producer flow control. Raptor broker keeps track of
         // producers.
@@ -659,13 +660,14 @@ public class MessageProducerImpl implements MessageProducer {
                 ps.close();
             }
 
+            session.removeMessageProducer(this);
+            destinations.clear();
+            producerStates.clear();
+
             } finally {
                 session.waitAllAsyncSendCompletion(this);
             }
 
-            session.removeMessageProducer(this);
-            destinations.clear();
-            producerStates.clear();
         } finally {
         	
             isClosed = true;

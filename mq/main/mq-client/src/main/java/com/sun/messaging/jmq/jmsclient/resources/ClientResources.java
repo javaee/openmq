@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -341,20 +341,19 @@ public class ClientResources extends MQResourceBundle {
     final public static String X_FORBIDDEN_IN_JAVAEE_WEB_EJB        = "C4306";
     final public static String X_JMSCONTEXT_CLOSED	                = "C4307";
     final public static String X_JMSCONSUMER_CLOSED	                = "C4308";
-    final public static String X_UNUSED                             = "C4309";
+    final public static String X_INVALID_SESSION_MODE               = "C4309";
     final public static String X_MESSAGE_IS_NULL                    = "C4310";
-    final public static String X_ASYNC_SEND_XA_TXN                  = "C4311";
+    final public static String X_ASYNC_SEND_XA_TXN                  = "C4311"; 
     final public static String X_CONNECTION_FAILOVER                = "C4312";
     final public static String X_PRODUCER_CLOSING                   = "C4313";
     final public static String X_ASYNC_SEND_COMPLETION_WAIT_TIMEOUT = "C4314";
     final public static String X_NO_ASYNC_SEND_LISTENER_PROCESSOR_THREAD = "C4315";
     final public static String X_INVALID_SHARED_SUBSCRIPTION_NAME        = "C4316";
-    final public static String X_NO_CLIENTID_FOR_NOLOCAL_DURA        = "C4317";
-    final public static String X_NO_CLIENTID_FOR_NOLOCAL_DURA_SHARE  = "C4318";
-    final public static String X_NO_CLIENTID_FOR_NOLOCAL_SHARE       = "C4319";
     final public static String X_MESSAGE_HAS_NO_BODY               = "C4320";
     final public static String X_BODY_CLASS_INVALID                = "C4321";
     final public static String X_MESSAGE_TYPE_NOT_SUPPORTED        = "C4322";
+    final public static String X_FILE_NOT_FOUND                    = "C4323";
+    final public static String X_NO_KEYSTORE_PASSWORD              = "C4324";
 
     //MQ event codes
 
@@ -473,6 +472,7 @@ public class ClientResources extends MQResourceBundle {
     public static final String I_ASYNC_SEND_LISTENER_PROCESSOR_THREAD_EXIT  ="I503";
     public static final String I_WAIT_ASYNC_SENDS_COMPLETE_PRODUCER  ="I504";
     public static final String I_WAIT_ASYNC_SENDS_COMPLETE_SESSION  ="I505";
+    public static final String I_USE_KEYSTORE       ="I506";
 
 
 

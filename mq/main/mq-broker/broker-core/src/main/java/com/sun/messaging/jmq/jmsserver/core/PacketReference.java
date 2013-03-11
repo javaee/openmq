@@ -834,7 +834,8 @@ public class PacketReference implements Sized, Ordered
             LinkedHashMap<ConsumerUID, ConnectionUID> m = remoteConsumerUIDs.get(suid);
             if (DEBUG) {
                 Globals.getLogger().log(Logger.INFO, 
-                "PacketReference.isLastRemoteConsumerUID("+suid+", "+cuid+"): "+m+", ref="+this);
+                "PacketReference.isLastRemoteConsumerUID("+suid+", "+cuid+"): "+
+                 m+", ref@"+this.hashCode()+"="+this);
             }
             if (m == null) {
                 return true;
@@ -844,7 +845,8 @@ public class PacketReference implements Sized, Ordered
                 lastuid = itr.next(); 
                 if (DEBUG) {
                     Globals.getLogger().log(Logger.INFO, 
-                    "PacketReference.isLastRemoteConsumerUID("+suid+", "+cuid+"): lastuid="+lastuid+", ref="+this);
+                    "PacketReference.isLastRemoteConsumerUID("+suid+", "+cuid+
+                    "): lastuid="+lastuid+", ref@"+this.hashCode()+"="+this);
                 }
             }
             return (lastuid == null || lastuid.equals(cuid));
@@ -1582,8 +1584,8 @@ public class PacketReference implements Sized, Ordered
         throws BrokerException {
         if (DEBUG) {
             Globals.getLogger().log(Logger.INFO, 
-            "storeRemoteInterests("+interests+", "+deliveryCnts+") for "+
-             msgid+"["+getDestination()+"]");
+            "storeRemoteInterests("+interests+", "+deliveryCnts+") for ref@"+
+             this.hashCode()+"="+this+"["+getDestination()+"]");
         }
         try {
             store(interests);
@@ -1959,7 +1961,7 @@ public class PacketReference implements Sized, Ordered
         if (DEBUG) {
             Globals.getLogger().log(Logger.INFO, 
             "PacketReference.consumed("+intid+", "+sync+", "+delivered+
-            ") for "+msgid+"["+getDestination()+"]");
+            ") for ref@"+this.hashCode()+"="+this+"["+getDestination()+"]");
         }
 
         if (destroyed || invalid) {
@@ -1997,13 +1999,13 @@ public class PacketReference implements Sized, Ordered
         if (DEBUG) {
             Globals.getLogger().log(Logger.INFO, 
             "PacketReference.updateForJMSXDeliveryCount("+suid+", "+n+", "+set+
-            ") for "+msgid+"["+getDestination()+"]");
+            ") for ref@"+this.hashCode()+"="+this+"["+getDestination()+"]");
         }
         if (destroyed || invalid) {
             if (DEBUG) {
             Globals.getLogger().log(Logger.INFO, 
-            "updateForJMSXDeliveryCount("+suid+", "+n+", "+set+") on destroyed ref "+
-             msgid+"["+destination+"]");
+            "updateForJMSXDeliveryCount("+suid+", "+n+", "+set+
+            ") on destroyed ref@"+this.hashCode()+"="+this+"["+destination+"]");
             }
             return;
         }
@@ -2014,8 +2016,8 @@ public class PacketReference implements Sized, Ordered
             // nothing to do
             if (DEBUG) {
             Globals.getLogger().log(Logger.INFO,
-            "updateForJMSXDeliveryCount("+suid+", "+n+","+set+"): unknown interest for ref "+
-             msgid+"["+destination+"]ackInfo="+ackInfo);
+            "updateForJMSXDeliveryCount("+suid+", "+n+","+set+"): unknown interest for ref@"+
+             this.hashCode()+"="+this+"["+destination+"]ackInfo="+ackInfo);
             }
             return;
         }
@@ -2023,8 +2025,8 @@ public class PacketReference implements Sized, Ordered
             if (cmp.isStored() && destination != null) {
                 if (DEBUG) {
                 Globals.getLogger().log(Logger.INFO,
-                "updateForJMSXDeliveryCount("+suid+", "+n+", "+set+") for ref "+msgid+"["+
-                 destination+"]: update delivered in store");
+                "updateForJMSXDeliveryCount("+suid+", "+n+", "+set+") for ref@"+
+                 this.hashCode()+"="+this+"["+destination+"]: update delivered in store");
                 }
                 try {
                     pstore.updateInterestState(

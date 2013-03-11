@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -46,6 +46,8 @@ package com.sun.messaging.jmq.admin.apps.broker;
 
 import java.io.*;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Hashtable;
 import java.util.HashMap;
@@ -6317,7 +6319,23 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 	return (retValue);
     }
 
+    /**
+     * This method is used by tests only
+     */
+    public String runGetAttrWithReturnResult(BrokerCmdProperties brokerCmdProps) {
+        List<String> result = new ArrayList<String>();
+        int ret = runGetAttr(brokerCmdProps, result);
+        if (ret != 0 || result.size() == 0) {
+            return null;
+        }
+        return result.get(0);
+    }
+
     private int runGetAttr(BrokerCmdProperties brokerCmdProps) {
+        return runGetAttr(brokerCmdProps, null);
+    }
+
+    private int runGetAttr(BrokerCmdProperties brokerCmdProps, List<String> result) {
         BrokerAdmin broker;
         int retValue = 1;
 
@@ -6371,11 +6389,19 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 			retValue = 0;
 
 		    } else if (PROP_NAME_OPTION_CUR_MESG.equals(attrName)) {
-	                Globals.stdOutPrintln(Integer.toString(dInfo.nMessages));
+                        String val = Integer.toString(dInfo.nMessages);
+	                Globals.stdOutPrintln(val);
+                        if (result != null) {
+                            result.add(val);
+                        }
 			retValue = 0;
 
 		    } else if (PROP_NAME_OPTION_CUR_UNACK_MESG.equals(attrName)) {
-	                Globals.stdOutPrintln(Integer.toString(dInfo.nUnackMessages));
+                        String val = Integer.toString(dInfo.nUnackMessages);
+	                Globals.stdOutPrintln(val);
+                        if (result != null) {
+                            result.add(val);
+                        }
 			retValue = 0;
 
 		    } else if (PROP_NAME_OPTION_CUR_PRODUCERS.equals(attrName)) {
@@ -6421,11 +6447,17 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 			retValue = 0;
 
 		    } else if (PROP_NAME_OPTION_CUR_A_CONSUMERS.equals(attrName)) {
+                        String val = null;
 			if (DestType.isQueue(destTypeMask)) {
-	                    Globals.stdOutPrintln(Integer.toString(dInfo.naConsumers));
+                            val = Integer.toString(dInfo.naConsumers);
+	                    Globals.stdOutPrintln(val);
 			} else  {
-	                    Globals.stdOutPrintln(Integer.toString(dInfo.nConsumers));
+                            val = Integer.toString(dInfo.nConsumers);
+	                    Globals.stdOutPrintln(val);
 			}
+                        if (result != null) {
+                            result.add(val);
+                        }
 			retValue = 0;
 
 		    } else if (PROP_NAME_OPTION_CUR_B_CONSUMERS.equals(attrName)) {
@@ -6647,13 +6679,18 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
                     DurableInfo dinfo = (DurableInfo)thisEnum.nextElement();
                     if (subName != null) {
                         if (dinfo.name.equals(subName)) {
+                            String val = null;
                             if (clientID != null && clientID.equals(dinfo.clientID)) {
-                                Globals.stdOutPrintln(Integer.toString(dinfo.activeCount));
-                                return 0;
+                                val = Integer.toString(dinfo.activeCount);
+                                Globals.stdOutPrintln(val);
                             } else {
-                                Globals.stdOutPrintln(Integer.toString(dinfo.activeCount));
-                                return 0;
+                                val = Integer.toString(dinfo.activeCount);
+                                Globals.stdOutPrintln(val);
                             }
+                            if (result != null) {
+                                result.add(val);
+                            }
+                            return 0;
                         }
                     } else if (destName != null && dinfo.consumer != null &&
                                destName.equals(dinfo.consumer.destination)) {

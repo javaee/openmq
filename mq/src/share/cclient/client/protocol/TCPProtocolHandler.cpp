@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -106,6 +106,7 @@ TCPProtocolHandler::connect(const Properties * const connectionProperties)
   PRInt32 directPort = 0;
   PRUint16 brokerPort = 0;
   const char * brokerName = NULL;
+  PRBool useIPV6 = PR_FALSE;
   PRUint32 connectTimeout = 0;
 
   // Make sure we are not already connected, and that
@@ -124,6 +125,14 @@ TCPProtocolHandler::connect(const Properties * const connectionProperties)
              directPort > PORT_MAPPER_CLIENT_MAX_PORT_NUMBER), MQ_TCP_INVALID_PORT );
     brokerPort = directPort;
   }
+  errorCode = connectionProperties->getBooleanProperty(
+                MQ_ENABLE_IPV6_PROPERTY, &useIPV6); 
+  if (errorCode != MQ_SUCCESS && errorCode != MQ_NOT_FOUND) {
+      ERRCHK( errorCode);
+  }
+  if (errorCode == MQ_NOT_FOUND) {
+    useIPV6 = PR_FALSE;
+  }
 
   if (brokerPort == 0) {
     // Use the portmapper to find out what port to connect to
@@ -138,7 +147,7 @@ TCPProtocolHandler::connect(const Properties * const connectionProperties)
 
   // Now connect to the broker on the JMS port
   ERRCHK( this->brokerSocket.connect(brokerName, 
-                                     brokerPort, 
+                                     brokerPort, useIPV6,
                                      connectTimeout) );
 
   LOG_INFO(( CODELOC, TCP_HANDLER_LOG_MASK, NULL_CONN_ID, MQ_SUCCESS,

@@ -875,9 +875,7 @@ public abstract class CommDBManager {
             // Set connection behavior
 
             try {
-                if (conn.getAutoCommit() != autocommit) {
-                    conn.setAutoCommit(autocommit);
-                }
+                conn.setAutoCommit(autocommit);
             } catch ( SQLException e ) {
                 exception = e;
                 throw new BrokerException(

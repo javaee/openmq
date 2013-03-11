@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -923,9 +923,7 @@ public class UserMgr implements UserMgrOptions  {
 	case UserMgrException.SRC_FILE_NOT_SPEC:
 	    Output.stdErrPrintln(
                 br.getString(br.E_ERROR), 
-		": The source file to encode/decode was not specified.\nPlease specify it using the " 
-		+ OPTION_SRC
-		+ " option.");
+                br.getKString(br.E_ENCODE_DECODE_NO_SRC_PASSFILE, OPTION_SRC));
 	break;
 	case UserMgrException.CANT_CREATE_INSTANCE:
 	    Output.stdErrPrintln(

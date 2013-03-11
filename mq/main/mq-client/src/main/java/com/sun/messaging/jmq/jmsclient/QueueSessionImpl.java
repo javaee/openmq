@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,202 +38,106 @@
  * holder.
  */
 
-/*
- * @(#)QueueSessionImpl.java	1.19 06/27/07
- */ 
-
 package com.sun.messaging.jmq.jmsclient;
 
-import javax.jms.*;
+import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
+import javax.jms.QueueSession;
+import javax.jms.TemporaryTopic;
+import javax.jms.Topic;
+import javax.jms.TopicSubscriber;
+
 import com.sun.messaging.AdministeredObject;
 
-/** A QueueSession provides methods for creating QueueReceiver's,
-  * QueueSender's, QueueBrowser's and TemporaryQueues.
-  *
-  * <P>If there are messages that have been received but not acknowledged
-  * when a QueueSession terminates, these messages will be retained and
-  * redelivered when a consumer next accesses the queue.
-  *
-  * @see         javax.jms.Session
-  * @see         javax.jms.QueueConnection#createQueueSession(boolean, int)
-  * @see         javax.jms.XAQueueSession#getQueueSession()
-  */
+/**
+ * A QueueSession provides methods for creating QueueReceiver's, QueueSender's,
+ * QueueBrowser's and TemporaryQueues.
+ * 
+ * <P>
+ * If there are messages that have been received but not acknowledged when a
+ * QueueSession terminates, these messages will be retained and redelivered when
+ * a consumer next accesses the queue.
+ * 
+ * @see javax.jms.Session
+ * @see javax.jms.QueueConnection#createQueueSession(boolean, int)
+ * @see javax.jms.XAQueueSession#getQueueSession()
+ */
 
 public class QueueSessionImpl extends UnifiedSessionImpl implements QueueSession {
 
-    public QueueSessionImpl
-            (ConnectionImpl connection, boolean transacted, int ackMode) throws JMSException {
+	public QueueSessionImpl(ConnectionImpl connection, boolean transacted, int ackMode) throws JMSException {
+		super(connection, transacted, ackMode);
+	}
 
-        super (connection, transacted, ackMode);
-    }
+	public QueueSessionImpl(ConnectionImpl connection, int ackMode) throws JMSException {
+		super(connection, ackMode);
+	}
 
-    public QueueSessionImpl
-            (ConnectionImpl connection, int ackMode)
-            throws JMSException {
+	@Override
+	public Topic createTopic(String topicName) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createTopic");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
-        super (connection, ackMode);
-    }
+	@Override
+	public TemporaryTopic createTemporaryTopic() throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createTemporaryTopic");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
-    /**
-    * Throws an IllegalStateException as it is an invalid method for this domain.
-    *
-    * @param topicName the name of this topic
-    *
-    * @return a Topic with the given name.
-    *
-    * @exception IllegalStateException Always, since it is an invalid method for
-    *            this domain.
-    */
-    public Topic createTopic(String topicName) throws JMSException {
+	@Override
+	public TopicSubscriber createDurableSubscriber(Topic topic, String name) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createDurableSubscriber");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
-        String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createTopic");
-        throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
+	@Override
+	public TopicSubscriber createDurableSubscriber(Topic topic, String name, String messageSelector, boolean noLocal) throws JMSException {
 
-    /**
-    * Throws an IllegalStateException as it is an invalid method for this domain.
-    *
-    * @return a temporary queue identity
-    *
-    * @exception IllegalStateException Always, since it is an invalid method for
-    *            this domain.
-    */
-    public TemporaryTopic
-    createTemporaryTopic() throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createDurableSubscriber");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
-        String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                                                              "createTemporaryTopic");
-        throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
+	@Override
+	public MessageConsumer createSharedConsumer(Topic topic, String sharedSubscriptionName) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createSharedConsumer");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
-    /**
-    * Throws an IllegalStateException as it is an invalid method for this domain.
-    *
-    * @param topic the non-temporary topic to subscribe to
-    * @param name the name used to identify this subscription.
-    *
-    * @exception IllegalStateException Always, since it is an invalid method for
-    *            this domain.
-    */
-    public TopicSubscriber
-    createDurableSubscriber(Topic topic, String name) throws JMSException {
+	@Override
+	public MessageConsumer createSharedConsumer(Topic topic, String sharedSubscriptionName, String messageSelector) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createSharedConsumer");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
-        String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                                                              "createDurableSubscriber");
-        throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
+	@Override
+	public MessageConsumer createDurableConsumer(Topic topic, String name) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createDurableConsumer");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
-    /**
-    * Throws an IllegalStateException as it is an invalid method for this domain.
-    *
-    * @param topic the non-temporary topic to subscribe to
-    * @param name the name used to identify this subscription.
-    * @param messageSelector only messages with properties matching the
-    * message selector expression are delivered. This value may be null.
-    * @param noLocal if set, inhibits the delivery of messages published
-    * by its own connection.
-    *
-    * @exception IllegalStateException Always, since it is an invalid method for
-    *            this domain.
-    */
-    public TopicSubscriber
-    createDurableSubscriber(Topic topic,
-                            String name,
-                String messageSelector,
-                boolean noLocal) throws JMSException {
+	@Override
+	public MessageConsumer createDurableConsumer(Topic topic, String name, String messageSelector, boolean noLocal) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createDurableConsumer");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
-        String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                                                              "createDurableSubscriber");
-        throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
+	@Override
+	public MessageConsumer createSharedDurableConsumer(Topic topic, String name) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createSharedDurableConsumer");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
-    /**
-    * Throws an IllegalStateException as it is an invalid method for this domain.
-    *
-    * @param name the name used to identify this subscription.
-    *
-    * @exception IllegalStateException Always, since it is an invalid method for
-    *            this domain.
-    */
-    public void
-    unsubscribe(String name) throws JMSException {
-
-        String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                                                              "unsubscribe");
-        throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
-
-    @Override
-    public MessageConsumer createSharedConsumer(Topic topic,
-        String sharedSubscriptionName) throws JMSException {
-        String errorString = AdministeredObject.cr.getKString(
-                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                   "createSharedConsumer");
-        throw new javax.jms.IllegalStateException(errorString, 
-            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
-
-    @Override
-    public MessageConsumer createSharedConsumer(Topic topic,
-        String sharedSubscriptionName, String messageSelector)
-        throws JMSException {
-        String errorString = AdministeredObject.cr.getKString(
-                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                   "createSharedConsumer");
-        throw new javax.jms.IllegalStateException(errorString, 
-            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
-
-    @Override
-    public MessageConsumer createSharedConsumer(Topic topic,
-        String sharedSubscriptionName, String messageSelector,
-        boolean noLocal) throws JMSException {
-        String errorString = AdministeredObject.cr.getKString(
-                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                   "createSharedConsumer");
-        throw new javax.jms.IllegalStateException(errorString, 
-            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
-
-    @Override
-    public MessageConsumer createDurableConsumer(Topic topic, String name)
-    throws JMSException {
-        String errorString = AdministeredObject.cr.getKString(
-                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                   "createDurableConsumer");
-        throw new javax.jms.IllegalStateException(errorString, 
-            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
-
-    @Override
-    public MessageConsumer createDurableConsumer(Topic topic, String name,
-        String messageSelector, boolean noLocal) throws JMSException {
-        String errorString = AdministeredObject.cr.getKString(
-                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                   "createDurableConsumer");
-        throw new javax.jms.IllegalStateException(errorString, 
-            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
-
-    @Override
-    public MessageConsumer createSharedDurableConsumer(Topic topic, String name)
-    throws JMSException {
-        String errorString = AdministeredObject.cr.getKString(
-                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                   "createSharedDurableConsumer");
-        throw new javax.jms.IllegalStateException(errorString, 
-            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
-
-    @Override
-    public MessageConsumer createSharedDurableConsumer(Topic topic, String name,
-         String messageSelector, boolean noLocal)
-         throws JMSException {
-        String errorString = AdministeredObject.cr.getKString(
-                   AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN,
-                   "createSharedDurableConsumer");
-        throw new javax.jms.IllegalStateException(errorString, 
-            AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
-    }
+	@Override
+	public MessageConsumer createSharedDurableConsumer(Topic topic, String name, String messageSelector) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "createSharedDurableConsumer");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
+	
+	@Override
+	public void unsubscribe(String name) throws JMSException {
+		String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN, "unsubscribe");
+		throw new javax.jms.IllegalStateException(errorString, AdministeredObject.cr.X_ILLEGAL_METHOD_FOR_DOMAIN);
+	}
 
 }

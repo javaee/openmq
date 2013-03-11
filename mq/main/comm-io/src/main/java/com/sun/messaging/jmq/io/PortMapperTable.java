@@ -270,11 +270,26 @@ public class PortMapperTable {
 
         // Read first line
         nBytes = readLine(in, buffer);
+        if (nBytes < 0 ) {
+            throw new IOException(
+                SharedResources.getResources().getString(
+                SharedResources.X_PORTMAPPER_SOCKET_CLOSED_UNEXPECTEDLY));
+        }
 
 	StringTokenizer st = new StringTokenizer(new String(buffer, "ASCII"));
 
-        version = st.nextToken();
-        if (Integer.parseInt(version) != PORTMAPPER_VERSION) {
+        int ver = -1;
+        try {
+            version = st.nextToken();
+            ver = Integer.parseInt(version);
+        } catch (Exception e) {
+            throw new IOException(
+                SharedResources.getResources().getString(
+                    SharedResources.X_BAD_PORTMAPPER_VERSION,
+                    String.valueOf(version),
+                    String.valueOf(PORTMAPPER_VERSION)), e);
+        }
+        if (ver != PORTMAPPER_VERSION) {
             throw new IOException(
                 SharedResources.getResources().getString(
                     SharedResources.X_BAD_PORTMAPPER_VERSION,
@@ -329,6 +344,9 @@ public class PortMapperTable {
             }
         }
 
+        if (n == 0 && b == -1) {
+            return -1;
+        }
         return n;
 
     }

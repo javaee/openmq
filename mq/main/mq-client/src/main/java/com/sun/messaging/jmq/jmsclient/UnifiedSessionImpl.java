@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -321,121 +321,113 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
         return new TopicSubscriberImpl (this, topic, messageSelector, noLocal);
     }
 
-   /** Creates a durable subscription with the specified name on the
-     * specified topic, and creates a <code>TopicSubscriber</code>
-     * on that durable subscription.
-     * <P>
-     * If the durable subscription already exists then this method
-     * creates a <code>TopicSubscriber</code> on the existing durable
-     * subscription.
-     * <p>
-     * A durable subscription is used by a client which needs to receive
-     * all the messages published on a topic, including the ones published
-     * when there is no <code>TopicSubscriber</code> associated with it.
-     * The JMS provider retains a record of this durable subscription
-     * and ensures that all messages from the topic's publishers are retained
-     * until they are delivered to, and acknowledged by,
-     * a <code>TopicSubscriber</code> on this durable subscription
-     * or until they have expired.
-     * <p>
-     * A durable subscription will continue to accumulate messages
-     * until it is deleted using the <code>unsubscribe</code> method.
-     * <p>
-     * A durable subscription which has a <code>TopicSubscriber</code>
-     * associated with it is described as being active.
-     * A durable subscription which has no <code>TopicSubscriber</code>
-     * associated with it is described as being inactive.
-     * <p>
-     * Only one session at a time can have a
-     * <CODE>TopicSubscriber</CODE> for a particular durable subscription.
-     * <p>
-     * A durable subscription is identified by a name specified by the client
-     * and by the client identifier if set. If the client identifier was set
-     * when the durable subscription was first created then a client which
-     * subsequently wishes to create a <code>TopicSunscriber</code>
-     * on that durable subscription must use the same client identifier.
-     * <p>
-     * A client can change an existing durable subscription by calling
-     * <code>createDurableSubscriber</code>
-     * with the same name and client identifier (if used),
-     * and a new topic and/or message selector.
-     * Changing a durable subscriber is equivalent to
-     * unsubscribing (deleting) the old one and creating a new one.
-     *
-     * @param topic the non-temporary <CODE>Topic</CODE> to subscribe to
-     * @param name the name used to identify this subscription
-     *
-     * @exception JMSException if the session fails to create a subscriber
-     * due to some internal error.
-     * @exception InvalidDestinationException if an invalid topic is specified.
-     *
-     * @since 2.0
+    /**
+     * Creates an unshared durable subscription 
      */
-
     public TopicSubscriber
     createDurableSubscriber(Topic topic, String name) throws JMSException {
 
         return createDurableSubscriber(topic, name, null, false);
     }
 
-   /** Creates a durable subscription with the specified name on the
-     * specified topic, and creates a <code>TopicSubscriber</code>
-     * on that durable subscription, specifying a message
-     * selector and whether messages published by its
-     * own connection should be delivered to it.
-     * <P>
-     * If the durable subscription already exists then this method
-     * creates a <code>TopicSubscriber</code> on the existing durable
+    /**
+     * Creates an unshared durable subscription on the specified topic (if one
+     * does not already exist), specifying a message selector and the
+     * {@code noLocal} parameter, and creates a consumer on that durable
      * subscription.
      * <p>
-     * A durable subscription is used by a client which needs to receive
-     * all the messages published on a topic, including the ones published
-     * when there is no <code>TopicSubscriber</code> associated with it.
-     * The JMS provider retains a record of this durable subscription
-     * and ensures that all messages from the topic's publishers are retained
-     * until they are delivered to, and acknowledged by,
-     * a <code>TopicSubscriber</code> on this durable subscription
-     * or until they have expired.
+     * A durable subscription is used by an application which needs to receive
+     * all the messages published on a topic, including the ones published when
+     * there is no active consumer associated with it. The JMS provider retains
+     * a record of this durable subscription and ensures that all messages from
+     * the topic's publishers are retained until they are delivered to, and
+     * acknowledged by, a consumer on this durable subscription or until they
+     * have expired.
      * <p>
-     * A durable subscription will continue to accumulate messages
-     * until it is deleted using the <code>unsubscribe</code> method.
+     * A durable subscription will continue to accumulate messages until it is
+     * deleted using the {@code unsubscribe} method.
      * <p>
-     * A durable subscription which has a <code>TopicSubscriber</code>
-     * associated with it is described as being active.
-     * A durable subscription which has no <code>TopicSubscriber</code>
-     * associated with it is described as being inactive.
+     * This method may only be used with unshared durable subscriptions. Any
+     * durable subscription created using this method will be unshared. This
+     * means that only one active (i.e. not closed) consumer on the subscription
+     * may exist at a time. The term "consumer" here means a
+     * {@code TopicSubscriber}, {@code  MessageConsumer} or {@code JMSConsumer}
+     * object in any client.
      * <p>
-     * Only one session at a time can have a
-     * <CODE>TopicSubscriber</CODE> for a particular durable subscription.
+     * An unshared durable subscription is identified by a name specified by the
+     * client and by the client identifier, which must be set. An application
+     * which subsequently wishes to create a consumer on that unshared durable
+     * subscription must use the same client identifier.
      * <p>
-     * A durable subscription is identified by a name specified by the client
-     * and by the client identifier if set. If the client identifier was set
-     * when the durable subscription was first created then a client which
-     * subsequently wishes to create a <code>TopicSunscriber</code>
-     * on that durable subscription must use the same client identifier.
+     * If an unshared durable subscription already exists with the same name and
+     * client identifier, and the same topic, message selector and
+     * {@code noLocal} value has been specified, and there is no consumer
+     * already active (i.e. not closed) on the durable subscription then
+     * this method creates a {@code TopicSubscriber} on the existing durable subscription.
      * <p>
-     * A client can change an existing durable subscription by calling
-     * <code>createDurableSubscriber</code>
-     * with the same name and client identifier (if used),
-     * and a new topic and/or message selector.
-     * Changing a durable subscriber is equivalent to
-     * unsubscribing (deleting) the old one and creating a new one.
+     * If an unshared durable subscription already exists with the same name and
+     * client identifier, and there is a consumer already active (i.e. not
+     * closed) on the durable subscription, then a {@code JMSException} will be
+     * thrown.
+     * <p>
+     * If an unshared durable subscription already exists with the same name and
+     * client identifier but a different topic, message selector or
+     * {@code noLocal} value has been specified, and there is no consumer
+     * already active (i.e. not closed) on the durable subscription then this is
+     * equivalent to unsubscribing (deleting) the old one and creating a new
+     * one.
+     * <p>
+     * if {@code noLocal} is set to true then any messages published to the topic
+     * using this session's connection, or any other connection with the same client
+     * identifier, will not be added to the durable subscription.
+     * <p>
+     * A shared durable subscription and an unshared durable subscription may
+     * not have the same name and client identifier. If a shared durable
+     * subscription already exists with the same name and client identifier then
+     * a {@code JMSException} is thrown.
+     * <p>
+     * There is no restriction on durable subscriptions and shared non-durable
+     * subscriptions having the same name and clientId. Such subscriptions would
+     * be completely separate.
+     * <p>
+     * This method is identical to the corresponding
+     * {@code createDurableConsumer} method except that it returns a
+     * {@code TopicSubscriber} rather than a {@code MessageConsumer} to
+     * represent the consumer.
      *
-     * @param topic the non-temporary <CODE>Topic</CODE> to subscribe to
-     * @param name the name used to identify this subscription
-     * @param messageSelector only messages with properties matching the
-     * message selector expression are delivered. A value of null or
-     * an empty string indicates that there is no message selector
-     * for the message consumer.
-     * @param noLocal if set, inhibits the delivery of messages published
-     * by its own connection
-     *
-     * @exception JMSException if the session fails to create a subscriber
-     * due to some internal error.
-     * @exception InvalidDestinationException if an invalid topic is specified.
-     * @exception InvalidSelectorException if the message selector is invalid.
-     *
-     * @since 2.0
+     * @param topic
+     *            the non-temporary {@code Topic} to subscribe to
+     * @param name
+     *            the name used to identify this subscription
+     * @param messageSelector
+     *            only messages with properties matching the message selector
+     *            expression are added to the durable subscription. A value of
+     *            null or an empty string indicates that there is no message
+     *            selector for the durable subscription.
+     * @param noLocal
+     *            if true then any messages published to the topic using this
+     *            session's connection, or any other connection with the same
+     *            client identifier, will not be added to the durable
+     *            subscription.
+     * @exception InvalidDestinationException
+     *                if an invalid topic is specified.
+     * @exception InvalidSelectorException
+     *                if the message selector is invalid.
+     * @exception IllegalStateException
+     *                if the client identifier is unset
+     * @exception JMSException
+     *                <ul>
+     *                <li>if the session fails to create the unshared durable
+     *                subscription and {@code TopicSubscriber} due to some
+     *                internal error
+     *                <li>
+     *                if an unshared durable subscription already exists with
+     *                the same name and client identifier, and there is a
+     *                consumer already active
+     *                <li>if a shared durable
+     *                subscription already exists with the same name and client
+     *                identifier
+     *                </ul>
      */
     public TopicSubscriber
     createDurableSubscriber(Topic topic, String name,
@@ -445,8 +437,6 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
 
         checkSessionState();
         checkTemporaryDestination(topic);
-        checkClientIDForNoLocal(noLocal, name, 
-                     true /*dura*/, false /*shared*/);
         checkClientIDWithBroker(true /*require clientid*/);
         return new TopicSubscriberImpl (this, topic, name,
                        messageSelector, noLocal, false /*shared*/);
@@ -717,38 +707,6 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
         }
     }
 
-    private void checkClientIDForNoLocal(boolean noLocal, 
-        String name, boolean durable, boolean shared) 
-        throws JMSException {
-
-        if (!noLocal || !(durable || shared)) {
-            return;
-        }
-
-        String clientID = connection.getClientID();
-
-        if (clientID == null) {
-            if (durable && !shared) {
-                String errorString = AdministeredObject.cr.getKString(
-                    AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_DURA, name);
-                throw new javax.jms.IllegalStateException(errorString, 
-                    AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_DURA);
-            }
-            if (durable && shared) {
-                String errorString = AdministeredObject.cr.getKString(
-                    AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_DURA_SHARE, name);
-                throw new javax.jms.IllegalStateException(errorString, 
-                    AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_DURA_SHARE);
-            }
-            if (shared) {
-                String errorString = AdministeredObject.cr.getKString(
-                    AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_SHARE, name);
-                throw new javax.jms.IllegalStateException(errorString, 
-                    AdministeredObject.cr.X_NO_CLIENTID_FOR_NOLOCAL_SHARE);
-            }
-        }
-    }
-
     protected void checkTemporaryDestination(Topic topic) throws JMSException {
         if ((topic == null) || topic instanceof TemporaryTopic) {
             String errorString = AdministeredObject.cr.getKString(
@@ -764,22 +722,12 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
     public MessageConsumer createSharedConsumer(Topic topic,
         String sharedSubscriptionName) throws JMSException {
 
-        return createSharedConsumer(topic, 
-            sharedSubscriptionName, null, false);
+        return createSharedConsumer(topic, sharedSubscriptionName, null);
     }
 
     @Override
     public MessageConsumer createSharedConsumer(Topic topic,
-        String sharedSubscriptionName, String messageSelector)
-        throws JMSException {
-        return createSharedConsumer(topic, 
-            sharedSubscriptionName, messageSelector, false);
-    }
-
-    @Override
-    public MessageConsumer createSharedConsumer(Topic topic,
-        String sharedSubscriptionName, String messageSelector,
-        boolean noLocal) throws JMSException {
+        String sharedSubscriptionName, String messageSelector) throws JMSException {
         checkSessionState();
         checkTemporaryDestination(topic);
         if (sharedSubscriptionName == null || 
@@ -791,11 +739,9 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
                 AdministeredObject.cr.X_INVALID_SHARED_SUBSCRIPTION_NAME);
             ExceptionHandler.throwJMSException(jmse);
         }
-        checkClientIDForNoLocal(noLocal, sharedSubscriptionName,
-                                false /*dura*/, true /*shared*/);
         checkClientIDWithBroker(false /*require clientid*/);
         return new TopicSubscriberImpl(this, topic, 
-            messageSelector, noLocal, sharedSubscriptionName);
+            messageSelector, sharedSubscriptionName);
     }
 
     @Override
@@ -813,20 +759,18 @@ public class UnifiedSessionImpl extends SessionImpl implements com.sun.messaging
     @Override
     public MessageConsumer createSharedDurableConsumer(Topic topic, String name)
     throws JMSException {
-        return createSharedDurableConsumer(topic, name, null, false);
+        return createSharedDurableConsumer(topic, name, null);
     }
 
     @Override
     public MessageConsumer createSharedDurableConsumer(Topic topic, String name,
-         String messageSelector, boolean noLocal)
+         String messageSelector)
          throws JMSException {
-
         checkSessionState();
         checkTemporaryDestination(topic);
-        checkClientIDForNoLocal(noLocal, name, true /*dura*/, true /*shared*/);
         checkClientIDWithBroker(false /*require clientid*/);
         return new TopicSubscriberImpl (this, topic, name,
-                       messageSelector, noLocal, true /*shared*/);
+                       messageSelector, false /* noLocal */, true /*shared*/);
     }
 
 }

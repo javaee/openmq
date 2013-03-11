@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -54,11 +54,6 @@ package javax.jms;
   * {@code clearBody} is 
   * called, the message can now be both read from and written to.
   *
-  * @version     1.1 - February 2, 2002
-  * @author      Mark Hapner
-  * @author      Rich Burridge
-  * @author      Kate Stout
-  *
   * @see         javax.jms.Session#createTextMessage()
   * @see         javax.jms.Session#createTextMessage(String)
   * @see         javax.jms.BytesMessage
@@ -67,6 +62,10 @@ package javax.jms;
   * @see         javax.jms.ObjectMessage
   * @see         javax.jms.StreamMessage
   * @see         java.lang.String
+  * 
+  * @version JMS 2.0
+  * @since JMS 1.0
+  * 
   */
  
 public interface TextMessage extends Message { 

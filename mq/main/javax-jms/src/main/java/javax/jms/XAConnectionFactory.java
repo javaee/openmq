@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 1997-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -62,10 +62,11 @@ package javax.jms;
   * Client programs are strongly encouraged to use the transactional support
   * available in their environment, rather than use these XA
   * interfaces directly. 
-  *
-  * @version     2.0
+  * 
+  * @version JMS 2.0
+  * @since JMS 1.0
+  * 
   */
-
 public interface XAConnectionFactory {
     
      /** Creates an {@code XAConnection} with the default user identity.
@@ -80,7 +81,8 @@ public interface XAConnectionFactory {
       * @exception JMSSecurityException  if client authentication fails due to 
       *                         an invalid user name or password.
       * 
-      * @since 1.1 
+      * @since JMS 1.1 
+      * 
       */ 
 
     XAConnection
@@ -102,7 +104,8 @@ public interface XAConnectionFactory {
       * @exception JMSSecurityException  if client authentication fails due to 
       *                         an invalid user name or password.
       *
-      * @since 1.1 
+      * @since JMS 1.1 
+      * 
       */ 
 
     XAConnection
@@ -124,7 +127,8 @@ public interface XAConnectionFactory {
 	 * @exception JMSSecurityRuntimeException
 	 *                if client authentication fails due to an invalid user name
 	 *                or password.
-	 * @since 2.0
+	 * @since JMS 2.0
+	 * 
 	 */
 	XAJMSContext createXAContext();
    
@@ -144,7 +148,7 @@ public interface XAConnectionFactory {
      *                         JMSContext due to some internal error.
      * @exception JMSSecurityRuntimeException  if client authentication fails due to 
      *                         an invalid user name or password.
-     * @since 2.0 
+     * @since JMS 2.0 
      * 
      */
     XAJMSContext createXAContext(String userName, String password);    

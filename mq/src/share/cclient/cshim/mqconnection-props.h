@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -51,6 +51,7 @@
 
 static const char * MQ_BROKER_HOST_PROPERTY             = "MQBrokerHostName"; /* MQString */
 static const char * MQ_BROKER_PORT_PROPERTY             = "MQBrokerHostPort"; /* MQInt32  */
+static const char * MQ_ENABLE_IPV6_PROPERTY                = "MQEnableIPv6"; /* MQBool  */
 static const char * MQ_SERVICE_PORT_PROPERTY            = "MQServicePort";    /* MQInt32  */
 static const char * MQ_CONNECTION_TYPE_PROPERTY         = "MQConnectionType"; /* MQString */
 static const char * MQ_ACK_TIMEOUT_PROPERTY             = "MQAckTimeout";     /* MQInt32 in millisecond */

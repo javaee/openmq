@@ -72,7 +72,7 @@ public class DirectConnection
         implements javax.jms.Connection,
         javax.jms.QueueConnection,
         javax.jms.TopicConnection, ContextableConnection {
-
+		
     /**
      *  The parent DirectConnectionFactory that created this DirectConnection
      */
@@ -200,7 +200,7 @@ public class DirectConnection
         params[1] = jmsservice;
         params[2] = connectionId;
         params[3] = inACC;
-        _loggerOC.entering(_className, "constructor()", params);        
+        _loggerOC.entering(_className, "constructor()", params);     
         this.dcf = cf;
         this.jmsservice = jmsservice;
         this.connectionId = connectionId;
@@ -299,6 +299,7 @@ public class DirectConnection
             ServerSessionPool sessionPool,   
             int maxMessages)
     throws JMSException {
+						
         _loggerJC.fine(_lgrMID_INF+
                 "connectionId="+connectionId+":"+"createConnectionConsumer():" +
                 "Destination=" + destination + ":" +
@@ -312,6 +313,7 @@ public class DirectConnection
 	@Override
 	public ConnectionConsumer createSharedConnectionConsumer(Topic topic, String subscriptionName,
 			String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+		
         _loggerJC.fine(_lgrMID_INF+
                 "connectionId="+connectionId+":"+"createSharedConnectionConsumer():" +
                 "Topic=" + topic + ":" +
@@ -326,6 +328,7 @@ public class DirectConnection
 	@Override
 	public ConnectionConsumer createSharedDurableConnectionConsumer(Topic topic, String subscriptionName,
 			String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+						
         _loggerJC.fine(_lgrMID_INF+
                 "connectionId="+connectionId+":"+"createSharedDurableConnectionConsumer():" +
                 "Topic=" + topic + ":" +
@@ -358,6 +361,7 @@ public class DirectConnection
             ServerSessionPool sessionPool,   
             int maxMessages)
     throws JMSException {
+				
         _loggerJC.fine(_lgrMID_INF+
                 "connectionId="+connectionId+":"+
                 "createDurableConnectionConsumer():" +
@@ -653,6 +657,7 @@ public class DirectConnection
             ServerSessionPool sessionPool,   
             int maxMessages)
     throws JMSException {
+     	    	
         _loggerJC.fine(_lgrMID_INF+
                 "connectionId="+connectionId+":"+"createConnectionConsumer():" +
                 "Queue=" + queue + ":" +
@@ -722,6 +727,7 @@ public class DirectConnection
             ServerSessionPool sessionPool,   
             int maxMessages)
     throws JMSException {
+    	    	
         _loggerJC.fine(_lgrMID_INF+
                 "connectionId="+connectionId+":"+"createConnectionConsumer():" +
                 "Topic=" + topic + ":" +

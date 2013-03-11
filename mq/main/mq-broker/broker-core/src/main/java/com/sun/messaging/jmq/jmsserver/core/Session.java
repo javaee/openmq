@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -557,9 +557,9 @@ public class Session implements EventBroadcaster, EventListener
      * @param redeliverPendingConsume - redeliver pending messages
      */
     public ConsumerSpi detatchConsumer(ConsumerUID c, SysMessageID id, 
-               boolean redeliverPendingConsume, boolean redeliverAll)
-        throws BrokerException
-    {
+        boolean idInTransaction, boolean redeliverPendingConsume, boolean redeliverAll)
+        throws BrokerException {
+
         pause("Consumer.java: detatch consumer " + c);
         ConsumerSpi con = (ConsumerSpi)consumers.remove(c);
         if (con == null) {
@@ -571,7 +571,7 @@ public class Session implements EventBroadcaster, EventListener
         }
         con.pause("Consumer.java: detatch consumer " + c
              + " DEAD"); // we dont want to ever remove messages
-        detatchConsumer(con, id, redeliverPendingConsume, redeliverAll);
+        detatchConsumer(con, id, idInTransaction, redeliverPendingConsume, redeliverAll);
         resume("Consumer.java: detatch consumer " + c);
         return con;
     }
@@ -582,7 +582,7 @@ public class Session implements EventBroadcaster, EventListener
      * @param redeliverPendingConsume - redeliver pending messages
      */
     private void detatchConsumer(ConsumerSpi con, SysMessageID id,
-           boolean redeliverPendingConsume, boolean redeliverAll)
+        boolean idInTransaction, boolean redeliverPendingConsume, boolean redeliverAll)
     {
         if (DEBUG) {
         logger.log(Logger.INFO,"Detaching Consumer "+con.getConsumerUID()+
@@ -603,7 +603,8 @@ public class Session implements EventBroadcaster, EventListener
 
         Connection conn = Globals.getConnectionManager().getConnection(getConnectionUID());
 
-        if (ssop.detachConsumer(con, id, redeliverPendingConsume, redeliverAll, conn)) {
+        if (ssop.detachConsumer(con, id, idInTransaction, 
+                redeliverPendingConsume, redeliverAll, conn)) {
             synchronized(ConsumerToSession) {
                 ConsumerToSession.remove(c);
             }
@@ -653,7 +654,7 @@ public class Session implements EventBroadcaster, EventListener
         while (itr.hasNext()) {
             ConsumerSpi c =(ConsumerSpi)itr.next();
             itr.remove();
-            detatchConsumer(c, null, old, false);
+            detatchConsumer(c, null, false, old, false);
         }
 
         ssop.close(conn);
@@ -717,8 +718,7 @@ public class Session implements EventBroadcaster, EventListener
      * @param ackack whether client requested ackack
      */
     public Object ackMessage(ConsumerUID cuid, SysMessageID id, boolean ackack)
-        throws BrokerException
-    {
+    throws BrokerException {
         return ackMessage(cuid, id, null, null, null, ackack);
     }
 
@@ -735,6 +735,15 @@ public class Session implements EventBroadcaster, EventListener
     public void postAckMessage(ConsumerUID cuid, SysMessageID id, boolean ackack)
     throws BrokerException {
         ssop.postAckMessage(cuid, id, ackack);
+        if (isValid()) {
+            if (consumers.get(cuid) == null) {
+                if (!ssop.hasDeliveredMessages(cuid)) {
+                    synchronized(ConsumerToSession) {
+                        ConsumerToSession.remove(cuid); 
+                    }
+                }
+            }
+        }
     }
 
     public void eventOccured(EventType type,  Reason r,

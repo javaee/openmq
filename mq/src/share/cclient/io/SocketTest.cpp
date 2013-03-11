@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -185,9 +185,9 @@ socketTest(FILE * const inputFile)
     fprintf(stderr, "On iteration %d\n", iter);
 
 #if defined(LOCAL_ECHO_SERVER)
-    RETURN_IF_ERROR( sock.connect("localhost", SERVER_PORT, 0xFFFFFFFF) );
+    RETURN_IF_ERROR( sock.connect("localhost", SERVER_PORT, PR_FALSE, 0xFFFFFFFF) );
 #else
-    RETURN_IF_ERROR( sock.connect("129.153.130.220", 22228, 0xFFFFFFFF) );
+    RETURN_IF_ERROR( sock.connect("129.153.130.220", 22228, PR_FALSE, 0xFFFFFFFF) );
     //RETURN_IF_ERROR( sock.connect("129.153.138.193", SERVER_PORT, 0xFFFFFFFF) );
 #endif    
     

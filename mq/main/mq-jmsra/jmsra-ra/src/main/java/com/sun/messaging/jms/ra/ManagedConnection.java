@@ -55,6 +55,7 @@ import javax.resource.spi.security.PasswordCredential;
 
 import javax.transaction.xa.XAResource;
 
+import com.sun.messaging.jms.ra.ConnectionRequestInfo.ConnectionType;
 import com.sun.messaging.jms.ra.api.JMSRAManagedConnection;
 import com.sun.messaging.jmq.jmsclient.XAConnectionImpl;
 import com.sun.messaging.jmq.jmsclient.XASessionImpl;
@@ -191,7 +192,13 @@ implements javax.resource.spi.ManagedConnection, JMSRAManagedConnection
             
             ConnectionCreator cc = mcf.getConnectionCreator();
             if (this.isRADirect) {
-                this.dc = (DirectConnection)cc._createConnection(un, pw);
+            	if (cxRequestInfo!=null && cxRequestInfo.getConnectionType()==ConnectionType.QUEUE_CONNECTION){
+                    this.dc = (DirectConnection)cc._createQueueConnection(un, pw);
+            	} else if (cxRequestInfo!=null && cxRequestInfo.getConnectionType()==ConnectionType.TOPIC_CONNECTION){
+                    this.dc = (DirectConnection)cc._createTopicConnection(un, pw);
+            	} else {
+                    this.dc = (DirectConnection)cc._createConnection(un, pw);
+            	}
                 this.dc.setManaged(true, this);
             } else {
                 xac = (XAConnectionImpl)(mcf._getXACF()).createXAConnection(un, pw);
@@ -205,6 +212,14 @@ implements javax.resource.spi.ManagedConnection, JMSRAManagedConnection
             jmse.printStackTrace();
             _loggerOC.throwing(_className, "constructor()", se);
             throw se;
+        } catch(java.lang.SecurityException se){
+        	javax.resource.spi.SecurityException jca_se = new javax.resource.spi.SecurityException(
+                    _lgrMID_EXC+"constructor:Aborting:SecurityExcetpion on createConnection="+se.getMessage());
+            jca_se.initCause(se);
+            _loggerOC.severe(jca_se.getMessage());
+            se.printStackTrace();
+            _loggerOC.throwing(_className, "constructor()", jca_se);
+            throw jca_se;
         }
         if (true) {
         } else { //XXX:tharakan REMOVE
@@ -231,7 +246,13 @@ implements javax.resource.spi.ManagedConnection, JMSRAManagedConnection
             } else {
                 xac._setExceptionListenerFromRA(evtlistener);
                 xac.setExtendedEventNotification(true);
-                ca = new ConnectionAdapter(this, xac, ra);
+            	if (cxRequestInfo!=null && cxRequestInfo.getConnectionType()==ConnectionType.QUEUE_CONNECTION){
+                    ca = new QueueConnectionAdapter(this, xac, ra);
+            	} else if (cxRequestInfo!=null && cxRequestInfo.getConnectionType()==ConnectionType.TOPIC_CONNECTION){
+                    ca = new TopicConnectionAdapter(this, xac, ra);
+            	} else {
+                    ca = new ConnectionAdapter(this, xac, ra);
+            	}
                 mcMetaData = new
                         com.sun.messaging.jms.ra.ManagedConnectionMetaData(this);
                 localTransaction = new

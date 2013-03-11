@@ -275,8 +275,7 @@ public class PortMapperClient {
             } catch (Exception ee) {
                 /* ignore */
             }
-            connection.getExceptionHandler().handleConnectException (
-                e, host, port);
+            connection.getExceptionHandler().handleConnectException (e, host, port);
         }
     }
     
@@ -291,7 +290,12 @@ public class PortMapperClient {
                 "Connecting to portmapper with timeout=" + timeout);
 
             if (ssl) {
-                socket = SSLUtil.makeSSLSocket(null, 0, isHostTrusted);
+                socket = SSLUtil.makeSSLSocket(null, 0, isHostTrusted, 
+                             connection.getProperty(
+                                 ConnectionConfiguration.imqKeyStore, null),
+                             connection.getProperty(
+                                 ConnectionConfiguration.imqKeyStorePassword, null),
+                             ConnectionImpl.connectionLogger, AdministeredObject.cr);
             } else {
                 socket = new Socket();
             }
@@ -302,7 +306,12 @@ public class PortMapperClient {
             ConnectionImpl.getConnectionLogger().fine(
                 "Connecting to portmapper without timeout ...");
             if (ssl) {
-                socket = SSLUtil.makeSSLSocket(host, port, isHostTrusted);
+                socket = SSLUtil.makeSSLSocket(host, port, isHostTrusted,
+                             connection.getProperty(
+                                 ConnectionConfiguration.imqKeyStore, null),
+                             connection.getProperty(
+                                 ConnectionConfiguration.imqKeyStorePassword, null),
+                             ConnectionImpl.connectionLogger, AdministeredObject.cr);
             } else {
                 socket = new Socket(host, port);
             }

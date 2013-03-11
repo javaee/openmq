@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1519,7 +1519,7 @@ public class DestinationList implements ConnToPartitionStrategyContext
             destsLoaded = true;
         }
 
-        logger.log(Logger.INFO, br.getKString(br.I_LOAD_STORED_DESTINATIONS)+logsuffix);
+        logger.log(Logger.INFO, br.getKString(br.I_RETRIEVE_STORED_DESTINATIONS)+logsuffix);
 
         // before we do anything else, make sure we dont have any
         // unexpected exceptions
@@ -1589,14 +1589,17 @@ public class DestinationList implements ConnToPartitionStrategyContext
        // retrieve stored destinations
         try {
             Destination dests[] = pstore.getAllDestinations();
-            logger.log(Logger.DEBUG, "Loaded {0} destinations from store",
-                       String.valueOf(dests.length));
+            logger.log(Logger.INFO, br.getKString(
+                br.I_RETRIEVED_STORED_DESTINATIONS, 
+                String.valueOf(dests.length))+logsuffix);
 
             for (int i =0; i < dests.length; i ++) {
                 if ( dests[i] == null) {
                     continue;
                 }
-                logger.log(Logger.DEBUG, "Process stored destination "+dests[i].toString());
+                if (DEBUG) {
+                    logger.log(Logger.INFO, "Process stored destination "+dests[i].toString());
+                }
                 dests[i].setDestinationList(this);
                 if (!dests[i].isAdmin() && (dests[i].getIsDMQ() || !dests[i].isInternal())) {
                     dests[i].initialize();

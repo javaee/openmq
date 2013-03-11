@@ -54,7 +54,7 @@
     <groupId>org.glassfish.mq</groupId>
     <artifactId>mq</artifactId>
     <packaging>pom</packaging>
-    <version> 5.0-b10 </version>
+    <version> 5.0-b12 </version>
     <name>MQ Main Project</name>
 
     <scm>
@@ -69,8 +69,8 @@
 
     <properties>
 	<!-- Change these for each build -->
-	<build.number>10</build.number>
-        <build.letter> f </build.letter>
+	<build.number>12</build.number>
+        <build.letter> a </build.letter>
 
 	<!-- Product-specific -->
         <full.name>Open Message Queue / Oracle GlassFish(tm) Server Message Queue</full.name>
@@ -82,25 +82,25 @@
         <product.version>5.0</product.version>
         <product.name>Message Queue</product.name>
         <product.abbrevname>MQ</product.abbrevname>
-        <product.copyright>Copyright (c) 2012, Oracle and/or its affiliates.  All rights reserved.</product.copyright>
-        <javax-jms.version>2.0-b10</javax-jms.version>
+        <product.copyright>Copyright (c) 2013, Oracle and/or its affiliates.  All rights reserved.</product.copyright>
+        <javax-jms.version>2.0-b12</javax-jms.version>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 	<!-- Versions of dependencies -->
-        <hk2.version>2.1.54</hk2.version>
-        <hk2.plugin.version>2.1.54</hk2.plugin.version>
+        <hk2.version>2.1.64</hk2.version>
+        <hk2.plugin.version>2.1.64</hk2.plugin.version>
         <glassfishbuild.version>3.2.4</glassfishbuild.version>
-        <old.glassfish.version>4.0-b33</old.glassfish.version>
-        <glassfish.version>4.0-b64</glassfish.version>
-        <grizzly.version>2.3-rc2</grizzly.version>
-        <servlet-api.version>3.1-b05</servlet-api.version>
+        <glassfish.version>4.0-b77</glassfish.version>
+        <grizzly.version>2.3-rc4</grizzly.version>
+        <servlet-api.version>3.1-b06</servlet-api.version>
         <jsp-api.version>2.3.0</jsp-api.version>
-        <javax-resource.version>1.7-b01</javax-resource.version>
+        <javax.resource-api.version>1.7-b03</javax.resource-api.version>
         <javahelp.version>2.0.05</javahelp.version>
 
         <jaf.version>1.1.1</jaf.version>
-        <javamail.version>1.4.6-rc1</javamail.version>
-        <saaj.version>1.3.4</saaj.version>
+        <javamail.version>1.4.6</javamail.version>
+        <javax.xml.soap-api.version>1.3.5</javax.xml.soap-api.version>
+        <saaj-impl.version>1.3.20</saaj-impl.version>
         <junit.version>4.10</junit.version>
 
     </properties>
@@ -226,32 +226,11 @@
                     <version>${glassfishbuild.version}</version>
                 </plugin>
 
+
                 <plugin>
                     <groupId>org.glassfish.hk2</groupId>
                     <artifactId>config-generator</artifactId>
                     <version>${hk2.plugin.version}</version>
-                    <executions>
-                    <execution>
-                        <configuration>
-                            <classpath>${project.build.directory}/classpath.txt</classpath>
-                        </configuration>
-
-                        <goals>
-                            <goal>generateInjectors</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>test-generation</id>
-                        <configuration>
-                            <classpath>${project.build.directory}/classpath.txt</classpath>
-                            <test>true</test>
-                        </configuration>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>generateInjectors</goal>
-                        </goals>
-                    </execution>
-                    </executions>
                 </plugin>
 
              <plugin>
@@ -437,33 +416,44 @@
                 </executions>
             </plugin>
 
-	    <plugin>
+            <plugin>
                 <groupId>org.glassfish.hk2</groupId>
                 <artifactId>config-generator</artifactId>
-                <version>${hk2.plugin.version}</version>
+                <configuration>
+                    <excludes>**/.ade_path/**</excludes>
+                </configuration>
                 <executions>
                     <execution>
-                        <configuration>
-                            <classpath>${project.build.directory}/classpath.txt</classpath>
-                        </configuration>
-
                         <goals>
-                            <goal>generateInjectors</goal>
+                            <goal>generate-injectors</goal>
                         </goals>
                     </execution>
                     <execution>
-                        <id>test-generation</id>
-                        <configuration>
-                            <classpath>${project.build.directory}/classpath.txt</classpath>
-                            <test>true</test>
-                        </configuration>
-                        <phase>generate-test-sources</phase>
+                        <id>generate-test-injectors</id>
                         <goals>
-                            <goal>generateInjectors</goal>
+                            <goal>generate-test-injectors</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.glassfish.hk2</groupId>
+                <artifactId>hk2-inhabitant-generator</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-inhabitants</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>generate-test-inhabitants</id>
+                        <goals>
+                            <goal>generate-test-inhabitants</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
 
 	     <plugin>
               <groupId>org.codehaus.mojo</groupId>
@@ -497,33 +487,6 @@
               </executions>
             </plugin>
 
-	    <plugin>
-                <groupId>org.glassfish.hk2</groupId>
-                <artifactId>hk2-inhabitant-generator</artifactId>
-                <executions>
-                    <execution>
-                        <configuration>
-                            <noswap>true</noswap>
-                            <classpath>${project.build.directory}/classpath.txt</classpath>
-                        </configuration>
-                        <goals>
-                            <goal>generateInhabitants</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>test</id>
-                        <phase>process-test-classes</phase>
-                        <configuration>
-                            <test>true</test>
-                            <classpath>${project.build.directory}/classpath.txt</classpath>
-                        </configuration>
-                        <goals>
-                            <goal>generateInhabitants</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- Configure maven-bundle-plugin to generate OSGi manifest.
                  Please note: we use the manifest goal only and not the bundle goal.
                   The bundle goal can lead to very surprising results if the
@@ -536,10 +499,6 @@
                     <!-- By default, we don't export anything.
                     -->
                     <Export-Package></Export-Package>
-                    <!-- Since, we are in a top level pom and
-                         we we don't want it to be active for plain jar type artifacts,
-                         enable the plugin for hk2-jar and bundle packaging type only,
-                    -->
                     <instructions>
                         <!-- Read all the configuration from osgi.bundle file, if it exists.
                              See Felix-699 to find out why we use ${basedir}.
@@ -626,69 +585,17 @@
           specify groupId and artifactId w/o versions in poms for modules. -->
     <dependencyManagement>
         <dependencies>
-            <dependency>
+           <dependency>
                 <groupId>org.glassfish.hk2</groupId>
-                <artifactId>hk2</artifactId>
+                <artifactId>hk2-bom</artifactId>
                 <version>${hk2.version}</version>
-            </dependency>
-	     <dependency>
-                <groupId>org.glassfish.hk2</groupId>
-                <artifactId>config-types</artifactId>
-                <version>${hk2.version}</version>
-            </dependency>
-	    <dependency>
-                <groupId>org.glassfish.hk2</groupId>
-                <artifactId>hk2-config</artifactId>
-                <version>${hk2.version}</version>
-            </dependency>
-	    <dependency>
-                <groupId>org.glassfish.hk2</groupId>
-                <artifactId>hk2-locator</artifactId>
-                <version>${hk2.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>org.apache.felix.bundlerepository</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-	     <dependency>
-                <groupId>org.glassfish.hk2</groupId>
-                <artifactId>hk2-runlevel</artifactId>
-                <version>${hk2.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.hk2</groupId>
-                <artifactId>core</artifactId>
-                <version>${hk2.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.hk2</groupId>
-                <artifactId>hk2-maven</artifactId>
-                <version>${hk2.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.hk2</groupId>
-                <artifactId>osgi-adapter</artifactId>
-                <version>${hk2.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>org.apache.felix.bundlerepository</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-	     <dependency>
-                <groupId>org.glassfish.hk2</groupId>
-                <artifactId>stax-osgi</artifactId>
-                <version>${hk2.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.glassfish.hk2</groupId>
-                <artifactId>hk2-api</artifactId>
-                <version>${hk2.version}</version>
+                <artifactId>osgi-resource-locator</artifactId>
+                <version>1.0.1</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.grizzly</groupId>
@@ -715,7 +622,7 @@
             <dependency>
                 <groupId>javax.resource</groupId>
                 <artifactId>javax.resource-api</artifactId>
-                <version>${javax-resource.version}</version>
+                <version>${javax.resource-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -728,9 +635,9 @@
                 <version>${jsp-api.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.glassfish.main</groupId>
-                <artifactId>javax.xml.soap</artifactId>
-                <version>${old.glassfish.version}</version>
+                <groupId>javax.xml.soap</groupId>
+                <artifactId>javax.xml.soap-api</artifactId>
+                <version>${javax.xml.soap-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.main.transaction</groupId>
@@ -926,7 +833,7 @@
             <dependency>
                 <groupId>com.sun.xml.messaging.saaj</groupId>
                 <artifactId>saaj-impl</artifactId>
-                <version>${saaj.version}</version>
+                <version>${saaj-impl.version}</version>
             </dependency>
 
 	    <dependency>

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -3339,7 +3339,8 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
                 Object o = destMessages.removeWithValue(id, remoteRef, errValue, r);
                 if (o == errValue) {
                     logger.log(((DEBUG_CLUSTER||DEBUG) ? Logger.INFO:Logger.DEBUG),
-                           "Requeued message found on remote reference removal " + id);
+                           "Requeued message found on removing remote reference@"+
+                            remoteRef.hashCode()+"="+remoteRef+"[" + id+"]");
                     return ret;
                 }
                 ref = (PacketReference)o;

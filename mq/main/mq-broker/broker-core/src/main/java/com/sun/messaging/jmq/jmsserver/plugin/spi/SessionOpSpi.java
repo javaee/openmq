@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -107,7 +107,7 @@ public abstract class SessionOpSpi
      * @param redeliverPendingConsume - redeliver pending messages
      * @param redeliverAll  ignore id and redeliver all
      */
-    public abstract boolean detachConsumer(ConsumerSpi con, SysMessageID id,
+    public abstract boolean detachConsumer(ConsumerSpi con, SysMessageID id, boolean idInTransaction,
                     boolean redeliverPendingConsume, boolean redeliverAll, Connection conn);
 
     /**
@@ -183,6 +183,12 @@ public abstract class SessionOpSpi
                            SysMessageID id, boolean ackack)
                            throws BrokerException;
 
+
+    /**
+     * @param cuid consumer UID
+     * @return true if the session has delivered messages pending for the consumer 
+     */
+    public abstract boolean hasDeliveredMessages(ConsumerUID cuid);
 }
 
 

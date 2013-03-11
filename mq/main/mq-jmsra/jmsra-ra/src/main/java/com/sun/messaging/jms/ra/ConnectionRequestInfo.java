@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,9 +40,6 @@
 
 package com.sun.messaging.jms.ra;
 
-import com.sun.messaging.jmq.jmsclient.XAConnectionImpl;
-import com.sun.messaging.jmq.jmsclient.XASessionImpl;
-
 /**
  *  ConnectionRequestInfo encapsulates the S1 MQ RA
  *  per connection information that is needed to
@@ -68,44 +65,25 @@ public class ConnectionRequestInfo implements javax.resource.spi.ConnectionReque
 
     /** The clientID for this instance
     private String clientId = null; */
+    
+    /** The required connection type */
+    private ConnectionType connectionType;
 
-    /** The identifier (unique) for this instance */
+	/** The identifier (unique) for this instance */
     private transient int criId = 0;
  
     /** The uniquifier */
     private static int idCounter = 0;
- 
-    /* Constructor */
+     
     public ConnectionRequestInfo(com.sun.messaging.jms.ra.ManagedConnectionFactory mcf,
-        String userName, String password)
+        String userName, String password,ConnectionType connectionType)
     {
         criId = ++idCounter;
-        //System.out.println("MQRA:CRI:Constructor-mcf,u,p:criId="+criId);
-
         this.mcf = mcf;
         this.userName = userName;
         this.password = password;
-
-        //this.clientId = mcf.getClientId();
+        this.connectionType=connectionType;
     }
-
- 
-    /* Constructor 
-    public ConnectionRequestInfo(XAConnectionImpl xac, XASessionImpl xas,
-        String userName, String password)
-    {
-        criId = ++idCounter;
-        //System.out.println("MQRA:CRI:Constructor-xac,xas,u,p:criId="+criId);
-
-        this.xac = xac;
-        this.xas = xas;
-        this.userName = userName;
-        this.password = password;
-    }
-    */
-
-    // ConnectionRequestInfo interface methods //
-    //
 
     /** Compares this ConnectionRequestInfo instance to one
      *  passed in for equality.
@@ -116,7 +94,6 @@ public class ConnectionRequestInfo implements javax.resource.spi.ConnectionReque
     public boolean
     equals(java.lang.Object other)
     {
-        //System.out.println("MQRA:CRI:equals:criId="+criId);
         if (other == null) {
             return false;
         }
@@ -124,9 +101,9 @@ public class ConnectionRequestInfo implements javax.resource.spi.ConnectionReque
             com.sun.messaging.jms.ra.ConnectionRequestInfo otherCRI =
                 (com.sun.messaging.jms.ra.ConnectionRequestInfo)other;
 
-            //System.out.println("MQRA:CRI:equals:\tthis="+this.toString()+"\n\t\tother="+otherCRI.toString());
             String oUserName = otherCRI.getUserName();
             String oPassword = otherCRI.getPassword();
+            ConnectionType oConnectionType = otherCRI.getConnectionType();
             com.sun.messaging.jms.ra.ManagedConnectionFactory oMCF = otherCRI.getMCF();
 
             if (
@@ -135,6 +112,8 @@ public class ConnectionRequestInfo implements javax.resource.spi.ConnectionReque
                &&
                 ((oPassword != null && oPassword.equals(password)) ||
                  (oPassword == null && password == null))
+               &&
+                (oConnectionType==connectionType)
                &&
                 ((oMCF != null && oMCF.equals(mcf)) ||
                  (oMCF == null && mcf == null))
@@ -162,32 +141,15 @@ public class ConnectionRequestInfo implements javax.resource.spi.ConnectionReque
         //So, we can simply use the criId.
 
         //Concat data
-        String hashStr = "" + userName + password + criId;
+        String hashStr = "" + userName + password + criId + connectionType.ordinal();
         return hashStr.hashCode();
     }
-
-    // Public Accessor Methods //
-    //
 
     public com.sun.messaging.jms.ra.ManagedConnectionFactory
     getMCF()
     {
         return mcf;
     }
-
-    /*
-    public XAConnectionImpl
-    getXAConnectionImpl()
-    {
-        return xac;
-    }
-
-    public XASessionImpl
-    getXASessionImpl()
-    {
-        return xas;
-    }
-    */
 
     public String
     getUserName()
@@ -206,6 +168,10 @@ public class ConnectionRequestInfo implements javax.resource.spi.ConnectionReque
     {
         return criId;
     }
+    
+    public ConnectionType getConnectionType() {
+		return connectionType;
+	}
 
     public String toString()
     {
@@ -213,20 +179,11 @@ public class ConnectionRequestInfo implements javax.resource.spi.ConnectionReque
             "\tcriId                               ="+criId+"\n"+
             "\tUserName                            ="+userName+"\n"+
             "\tPassword                            ="+password+"\n"+
+            "\tconnectionType                      ="+connectionType+"\n"+
             "\tMCF configuration                   ="+(mcf !=null ? mcf.toString() : "NULL" )+"\n");
             //"\tClientId                            ="+clientId+"\n");
     }
 
-    // Private Methods //
-
-    private boolean
-    isEqual(Object one, Object two)
-    {
-        if (one == null) {
-            return (two == null);
-        } else {
-            return one.equals(two);
-        }
-    }
+    public enum ConnectionType {UNIFIED_CONNECTION,QUEUE_CONNECTION,TOPIC_CONNECTION}
 }
 
