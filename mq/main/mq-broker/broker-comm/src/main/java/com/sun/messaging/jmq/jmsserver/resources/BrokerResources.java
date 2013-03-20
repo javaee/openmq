@@ -1789,6 +1789,8 @@ public class BrokerResources extends MQResourceBundle {
     final public static String X_CANNOT_DELIVER_MESSAGE_TO_CONSUMER = "B4444";
     final public static String X_SERVICE_TYPE_NOT_FOUND_FOR_SERVICE = "B4445";
     final public static String X_PU_SERVICE_REBIND = "B4446";
+    final public static String X_CREATE_CONNECTION_FOR_USER_IN_SERVICE = "B4447";
+    final public static String X_JDBC_DRIVER_SET_LOGIN_TIMEOUT = "B4448";
 
     /***************** End of message key constants *******************/
 

@@ -299,6 +299,9 @@ Cleanup:
   monitor.exit();  
   MQ_ERROR_TRACE( FUNCNAME, errorCode );
 
+  if (errorCode == PR_CONNECT_RESET_ERROR) {
+      errorCode = MQ_COULD_NOT_CONNECT_TO_BROKER;
+  }
   return errorCode;
 }
 

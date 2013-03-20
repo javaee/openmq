@@ -71,7 +71,7 @@ import java.lang.annotation.Target;
 public @interface JMSDestinationDefinition {
 
     /**
-     *  Description of this JMS Destination.
+     *  Description of this JMS destination.
      */
     String description() default "";
 
@@ -80,16 +80,27 @@ public @interface JMSDestinationDefinition {
      */
     String name();
 
-    /**
-     *  JMS destination implementation class name which implements:
-     *  {@code javax.jms.Queue} or {@code javax.jms.Topic}
-     */
-    String className();
+	/**
+	 * Fully qualified name of the JMS destination interface.
+	 * Permitted values are
+	 * {@code javax.jms.Queue} or
+	 * {@code javax.jms.Topic}.
+	 */
+	String interfaceName();
+	
+	/**
+	 * Fully-qualified name of the JMS destination implementation class.
+	 * Ignored if a resource adapter is used unless the resource adapter 
+	 * defines more than one JMS destination implementation class for the specified interface
+	 */
+	String className() default "";
 
-    /**
-     *  Resource adapter name.
-     */
-    String resourceAdapter() default "";
+	/**
+	 * Resource adapter name.
+	 * If not specified then the application server will define the default behaviour,
+	 * which may or may not involve the use of a resource adapter.
+	 */
+	String resourceAdapter() default "";
 
     /**
      *  Name of the queue or topic.

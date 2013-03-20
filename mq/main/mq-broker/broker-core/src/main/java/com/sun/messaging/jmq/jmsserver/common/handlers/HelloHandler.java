@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -110,7 +110,9 @@ public class HelloHandler extends PacketHandler
         } catch (BrokerException ex) {
             CAN_RECONNECT = false;
         }
-
+        if (Globals.getLogger().getLevel() <= Logger.DEBUG) {
+            DEBUG = true;
+	}
     }
 
     public static void DUMP(String title) {
@@ -171,6 +173,10 @@ public class HelloHandler extends PacketHandler
           String destprov = null;
           if (hello_props != null) {
               Integer level = (Integer)hello_props.get("JMQProtocolLevel");
+              String clientv = (String)hello_props.get("JMQVersion");
+              if (DEBUG) {
+                  logger.log(logger.INFO, "HelloHandler.handle(): Client["+clientv+", "+level+"] "+con);
+              }
               if (level == null) {
                   requestedProtocol=PacketType.VERSION1;
               } else {

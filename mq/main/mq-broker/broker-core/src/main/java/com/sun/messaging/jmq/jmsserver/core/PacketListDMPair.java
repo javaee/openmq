@@ -39,62 +39,61 @@
  */
 
 /*
- * @(#)JMSPacketProperties.java	1.4 06/29/07
  */ 
 
-package com.sun.messaging.jmq.jmsservice;
+package com.sun.messaging.jmq.jmsserver.core;
 
-import java.util.Hashtable;
-import java.util.Map;
+class PacketListDMPair 
+{
+    protected DestinationUID duid = null;
+    private PacketReference ref = null;
+    private boolean ret = true;
+    private boolean islocal = true;
 
-/**
- *  The JMSPacketProperties class encapsulates the properties as used by the
- *  MQ wire protocol.<p>
- *  All relevant properties that need to be passed can be correctly
- *  set using methods that follow the pattern {@code set<PropertyName>}, where
- *  {@code <PropertyName>} is replaced with the name of the property in the
- *  MQ wire protocol.<br>
- */
-public class JMSPacketProperties extends Hashtable <String, Object> {
-
-    public static final String JMQStatus = "JMQStatus";
-    public static final String JMQErrorCode = "JMQErrorCode";
-
-    /**
-     * Creates a new instance of JMSPacketProperties
-     */
-    public JMSPacketProperties() {
-        super();
+    public PacketListDMPair(DestinationUID duid, PacketReference ref) {
+        this.duid = duid;
+        if (ref != null && !ref.isLocal()) {
+            islocal = false;
+            this.ref = ref;
+        }
+    }
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (!(o instanceof PacketListDMPair)) {
+            return false;
+        }
+        PacketListDMPair other = (PacketListDMPair)o;
+        return this.duid.equals(other.duid);
     }
 
-    public JMSPacketProperties(Map <? extends String, ? extends Object> map){
-        super(map);
+    public int hashCode() {
+        return duid.hashCode();
     }
 
-    /**
-     *  Sets the JMQUserAgent property for JMS-DIRECT mode clients
-     */
-    public void setJMQUserAgent(){
-        String ua = "SJSMQ/4.1 JMS-DIRECT; "
-                + System.getProperty("os.name") +" "
-                + System.getProperty("os.version") +" "
-                + System.getProperty("os.arch") +" )";
-        super.put("JMQUserAgent", ua);
+    public synchronized void nullRef() {
+        ref =  null;
     }
 
     /**
-     *  Gets the JMQUserAgent property from this JMSService request parameter
-     *
-     *  @return The JMQUserAgent string
-     */
-    public String getJMQUserAgent(){
-        return (String)super.get("JMQUserAgent");
+     */ 
+    public synchronized boolean canRemove(PacketReference pr, DestinationList dl) {
+        if (islocal || pr == null || pr.isLocal()) {
+            return true;
+        }
+        if (ref != null) {
+            return (ref == pr);
+        }
+        return (dl.get(pr.getSysMessageID(), true) == null);
     }
 
-    /**
-     *  Sets the JMQConnectionID property for JMS-DIRECT clients
-     */
-    public void setJMQConnectionID(long connectionID){
-        super.put("JMQConnectionID", connectionID);
+    public void setReturn(boolean ret) {
+        this.ret = ret;
     }
+
+    public boolean getReturn() {
+        return ret;
+    }
+
 }

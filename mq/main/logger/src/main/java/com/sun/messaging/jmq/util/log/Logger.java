@@ -311,6 +311,39 @@ public class Logger implements LoggerWrapper {
 
 //	close();
 
+	String property = null, value = null;  
+	Level julLevel = null;
+	property = prefix+".log."+ "level";
+	value = props.getProperty(property);
+	if (value != null && !value.trim().equals("")) {
+		try {
+			this.level = levelStrToInt(value);
+			julLevel = levelIntToJULLevel(this.level);
+		} catch (IllegalArgumentException e) {
+			this.level = INFO;
+			julLevel = null;
+			this.log(WARNING,
+				myrb.getKString(myrb.W_BAD_LOGLEVELSTR, property, value));
+		}
+	}
+    
+	property = ".level";
+	value = props.getProperty(property);
+	if (value != null && !value.trim().equals("")) {
+		try {
+			julLevel = Level.parse(value);
+			this.level = levelJULLevelToInt(julLevel);
+		} catch (IllegalArgumentException e) {
+			this.level = INFO;
+			julLevel = null;
+			this.log(WARNING,
+				myrb.getKString(myrb.W_BAD_LOGLEVELSTR, property, value));
+		}
+	}
+	if (julLevel != null) {
+		newLogger.setLevel(julLevel);
+	}	
+
 	// load properties to nucleus when we are not running inside nucleus
 	// This is only until we completely moved to nucleus env
 	loadPropsToNucleusLogging(props, habitat,inProcess, jmsraManaged);
@@ -564,8 +597,6 @@ public class Logger implements LoggerWrapper {
      */
     private void manuallyConfigureLogging(Properties props) {
     	newLogger.setUseParentHandlers(false);
-    	Level logLevel = Level.parse(props.getProperty(".level"));
-    	newLogger.setLevel(logLevel);
     	String[] handlerClasses = parseClassNames(props.getProperty("handlers"));
     	
 		for (String handlerClass : handlerClasses) {

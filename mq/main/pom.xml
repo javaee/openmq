@@ -54,7 +54,7 @@
     <groupId>org.glassfish.mq</groupId>
     <artifactId>mq</artifactId>
     <packaging>pom</packaging>
-    <version> 5.0-b12 </version>
+    <version> 5.0-b13 </version>
     <name>MQ Main Project</name>
 
     <scm>
@@ -69,8 +69,8 @@
 
     <properties>
 	<!-- Change these for each build -->
-	<build.number>12</build.number>
-        <build.letter> a </build.letter>
+	<build.number>13</build.number>
+        <build.letter> d </build.letter>
 
 	<!-- Product-specific -->
         <full.name>Open Message Queue / Oracle GlassFish(tm) Server Message Queue</full.name>
@@ -83,16 +83,16 @@
         <product.name>Message Queue</product.name>
         <product.abbrevname>MQ</product.abbrevname>
         <product.copyright>Copyright (c) 2013, Oracle and/or its affiliates.  All rights reserved.</product.copyright>
-        <javax-jms.version>2.0-b12</javax-jms.version>
+        <javax-jms.version>2.0-b13</javax-jms.version>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 	<!-- Versions of dependencies -->
-        <hk2.version>2.1.64</hk2.version>
-        <hk2.plugin.version>2.1.64</hk2.plugin.version>
+        <hk2.version>2.1.66</hk2.version>
+        <hk2.plugin.version>2.1.66</hk2.plugin.version>
         <glassfishbuild.version>3.2.4</glassfishbuild.version>
         <glassfish.version>4.0-b77</glassfish.version>
-        <grizzly.version>2.3-rc4</grizzly.version>
-        <servlet-api.version>3.1-b06</servlet-api.version>
+        <grizzly.version>2.3-rc6</grizzly.version>
+        <servlet-api.version>3.1-b07</servlet-api.version>
         <jsp-api.version>2.3.0</jsp-api.version>
         <javax.resource-api.version>1.7-b03</javax.resource-api.version>
         <javahelp.version>2.0.05</javahelp.version>

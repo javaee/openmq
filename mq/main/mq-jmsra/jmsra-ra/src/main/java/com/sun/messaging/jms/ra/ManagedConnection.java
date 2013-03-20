@@ -204,22 +204,22 @@ implements javax.resource.spi.ManagedConnection, JMSRAManagedConnection
                 xac = (XAConnectionImpl)(mcf._getXACF()).createXAConnection(un, pw);
             }
             
-        } catch (JMSException jmse) {
+        } catch (javax.jms.JMSSecurityException jmsse) {
             javax.resource.spi.SecurityException se = new javax.resource.spi.SecurityException(
-                    _lgrMID_EXC+"constructor:Aborting:JMSException on createConnection="+jmse.getMessage(),jmse.getErrorCode());
-            se.initCause(jmse);
+                    _lgrMID_EXC+"constructor:Aborting:JMSException on createConnection="+jmsse.getMessage(), jmsse.getErrorCode());
+            se.initCause(jmsse);
             _loggerOC.severe(se.getMessage());
-            jmse.printStackTrace();
+            jmsse.printStackTrace();
             _loggerOC.throwing(_className, "constructor()", se);
             throw se;
-        } catch(java.lang.SecurityException se){
-        	javax.resource.spi.SecurityException jca_se = new javax.resource.spi.SecurityException(
-                    _lgrMID_EXC+"constructor:Aborting:SecurityExcetpion on createConnection="+se.getMessage());
-            jca_se.initCause(se);
-            _loggerOC.severe(jca_se.getMessage());
-            se.printStackTrace();
-            _loggerOC.throwing(_className, "constructor()", jca_se);
-            throw jca_se;
+        } catch (JMSException jmse) {
+            javax.resource.ResourceException re = new javax.resource.ResourceException(
+                    _lgrMID_EXC+"constructor:Aborting:JMSException on createConnection="+jmse.getMessage(),jmse.getErrorCode());
+            re.initCause(jmse);
+            _loggerOC.severe(re.getMessage());
+            jmse.printStackTrace();
+            _loggerOC.throwing(_className, "constructor()", re);
+            throw re;
         }
         if (true) {
         } else { //XXX:tharakan REMOVE

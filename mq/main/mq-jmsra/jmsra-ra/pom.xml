@@ -47,7 +47,7 @@
     <parent>
        <groupId>org.glassfish.mq</groupId>
        <artifactId>jmsra</artifactId>
-       <version>5.0-b12</version>
+       <version>5.0-b13</version>
        <relativePath>../pom.xml</relativePath>
     </parent>
 

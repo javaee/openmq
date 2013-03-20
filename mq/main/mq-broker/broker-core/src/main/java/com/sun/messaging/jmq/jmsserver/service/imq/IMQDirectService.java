@@ -101,10 +101,7 @@ public class IMQDirectService extends IMQService implements JMSService
     Map		queueBrowseList = Collections.synchronizedMap(new HashMap());
     Protocol	protocol;
 
-
-
     protected ThreadPool pool = null;
-
 
     /**
      * the list of connections which this service knows about
@@ -117,17 +114,14 @@ public class IMQDirectService extends IMQService implements JMSService
  
     HashMap serviceprops = null;
     
-    public IMQDirectService(String name, int type, int min, int max, boolean acc) 
-    {
-	    super(name, type);
-	    protocol = Globals.getProtocol();
-
+    public IMQDirectService(String name, int type, int min, int max, boolean acc) {
+        super(name, type);
+        protocol = Globals.getProtocol();
         acEnabled = acc;
 
-        // create a thread pool for the threading off of the forwarding
-        // task
+        // create a thread pool for the threading off of the forwarding task
         OperationRunnableFactory runfac =new OperationRunnableFactory(true /* blocking */); 
-        pool = new ThreadPool(name,min,max,runfac);
+        pool = new ThreadPool(name, min, max, runfac);
     }
 
 
@@ -342,7 +336,9 @@ public class IMQDirectService extends IMQService implements JMSService
             connectionList.removeConnection(con.getConnectionUID(),
                            true, GoodbyeReason.CON_FATAL_ERROR, errStr);
             localConnectionList.remove(con.getConnectionUID());
-            throw new SecurityException(errStr);
+
+            throw new BrokerException(errStr, 
+                BrokerResources.X_FORBIDDEN, e, Status.FORBIDDEN);
         }
 
         Agent agent = Globals.getAgent();
@@ -408,9 +404,9 @@ public class IMQDirectService extends IMQService implements JMSService
      */
     public JMSServiceReply createConnection(String username, String password,
                         JMSServiceBootStrapContext ctx) 
-					throws JMSServiceException  {
-	JMSServiceReply reply;
-	HashMap props = new HashMap();
+                        throws JMSServiceException  {
+        JMSServiceReply reply;
+        HashMap props = new HashMap();
         IMQConnection cxn = null;
 
         try {
@@ -419,20 +415,24 @@ public class IMQDirectService extends IMQService implements JMSService
                 logger.log(logger.INFO, "IMQDirectService:createConnection("+
                            username+"): ["+cxn.getConnectionUID()+", "+cxn+"]");
             } 
-	} catch (BrokerException be)  {
-	    String errStr = "Failed to create direct connection for user: "
-			+ username;
-				
-            logger.logStack(Logger.ERROR, errStr, be);
-	    props.put("JMQStatus", JMSServiceReply.Status.ERROR);
-	    throw new JMSServiceException(errStr, be, props);
-	}
+        } catch (BrokerException be)  {
+            String[] args = { username, getName(), be.getMessage() }; 
+            String emsg = Globals.getBrokerResources().getKString(
+                BrokerResources.X_CREATE_CONNECTION_FOR_USER_IN_SERVICE, args);
+            logger.logStack(Logger.ERROR, emsg, be);
+            props.put("JMQStatus", getErrorReplyStatus(be));
+            String ecode = be.getErrorCode();
+            if (ecode != null) {
+                props.put(JMSPacketProperties.JMQErrorCode, ecode);
+            }
+            throw new JMSServiceException(emsg, be, props);
+        }
 
-	props.put("JMQStatus", JMSServiceReply.Status.OK);
-	props.put("JMQConnectionID", cxn.getConnectionUID().longValue());
-	reply = new JMSServiceReply(props, null);
+        props.put("JMQStatus", JMSServiceReply.Status.OK);
+        props.put("JMQConnectionID", cxn.getConnectionUID().longValue());
+        reply = new JMSServiceReply(props, null);
 
-	return (reply);
+        return (reply);
     }
 
     /**

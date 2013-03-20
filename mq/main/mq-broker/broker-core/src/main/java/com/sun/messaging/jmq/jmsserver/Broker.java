@@ -319,8 +319,9 @@ public class Broker implements GlobalErrorHandler, CommBroker {
            }
        
            PortMapper pm = Globals.getPortMapper();
-     
-           pm.destroy();
+           if (pm != null) {
+               pm.destroy();
+           } 
            Globals.cleanup();
            synchronized (Broker.class) {
                broker = null;

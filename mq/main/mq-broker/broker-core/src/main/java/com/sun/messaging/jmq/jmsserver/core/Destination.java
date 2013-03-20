@@ -644,10 +644,11 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
 
         SysMessageID newid = ref.replacePacket(addProps, data);
         destMessages.remove(old);
+        DL.removePacketList(old, ref.getDestinationUID(), ref);
+        PacketListDMPair dmp = DL.packetlistAdd(newid, ref.getDestinationUID(), ref);
         destMessages.put(newid, ref);
+        dmp.nullRef();
         DL.adjustTotalBytes(ref.byteSize() - oldbsize);
-        DL.removePacketList(old, ref.getDestinationUID());
-        DL.packetlistAdd(newid, ref.getDestinationUID());
 
         Subscription sub = null;
         itr = subs.iterator();
@@ -2905,16 +2906,20 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
                 msgsOutInternal = 0;
             }
         }
+        PacketListDMPair dmp = null;
+        try {
+
         try {
             boolean check = !isAdmin() && !isInternal();
-            boolean ok = DL.addNewMessage((check && enforcelimit), pkt);
+            dmp = DL.addNewMessage((check && enforcelimit), pkt);
+            boolean ok = dmp.getReturn();
             if (!ok && !isDMQ) {
                // expired
                // put on dead message queue
                if (!isInternal()) {
                   pkt.setDestination(this);
                   markDead(pkt, RemoveReason.EXPIRED, null);
-                  DL.removePacketList(pkt.getSysMessageID(), this.getDestinationUID());
+                  DL.removePacketList(pkt.getSysMessageID(), this.getDestinationUID(), pkt);
                }
                return false;
             }
@@ -3026,6 +3031,13 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
             removeMessage(pkt.getSysMessageID(), RemoveReason.ERROR);
             throw ex;
         }
+
+        } finally {
+        if (dmp != null) {
+            dmp.nullRef();
+        }
+        }
+
         return true;
     }
 
@@ -3238,7 +3250,7 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
         ref = (PacketReference)destMessages.get(id);
         if (ref == null) {
             // message already gone 
-            DL.removePacketList(id, getDestinationUID());
+            DL.removePacketList(id, getDestinationUID(), ref);
             logger.log(Logger.DEBUG, "Reference already gone for " + id);
             return ret;
         }
@@ -3812,7 +3824,7 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
                          " into destination " + this);
                 }
                 try {
-                    if (!isDMQ && !DL.addNewMessage(false, pr)) {
+                    if (!isDMQ && !DL.addNewMessage(false, pr).getReturn()) {
                         // expired
                         deadMsgs.add(pr);
                     }
@@ -3826,7 +3838,7 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
                     continue;
                 }
                 s.add(pr);
-                DL.packetlistAdd(pr.getSysMessageID(), pr.getDestinationUID());
+                DL.packetlistAdd(pr.getSysMessageID(), pr.getDestinationUID(), null);
 
                 curcnt ++;
                 if (curcnt > 0 && (curcnt % LOAD_COUNT == 0
@@ -3883,7 +3895,7 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
                     pr.getSysMessageID()+"["+this+"] has been acked, destory..");
                     }
                     decrementDestinationSize(pr);
-                    DL.removePacketList(pr.getSysMessageID(), pr.getDestinationUID());
+                    DL.removePacketList(pr.getSysMessageID(), pr.getDestinationUID(), pr);
                     pr.destroy();
                     continue;
                 }
@@ -3943,7 +3955,7 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
                                 " [TUID="+pr.getTransactionID()+", "+this+"] no interest" +", destroy...");
                                 }
                                 decrementDestinationSize(pr);
-                                DL.removePacketList(pr.getSysMessageID(), pr.getDestinationUID());
+                                DL.removePacketList(pr.getSysMessageID(), pr.getDestinationUID(), pr);
                                 pr.destroy();
                                 continue;
                             }
@@ -3962,7 +3974,7 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
                         " [TUID="+pr.getTransactionID()+", "+this+"] to be rolled back" +", destroy...");
                         }
                         decrementDestinationSize(pr);
-                        DL.removePacketList(pr.getSysMessageID(), pr.getDestinationUID());
+                        DL.removePacketList(pr.getSysMessageID(), pr.getDestinationUID(), pr);
                         pr.destroy();
                         continue;
                     }
@@ -3978,7 +3990,7 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
                         "No consumer and dontRoute: Unrouted packet " + pr+", "+this);
                     }
                     decrementDestinationSize(pr);
-                    DL.removePacketList(pr.getSysMessageID(), pr.getDestinationUID());
+                    DL.removePacketList(pr.getSysMessageID(), pr.getDestinationUID(), pr);
                     pr.destroy();
                     continue;
                 }
@@ -4056,7 +4068,7 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
                                  }
                                  decrementDestinationSize(pr);
                                  DL.removePacketList(pr.getSysMessageID(), 
-                                                     pr.getDestinationUID());
+                                                     pr.getDestinationUID(), pr);
                                  pr.destroy();
                                  if (DEBUG) {
                                      logger.log(Logger.INFO, "Remove committed consumed message "+
@@ -4335,7 +4347,7 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
             return true; // did nothing
         }  
 
-        DL.removePacketList(ref.getSysMessageID(), getDestinationUID());
+        DL.removePacketList(ref.getSysMessageID(), getDestinationUID(), ref);
         if (!doCount) {
             return true;
         }
@@ -4630,7 +4642,7 @@ java.io.Serializable, com.sun.messaging.jmq.util.lists.EventListener
           if (d != null) {
               ret = d._removeMessage(id, RemoveReason.EXPIRED, null, null, true);
               if (ret.removed) {
-                 DL.removePacketList(id, d.getDestinationUID());
+                 DL.removePacketList(id, d.getDestinationUID(), null);
               }
           }
           if (ret == null) {

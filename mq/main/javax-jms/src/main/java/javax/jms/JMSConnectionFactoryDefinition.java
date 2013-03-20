@@ -80,15 +80,25 @@ public @interface JMSConnectionFactoryDefinition {
 	String name();
 
 	/**
-	 * JMS connection factory implementation class name which implements:
+	 * Fully qualified name of the JMS connection factory interface.
+	 * Permitted values are
 	 * {@code javax.jms.ConnectionFactory} or
 	 * {@code javax.jms.QueueConnectionFactory} or
-	 * {@code javax.jms.TopicConnectionFactory}
+	 * {@code javax.jms.TopicConnectionFactory}.
+	 * If not specified then {@code javax.jms.ConnectionFactory} will be used. 
 	 */
-	String className();
+	String interfaceName() default "javax.jms.ConnectionFactory";
+	
+	/**
+	 * Fully-qualified name of the JMS connection factory implementation class.
+	 * Ignored if a resource adapter is used.
+	 */
+	String className() default "";
 
 	/**
 	 * Resource adapter name.
+	 * If not specified then the application server will define the default behaviour,
+	 * which may or may not involve the use of a resource adapter.
 	 */
 	String resourceAdapter() default "";
 

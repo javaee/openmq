@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2012-2013 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -47,7 +47,7 @@
     <parent>
        <groupId>org.glassfish.mq</groupId>
        <artifactId>bridge</artifactId>
-       <version>5.0-b12</version>
+       <version>5.0-b13</version>
        <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -105,6 +105,7 @@
         <dependency>
             <groupId>org.glassfish.main.common</groupId>
             <artifactId>glassfish-api</artifactId>
+	    <optional>true</optional>
         </dependency>
         <dependency>
              <groupId>javax.jms</groupId>

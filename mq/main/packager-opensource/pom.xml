@@ -48,7 +48,7 @@
     <parent>
        <groupId>org.glassfish.mq</groupId>
        <artifactId>mq</artifactId>
-       <version>5.0-b12</version>
+       <version>5.0-b13</version>
        <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -718,6 +718,7 @@
          <dependency>
              <groupId>org.glassfish.main.external</groupId>
              <artifactId>ant</artifactId>
+	     <optional>true</optional>
          </dependency>
 -->
          <dependency>
@@ -755,10 +756,16 @@
              <groupId>javax.resource</groupId>
              <artifactId>javax.resource-api</artifactId>
          </dependency>
+         <dependency>
+             <groupId>org.glassfish.main.common</groupId>
+             <artifactId>glassfish-api</artifactId>
+	     <optional>true</optional>
+         </dependency>
 <!--
          <dependency>
              <groupId>org.glassfish.main.transaction</groupId>
              <artifactId>jta</artifactId>
+	     <optional>true</optional>
          </dependency>
 
 -->

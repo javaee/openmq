@@ -488,8 +488,8 @@ public class DirectConnectionFactory extends ConnectionCreator
                     " due to " + failure_cause;
             _loggerJF.severe(exerrmsg);
             jmsse = (security_exception
-                    ? new JMSSecurityException(exerrmsg)
-                    : new JMSException(exerrmsg));
+                    ? new JMSSecurityException(exerrmsg, jse.getJMSServiceReply().getErrorCode())
+                    : new JMSException(exerrmsg, jse.getJMSServiceReply().getErrorCode()));
             jmsse.initCause(jse);
             throw jmsse;
         }

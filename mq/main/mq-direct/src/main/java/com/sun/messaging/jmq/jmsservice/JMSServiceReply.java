@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -95,6 +95,20 @@ public class JMSServiceReply {
      */
     public Status getStatus(){
         return _status;
+    }
+
+    public String getErrorCode(){
+        if (_replyProps == null) {
+            return null;
+        }
+        Object o = _replyProps.get(JMSPacketProperties.JMQErrorCode); 
+        if (o == null) {
+            return null;
+        }
+        if (o instanceof String) {
+            return (String)o;
+        }
+        return o.toString();
     }
 
     /**

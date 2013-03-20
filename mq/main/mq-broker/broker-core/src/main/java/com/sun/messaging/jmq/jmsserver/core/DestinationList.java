@@ -362,7 +362,9 @@ public class DestinationList implements ConnToPartitionStrategyContext
     /**
      * list of messages to destination
      */
-    private final Map packetlist = Collections.synchronizedMap(new HashMap());
+    private final Map<SysMessageID, Set<PacketListDMPair>> packetlist = 
+        Collections.synchronizedMap(new HashMap<SysMessageID, Set<PacketListDMPair>>());
+
     protected final Map destinationList = Collections.synchronizedMap(new HashMap());
 
     private Logger logger = Globals.getLogger();
@@ -873,7 +875,7 @@ public class DestinationList implements ConnToPartitionStrategyContext
                     }
                 }
             }
-            dl.packetlistAdd(pr.getSysMessageID(), pr.getDestinationUID());
+            dl.packetlistAdd(pr.getSysMessageID(), pr.getDestinationUID(), null);
 
             Set l = null;
             if ((l = (Set)m.get(dUID)) == null) {
@@ -1225,43 +1227,71 @@ public class DestinationList implements ConnToPartitionStrategyContext
         return DestinationUID.getUniqueString(name, isQueue);
     }
 
-
-    protected void packetlistAdd(SysMessageID uid, DestinationUID duid) {
+    /**
+     */
+    protected PacketListDMPair packetlistAdd(SysMessageID sysid, 
+        DestinationUID duid, PacketReference ref) {
+        PacketListDMPair dmp = new PacketListDMPair(duid, ref);
         synchronized (packetlist) {
-            Set s = (Set)packetlist.get(uid);
+            Set<PacketListDMPair> s = packetlist.get(sysid);
             if (s == null) {
-                s = Collections.synchronizedSet(new LinkedHashSet());
-                packetlist.put(uid, s);
+                s = Collections.synchronizedSet(new LinkedHashSet<PacketListDMPair>());
+                packetlist.put(sysid, s);
             }
-            s.add(duid);
+            
+            s.add(dmp);
         }
+        return dmp;
     }
 
-    private DestinationUID getPacketListFirst(SysMessageID uid) {
-        Set s = null;
+    private DestinationUID getPacketListFirst(SysMessageID sysid) {
+        Set<PacketListDMPair> s = null;
         synchronized (packetlist) {
-            s = (Set)packetlist.get(uid);
+            s = packetlist.get(sysid);
             if (s == null) {
                 return null;
             }
         }
         synchronized (s) {
-            Iterator itr = s.iterator();
-            if (itr.hasNext())
-                return (DestinationUID) itr.next();
+            Iterator<PacketListDMPair> itr = s.iterator();
+            if (itr.hasNext()) {
+                return itr.next().duid;
+            }
         }
         return null;
     }
 
-    protected Object removePacketList(SysMessageID uid, DestinationUID duid) {
+    protected Object removePacketList(SysMessageID sysid,
+        DestinationUID duid, PacketReference ref) {
         synchronized (packetlist) {
-            Set s = (Set)packetlist.get(uid);
-            if (s == null) return null;
-            if (s.contains(duid)) {
-                s.remove(duid);
-                if (s.isEmpty())
-                    packetlist.remove(uid);
-                return duid;
+            Set<PacketListDMPair> s = packetlist.get(sysid);
+            if (s == null) {
+                return null;
+            }
+            PacketListDMPair dmp = new PacketListDMPair(duid, null);
+            PacketListDMPair mydmp = null;
+            if (s.contains(dmp)) {
+                Iterator<PacketListDMPair> itr = s.iterator();
+                while (itr.hasNext()) {
+                    mydmp = itr.next();
+                    if (mydmp.equals(dmp)) {
+                        if (ref == null) {
+                            itr.remove();
+                            break;
+                        }
+                        if (mydmp.canRemove(ref, this)) {
+                            itr.remove();
+                            break;
+                        }
+                    }
+                    mydmp = null;
+                }
+                if (s.isEmpty()) {
+                    packetlist.remove(sysid);
+                }
+            }
+            if (mydmp != null) {
+                return mydmp.duid;
             }
             return null;
         }
@@ -3205,7 +3235,7 @@ public class DestinationList implements ConnToPartitionStrategyContext
      *         because it had expired
      * @throws BrokerException if a system limit has been exceeded
      */
-    protected static boolean addNewMessage(PartitionedStore ps,
+    protected static PacketListDMPair addNewMessage(PartitionedStore ps,
         boolean checkLimits, PacketReference ref)
         throws BrokerException {
         if (ps == null) {
@@ -3219,7 +3249,11 @@ public class DestinationList implements ConnToPartitionStrategyContext
         return dl.addNewMessage(checkLimits, ref);
     }
 
-    protected boolean addNewMessage(
+    /**
+     * caller must call PacketListDMPair.nullRef() if remote msg
+     * after completes enqueuing the msg
+     */ 
+    protected PacketListDMPair addNewMessage(
         boolean checkLimits, PacketReference ref)
         throws BrokerException {
 
@@ -3231,14 +3265,15 @@ public class DestinationList implements ConnToPartitionStrategyContext
         }
 
         // Add to list
-        packetlistAdd(ref.getSysMessageID(), ref.getDestinationUID());
-
+        PacketListDMPair dmp = packetlistAdd(ref.getSysMessageID(),
+                                   ref.getDestinationUID(), ref);
         if (ref.isExpired()) {
-            return false;
+            dmp.setReturn(false);
+        } else {
+            dmp.setReturn(true);
         }
 
-        // check on expiration
-        return true;
+        return dmp;
     }
 
     public static long checkSystemLimit(PacketReference ref)

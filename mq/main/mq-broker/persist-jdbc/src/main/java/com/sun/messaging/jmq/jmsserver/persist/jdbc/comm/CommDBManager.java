@@ -73,6 +73,9 @@ public abstract class CommDBManager {
     private static final String TABLE_NAME_VARIABLE = "name";
     private static final String INDEX_NAME_VARIABLE = "index";
 
+    private static final String LOGIN_TIMEOUT_PROP_SUFFIX =
+        ".loginTimeout";
+
     private static final String TRANSACTION_RETRY_MAX_PROP_SUFFIX =
         ".transaction.retry.max";
     private static final String TRANSACTION_RETRY_DELAY_PROP_SUFFIX =
@@ -162,6 +165,8 @@ public abstract class CommDBManager {
     private static final String DEFAULT_CONNECTION_RETRY_PATTERN  = "(?s).*";
 
     private ArrayList<Integer> sqlRetriableErrorCodes = new ArrayList<Integer>();
+
+    private Integer loginTimeout = null;
 
     /**
      */
@@ -292,6 +297,28 @@ public abstract class CommDBManager {
 
         String JDBC_PROP_PREFIX = getJDBCPropPrefix();
 
+        String name = JDBC_PROP_PREFIX+LOGIN_TIMEOUT_PROP_SUFFIX; 
+        String strv = config.getProperty(name);
+        if (strv != null) {
+            try {
+                int v = Integer.parseInt(strv);
+                if (v < 0) {
+                    String emsg =  Globals.getBrokerResources().getKString(
+                        BrokerResources.X_BAD_PROPERTY_VALUE, name+"="+strv);
+                    throw new BrokerException(emsg);
+                }
+                loginTimeout = Integer.valueOf(v);
+                logger.log(logger.INFO, name+"="+strv);
+            } catch (Exception e) {
+                if (e instanceof BrokerException) {
+                    throw (BrokerException)e;
+                }
+                String emsg =  Globals.getBrokerResources().getKString(
+                    BrokerResources.X_BAD_PROPERTY_VALUE, name+"="+strv)+": "+e;
+                logger.log(Logger.ERROR, emsg, e);
+                throw new BrokerException(emsg);
+            }
+        }
         txnRetryMax = config.getIntProperty(
             JDBC_PROP_PREFIX+TRANSACTION_RETRY_MAX_PROP_SUFFIX,
             TRANSACTION_RETRY_MAX_DEFAULT );
@@ -507,6 +534,8 @@ public abstract class CommDBManager {
             if ( isDataSource ) {
                 dataSource = driverObj;
                 initDataSource(driverCls, dataSource);
+            } else {
+                initDriverManager();
             }
         } catch (InstantiationException e) {
             throw new BrokerException(
@@ -517,6 +546,8 @@ public abstract class CommDBManager {
         } catch (ClassNotFoundException e) {
             throw new BrokerException(
                 br.getKString(BrokerResources.E_CANNOT_LOAD_JDBC_DRIVER, driver), e);
+        } catch (BrokerException e) {
+             throw e;
         }
 
         // password to open connection; do this last because we want to init
@@ -1168,7 +1199,32 @@ public abstract class CommDBManager {
         return e2;
     }
 
-    private void initDataSource( Class dsClass, Object dsObject ) {
+    private void initDriverManager() throws BrokerException {
+        if (loginTimeout != null) {
+            try {
+                DriverManager.setLoginTimeout(loginTimeout.intValue());
+            } catch (Exception e) {
+                throw new BrokerException(Globals.getBrokerResources().
+                    getKString(BrokerResources.X_JDBC_DRIVER_SET_LOGIN_TIMEOUT,
+                    driver, e.toString())); 
+            }
+        }
+    }
+
+    private void initDataSource( Class dsClass, Object dsObject ) 
+    throws BrokerException {
+
+        if (loginTimeout != null && dsObject != null) {
+            try {
+                ((javax.sql.CommonDataSource)dsObject).
+                    setLoginTimeout(loginTimeout.intValue());
+            } catch (Exception e) {
+                throw new BrokerException(
+                    Globals.getBrokerResources().getKString(
+                    BrokerResources.X_JDBC_DRIVER_SET_LOGIN_TIMEOUT,
+                    driver, e.toString())); 
+            }
+        }
 
     	// Get a list of property names to initialize the Data Source,
         // e.g. imq.persist.jdbc.<dbVendor>.property.*

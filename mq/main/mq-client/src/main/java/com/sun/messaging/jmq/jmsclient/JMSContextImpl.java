@@ -44,6 +44,8 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
@@ -91,7 +93,14 @@ import com.sun.messaging.jms.MQTransactionInProgressRuntimeException;
 import com.sun.messaging.jms.MQTransactionRolledBackRuntimeException;
 
 public class JMSContextImpl implements JMSContext, Traceable {
-	
+	private static final String ROOT_LOGGER_NAME = "javax.jms";
+	protected static final String JMSCONTEXT_LOGGER_NAME =
+				ROOT_LOGGER_NAME + ".jmscontext";
+
+	protected static final Logger contextLogger =
+		Logger.getLogger(JMSCONTEXT_LOGGER_NAME,
+			ClientResources.CLIENT_RESOURCE_BUNDLE_NAME);
+
 	Connection connection;
 	Session session;
 	MessageProducer messageProducer;
@@ -116,6 +125,8 @@ public class JMSContextImpl implements JMSContext, Traceable {
 	private boolean allowToSetClientID = true;
 
 	public JMSContextImpl(ConnectionFactory connectionFactory, ContainerType containerType, String userName, String password) {
+		contextLogger.log(Level.FINE, "JMSContext@"+this.hashCode()+
+			"(cf@"+connectionFactory.hashCode()+", "+containerType+", "+userName+",)");
 		this.containerType=containerType;
 		
 		// create connection
@@ -143,6 +154,8 @@ public class JMSContextImpl implements JMSContext, Traceable {
 	}
 
 	public JMSContextImpl(ConnectionFactory connectionFactory, ContainerType containerType) {
+		contextLogger.log(Level.FINE, "JMSContext@"+this.hashCode()+
+			"(cf@"+connectionFactory.hashCode()+", "+containerType+")");
 		this.containerType=containerType;
 		
 		// create connection
@@ -170,6 +183,9 @@ public class JMSContextImpl implements JMSContext, Traceable {
 	}
 
 	public JMSContextImpl(ConnectionFactory connectionFactory, ContainerType containerType, String userName, String password, int sessionMode) {
+		contextLogger.log(Level.FINE, "JMSContext@"+this.hashCode()+
+			"(cf@"+connectionFactory.hashCode()+", "+containerType+
+			", "+userName+",, "+sessionMode+")");
 		validateSessionMode(sessionMode);
 		this.containerType=containerType;
 		
@@ -198,6 +214,8 @@ public class JMSContextImpl implements JMSContext, Traceable {
 	}
 
 	public JMSContextImpl(ConnectionFactory connectionFactory, ContainerType containerType, int sessionMode) {
+		contextLogger.log(Level.FINE, "JMSContext@"+this.hashCode()+
+			"(cf@"+connectionFactory.hashCode()+", "+containerType+", "+sessionMode+")");
 		validateSessionMode(sessionMode);
 		this.containerType=containerType;
 		
@@ -234,6 +252,9 @@ public class JMSContextImpl implements JMSContext, Traceable {
 	 * @param sessionMode
 	 */
 	public JMSContextImpl(ContainerType containerType, Set<JMSContext> contextSet, Connection connection, int sessionMode) {
+		contextLogger.log(Level.FINE, "JMSContext@"+this.hashCode()+
+			"("+containerType+", contextSet@"+contextSet.hashCode()+
+			", connection@"+connection.hashCode()+", "+sessionMode+")");
 		validateSessionMode(sessionMode);
 		this.containerType=containerType;
 		
@@ -253,8 +274,9 @@ public class JMSContextImpl implements JMSContext, Traceable {
 	}
 	
 	public JMSContextImpl(XAConnectionFactory xaConnectionFactory, ContainerType containerType, String userName, String password) {
+		contextLogger.log(Level.FINE, "JMSContext@"+this.hashCode()+
+			"(xacf@"+xaConnectionFactory.hashCode()+", "+containerType+", "+userName+",)");
 		this.containerType=containerType;
-		
 		// create XA connection
 		try {
 			connection = xaConnectionFactory.createXAConnection(userName,password);
@@ -280,8 +302,9 @@ public class JMSContextImpl implements JMSContext, Traceable {
 	}
 	
 	public JMSContextImpl(XAConnectionFactory xaConnectionFactory, ContainerType containerType) {
+		contextLogger.log(Level.FINE, "JMSContext@"+this.hashCode()+
+			"(xacf@"+xaConnectionFactory.hashCode()+", "+containerType+")");
 		this.containerType=containerType;
-		
 		// create XA connection
 		try {
 			connection = xaConnectionFactory.createXAConnection();
@@ -307,6 +330,7 @@ public class JMSContextImpl implements JMSContext, Traceable {
 	}
 	
 	public JMSContextImpl() {
+		contextLogger.fine("JMSContext@"+this.hashCode()+"()");
 	}
 	
 	private void validateSessionMode(int sessionMode) {
@@ -325,16 +349,28 @@ public class JMSContextImpl implements JMSContext, Traceable {
 	protected void initializeForNewConnection() {
 		contextSet = new HashSet<JMSContext>();
 		contextSet.add(this);
+		contextLogger.log(Level.FINE, "JMSContext@"+this.hashCode()+
+			".initializeForNewConnection(): connection@"+
+			 connection.hashCode()+", session@"+session.hashCode()+", contextSet@"+
+			 contextSet.hashCode()+"("+contextSet.size()+")");
 	}
 	
 	/**
 	 * Initialize a newly-created JMSContext that we have created from an existing JMSContext
 	 */
 	private void initializeForExistingConnection(Set<JMSContext> existingContextSet) {
+		int size = 0;            
+		int hashcode = 0;
 		synchronized(existingContextSet){
+			size = existingContextSet.size();
+			hashcode = existingContextSet.hashCode();
 			contextSet = existingContextSet;
 			contextSet.add(this);
 		}
+	        contextLogger.log(Level.FINE, "JMSContext@"+this.hashCode()+
+			".initializeForExistingConnection(): connection@"+
+			connection.hashCode()+", session@"+session.hashCode()+
+			", contextSet@"+hashcode+"("+size+")");
 	}
 
 	@Override
@@ -484,6 +520,8 @@ public class JMSContextImpl implements JMSContext, Traceable {
 
 	@Override
 	public void close() {
+		contextLogger.log(Level.FINE, "JMSContext@"+this.hashCode()+
+			".close(): connection@"+(connection == null ? "null":connection.hashCode()));
 		if (closed) return;
 		closed=true;
 
