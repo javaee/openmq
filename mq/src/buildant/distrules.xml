@@ -284,6 +284,20 @@
 	    </fileset>
 	</copy>
 
+        <!-- legal dir -->
+        <echo message="### legal "/>
+        <mkdir dir="${mq.zip.installdir}/legal"/>
+        <copy tofile="${mq.zip.installdir}/legal/LICENSE.txt">
+            <fileset dir="${base_src.dir}/doc/en">
+                <include name="CDDL_GPL_LICENSE"/>
+            </fileset>
+        </copy>
+        <copy tofile="${mq.zip.installdir}/legal/3RD-PARTY-LICENSE.txt">
+            <fileset dir="${base_src.dir}/doc/en">
+                <include name="THIRDPARTYLICENSEREADME"/>
+            </fileset>
+        </copy>
+
 	<!-- lib/dtd dir -->
 	<echo message="### lib/dtd"/>
         <mkdir dir="${mq.zip.installdir}/lib/dtd"/>
@@ -798,6 +812,15 @@
             </fileset>
         </copy>
 
+        <!-- legal dir -->
+        <echo message="### legal "/>
+        <mkdir dir="${mq.zip.installdir}/legal"/>
+        <copy tofile="${mq.zip.installdir}/legal/LICENSE.txt">
+            <fileset dir="${base_src.dir}/doc/en">
+                <include name="CDDL_GPL_LICENSE"/>
+            </fileset>
+        </copy>
+
 	<!-- examples dir -->
         <echo message="### examples dir"/>
         <mkdir dir="${mq.zip.installdir}/examples"/>
@@ -1248,6 +1271,15 @@ IMQ_DEFAULT_VARHOME=../../glassfish/domains/domain1/imq]]>
         <copy tofile="${mq.zip.installdir}/lib/ext/README">
             <fileset dir="${base_src.dir}/doc/en">
                 <include name="README-lib"/>
+            </fileset>
+        </copy>
+
+        <!-- legal dir -->
+        <echo message="### legal "/>
+        <mkdir dir="${mq.zip.installdir}/legal"/>
+        <copy tofile="${mq.zip.installdir}/legal/LICENSE.txt">
+            <fileset dir="${base_src.dir}/doc/en">
+                <include name="CDDL_GPL_LICENSE"/>
             </fileset>
         </copy>
 

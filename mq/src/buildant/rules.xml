@@ -672,8 +672,7 @@ All rights reserved.</i></font>]]></bottom>
     <!-- Compile Java classes as necessary -->
     <javac
           srcdir="${examples_src.dir}"
-	  includes="${examples_src.dir}/**/*java"
-	  excludes="${examples_src.dir}/jaxm/*java"
+	  excludes="jaxm/**"
           listfiles="no"
           verbose="no"
           debug="${compile.debug}"
