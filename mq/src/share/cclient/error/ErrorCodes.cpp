@@ -248,7 +248,6 @@ errorStr(const MQError errorCode)
   case MQ_DESTINATION_CONSUMER_LIMIT_EXCEEDED:  return "The number of consumers on the destination exceeded limit";
   case MQ_CONSUMER_DESTINATION_NOT_FOUND:       return "Destination that this consumer was on no longer exists";
   case MQ_NOLOCAL_DURABLE_CONSUMER_NO_CLIENTID: return "Client ID must set when noLocal is true to create durable subscription";
-  case MQ_NOLOCAL_SHARED_SUBSCRIPTION_NO_CLIENTID: return "Client ID must set when noLocal is true to create shared subscription";
   case MQ_CONSUMER_NO_SUBSCRIPTION_NAME:        return "There is no subscription name specified";
 
 

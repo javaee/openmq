@@ -192,7 +192,6 @@ declaration     MQStatus \
                                                const MQDestinationHandle destinationHandle, \
                                                ConstMQString             durableName, \
                                                ConstMQString             messageSelector, \
-                                               MQBool                    noLocal, \
                                                MQConsumerHandle *        consumerHandle)
 include         "mqcrt.h"
 arch            all
@@ -218,7 +217,6 @@ declaration     MQStatus \
                                         const MQDestinationHandle destinationHandle, \
                                         ConstMQString             subscriptionName, \
                                         ConstMQString             messageSelector, \
-                                        MQBool                    noLocal, \
                                         MQConsumerHandle *        consumerHandle)
 include         "mqcrt.h"
 arch            all
@@ -247,7 +245,6 @@ declaration     MQStatus \
                                                     const MQDestinationHandle destinationHandle, \
                                                     ConstMQString             durableName, \
                                                     ConstMQString             messageSelector, \
-                                                    MQBool                    noLocal, \
                                                     MQMessageListenerFunc     messageListener, \
                                                     void *                    listenerCallbackData, \
                                                     MQConsumerHandle *        consumerHandle)
@@ -276,7 +273,6 @@ declaration     MQStatus \
                                              const MQDestinationHandle destinationHandle, \
                                              ConstMQString             subscriptionName, \
                                              ConstMQString             messageSelector, \
-                                             MQBool                    noLocal, \
                                              MQMessageListenerFunc     messageListener,\
                                              void *                    listenerCallbackData, \
                                              MQConsumerHandle *        consumerHandle)

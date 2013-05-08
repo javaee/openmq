@@ -333,7 +333,6 @@ MQCreateSharedMessageConsumer(const MQSessionHandle     sessionHandle,
                         const MQDestinationHandle destinationHandle,
                         ConstMQString             subscriptionName,
                         ConstMQString             messageSelector,
-                        MQBool                    noLocal,
                         MQConsumerHandle *        consumerHandle)
 {
   static const char FUNCNAME[] = "MQCreateSharedMessageConsumer";
@@ -369,10 +368,10 @@ MQCreateSharedMessageConsumer(const MQSessionHandle     sessionHandle,
     UTF8String messageSelectorStr(messageSelector);
     CNDCHK( STRCMP( messageSelectorStr.toString(), messageSelector ) != 0, MQ_OUT_OF_MEMORY );
     ERRCHK( session->createConsumer(destination, PR_FALSE, PR_TRUE, &subscriptionNameStr,
-                                    &messageSelectorStr, noLocal, NULL, NULL, &consumer) );
+                                    &messageSelectorStr, PR_FALSE, NULL, NULL, &consumer) );
   } else {
     ERRCHK( session->createConsumer(destination, PR_FALSE, PR_TRUE, &subscriptionNameStr,
-                                    NULL, noLocal, NULL, NULL, &consumer) );
+                                    NULL, PR_FALSE, NULL, NULL, &consumer) );
   } 
   }
 
@@ -464,7 +463,6 @@ MQCreateAsyncSharedMessageConsumer(const MQSessionHandle     sessionHandle,
                              const MQDestinationHandle destinationHandle,
                              ConstMQString             subscriptionName,
                              ConstMQString             messageSelector,
-                             MQBool                    noLocal,
                              MQMessageListenerFunc     messageListener,
                              void *                    messageListenerCallbackData,
                              MQConsumerHandle *        consumerHandle)
@@ -504,11 +502,11 @@ MQCreateAsyncSharedMessageConsumer(const MQSessionHandle     sessionHandle,
     UTF8String messageSelectorStr(messageSelector);
     CNDCHK( STRCMP( messageSelectorStr.toString(), messageSelector ) != 0, MQ_OUT_OF_MEMORY );
     ERRCHK( session->createConsumer(destination, PR_FALSE, PR_TRUE, &subscriptionNameStr,
-                                    &messageSelectorStr, noLocal, messageListener,
+                                    &messageSelectorStr, PR_FALSE, messageListener,
                                     messageListenerCallbackData, &consumer) );
   } else {
     ERRCHK( session->createConsumer(destination, PR_FALSE, PR_TRUE, &subscriptionNameStr,
-                                    NULL, noLocal, messageListener, 
+                                    NULL, PR_FALSE, messageListener, 
                                     messageListenerCallbackData, &consumer) );
   }
   }
@@ -605,7 +603,6 @@ MQCreateSharedDurableMessageConsumer(const MQSessionHandle     sessionHandle,
                                const MQDestinationHandle destinationHandle,
                                ConstMQString             durableName,
                                ConstMQString             messageSelector,
-                               MQBool                    noLocal, 
                                MQConsumerHandle *        consumerHandle)
 {
   static const char FUNCNAME[] = "MQCreateSharedDurableMessageConsumer";
@@ -641,10 +638,10 @@ MQCreateSharedDurableMessageConsumer(const MQSessionHandle     sessionHandle,
       UTF8String messageSelectorStr(messageSelector);
       CNDCHK( STRCMP( messageSelectorStr.toString(), messageSelector ) != 0, MQ_OUT_OF_MEMORY );
       ERRCHK( session->createConsumer(destination, PR_TRUE, PR_TRUE, &durableNameStr, 
-                                      &messageSelectorStr, noLocal, NULL, NULL, &consumer) );
+                                      &messageSelectorStr, PR_FALSE, NULL, NULL, &consumer) );
     } else {
       ERRCHK( session->createConsumer(destination, PR_TRUE, PR_TRUE, &durableNameStr, 
-                                      NULL, noLocal, NULL, NULL, &consumer) );
+                                      NULL, PR_FALSE, NULL, NULL, &consumer) );
     }
   }
 
@@ -750,7 +747,6 @@ MQCreateAsyncSharedDurableMessageConsumer(const MQSessionHandle     sessionHandl
                                     const MQDestinationHandle destinationHandle,
                                     ConstMQString             durableName,
                                     ConstMQString             messageSelector,
-                                    MQBool                    noLocal,
                                     MQMessageListenerFunc     messageListener,
                                     void *                    messageListenerCallbackData,
                                     MQConsumerHandle *        consumerHandle)
@@ -789,11 +785,11 @@ MQCreateAsyncSharedDurableMessageConsumer(const MQSessionHandle     sessionHandl
       UTF8String messageSelectorStr(messageSelector);
       CNDCHK( STRCMP( messageSelectorStr.toString(), messageSelector ) != 0, MQ_OUT_OF_MEMORY );
       ERRCHK( session->createConsumer(destination, PR_TRUE, PR_TRUE, &durableNameStr,
-                                      &messageSelectorStr, noLocal, messageListener,
+                                      &messageSelectorStr, PR_FALSE, messageListener,
                                       messageListenerCallbackData, &consumer) );
     } else {
       ERRCHK( session->createConsumer(destination, PR_TRUE, PR_TRUE, &durableNameStr,
-                                      NULL, noLocal, messageListener,
+                                      NULL, PR_FALSE, messageListener,
                                       messageListenerCallbackData, &consumer) );
     }
   }

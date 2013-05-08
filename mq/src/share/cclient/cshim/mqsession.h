@@ -168,9 +168,6 @@ MQCreateMessageConsumer(const MQSessionHandle     sessionHandle,
  *        receives messages
  * @param subscriptionName the subscription name
  * @param messageSelector the message selector
- * @param noLocal if MQ_TRUE and the connection has client ID set, 
- *        the subscription should not receive messages sent by a
- *        producer on a connection with the same client ID
  * @param consumerHandle the output handle to the newly created
  *        consumer
  * @return the status of the function call.  Pass this value to
@@ -181,7 +178,6 @@ MQCreateSharedMessageConsumer(const MQSessionHandle     sessionHandle,
                         const MQDestinationHandle destinationHandle,
                         ConstMQString             subscriptionName,
                         ConstMQString             messageSelector,
-                        MQBool                    noLocal,
                         MQConsumerHandle *        consumerHandle);
 
 /**
@@ -220,9 +216,6 @@ MQCreateDurableMessageConsumer(
  *        receives messages
  * @param durableName the subscription name
  * @param messageSelector the message selector
- * @param noLocal if MQ_TRUE and the connection has client ID set, 
- *        the subscription should not receive messages sent by a
- *        producer on a connection with the same client ID
  * @param consumerHandle the output handle to the newly created
  *        consumer
  * @return the status of the function call.  Pass this value to
@@ -233,7 +226,6 @@ MQCreateSharedDurableMessageConsumer(const MQSessionHandle     sessionHandle,
                         const MQDestinationHandle destinationHandle,
                         ConstMQString             durableName,
                         ConstMQString             messageSelector,
-                        MQBool                    noLocal,
                         MQConsumerHandle *        consumerHandle);
 
 /**
@@ -278,9 +270,6 @@ MQCreateAsyncMessageConsumer(const MQSessionHandle     sessionHandle,
  *        receives messages
  * @param subscriptionName the subscription name
  * @param messageSelector the messages selector
- * @param noLocal if MQ_TRUE and the connection has client ID set,
- *        the subscription should not receive  messages sent by 
- *        a producer on a connection that has the same client ID
  * @param messageListener the message listener callback function
  * @param listenerCallbackData void * data pointer that to be
  *        passed to the message listener function when it is called
@@ -294,7 +283,6 @@ MQCreateAsyncSharedMessageConsumer(const MQSessionHandle     sessionHandle,
                              const MQDestinationHandle destinationHandle,
                              ConstMQString             subscriptionName,
                              ConstMQString             messageSelector,
-                             MQBool                    noLocal,
                              MQMessageListenerFunc     messageListener,
                              void *                    listenerCallbackData,
                              MQConsumerHandle *        consumerHandle);
@@ -344,9 +332,6 @@ MQCreateAsyncDurableMessageConsumer(
  *        receives messages
  * @param durableName the durable name
  * @param messageSelector the messages selector
- * @param noLocal if MQ_TRUE and the connection has client ID set,
- *        the consumer should not receive  messages sent by  a
- *        producer on a connection that has the same client ID
  * @param messageListener the message listener callback function
  * @param listenerCallbackData void * data pointer that to be
  *        passed to the message listener function when it is called
@@ -360,7 +345,6 @@ MQCreateAsyncSharedDurableMessageConsumer(const MQSessionHandle sessionHandle,
                              const MQDestinationHandle destinationHandle,
                              ConstMQString             durableName,
                              ConstMQString             messageSelector,
-                             MQBool                    noLocal,
                              MQMessageListenerFunc     messageListener,
                              void *                    listenerCallbackData,
                              MQConsumerHandle *        consumerHandle);

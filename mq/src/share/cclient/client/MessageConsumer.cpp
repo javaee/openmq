@@ -105,14 +105,12 @@ MessageConsumer::MessageConsumer(Session * const sessionArg,
     this->noLocal = PR_FALSE;
   } else {
     this->noLocal = noLocalArg;
+    CNDCHK( (this->isShared && this->noLocal == PR_TRUE), 
+            MQ_UNSUPPORTED_ARGUMENT_VALUE );
     CNDCHK( (this->isDurable && 
               this->noLocal == PR_TRUE && 
               this->session->getConnection()->getClientID() == NULL), 
             MQ_NOLOCAL_DURABLE_CONSUMER_NO_CLIENTID );
-    CNDCHK( (this->isShared && 
-              this->noLocal == PR_TRUE && 
-              this->session->getConnection()->getClientID() == NULL), 
-            MQ_NOLOCAL_SHARED_SUBSCRIPTION_NO_CLIENTID );
   }
 
   this->messageListener = messageListenerArg;
