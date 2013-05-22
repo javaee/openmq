@@ -1,0 +1,33 @@
+@(#)README      1.0 09/09/08
+
+UMS APIs examples
+
+Description
+-----------
+This directory contains C# .NET examples that illustrates the use of the
+UMS APIs to send and receive text or binary message.
+
+Files
+-----
+SendSOAPMsg.cs		Source file for C# application that sends text
+			or binary message as XML/SOAP message to a UMS server.
+ReceiveSOAPMsg.cs	Source file for C# application that receives text
+			or binary message as XML/SOAP message from a UMS server.
+SendSOAPMsg.exe		Prebuilt executable for .NET 2.0.
+ReceiveSOAPMsg.exe	Prebuilt executable for .NET 2.0.
+
+README			This file.
+
+Configuring the environment
+---------------------------
+These examples require .NET Framework 2.0 or later version.
+
+The examples above assume that the Context Root for the UMS web module
+is '/ums'. If this is not the case, please modify the DEFAULT_CONTEXT_ROOT
+variable in the application accordingly.
+
+Running the example
+-------------------
+Example usage:
+
+    SendSOAPMsg.exe -h
