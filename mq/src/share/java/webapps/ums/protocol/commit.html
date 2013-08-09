@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<!--
+
+    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+
+    The contents of this file are subject to the terms of either the GNU
+    General Public License Version 2 only ("GPL") or the Common Development
+    and Distribution License("CDDL") (collectively, the "License").  You
+    may not use this file except in compliance with the License.  You can
+    obtain a copy of the License at
+    https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+    or packager/legal/LICENSE.txt.  See the License for the specific
+    language governing permissions and limitations under the License.
+
+    When distributing the software, include this License Header Notice in each
+    file and include the License file at packager/legal/LICENSE.txt.
+
+    GPL Classpath Exception:
+    Oracle designates this particular file as subject to the "Classpath"
+    exception as provided by Oracle in the GPL Version 2 section of the License
+    file that accompanied this code.
+
+    Modifications:
+    If applicable, add the following below the License Header, with the fields
+    enclosed by brackets [] replaced by your own identifying information:
+    "Portions Copyright [year] [name of copyright owner]"
+
+    Contributor(s):
+    If you wish your version of this file to be governed by only the CDDL or
+    only the GPL Version 2, indicate your decision by adding "[Contributor]
+    elects to include this software in this distribution under the [CDDL or GPL
+    Version 2] license."  If you don't indicate a single choice of license, a
+    recipient has the option to distribute your version of this file under
+    either the CDDL, the GPL Version 2 or to extend the choice of license to
+    its licensees as provided above.  However, if you add GPL Version 2 code
+    and therefore, elected the GPL Version 2 license, then the option applies
+    only if the new code is made subject to such option by the copyright
+    holder.
+
+-->
+
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="StarOffice 8  (Win32)">
+	<META NAME="AUTHOR" CONTENT="chiaming">
+	<META NAME="CREATED" CONTENT="20080902;14301200">
+	<META NAME="CHANGED" CONTENT="20081001;13394831">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<P><FONT SIZE=4><B>commit</B></FONT></P>
+<P><A NAME="wfdi"></A><A NAME="krcn"></A>The <B>commit</B> service
+request is an http HTTP request message sent to the UMS in accordance
+with the Simple Messaging API or the XML Messaging API.</P>
+<P>The <B>commit</B> service request must conform to the following
+criteria:</P>
+<TABLE WIDTH=100% BORDER=1 CELLPADDING=4 CELLSPACING=3>
+	<COL WIDTH=128*>
+	<COL WIDTH=128*>
+	<TR VALIGN=TOP>
+		<TH WIDTH=50%>
+			<P>Required field/attribute values</P>
+		</TH>
+		<TH WIDTH=50%>
+			<P>Optional field/attribute values</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=50%>
+			<P>service=commit</P>
+		</TD>
+		<TD WIDTH=50%>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=50%>
+			<P>sid</P>
+		</TD>
+		<TD WIDTH=50%>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P><BR><B>Notes</B>:</P>
+<P>A <B>commit</B> service request is supported only for a transacted
+session. A transacted session is created by sending a <B>login</B>
+request with the transacted attribute set to true.</P>
+<P>A <B>commit</B> request MUST contain an sid attribute with its
+value set to a secure token obtained from the previous <A HREF="http://niagra2.sfbay.sun.com:8080/ums/login_reply.html">login_reply</A>
+message.</P>
+<P>A new transaction is automatically started after a successful
+<B>commit</B> service request.</P>
+<P>Service response message: <A HREF="./commit_reply.html"><B>commit_reply</B></A></P>
+<P><FONT SIZE=3 STYLE="font-size: 13pt"><B>1. Simple Messaging API
+Example: </B></FONT>
+</P>
+<P>The following is a <B>commit</B> service request.</P>
+<P>POST /ums/simple?service=commit&amp;sid=4-LTgxMDczMTczNQ==
+HTTP/1.1 <BR>Content-Type: text/plain;charset=UTF-8 <BR>User-Agent:
+Java/1.6.0_07 <BR>Host: localhost:8888 <BR>Accept: text/html,
+image/gif, image/jpeg, *; q=.2, */*; q=.2 <BR>Connection: keep-alive
+<BR>Content-Length: 0 <FONT SIZE=4><BR><B><BR></B></FONT><B><FONT SIZE=3 STYLE="font-size: 13pt">2.
+XML Messaging API Example:</FONT></B></P>
+<P>The following is a <B>commit</B> service request.</P>
+<P>POST /ums/xml HTTP/1.1 <BR>Accept: text/xml, text/html, image/gif,
+image/jpeg, *; q=.2, */*; q=.2 <BR>Content-Type: text/xml;
+charset=utf-8 <BR>Content-Length: 393 <BR>SOAPAction: &quot;&quot;
+<BR>Cache-Control: no-cache <BR>Pragma: no-cache <BR>User-Agent:
+Java/1.6.0_07 <BR>Host: localhost:8888 <BR>Connection: keep-alive
+<BR><BR>&lt;SOAP-ENV:Envelope
+xmlns:SOAP-ENV=&quot;<A HREF="http://schemas.xmlsoap.org/soap/envelope/">http://schemas.xmlsoap.org/soap/envelope/</A>&quot;&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;SOAP-ENV:Header&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ums:MessageHeader
+xmlns:ums=&quot;https://mq.java.net/ums&quot; ums:id=&quot;1.0&quot;
+ums:version=&quot;1.0&quot;&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ums:Service
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ums:service=&quot;commit&quot;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ums:sid=&quot;7-LTgxMDczMTczNQ==&quot;
+/&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/ums:MessageHeader&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/SOAP-ENV:Header&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;SOAP-ENV:Body/&gt;<BR>&lt;/SOAP-ENV:Envelope&gt;<BR><BR><A HREF="./protocol.html">Back
+to UMS protocol page.</A></P>
+</BODY>
+</HTML>
