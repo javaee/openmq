@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<!--
+
+    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+
+    The contents of this file are subject to the terms of either the GNU
+    General Public License Version 2 only ("GPL") or the Common Development
+    and Distribution License("CDDL") (collectively, the "License").  You
+    may not use this file except in compliance with the License.  You can
+    obtain a copy of the License at
+    https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+    or packager/legal/LICENSE.txt.  See the License for the specific
+    language governing permissions and limitations under the License.
+
+    When distributing the software, include this License Header Notice in each
+    file and include the License file at packager/legal/LICENSE.txt.
+
+    GPL Classpath Exception:
+    Oracle designates this particular file as subject to the "Classpath"
+    exception as provided by Oracle in the GPL Version 2 section of the License
+    file that accompanied this code.
+
+    Modifications:
+    If applicable, add the following below the License Header, with the fields
+    enclosed by brackets [] replaced by your own identifying information:
+    "Portions Copyright [year] [name of copyright owner]"
+
+    Contributor(s):
+    If you wish your version of this file to be governed by only the CDDL or
+    only the GPL Version 2, indicate your decision by adding "[Contributor]
+    elects to include this software in this distribution under the [CDDL or GPL
+    Version 2] license."  If you don't indicate a single choice of license, a
+    recipient has the option to distribute your version of this file under
+    either the CDDL, the GPL Version 2 or to extend the choice of license to
+    its licensees as provided above.  However, if you add GPL Version 2 code
+    and therefore, elected the GPL Version 2 license, then the option applies
+    only if the new code is made subject to such option by the copyright
+    holder.
+
+-->
+
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="StarOffice 8  (Win32)">
+	<META NAME="AUTHOR" CONTENT="chiaming">
+	<META NAME="CREATED" CONTENT="20080902;12395900">
+	<META NAME="CHANGED" CONTENT="20081001;13402935">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<P><B><FONT SIZE=4>rollback_reply</FONT></B></P>
+<P><B>rollback_reply </B><SPAN STYLE="font-weight: medium">is an http
+response message to the </SPAN><B><A HREF="./rollback.html">rollback</A>
+</B><SPAN STYLE="font-weight: medium">service</SPAN><B> </B><SPAN STYLE="font-weight: medium">request</SPAN><B>.</B></P>
+<P STYLE="font-weight: medium">For the Simple Messaging API,
+<B>rollback_reply</B> contains no information in the http response
+message body, but sets the following extension-header fields:</P>
+<P>ums.service: rollback_reply <BR>ums.mom: openmq <BR>ums.status:
+200&nbsp; <BR><BR>For the XML Messaging API, <B>rollback_reply</B>
+includes a SOAP message in the http response message body, and sets
+the following attributes of the Service element of the SOAP message
+header :</P>
+<P>&lt;ums:Service <BR>ums:mom=&quot;openmq&quot;
+<BR>ums:service=&quot;rollback_reply&quot; <BR>ums:status=&quot;200&quot;/&gt;<B><BR><BR></B>For
+both the Simple Messaging API and the XML Messaging API, a 200 status
+code indicates the <B>rollback</B> service request was successful.
+All other status codes indicate the <B>rollback</B> service request
+might not be successful.</P>
+<P><B><FONT SIZE=3 STYLE="font-size: 13pt">1. Simple Messaging API
+Example: </FONT></B>
+</P>
+<P>The following is a <B>rollback_reply</B> response message.</P>
+<P>HTTP/1.1 200 OK <BR>Server: Apache-Coyote/1.1 <BR>ums.service:
+rollback_reply <BR>ums.mom: openmq <BR>ums.status: 200 <BR>Content-Type:
+text/plain;charset=UTF-8 <BR>Content-Length: 0 <BR>Date: Tue, 02 Sep
+2008 23:04:05 GMT <BR><BR><B><FONT SIZE=3 STYLE="font-size: 13pt">2.
+XML Messaging API Example:</FONT></B></P>
+<P>The following is a <B>rollback_reply</B> response message that
+includes a SOAP message with Service element attribute values in the
+header.</P>
+<P STYLE="margin-bottom: 0in">HTTP/1.1 200 OK <BR>Server:
+Apache-Coyote/1.1 <BR>Accept: text/xml, text/html, image/gif,
+image/jpeg, *; q=.2, */*; q=.2 <BR>Content-Type:
+text/xml;charset=utf-8 <BR>Transfer-Encoding: chunked <BR>Date: Tue,
+02 Sep 2008 23:06:25 GMT <BR><BR>&lt;SOAP-ENV:Envelope
+xmlns:SOAP-ENV=&quot;<A HREF="http://schemas.xmlsoap.org/soap/envelope/">http://schemas.xmlsoap.org/soap/envelope/</A>&quot;&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;SOAP-ENV:Header&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ums:MessageHeader
+xmlns:ums=&quot;https://mq.java.net/ums&quot; ums:id=&quot;1.0&quot;
+ums:version=&quot;1.0&quot;&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ums:Service
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ums:service=&quot;rollback_reply&quot;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ums:mom=&quot;openmq&quot;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ums:status=&quot;200&quot;/&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/ums:MessageHeader&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/SOAP-ENV:Header&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;SOAP-ENV:Body/&gt;<BR>&lt;/SOAP-ENV:Envelope&gt;<BR><BR><A HREF="./protocol.html">Back
+to UMS protocol page.</A></P>
+</BODY>
+</HTML>
