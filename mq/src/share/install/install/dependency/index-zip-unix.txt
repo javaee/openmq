@@ -1,2 +1,0 @@
-MessageQueue.xml
-JavaHelpRuntime.xml
