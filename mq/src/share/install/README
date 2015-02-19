@@ -1,0 +1,5 @@
+#Make the package
+pkgmk -a all -b /ru1/17160/200702092015/src/pkgdefs/.. -o -v 1.0,REV=2007.02.09.16.40 -d . SUNWmq-install
+
+#Transfer package to media image
+pkgtrans . /path/to/media_image/Product/UNIX/SOLARIS/SPARC|X86/5.10/Packages/SUNWmq-install SUNWmq-install
