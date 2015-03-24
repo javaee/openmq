@@ -1,2 +1,0 @@
-com/sun/messaging/jmq/jmsserver/**/**.java
-com/sun/messaging/jmq/util/lists/**/**.java
