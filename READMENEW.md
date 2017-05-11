@@ -77,7 +77,6 @@ Select the version you desire from the tables below.
 | Unix (e.g. Mac OSX) | Generic Unix zip archive |
 
 | Open MQ 5.1 Latest Developer Release, Binary Downloads |
-| Left-aligned | Left-aligned | 
 | :---         | :---      | 
 | git status   | git status     |
 | git diff     | git diff       | 
