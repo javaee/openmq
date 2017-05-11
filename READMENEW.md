@@ -11,7 +11,6 @@ Please see the [license](LICENSE) and the [terms of use for contributors](CONTRI
 # Table of Contents
 * [Downloads](#Download_OpenMQ)
 * [Quick start guide](www/overview.html)
-* [API Documentation](#API_Documentation)
 
 # <a name="Download_OpenMQ"></a>Download Open Message Queue
 
