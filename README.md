@@ -1,10 +1,14 @@
-# About
+Welcome to the new home of Open Message Queue (Open MQ) on GitHub.
 
-Welcome to the openmq project.
+Open Message Queue is the reference implementation for the JMS (Java Message Service) specification,
+and the JMS provide in GlassFish.
+
+Open Message Queue is a complete message-oriented middleware platform.
+It offers high quality, enterprise ready messaging and is open source with a community of developers and users. 
+
+Please see the [license](LICENSE) and the [terms of use for contributors](CONTRIBUTING).
+
+To find our more about Open MQ, read the  [Quick start guide](Overview.md) and visit the [Downloads page](Downloads.md).
 
 
-
-# IMPORTANT!
-
-* By contributing to this project, you are agreeing to the terms of use described in [CONTRIBUTING.md](./CONTRIBUTING.md)
 
