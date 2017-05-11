@@ -67,7 +67,7 @@ Select the version you desire from the tables below.
 
 | Open MQ 5.1 Latest Developer Release, Binary Downloads |
 | See the Open MQ 5.1 page for additional details on this product version |
-|:------------------------------------------------------:|
+|:------------------------------------------------------|
 | Operating System | file image (no installer) | 
 | Sun Solaris Sparc | Oracle Solaris Sparc zip archive | 
 | Sun Solaris x86 | Oracle Solaris x86 zip archive | 
