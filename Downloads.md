@@ -28,12 +28,12 @@ _See the Open MQ 5.1 page for additional details on this product version_
 | :---         | :---      | 
 | **Operating System**   | **file image (no installer)** |
 | :---         | :---      | 
-| Sun Solaris Sparc | Oracle Solaris Sparc zip archive | 
-| Sun Solaris x86 | Oracle Solaris x86 zip archive | 
-| Linux | Linux x86 zip archive | 
-| Microsoft Windows x86 | Microsoft Windows x86 zip archive | 
-| IBM AIX | IBM AIX zip archive | 
-| Unix (e.g. Mac OSX) | Generic Unix zip archive |
+| Sun Solaris Sparc | [Oracle Solaris Sparc zip archive](http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-sunos.zip) | 
+| Sun Solaris x86 | [Oracle Solaris x86 zip archive](http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-sunos_x86.zip) | 
+| Linux | [Linux x86 zip archive](http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-linux.zip) | 
+| Microsoft Windows x86 | [Microsoft Windows x86 zip archive](http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-windows.zip) | 
+| IBM AIX | [IBM AIX zip archive](http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-aix.zip) | 
+| Unix (e.g. Mac OSX) | [Generic Unix zip archive](http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-unix.zip) |
 
 #### Open MQ 5.0 Latest Developer Release, Binary Downloads
 
@@ -42,12 +42,12 @@ _See the Open MQ 5.0 page for additional details on this product version_
 | :---         | :---      | 
 | **Operating System**   | **file image (no installer)** |
 | :---         | :---      | 
-| Sun Solaris Sparc | Oracle Solaris Sparc zip archive |
-| Sun Solaris x86 | Oracle Solaris x86 zip archive |
-| Linux | Linux x86 zip archive |
-| Microsoft Windows x86 | Microsoft Windows x86 zip archive |
-| IBM AIX | IBM AIX zip archive |
-| Unix (e.g. Mac OSX) | Generic Unix zip archive |
+| Sun Solaris Sparc | [Oracle Solaris Sparc zip archive](http://download.java.net/mq/open-mq/5.0/latest/openmq5_0-binary-SunOS.zip) |
+| Sun Solaris x86 | [Oracle Solaris x86 zip archive](http://download.java.net/mq/open-mq/5.0/latest/openmq5_0-binary-SunOS_X86.zip) |
+| Linux | [Linux x86 zip archive](http://download.java.net/mq/open-mq/5.0/latest/openmq5_0-binary-Linux_X86.zip) |
+| Microsoft Windows x86 | [Microsoft Windows x86 zip archive](http://download.java.net/mq/open-mq/5.0/latest/openmq5_0-binary-Windows.zip) |
+| IBM AIX | [IBM AIX zip archive](http://download.java.net/mq/open-mq/5.0/latest/openmq5_0-binary-AIX.zip) |
+| Unix (e.g. Mac OSX) | [Generic Unix zip archive](http://download.java.net/mq/open-mq/5.0/latest/openmq5_0-binary-Unix.zip) |
 
 Open MQ 4.5 and earlier support JMS 1.1. This version of MQ is included with GlassFish Enterprise Server, 3.1.
 
@@ -58,12 +58,12 @@ _See the Open MQ 4.5 page for additional details on this release_
 | :--- | :--- | :--- |
 | **Operating System**   | **installer image** | **file image (no installer)** |
 | :--- | :--- | :--- |
-| Sun Solaris Sparc | image with installer | zip archive, no installer |
-| Sun Solaris x86 | image with installer | zip archive, no installer |
-| Linux | image with installer | zip archive, no installer |
-| Microsoft Windows x86 | image with installer | zip archive, no installer |
-| IBM AIX | image with installer | zip archive, no installer |
-| Unix (e.g. Mac OSX) | image with installer | zip archive, no installer |
+| Sun Solaris Sparc | [image with installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-installer-SunOS.zip) | [zip archive, no installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-binary-SunOS.zip) |
+| Sun Solaris x86 | [image with installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-installer-SunOS_X86.zip) | [zip archive, no installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-binary-SunOS_X86.zip) |
+| Linux | [image with installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-installer-Linux_X86.zip) | [zip archive, no installer]() |
+| Microsoft Windows x86 | [image with installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-installer-WINNT.zip) | [zip archive, no installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-binary-WINNT.zip) |
+| IBM AIX | [image with installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-installer-AIX.zip) | [zip archive, no installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-binary-AIX.zip) |
+| Unix (e.g. Mac OSX) | [image with installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-installer-Unix.zip) | [zip archive, no installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-binary-Unix.zip) |
 
 Beginning with Open MQ 4.4u2, Oracle no longer offers Open MQ as an independent product. 
 Open MQ will continue to provide builds and separate release packages as they are contributing to the GlassFish Server project. 
