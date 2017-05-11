@@ -19,14 +19,14 @@ and is also included in the
 
 # <a name="Latest_News"></a>Latest News
 
-## April 28, 2017 - JavaMail moves to GitHub! ##
+## April 28, 2017 - Open Message Queue moves to GitHub! ##
 
-Welcome to the new home of the JavaMail API project on GitHub!
-This project hosts the downloads and source code for the JavaMail API
-reference implementation. The JavaMail reference implementation is
-licensed under the
-[Common Development and Distribution License (CDDL) v1.1 and GNU General Public
-License (GPL) v2 with Classpath Exception](https://oss.oracle.com/licenses/CDDL+GPL-1.1).
+Welcome to the new home of Open Message Queue project on GitHub.
+This project hosts the downloads and source code for Open Message Queue,
+the reference implementation for the JMS (Java Message Service) specification,
+and the JMS provide in GlassFish.
+
+Please see the [licence](LICENSE).
 
 By contributing to this project, you agree to these additional terms of
 use, described in [CONTRIBUTING](CONTRIBUTING).
