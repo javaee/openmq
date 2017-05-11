@@ -45,7 +45,6 @@ A more complete feature list is available <a href="www/features.html">here</a>.
 <p>We have extensive manuals which describe these concepts and more. Begining with MQ 4.4 update 2, all MQ documentation is now contained in the related GlassFish Server documentation. GlassFish 3.0.1 documentation is available <a href="http://download.oracle.com/docs/cd/E19798-01/">here</a>. Legacy documentation, for all prior releases can be found at <a href="http://www.oracle.com/technetwork/indexes/documentation/legacy-glassfish-message-queue-306290.html">this link</a>. 
 <p> If you're new to JMS Messaging, you might want to read the Overview Guide to become oriented to the product. You can get your hands dirty with the Admin. overview and Quick Start tutorial, in the <a href="http://download.oracle.com/docs/cd/E19798-01/821-1794/gcrlv/index.html">Administration Guide, Part 1, Introduction to MQ Administration</a> -- which will guide you through the basic administration function, followed by a tutorial. Following that, you might find the <a href="http://download.oracle.com/docs/cd/E19798-01/821-1798/index.html">MQ Technical Overview</a> useful for planning and organizing how you want to approach your JMS project. 
 <p>There are also many tips and hints elsewhere on this site. 
-<hr width="40%" size="5" noshade="noshade" />
 
 <h2>Products that contain Open Message Queue</h2>
 
