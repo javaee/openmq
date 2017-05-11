@@ -19,51 +19,30 @@ and is also included in the
 
 # <a name="Latest_News"></a>Latest News
 
-## April 28, 2017 - Open Message Queue moves to GitHub! ##
+## 11 May 2017: Open Message Queue moves to GitHub ##
 
 Welcome to the new home of Open Message Queue project on GitHub.
-This project hosts the downloads and source code for Open Message Queue,
-the reference implementation for the JMS (Java Message Service) specification,
+This project hosts the downloads and source code for Open Message Queue.
+
+Open Message Queue is the reference implementation for the JMS (Java Message Service) specification,
 and the JMS provide in GlassFish.
 
-Please see the [licence](LICENSE).
+Please see the [licence](LICENSE) and [terms of use for contributors](CONTRIBUTING).
 
-By contributing to this project, you agree to these additional terms of
-use, described in [CONTRIBUTING](CONTRIBUTING).
+# <a name="Download_OpenMQ_Release"></a>Download Open Message Queue
 
-# <a name="Download_JavaMail_Release"></a>Download JavaMail Release
+The latest release of Open Message Queue is 5.1.
+This is a quality improvement and minor feature update which supports JMS 2.0.
+Open Message Queue 5.1 is the JMS provider included with GlassFish Enterprise Server Open Source Edition 4.1.
 
-The latest release of JavaMail is 1.5.6.
-
-The following table provides easy access to the latest release. Most
-people will only need the main JavaMail reference implementation in the
-javax.mail.jar file.
-
-|Item|Description|
-|:---|:----------|
-|[javax.mail.jar](https://github.com/javaee/javamail/releases/download/JAVAMAIL-1_5_6/javax.mail.jar)|The JavaMail reference implementation, including the SMTP, IMAP, and POP3 protocol providers|
-|[README.txt](docs/README.txt)|Overview of the release|
-|[NOTES.txt](docs/NOTES.txt)|Additional notes about using JavaMail|
-|[SSLNOTES.txt](docs/SSLNOTES.txt)|Notes on using SSL/TLS with JavaMail|
-|[NTLMNOTES.txt](docs/NTLMNOTES.txt)|Notes on using NTLM authentication with JavaMail|
-|[CHANGES.txt](docs/CHANGES.txt)|Changes since the previous release|
-|[COMPAT.txt](docs/COMPAT.txt)|Important notes about compatibility|
-
-
-In addition, the JavaMail jar files are published to the Maven repository. You can find them in both the [java.net Maven repository](http://maven.java.net), and in [Maven Central](http://search.maven.org).
-
-
-|jar file|groupId|artifactId|Description|
-|:-------|:------|:---------|:----------|
-|[javax.mail.jar](https://maven.java.net/content/repositories/releases/com/sun/mail/javax.mail/1.5.6/javax.mail-1.5.6.jar)|com.sun.mail|javax.mail|The JavaMail reference implementation jar file, including the SMTP, IMAP, and POP3 protocol providers|
-|[javax.mail-api.jar](https://maven.java.net/content/repositories/releases/javax/mail/javax.mail-api/1.5.6/javax.mail-api-1.5.6.jar)|javax.mail|javax.mail-api|The JavaMail API definitions only, suitable for compiling against|
-|[mailapi.jar](https://maven.java.net/content/repositories/releases/com/sun/mail/mailapi/1.5.6/mailapi-1.5.6.jar)|com.sun.mail|mailapi|The JavaMail reference implementation with no protocol providers; use with one of the following providers|
-|[smtp.jar](https://maven.java.net/content/repositories/releases/com/sun/mail/smtp/1.5.6/smtp-1.5.6.jar)|com.sun.mail|smtp|The SMTP protocol provider|
-|[imap.jar](https://maven.java.net/content/repositories/releases/com/sun/mail/imap/1.5.6/imap-1.5.6.jar)|com.sun.mail|imap|The IMAP protocol provider|
-|[pop3.jar](https://maven.java.net/content/repositories/releases/com/sun/mail/pop3/1.5.6/pop3-1.5.6.jar)|com.sun.mail|pop3|The POP3 protocol provider|
-|[gimap.jar](https://maven.java.net/content/repositories/releases/com/sun/mail/gimap/1.5.6/gimap-1.5.6.jar)|com.sun.mail|gimap|An EXPERIMENTAL Gmail IMAP protocol provider that supports Gmail-specific features|
-|[dsn.jar](https://maven.java.net/content/repositories/releases/com/sun/mail/dsn/1.5.6/dsn-1.5.6.jar)|com.sun.mail|dsn|Support for parsing and creating messages containing Delivery Status Notifications|
-|[logging-mailhandler.jar](https://maven.java.net/content/repositories/releases/com/sun/mail/logging-mailhandler/1.5.6/logging-mailhandler-1.5.6.jar)|com.sun.mail|logging-mailhandler|A java.util.logging handler that uses JavaMail, suitable for use in Google App Engine.|
+Open Message Queue is dual licensed with either CDDL or GPL v2 with ClassPath Exception. 
+[Click here to view the license](LICENSE).
+In addition, Open MQ Binaries include Mozilla 
+[Network Security Services](http://www.mozilla.org/projects/security/pki/nss) and
+[Network Security Portable Runtime](http://www.mozilla.org/projects/nspr)
+(NSS / NSPR) which are licensed under the LGPL (beginning with MQ 4.5). 
+You may only use these products under the terms of these licenses. 
+By downloading the source or binary archives from this site, you are agreeing to the terms of these licenses
 
 # <a name="API_Documentation"></a>API Documentation
 
@@ -109,74 +88,4 @@ Finally, you can send mail directly to the JavaMail team at
 JavaMail bugs are tracked in the
 [GitHub JavaMail project issue tracker](https://github.com/javaee/javamail/issues).
 
-# <a name="Development_Releases"></a>Development Releases
 
-From time to time snapshot releases of the next version of JavaMail
-under development are published to the
-[java.net Maven repository](http://maven.java.net).
-These snapshot releases have received only minimal testing, but may
-provide previews of bug fixes or new features under development.
-
-For example, you can download the javax.mail.jar file from the JavaMail
-1.6.0-SNAPSHOT release
-[here](https://maven.java.net/content/repositories/snapshots/com/sun/mail/javax.mail/1.6.0-SNAPSHOT/).
-Be sure to scroll to the bottom and choose the jar file with the most
-recent time stamp.
-
-A [Release Candidate version of JavaMail 1.6.0](https://maven.java.net/content/repositories/releases/com/sun/mail/javax.mail/1.6.0-rc1/javax.mail-1.6.0-rc1.jar)
-is now available. This is a non-final development release of JavaMail
-1.6.0 suitable for testing. Your feedback on this release is
-encouraged. The final release of JavaMail 1.6.0 is expected this
-summer.
-
-# <a name="JavaMail_for_Android"></a>JavaMail for Android
-
-The latest release includes support for JavaMail on Android.
-See the [Android](Android) page for details.
-
-# <a name="Project_Documentation"></a>Project Documentation
-
-You'll find more information about the protocol providers supported by
-JavaMail on the following pages:
-
--   [ smtp ](SMTP-Transport)
--   [ imap ](IMAP-Store)
--   [ pop3 ](POP3-Store)
--   [ mbox ](Mbox-Store)
--   [ pop3remote ](POP3-Remote-Store)
-
-If you're interested in writing your own protocol provider (most people
-won't need to), you can find more documentation on protocol providers
-[here](docs/Providers.pdf).
-
-The following pages provide hints and tips for using particular mail servers:
-
--   [Gmail](Gmail)
--   [ Yahoo! Mail ](Yahoo)
--   [ Exchange and Office 365 ](Exchange)
--   [ Outlook.com ](Outlook)
-
-The following pages provide hints and tips for using JavaMail on
-particular operating systems or environments:
-
--   [Windows](Windows)
--   [Google App Engine](Google-App-Engine)
-
-See [Build Instructions](Build-Instructions) for instructions on how to
-download and build the most recent JavaMail source code. You can also
-find a bundle of the source code for the most recent JavaMail release
-in the [Releases](https://github.com/javaee/javamail/releases) area of
-this project.
-
-If you're interested in contributing to JavaMail, see the
-[Contributions](Contributions) page.
-
-You can find a list of products related to JavaMail on the
-[Third Party Products](ThirdPartyProducts) page.
-
-Please see our page of
-[links to additional information about JavaMail and Internet email](Links)
-and our list of
-[books about JavaMail and Internet email](Books).
-
-To understand the JavaMail license, see the [License](JavaMail-License) page.
