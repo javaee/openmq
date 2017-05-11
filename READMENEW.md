@@ -76,6 +76,13 @@ Select the version you desire from the tables below.
 | IBM AIX | IBM AIX zip archive | 
 | Unix (e.g. Mac OSX) | Generic Unix zip archive |
 
+
+| Left-aligned | Center-aligned | Right-aligned |
+| :---         |     :---:      |          ---: |
+| git status   | git status     | git status    |
+| git diff     | git diff       | git diff      |
+
+
  
 Open MQ 5.0 Latest Developer Release, Binary Downloads
 See the Open MQ 5.0 page for additional details on this product version
