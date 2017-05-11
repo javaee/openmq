@@ -8,7 +8,7 @@ and is also included in the
 
 # Table of Contents
 * [Latest News](#Latest_News)
-* [Download JavaMail Release](#Download_JavaMail_Release)
+* [Download Open Message Queue Release](#Download_OpenMQ)
 * [API Documentation](#API_Documentation)
 * [Samples](#Samples)
 * [Help](#Help)
@@ -29,7 +29,7 @@ and the JMS provide in GlassFish.
 
 Please see the [license](LICENSE) and the [terms of use for contributors](CONTRIBUTING).
 
-# <a name="Download_OpenMQ_Release"></a>Download Open Message Queue
+# <a name="Download_OpenMQ"></a>Download Open Message Queue
 
 The latest release of Open Message Queue is 5.1.
 This is a quality improvement and minor feature update which supports JMS 2.0.
@@ -48,6 +48,11 @@ You may only use these products under the terms of these licenses.
 By downloading the source or binary archives from this site, you are agreeing to the terms of these licenses
 
 ## Downloads
+
+First Header | Second Header
+------------ | -------------
+Content from cell 1 | Content from cell 2
+Content in the first column | Content in the second column
 
 
 Open Message Queue is available for Solaris Sparc, Solaris x86, AIX, Linux, and Windows. 
