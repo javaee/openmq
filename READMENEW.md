@@ -49,34 +49,11 @@ By downloading the source or binary archives from this site, you are agreeing to
 
 ## Downloads
 
-| Open MQ 5.1 Latest Developer Release, Binary Downloads |
-| See the Open MQ 5.1 page for additional details on this product version |
-|Item|Description|
-|:---|:----------|
-|[javax.mail.jar](https://github.com/javaee/javamail/releases/download/JAVAMAIL-1_5_6/javax.mail.jar)|The JavaMail reference implementation, including the SMTP, IMAP, and POP3 protocol providers|
-|[README.txt](docs/README.txt)|Overview of the release|
-|[NOTES.txt](docs/NOTES.txt)|Additional notes about using JavaMail|
-|[SSLNOTES.txt](docs/SSLNOTES.txt)|Notes on using SSL/TLS with JavaMail|
-|[NTLMNOTES.txt](docs/NTLMNOTES.txt)|Notes on using NTLM authentication with JavaMail|
-|[CHANGES.txt](docs/CHANGES.txt)|Changes since the previous release|
-|[COMPAT.txt](docs/COMPAT.txt)|Important notes about compatibility|
-
-
 Open Message Queue is available for Solaris Sparc, Solaris x86, AIX, Linux, and Windows. 
 Select the version you desire from the tables below.
 
 | Open MQ 5.1 Latest Developer Release, Binary Downloads |
 | See the Open MQ 5.1 page for additional details on this product version |
-|:------------------------------------------------------|
-| Operating System | file image (no installer) | 
-| Sun Solaris Sparc | Oracle Solaris Sparc zip archive | 
-| Sun Solaris x86 | Oracle Solaris x86 zip archive | 
-| Linux | Linux x86 zip archive | 
-| Microsoft Windows x86 | Microsoft Windows x86 zip archive | 
-| IBM AIX | IBM AIX zip archive | 
-| Unix (e.g. Mac OSX) | Generic Unix zip archive |
-
-| Open MQ 5.1 Latest Developer Release, Binary Downloads |
 | :---         | :---      | 
 | Operating System   | file image (no installer)     |
 | :---         | :---      | 
