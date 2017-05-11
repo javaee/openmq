@@ -21,7 +21,7 @@ By downloading the source or binary archives from this site, you are agreeing to
 Open Message Queue is available for Solaris Sparc, Solaris x86, AIX, Linux, and Windows. 
 Select the version you desire from the tables below.
 
-#### Open MQ 5.1 Latest Developer Release, Binary Downloads 
+### Open MQ 5.1 Latest Developer Release, Binary Downloads 
 
 _See the Open MQ 5.1 page for additional details on this product version_
 
@@ -35,7 +35,7 @@ _See the Open MQ 5.1 page for additional details on this product version_
 | IBM AIX | [IBM AIX zip archive](http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-aix.zip) | 
 | Unix (e.g. Mac OSX) | [Generic Unix zip archive](http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-unix.zip) |
 
-#### Open MQ 5.0 Latest Developer Release, Binary Downloads
+### Open MQ 5.0 Latest Developer Release, Binary Downloads
 
 _See the Open MQ 5.0 page for additional details on this product version_ 
 
@@ -51,7 +51,7 @@ _See the Open MQ 5.0 page for additional details on this product version_
 
 Open MQ 4.5 and earlier support JMS 1.1. This version of MQ is included with GlassFish Enterprise Server, 3.1.
 
-#### Open MQ 4.5 Latest Stable (4.5.2) Binary Downloads
+### Open MQ 4.5 Latest Stable (4.5.2) Binary Downloads
 
 _See the Open MQ 4.5 page for additional details on this release_
 
@@ -73,6 +73,10 @@ Existing MQ customers should discuss the appropriate options, with their support
 JMS Development will continue as a component of GlassFish Server Open Source Edition 
 and as a component to Oracle GlassFish Enterprise Server. 
 Installer guide for stand-alone MQ will no longer be updated. 
-We will provide the Open MQ community updates and errata changes, using the Open MQ Wiki, here.
+We will provide the Open MQ community updates and errata changes.
 
 Open MQ 4.5 community documentation collection is contained within the GlassFish Server 3.1 Documentation Collection. 
+
+### Legacy versions
+
+Older versions of GlassFish Message Queue are available [here](https://mq.java.net/downloads/legacy-downloads.html)
