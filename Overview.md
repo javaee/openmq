@@ -25,7 +25,7 @@ A more complete feature list is available <a href="www/features.html">here</a>.
 [Downloads page](Downloads.md) for directions about how to obtain this package
 <h2>Open MQ Architecture and System Components </h2>
 <p>Here's a block diagram to orient you to the major system components of Open MQ
-<p align="center"><img src="to_MQService.jpg" alt="Open MQ Block Diagram" width="424" height="446" />
+<p align="center"><img src="www/to_MQService.jpg" alt="Open MQ Block Diagram" width="424" height="446" />
 <h2> <a name="broker" id="broker"></a>Open MQ Message Brokers</h2>
 <p>Message Brokers are the fundamental work-horses of Open MQ. These server side applications manage all message exchanges between the clients who are producing and consuming messages. A message broker is responsible for managing a collection of message destinations. Clients can produce messages to, or consume messages from a message destination. A message destination can be configured as a message queue, or as a topic destination. Queues are used when you want messages to be handled with precise ordering and, when you need to ensure that delivery is guaranteed. Topic destinations are useful in &quot;Publish and Subscribe&quot; messaging. Pub-Sub messaging is useful for distributing messages to more than one consumer (though there's no reason you can't have only one consumer). Whereas, message &quot;queues&quot; are used when you need to ensure that messages are handled in an exact order, and with specific recovery and retry capabilities.
 <p>Brokers can be &quot;clustered&quot; for service and data redundancy. Messages Broker Clusters manage internal book-keeping between the &quot;Cluster Nodes&quot; to ensure that the rules for delivery are followed. 
@@ -46,6 +46,8 @@ A more complete feature list is available <a href="www/features.html">here</a>.
 <p> If you're new to JMS Messaging, you might want to read the Overview Guide to become oriented to the product. You can get your hands dirty with the Admin. overview and Quick Start tutorial, in the <a href="http://download.oracle.com/docs/cd/E19798-01/821-1794/gcrlv/index.html">Administration Guide, Part 1, Introduction to MQ Administration</a> -- which will guide you through the basic administration function, followed by a tutorial. Following that, you might find the <a href="http://download.oracle.com/docs/cd/E19798-01/821-1798/index.html">MQ Technical Overview</a> useful for planning and organizing how you want to approach your JMS project. 
 <p>There are also many tips and hints elsewhere on this site. 
 <hr width="40%" size="5" noshade="noshade" />
+
+## Products that contain Open Message Queue
 
 <p>Open Message Queue is integrated into several community and commercial class products. It is the Java EE Java Message Service (JMS) provider for Project GlassFish, and it is the reference implementation JMS Provider for Java Platform, Enterprise Edition.
 <p>If you are interested in using a supported version of Open Message Queue, you should look over at the <a href="http://www.oracle.com/technetwork/middleware/glassfish/overview/index.html">Oracle GlassFish Server product pages</a>. Trial versions are available for download and service contracts are available from Sun Microsystems. Please remember, features in the commercial class products may vary from Open MQ. 
