@@ -57,7 +57,7 @@ Select the version you desire from the tables below.
 _See the Open MQ 5.1 page for additional details on this product version_
 
 | :---         | :---      | 
-| **Operating System**   | **file image (no installer) ** |
+| **Operating System**   | **file image (no installer)** |
 | :---         | :---      | 
 | Sun Solaris Sparc | Oracle Solaris Sparc zip archive | 
 | Sun Solaris x86 | Oracle Solaris x86 zip archive | 
@@ -71,7 +71,7 @@ _See the Open MQ 5.1 page for additional details on this product version_
 _See the Open MQ 5.0 page for additional details on this product version_ 
 
 | :---         | :---      | 
-| **Operating System**   | **file image (no installer) ** |
+| **Operating System**   | **file image (no installer)** |
 | :---         | :---      | 
 | Sun Solaris Sparc | Oracle Solaris Sparc zip archive |
 | Sun Solaris x86 | Oracle Solaris x86 zip archive |
@@ -88,35 +88,26 @@ _See the Open MQ 4.5 page for additional details on this release_
 
 
 | :--- | :--- | :--- |
-| **Operating System**   | **installer image** | **file image (no installer) ** |
+| **Operating System**   | **installer image** | **file image (no installer)** |
 | :--- | :--- | :--- |
-| Sun Solaris Sparc | image with installer | zip archive, no installer
+| Sun Solaris Sparc | image with installer | zip archive, no installer |
+| Sun Solaris x86 | image with installer | zip archive, no installer |
+| Linux | image with installer | zip archive, no installer |
+| Microsoft Windows x86 | image with installer | zip archive, no installer |
+| IBM AIX | image with installer | zip archive, no installer |
+| Unix (e.g. Mac OSX) | image with installer | zip archive, no installer |
 
-Sun Solaris x86
-	
-image with installer
-	
-zip archive, no installer
-Linux
-	
-image with installer
-	
-zip archive, no installer
-Microsoft Windows x86
-	
-image with installer
-	
-zip archive, no installer
-IBM AIX
-	
-image with installer
-	
-zip archive, no installer
-Unix (e.g. Mac OSX)
-	
-image with installer
-	
-zip archive, no installer
+Beginning with Open MQ 4.4u2, Oracle no longer offers Open MQ as an independent product. 
+Open MQ will continue to provide builds and separate release packages as they are contributing to the GlassFish Server project. 
+Support contracts continue to be offered as part of GlassFish Enterprise Server 
+and customers may use GlassFish MQ as a component of the Java EE server. 
+Existing MQ customers should discuss the appropriate options, with their support sales representative. 
+JMS Development will continue as a component of GlassFish Server Open Source Edition 
+and as a component to Oracle GlassFish Enterprise Server. 
+Installer guide for stand-alone MQ will no longer be updated. 
+We will provide the Open MQ community updates and errata changes, using the Open MQ Wiki, here.
+
+Open MQ 4.5 community documentation collection is contained within the GlassFish Server 3.1 Documentation Collection. 
 
 # <a name="API_Documentation"></a>API Documentation
 
