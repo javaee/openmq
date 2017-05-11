@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+  
+  <link rel="stylesheet" media="all" type="text/css" href="../style.css" />
+
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <title>VisualVM Plugin for Message Queue</title>
+
+  
+<!-- hide the project info -->
+  
+  <style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+.style3 {font-family: "Courier New", Courier, monospace; font-size: small; }
+  </style>
+</head><body>
+<table id="main2" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+    <tr class="nav1" valign="bottom">
+      <td colspan="3" nowrap="nowrap"><!-- tab 4--><br />
+      </td>
+    </tr>
+    <form>
+      <tr class="sub1">
+        <td nowrap="nowrap"><strong>&nbsp;<a name="orientation" id="orientation">Visual VM Plugin for MQ 4.4 </a></strong><br />
+</td>
+        <td align="right" nowrap="nowrap">&nbsp;<br />
+</td>
+      </tr>
+      <tr>
+        <td colspan="3" class="white">
+        <div class="min1">&nbsp;</div>
+        <br />
+        <br />
+</td>
+      </tr>
+    </form>
+  </tbody>
+  <p>We are introducing a Visual VM Plugin sample in Open MQ 4.4. This
+will be released as a binary only and we are interested in your
+feedback. Here are the details:</p>
+  <h2>VisualVM Plugin for Message Queue</h2>
+  <p>Please note that although this plugin is certainly useable, it is
+still under development. It is planned to release a more polished
+version in the 4.4 final release.</p>
+  <h3>What is this Plugin?</h3>
+The VisualVM plugin for MQ is a simple GUI application which provides a
+very easy way to display the monitoring and configuration attributes
+exposed by a MQ broker using JMX.&nbsp; It is provided as a plugin to
+the VisualVM tool included in Java 6 (version 1.6.0_14 or later). <br />
+  <br />
+You can already view MQ's JMX MBeans directly using the MBean plugins
+for VisualVM or JConsole. This new plugin provides access to the same
+information but is intended to be much easier to use, providing access
+to most information in only a few mouse clicks, and should make it much
+easier to see how a group of broker attributes varies over time. <br />
+  <br />
+The tool provides information about a running broker on a series of
+tabbed panes. The main pane provides general information about the
+broker. Other panes display lists of connections, consumers, producers,
+destinations and open transactions and show their configured and
+runtime attributes in a series of simple tables. You can also list the
+brokers in a running cluster. When you first open the tool a limited
+subset of all configuration and monitoring attributes exposed by MQ's
+JMX interface can be viewed, though you can configure the information
+displayed to show virtually any attribute available through JMX. <br />
+  <br />
+The tool is dynamic and continually refreshed to show the current value
+of each attribute. So you can watch the number of messages in a queue
+grow and fall, see how connections come and go or view the number of
+open transactions. <br />
+  <br />
+The tool can be used to monitor both standalone MQ brokers and those
+running embedded in a Glassfish instance.
+  <h3>How to install and run it</h3>
+  <p><strong>Make sure you have VisualVM installed</strong></p>
+  <ul>
+    <li>VisualVM is available as a JDK tool included in the Sun JDK 6
+distribution. You must use jdk1.6.0_14 or later. Earlier versions won't
+work. </li>
+    <li> To start VisualVM, run the <tt>jvisualvm</tt> executable in
+the <tt>bin</tt> directory of your JDK 6 installation. Sun's manual
+page for <tt>jvisualvm</tt> is <a href="http://java.sun.com/javase/6/docs/technotes/tools/share/jvisualvm.html">here</a></li>
+  </ul>
+  <ul>
+    <li>VisualVM can also be downloaded from <a href="http://visualvm.java.net/">visualvm.java.net</a>.
+You must use VisualVM 1.1.1 or later. Note that VisualVM is only
+supported on the platforms listed on the <a href="http://visualvm.java.net/relnotes.html">release note</a>.
+At the time of writing this did not include AIX.</li>
+  </ul>
+  <ul>
+    <li>Note for Apple Mac users: The Apple Java JDK 6 distribution
+includes VisualVM, but at the time of writing only update 13 was
+available, whereas you need update 14. You therefore currently need to
+download VisualVM 1.1.1 from <a href="http://visualvm.java.net/">visualvm.java.net</a>.
+    </li>
+  </ul>
+  <p><strong>Install the MQ plugin into VisualVM</strong></p>
+  <ul>
+    <li> Start VisualVM</li>
+    <li> Select Tools -&gt; Plugins to open the Plugins window. Click
+on the "Downloaded" tab.</li>
+    <li>Click on "Add Plugins", navigate to and select the plugin
+module <tt>com-sun-messaging-visualvm.nbm</tt>, which you can download
+from <a href="com-sun-messaging-visualvm.nbm">here</a> (on most
+browsers, right-click and choose SaveAs ...) and press Open to dismiss
+the file chooser dialog. This will display the VisualVM-MessageQueue
+plugin in the list of downloaded plugins. Press Install and follow the
+prompts to install it.</li>
+  </ul>
+  <p><strong>Use VisualVM to monitor a broker</strong></p>
+  <ul>
+    <li> Run VisualVM with the MQ plugin installed.</li>
+    <li> Start a MQ broker (if one is not already started). To see any
+information about the broker you need to start it with JMX enabled.
+      <ul>
+        <li>The simplest way to do this is to run it using Java 6. If
+required, use the <span class="style3">-javahome</span> argument:
+(e.g. <span class="style3">imqbrokerd -javahome "C:\Program
+Files\Java\jdk1.6.0_14"</span>)</li>
+      </ul>
+    </li>
+    <li> You should see the broker in the tree-view. Expand it and open
+its various sub nodes. If you see the tree-view but no data then you
+might not have started the broker with JMX enabled (see above).</li>
+  </ul>
+  <h3>How to use it</h3>
+  <p>Read the <a href="visualvm/quickstartguide/index.html">Quick
+start guide</a></p>
+  <p>Sun's JDK documentation contains some general information on using
+VisualVM <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/visualvm/index.html">here</a>.
+  </p>
+  <h3>Notes</h3>
+  <p><strong>Installation via Visual VM plugin directory</strong></p>
+  <p>We anticipate that we will make future versions of this plugin
+available from the Visual VM plugin repository. When that happens, you
+will likely need to manually uninstall this preliminary version, before
+you can install the signed version. <br />
+  </p>
+  <h3>Release notes</h3>
+  <p>Download from <a href="com-sun-messaging-visualvm.nbm">here</a>.</p>
+  <table border="1">
+    <tbody>
+      <tr>
+        <th>Build</th>
+        <th align="left">Notes</th>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td>First release to <tt>mq.java.net</tt></td>
+      </tr>
+      <tr>
+        <td>15.1</td>
+        <td>Updated to include tooltips for all attribute names.<br />
+        <br />
+Improved handling of the case where VisualVM is running and a broker
+(either a standalone broker or a client JVM or Glassfish instance
+containing an embedded broker) is then started. (Bug 6859980).</td>
+      </tr>
+    </tbody>
+  </table>
+  <p align="center">©2009-2012 Oracle Corporation, Inc. All Rights Reserved </p>
+  
+</table>
+</body></html>

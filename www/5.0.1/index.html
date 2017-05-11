@@ -1,0 +1,613 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type" /><title>Open MQ 5.0.1 (Preliminary)</title>
+  
+
+  
+  
+  <link href="../style.css" type="text/css" media="all" rel="stylesheet" />
+
+  
+  <meta content="no-cache" http-equiv="Pragma" />
+
+  
+  <meta content="-1" http-equiv="Expires" /><!-- hide the project info -->
+
+
+  
+  <style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+.style1 {
+	font-size: x-large;
+	font-weight: bold;
+}
+  </style></head><body>
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>
+    <h2>GlassFish Open Message Queue 5.1 (Formerly 5.0.1)</h2>
+    </div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+
+
+<thread> </thread>
+<p><a href="#download">Straight to the Downloads</a></p>
+
+<p>GlassFish Open MQ 5.0 was the worlds first JMS 2.0 compliant messaging project. Open MQ 5.1 is a minor update to that release. It contains some new features as well as bug fixes. Open MQ is available for community use as a stand-alone JMS provider and it is also included with GlassFish Server, Open
+Source Edition 4.1.<br />
+</p>
+
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>Project Overview </div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>Open MQ 5.1 will consist primarily of bug-fixes from the 5.0, JMS 2.0 / Java EE 7 inception release. The primary goal of Open MQ 5.0 was to facilitate completion of the JMS 2.0 specification. You can read more about that release by clicking this <a href="5.0.html">link to MQ 5.0 project page</a>. This release adds support for WebSocket interactions with the JMS server.</p>
+
+<p>We will use this page to provide updates as well as highlights of
+  the features and changes in store for MQ 5.1. Most likely, a JIRA query will be your best mechanism for determining what's been updated in 5.1 .We'll try to highlight the major changes, here. If you have any comments
+  or questions, please send e-mail to <a href="mailto:users@mq.java.net">users@mq.java.net</a>
+  or <a href="mailto:users@glassfish.java.net">users</a><a href="mailto:users@glassfish.java.net">@glassfish.java.net</a>.</p>
+
+<p>The roadmap for MQ 5.1 is still to be determined. We will update this page once we have additional details.</p>
+
+<table summary="This is a list of features that we plan to add to Open MQ 4.4. Please note: specifications are subject to change without notice." class="generic1" style="width: 100%;" border="0">
+
+  <caption> <span class="style1">GlassFish Open MQ 5.1 New Features </span>
+  </caption> <tbody>
+    <tr bgcolor="#cccccc">
+      <th scope="col" width="19%">Feature</th>
+      <th scope="col" width="44%">Description</th>
+      <th scope="col" width="9%">Current Status </th>
+      <th scope="col" width="10%">
+      <div align="center">Available?</div>
+      </th>
+      <th scope="col" width="6%">
+        <div align="center">Details</div>
+      </th>
+    </tr>
+    <tr>
+      <td>Add support for WebSocket<br />
+      </td>
+      <td>Using a combination of Grizzly and Tyrus, we'll add WebSocket to Open MQ. Read the slides of our JavaOne presentation, from this <a href="CON7777_Bratt-Kang.pdf">link (pdf</a>).<br />
+      </td>
+      <td>Complete<br />
+      </td>
+      <td>Yes<br />
+      </td>
+      <td><a href="ws.html">Guidelines  for using WebSocket in Open MQ</a><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Add Java JMS via WebSocket</td>
+      <td>Using the basic WebSocket support, provide a websocket implementation which supports Java JMS clients, yet uses WebSocket, rather than a direct TCP socket</td>
+      <td>Complete</td>
+      <td>Yes</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>Add STOMP over WebSocket</td>
+      <td>Provide support for STOMP 1.2 via WebSocket</td>
+      <td>Complete</td>
+      <td>Yes</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>Add experimental STOMP like protocol using JSON</td>
+      <td>Based on the STOMP protocol, provide mechanism to bind via JSON key-value pairs</td>
+      <td>Complete</td>
+      <td>Yes</td>
+      <td>&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+
+<br />
+
+<table summary="This is a list of features that we plan to add to Open MQ 4.4. Please note: specifications are subject to change without notice." class="generic1" style="width: 100%;" border="0" cellspacing="3">
+
+  <caption> <span class="style1">Useful Bug Queries</span>
+  </caption> <tbody>
+    <tr bgcolor="#cccccc">
+      <th scope="col" style="text-align: center;">Bug ID<br />
+      </th>
+      <th scope="col">Description</th>
+      <th scope="col">Bug/RFE </th>
+    </tr>
+    <tr>
+      <td style="text-align: center;"><br />
+      </td>
+      <td style="text-align: center;">Coming Soon</td>
+      <td><br />
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br />
+</p>
+
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>Schedule</div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>This release will track the GlassFish Server, Open Source Edition
+4.1 project. <br />
+</p>
+
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>
+    <div align="center">Open MQ 5.1 Milestones </div>
+    </div>
+    </td>
+    <td>
+    <div>
+    <div align="center">Date</div>
+    </div>
+    </td>
+    <td>
+    <div>
+    <div align="center">Description</div>
+    </div>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr>
+      <td>
+      <div>
+      <div align="center">Feature freeze <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-SunOS-20080707.zip">
+      </a></div>
+      <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-SunOS-20080707.zip">
+      </a></div>
+      </td>
+      <td>
+      <div>
+      <div align="center">TBD</div>
+      </div>
+      </td>
+      <td>
+      <div>All new features are integrated and available in a promoted
+build. The release is ready for testing. Community members are welcome
+to try any new feature as it is integrated. Feedback provides
+immeasurable benefit to the developers so please, don't hesitate to
+offer your experience feedback by sending an e-mail to <a href="mailto:users@mq.java.net">users@mq.java.net</a>. </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>
+      <div align="center">Hard-code freeze <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-SunOS_X86-20080707.zip">
+      </a></div>
+      <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-SunOS_X86-20080707.zip">
+      </a></div>
+      </td>
+      <td>
+      <div>
+      <div align="center">TBD</div>
+      </div>
+      </td>
+      <td>
+      <div>All QE tests have been run once and required fixes have been
+integrated. All bugs which have been prioritized for this release are
+fixed. (After this milestone, only show-stopper problems are eligible
+for further integration). While we'll always accept feedback, your
+input into how well the features are working for you is most useful to
+us if you can provide it around the beginning of May. </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>
+      <div align="center">Finish</div>
+      </div>
+      </td>
+      <td>
+      <div>
+      <div align="center">TBD<br />
+      </div>
+      </div>
+      </td>
+      <td>
+      <div>All tests completed and passed. All integration requirements
+met. Product released for community use. </div>
+      </td>
+    </tr>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p><br />
+</p>
+
+<table class="generic1" border="0" cellpadding="1" cellspacing="1" width="100%">
+
+  <tbody>
+    <tr bgcolor="#cccccc">
+      <th scope="col">
+      <div align="center">GlassFish Server, Open Source Edition
+Milestone </div>
+      </th>
+      <th scope="col">
+      <div align="center">GF Build Date</div>
+      </th>
+      <th scope="col">
+      <div align="center">GlassFish MQ Build </div>
+      </th>
+      <th scope="col">
+      <div align="center">MQ Build Date </div>
+      </th>
+      <th scope="col">
+      <div align="center">JIRA Target </div>
+      </th>
+    </tr>
+    <tr>
+      <td>
+      <div align="center">TBD</div></td>
+      <td align="center"><div>TBD</div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>
+      <div align="center">TBD</div>
+      </td>
+      <td align="center" valign="middle"><div>TBD</div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+
+<br />
+
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div><a id="download" name="download">Downloads</a></div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<table border="0" width="100%">
+  <tbody>
+    <tr>
+      <td bgcolor="#ffff99"><p class="generic1"> Open MQ is dual licensed with CDDL or GPL v2
+        with ClassPath Exception. <a href="LICENSE.txt">Click here to view the
+          license</a>. In addition, Open MQ Binaries include Mozilla <a href="http://www.mozilla.org/projects/security/pki/nss/">Network
+            Security Services</a> and <a href="http://www.mozilla.org/projects/nspr/">Network Security Portable
+              Runtime</a> (NSS / NSPR) which are licensed under the LGPL. You may
+        only use these products under the terms of these licenses. By
+        downloading the source or binary archives from this site, you are
+        agreeing to the terms of these licenses.
+        </p></td>
+    </tr>
+  </tbody>
+</table>
+<p>&nbsp;</p>
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="60%">
+
+  <thead> <tr>
+    <td colspan="3">
+    <div><a id="fileinstall" name="fileinstall">Open MQ&nbsp; 5.1
+Latest Downloads <blink><em /></blink><em><em><em><em><em><em><em><em /></em></em></em></em></em></em></em></a></div>
+<em><em><em><em>    <em><em> <em><em> <em><em><em><em> </em></em></em></em></em></em></em></em></em></em></em></em></td>
+  </tr>
+  </thead> <tbody>
+    <tr bgcolor="#cccccc">
+      <td style="text-align: center; background-color: rgb(204, 204, 204);">
+      Operating System
+      </td>
+      <td style="text-align: center; background-color: rgb(204, 204, 204);">&nbsp;</td>
+      <td style="text-align: center; background-color: rgb(204, 204, 204);"> Archive image (no installer) </td>
+    </tr>
+    <tr>
+      <td style="text-align: center;">Generic<br />
+      </td>
+      <td style="text-align: center;"><br />
+      </td>
+      <td style="text-align: center;"><a href="http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-unix.zip">Universal
+Binary (.zip)</a><a href="http://download.java.net/mq/open-mq/5.0/latest/mq5.0-source.zip">
+      </a></td>
+    </tr><tr>
+      <td style="vertical-align: top; text-align: center;">Windows<br />
+      </td>
+      <td style="vertical-align: top;"><br />
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a href="http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-windows.zip">Windows Binary (.zip)</a><br />
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">Linux x86<br />
+      </td>
+      <td style="vertical-align: top;"><br />
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a href="http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-linux.zip">Linux Binary (.zip)</a><br />
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">Solaris SPARC<br />
+      </td>
+      <td style="vertical-align: top;"><br />
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a href="http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-sunos.zip">Solaris SPARC binary (.zip)</a><br />
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">Solaris x86<br />
+      </td>
+      <td style="vertical-align: top;"><br />
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a href="http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-sunos_x86.zip">Solaris x86 binary (.zip)</a><br />
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;">IBM AIX<br />
+      </td>
+      <td style="vertical-align: top;"><br />
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a href="http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-binary-aix.zip">IBM AIX Binary (.zip)</a><br />
+      </td>
+    </tr>
+    <tr align="center">
+      <td colspan="3" rowspan="1" style="vertical-align: top;">&nbsp;</td>
+    </tr>
+
+  </tbody> <tbody>
+  </tbody>
+</table><br />
+<br />
+
+
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div><a id="source" name="source">Source-code Downloads 5.1<br />
+    </a></div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody>
+</table>
+
+<p>The MQ 5 Source is available two ways -- as a single .zip file, for convenient download, or through the MQ 5 Mercurial repository. The latest source zip file is at <a href="http://download.java.net/mq/open-mq/5.1/latest/openmq5_1-source.zip">this link</a>. Or, go to <a href="https://java.net/projects/mq/sources/mq5/show">this web-page</a> for the access URL for yoru Mercurial client.<br />
+</p>
+
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>Documentation</div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>These are the MQ 5.0 documents. MQ 5.1 updates will be posted as they become available.</p>
+<p>Open MQ 5.0 JavaDoc is available <a href="https://mq.java.net/nonav/javadoc/5.0/javadoc/index.html">here</a>.</p>
+<p>GlassFIsh MQ Documentation:</p>
+<table width="60%" border="0" cellspacing="5">
+  <tr>
+    <td><div align="center"><a href="https://glassfish.java.net/docs/4.0/mq-tech-over.pdf">Message Queue Technical Overview</a></div></td>
+    <td><div align="center"><a href="https://glassfish.java.net/docs/4.0/mq-dev-guide-java.pdf">Message Queue Developer's Guide for Java Clients</a></div></td>
+  </tr>
+  <tr>
+    <td><div align="center"><a href="https://glassfish.java.net/docs/4.0/mq-relnotes.pdf">Message Queue Release Notes</a></div></td>
+    <td><div align="center">
+      <table>
+        <tbody>
+          <tr>
+            <td colspan="2"><a href="https://glassfish.java.net/docs/4.0/mq-dev-guide-jmx.pdf">Message Queue Developer's Guide for JMX Clients</a></td>
+            </tr>
+          </tbody>
+      </table>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center"><a href="https://glassfish.java.net/docs/4.0/mq-admin-guide.pdf">Message Queue Administration Guide</a></div></td>
+    <td><div align="center"><a href="https://glassfish.java.net/docs/4.0/mq-dev-guide-c.pdf">Message Queue Developer's Guide for C Clients</a></div></td>
+  </tr>
+</table>
+<p>Several new resources are also available to help you learn about JMS 2.0</p>
+<ul>
+  <li>First and foremost, the <a href="http://jcp.org/aboutJava/communityprocess/final/jsr343/index.html">JMS 2.0 Specification</a> (or, try the <a href="https://jms-spec.java.net">JMS specification Project</a>)</li>
+  <li>OTN article: What's New in JMS 2.0 by Nigel Deakin: <a href="http://www.oracle.com/technetwork/articles/java/jms20-1947669.html">Part 1</a> and <a href="http://www.oracle.com/technetwork/articles/java/jms2messaging-1954190.html">Part 2</a></li>
+  <li>Java EE 7 Documentation is availabe <a href="http://docs.oracle.com/javaee/">here</a>.</li>
+  <li>Revised JMS section in the <a href="http://docs.oracle.com/javaee/7/tutorial/doc/home.htm">Java EE 7 Tutorial</a>. See <a href="http://docs.oracle.com/javaee/7/tutorial/doc/partmessaging.htm#GFIRP3">Messaging, part VII</a><br />
+  </li>
+</ul>
+
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td height="23">
+    <div>Maven</div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+<p>MQ 5 and higher is now built via Maven. See the build instructions in the <a href="https://java.net/projects/mq/sources/mq5/show/">top-level Readme</a> for details.</p>
+<p></p>
+
+
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>Promoted Build History&nbsp;&nbsp; &nbsp;<br />
+    </div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+
+<p><a href="http://download.java.net/mq/open-mq/5.1/latest/">The Latest build is generally available from this link</a></p>
+
+
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td colspan="3">
+    <div><a id="version-history" name="version-history" href="http://download.java.net/mq/open-mq/4.6/b01/">Build History </a></div>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr>
+      <td width="7%">
+      <div><a href="http://download.java.net/mq/open-mq/5.1/latest/"> Latest
+</a><br />
+      </div>
+      </td>
+      <td width="91%">
+      <div>The most recent build of MQ 5.1</div>
+      </td>
+      <td width="2%">
+      <div>
+      <div align="center"></div>
+      </div>
+      </td>
+    </tr>
+    <tr>
+      <td><div><a href="http://download.java.net/mq/open-mq/5.1/b09/">Build 9</a></div></td>
+      <td><div>Changed release version from to MQ 5.1 (was 5.0.1)</div></td>
+      <td><div>&nbsp;</div></td>
+    </tr>
+    <tr>
+      <td><div><a href="http://download.java.net/mq/open-mq/5.0.1/b08/">Build 8</a></div></td>
+      <td><div>Housekeeping update</div></td>
+      <td><div>&nbsp;</div></td>
+    </tr>
+    <tr>
+      <td><div><a href="http://download.java.net/mq/open-mq/5.0.1/b07/">Build 7</a></div></td>
+      <td><div>Bugs Fixed - <a href="https://java.net/jira/browse/MQ-307?jql=project = MQ AND status in (Resolved, Closed) AND resolved &gt;= 2014-03-03 AND resolved &lt;= 2014-06-12 ORDER BY updated DESC">Open MQ JIRA</a> (6), Update Grizzly 2.3.13, NSS 3.16 (pickup latest security fixes), Tyrus   1.5, JSONP 1.0, javamail 1.5.2, Added property to set read portmapper   timeout (C-Client: MQ_READ_PORTMAPPER_TIMEOUT_PROPERTY), Scalability Improvements to filestore</div></td>
+      <td><div>&nbsp;</div></td>
+    </tr>
+    <tr>
+      <td><div><a href="http://download.java.net/mq/open-mq/5.0.1/b06/">Build 6</a></div></td>
+      <td><div>Bugs Fixed - <a href="https://java.net/jira/browse/MQ-349?jql=project = MQ AND status in (Resolved, Closed) AND resolved &gt;= 2013-12-10 AND resolved &lt;= 2014-03-03 ORDER BY updated DESC">Open MQ JIRA</a> (2), More improvements in HA Takeover, Security improvements</div></td>
+      <td><div>&nbsp;</div></td>
+    </tr>
+    <tr>
+      <td><div><a href="http://download.java.net/mq/open-mq/5.0.1/b05/">Build 5</a></div></td>
+      <td><div>Bugs Fixed - <a href="https://java.net/jira/browse/MQ-290?jql=project = MQ AND status in (Resolved, Closed) AND resolved &gt;= 2013-11-22 AND resolved &lt;= 2013-12-10 ORDER BY updated DESC">Open MQ JIRA</a> (1)</div></td>
+      <td><div>&nbsp;</div></td>
+    </tr>
+    <tr>
+      <td><div><a href="http://download.java.net/mq/open-mq/5.0.1/b04/">Build 4</a></div></td>
+      <td><div>Bugs Fixed - <a href="https://java.net/jira/browse/MQ-346?jql=project = MQ AND status in (Resolved, Closed) AND resolved &gt;= 2013-09-23 AND resolved &lt;= 2013-11-22 ORDER BY updated DESC">Open MQ JIRA</a> (2), Lots of improvements in HA Takeover (particularly with Oracle RAC)</div></td>
+      <td><div>&nbsp;</div></td>
+    </tr>
+    <tr>
+      <td><div><a href="http://download.java.net/mq/open-mq/5.0.1/b03/">Build 3</a></div></td>
+      <td><div>Finalize WebSocket support</div></td>
+      <td><div>&nbsp;</div></td>
+    </tr>
+    <tr>
+      <td><div><a href="http://download.java.net/mq/open-mq/5.0.1/b02/">Build 2</a></div></td>
+      <td><div>Bugs Fixed - <a href="https://java.net/jira/browse/MQ-340?jql=project = MQ AND status in (Resolved, Closed) AND resolved &gt;= 2013-08-08 AND resolved &lt;= 2013-09-21 ORDER BY updated DESC">Open MQ JIRA</a> (11)</div></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td><div><a href="http://download.java.net/mq/open-mq/5.0.1/b01/">Build 1</a></div></td>
+      <td><div>Bug fixes - <a href="https://java.net/jira/browse/MQ-318?jql=project = MQ AND status in (Resolved, Closed) AND resolved &gt;= 2013-05-09 AND resolved &lt;= 2013-08-08 ORDER BY updated DESC">Open MQ JIRA</a> (20), Introduce WebSocket support, resolve many FindBugs warnings</div></td>
+      <td><div>&nbsp;</div></td>
+    </tr>
+  </tbody>
+</table>
+
+<p align="center">Feedback
+is always welcome -- e-mail to: <a href="mailto:users@mq.java.net">users@mq.java.net</a></p>
+
+<center>
+<script language="JavaScript">
+
+<!-- This script and many more are available free online at -->
+<!-- The JavaScript Source!! http://javascript.internet.com -->
+
+<!-- Begin
+var days = new Array(8);
+days[1] = "Sunday";
+days[2] = "Monday";
+days[3] = "Tuesday";
+days[4] = "Wednesday";
+days[5] = "Thursday";
+days[6] = "Friday";
+days[7] = "Saturday";
+var months = new Array(13);
+months[1] = "January";
+months[2] = "February";
+months[3] = "March";
+months[4] = "April";
+months[5] = "May";
+months[6] = "June";
+months[7] = "July";
+months[8] = "August";
+months[9] = "September";
+months[10] = "October";
+months[11] = "November";
+months[12] = "December";
+var dateObj = new Date(document.lastModified)
+var wday = days[dateObj.getDay() + 1]
+var lmonth = months[dateObj.getMonth() + 1]
+var date = dateObj.getDate()
+var fyear = dateObj.getYear()
+if (fyear < 2000) 
+fyear = fyear + 1900
+document.write("Last Updated " + wday + ", " + lmonth + " " + date + ", " + fyear)
+// End -->
+</script></center>
+
+</body></html>

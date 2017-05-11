@@ -1,0 +1,226 @@
+One pager template version: 1.91
+
+1. Introduction
+    1.1. Project/Component Working Name:
+
+    Dynamic Sync Broker List of MQ Conventional Cluster with GlassFish Cluster
+
+    1.2. Name(s) and e-mail address of Document Author(s)/Supplier:
+
+    Amy Kang     (amyk@dev.java.net)
+    Nigel Deakin
+
+    1.3. Date of This Document:
+
+    15 May 2010: Initial version
+    20 Jul 2010: Updated 
+
+2. Project Summary
+    2.1. Project Description:
+
+    In GlassFish EMBEDED and LOCAL JMS service modes, each GlassFish instance
+    in a GlassFish cluster is configured to have a LOCAL or EMBEDED broker
+    and manages the lifecycle of the broker. These brokers form a MQ cluster. 
+
+    When a GlassFish instance starts an EMBEDED or LOCAL broker, via JMS RA,
+    it passes a list of broker properties to the broker.  When the MQ cluster
+    is a conventional cluster, among these broker properties is the 
+
+    imq.cluster.brokerlist
+
+    which tells the configured list of brokers that will be part of the cluster.
+
+    imq.cluster.brokerlist controls whether a broker link to a remote broker 
+    should be auto-reconnected when the link is down and gives the configured
+    list of brokers belonging to this cluster for MQ administrative interfaces.
+
+    Since a GlassFish instance can be added or removed from a GlassFish cluster 
+    dynamically through GlassFish adminitrative user interfaces, a MQ broker 
+    that is running in a GlassFish cluster should be updated for the current  
+    imq.cluster.brokerlist accordingly.
+
+    2.2. Risks and Assumptions:
+
+    The assumptions are,
+   
+    1) GlassFish dynamic configuration change events in a GlassFish cluster will
+       propagate to each running GlassFish instance in that cluster. 
+
+    2) A GlassFish JMS module in EMBEDED and LOCAL modes can listen on GlassFish
+       dynamic configuration change events as well as GlassFish configuration 
+       synchronization events to learn changes on broker instances (host or IP 
+       address, port) associated to the GlassFish cluster that the JMS module is in.
+
+    3) Unpon receiving a GlassFish dynamic configuration change event, the JMS module
+       can query GlassFish configration API to get the updated configuration information. 
+
+    4) For a MQ conventional cluster that uses master broker in GlassFish LOCAL/EMBEDED
+       JMS mode, when changing of master broker is needed due to removing a GlassFish 
+       instance, GlassFish 3.1 JMS module can either
+
+       (a) Recommend GlassFish 3.1 user to use, or Configure it as default,  MQ conventional
+           cluster with no master broker mode by using a shared database[1]
+       or
+       (b) Implement use of MQ 4.5 feature of Dynamic Change Master Broker[2]
+       or
+       (c) Prevent the dynamic removal of GlassFish instance that associated with the
+           master broker dynamically, then instruct user to follow MQ change of master
+           broker manually:
+
+          (1) Shutdown all instances in the cluster 
+          (2) Start the old master broker instance with imqbrokerd option -backup <filename>, 
+              when the backup is done, shutdown the old master broker 
+          (3) Change all instances to have broker property imq.cluster.masterbroker set to 
+              the new master broker and change imq.cluster.brokerlist if necessary 
+          (4) Start up the new master broker with imqbrokerd option -restore <filename>,
+              where <filename> is the same file in step (2)
+          (5) Start up other brokers in the cluster
+
+3. Problem Summary
+    3.1. Problem Area:
+    3.2. Justification:
+
+    see 2.1
+
+4. Technical Description:
+     4.1. Details:
+
+     A GlassFish JMS module in a GlassFish instance that is running in a GlassFish
+     cluster will listen on GlassFish configuration change events to learn changes
+     about which broker instances belonging to the GlassFish cluster that the JMS
+     module is running in,  then pass this change information to the JMS RA.
+
+     The JMS RA then in turn notifies the associated EMBEDED or LOCAL broker instance
+     of the GlassFish instance through a MQ private admin-broker protocol.
+
+     Unpon receiving the notification, if it's not about changes in master broker, 
+     the broker will update the imq.cluster.brokerlist and reload it for this broker.
+     If the new imq.cluster.brokerlist does not contain the current master broker,
+     it will throw an exception.
+
+     4.2. Bug/RFE Number(s):
+     N/A
+
+     4.3. In Scope:
+
+     This one-pager describes changes in MQ only. 
+
+     This feature is applicable only to GlassFish JMS EMBEDED and LOCAL modes.
+
+     4.4. Out of Scope:
+
+     To support GlassFish JMS module the need of dynamic change master broker
+     in case of dynamic removing GlassFish instance associated with matser broker
+     is covered in a separate one pager[2].
+
+     This one-pager does not cover the changes needed to Glassfish JMS module.
+
+     4.5. Interfaces:
+
+        4.5.1.  Public Interfaces:
+
+        None 
+
+        4.5.2.  Private Interfaces:
+
+        1) JMS-RA and GlassFish JMS module contract:
+           New method on com.sun.messaging.jms.ra.ResourceAdapter (for use when the RA is being used for lifecycle management)
+           and com.sun.messaging.jms.blc.LifecycleManagedBroker (for use when it isn't)
+
+           public void setClusterBrokerList(String brokerList) throws Exception
+
+           where brokerList is in imq.cluster.brokerlist format;
+           
+           If this is called before the RA is started then this causes the
+		   property imq.cluster.brokerlist to be set on the broker.
+
+		   If this is called after the RA is started then
+		   (1) the updated brokerlist will be transmitted dynamically to the broker and
+           (2) if the broker is subsequently restarted (local mode only) then the
+               updated brokerlist will be used to set the property
+               imq.cluster.brokerlist on the restarted broker.
+
+           For reasons of backwards compatibility with old Glassfish versions,
+           setBrokerArgs() can continue to be used to set
+           -Dimq.cluster.brokerlist. However this method can only be called before the broker is started,
+           and this use of setBrokerArgs() will be depecated in 4.5. 
+
+        2) JMS-RA and broker private contract
+
+           New admin protocol (private): UPDATE_CLUSTER_BROKERLIST 
+
+           The broker will return an error status if the new broker list does not
+           contain the current master broker or if error occurs on updating its broker list 
+
+             
+        4.5.3.  Deprecated/Removed Interfaces:
+
+        N/A
+
+     4.6. Doc Impact:
+
+     No 
+
+     4.7. Admin/Config Impact:
+
+     No
+
+     4.8. HA Impact:
+
+     This feature applies only to MQ conventional cluster.
+
+     4.9. I18N/L10N Impact:
+
+     This feature will introduce new resource and log strings 
+
+     4.10. Packaging, Delivery & Upgrade:
+
+        4.10.1. Packaging
+
+        N/A
+
+        4.10.2. Delivery
+
+        N/A
+    
+        4.10.3. Upgrade and Migration:
+
+        N/A
+    
+     4.11. Security Impact:
+
+     N/A     
+
+     4.12. Compatibility Impact
+
+     This feature is only supported for MQ 4.5 and GlassFish 3.1 onward.
+
+     1) The new JMS RA method will not be invoked by GlassFish JMS module
+        in older version of GlassFish;
+
+     2) If 4.5 JMS RA talking to a < 4.5 version broker, the private admin protocol 
+        will be no op and an ERROR log message will be logged in broker log.
+
+     4.13. Dependencies:
+
+        4.13.1 Internal Dependencies
+
+        This feature has dependency on Glassfish JMS module. 
+
+        4.13.2 External Dependencies
+
+        None
+
+     4.14. Testing Impact
+
+     New tests need to be written and can be automated.
+
+5. Reference Documents:
+   [1] http://mq.java.net/4.5-content/cluster-nomaster-db.txt
+   [2] http://mq.java.net/4.5-content/dynamic-change-mastebroker.txt
+
+6. Schedule:
+    6.1. Projected Availability:
+
+    Milestone 3-4: MQ changes ready
+

@@ -1,0 +1,602 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- @(#)funcspec.html	1.8 01/27/05  -->
+
+<html>
+<head>
+<title>
+MQ: Functional Specification: Extended Transaction Log
+</title>
+</head>
+<body>
+<H5><I> Copyright 2009, Sun Microsystems Inc. All Rights Reserved
+</I></H5>
+<H2><center>
+			Functional Specification:  Extended Transaction Log
+</center></H2>
+
+
+
+<DL>
+<DT><b>1.0 Author/Date:</b><DD>
+	Gordon Sivewright 24 June 2009
+
+<P><DT><b>2.0 Synopsis:</b><DD>
+	Use a transaction log to store transactional state.
+
+<P><DT><b>3.0 PRD Requirement #:</b><DD>
+
+	N/A
+
+<P><DT><b>4.0 Description:</b><DD>
+	The aim of this feature is to provide a replacement for storing
+	transactional state in the File Store message store, with the aim
+	of improving transactional messaging performance. <p>
+
+
+	<H4>Overview of current non-transaction log implementation</H4>
+
+
+	Currently, transactional state is stored in two files: "txn" and "txnack".
+	Transactional data is stored in the form of a persistent hashmap keyed on transaction ID.
+    Starting a new JMS transaction creates a new transaction object which is persisted as an entry in the "txn" file.
+    Messages sent to the broker in a transaction are immediately persisted in destination files.
+    Messages are stored with a corresponding transactionID.
+    Message acknowledgements are added to a txnAck object and persited in the "txnack" file.
+    Multiple message acknowledgements in the same transaction each result in the txnAck object being rewritten
+    with the new message acknowledgement being added.
+    When the transaction commits, the state of the transaction object is updated to committed.
+    This results in a new copy of the transaction object being persisted.
+    When the transaction completes the transaction object is removed from the presistent hash map file.
+    It is apparent that multiple write operations are required to persiste the state of a transaction over its life cycle.
+    The reason for the number of writes and their specific order, is so that a consistent transactional state can
+    be reconstructed from the persistent store in the event of a failure at any point of update to that store.
+
+
+
+    <H4>Overview of existing transaction log implementation</H4>
+
+    Transaction logging was added to the broker in version MQ 3.7u2. This logging was to be used in conjunction with the
+    transactional persistence described above.
+    The idea is that transactional state and message data would be stored exactly as before, except that
+    after commit, message data and message acknowledgments would be written to a transaction log in sync-to-disk mode.
+    When the transaction log fills up, a checkpoint would be triggered.
+    This causes all transactional and message store files to be synced-to-disk.
+    The transaction log is then reset.<p>
+
+    The aim of this implementation was to provide a higher degree of resilience to failures that result in
+    loss of disk buffers before data had actually been persisted to disk.
+    This could be used as an alternative to turning on sync-to-disk for all transaction and message store files,
+    which was found to result in a large performance degradation due to the high number of writes.
+    A problem with the implementation is that data is only logged on commit and not prepare.
+    This means that in the event of loss of disk buffers :
+    a) prepared transaction state may be lost;
+    and
+    b) because data is written to message store before being logged, failure immediatley prior to logging may mean
+    the persistent state of the last transaction is inconsistent.
+
+
+	<H4>Overview of new transaction log implementation</H4>
+
+	The aim of this new transactional logging feature is to improve the robustness of the previous transaction log
+	implementation and to provide a potentially higher performing replacement to the current transactional persistence.
+<p>
+
+	The new logging works as follows. When a transaction is first started, transactional state is not persisted.
+	Messages sent to the broker in a transaction are also not persisted.
+	Instead they are held in memory, grouped with an associated transaction.
+	Similarly, message acknowledgements are not persisted but held in memory, grouped with an associated transaction.
+	When the transaction commits, all the transactional state, include message data and message acknowledgements
+	are written first to a transaction log.
+	The messages and message acknowledgments are then written to the message store. Writes to the transaction log are atomic.
+	In the event of a failure of the broker, on recovery, the transaction log is replayed. Complete transactions are read from
+	the log and new messages or message acknowledgments are applied to the message store.
+	Once replay has completed, the message store is synced-to-disk and the transaction log can be reset.
+  <p>
+	This implementation results in
+	fewer io write calls compared with running with no transaction log. As messages are written first to
+	the transaction log and then to message store files, the total number of written bytes may increase
+	for larger message sizes.
+
+  <H4>Extending the transaction logging feature to cover 2-phase transactions </H4>
+    The transaction log implementation has been extended to store prepared transactions in the transaction log.
+
+    <H4>Extending the transaction logging feature to cover cluster transactions </H4>
+    The transaction log implementation has been extended to store information about cluster transactions.
+    A cluster transaction occurs when a client consumes one or more messages in a transaction and where those messages
+    originate from a different broker in the cluster. The local broker then has to coordinate the transaction with one or
+    more remote brokers, which contain the messages being acknowledged. Additional state relating to the addresses of the
+    brokers needs to be stored. In addition the transaction may have to be upgraded to a 2-phase commit to ensure that all
+    brokers can commit the transactional work atomically.
+
+    <H4>Maintaining state of incomplete transactions across checkpoints</H4>
+    A checkpoint is triggerred when the transaction log fills up. This involves
+    <OL>
+    <LI>ensuring all committed work has been written to the message store</LI>
+    <LI>syncing-to-disk the message store</LI>
+    <LI>resetting the transaction log</LI>
+    </OL>
+
+    However, the state associated with incomplete transactions (e.g. those in a prepared state) needs to be maintained somewhere.
+    The state can not yet be added to the message store (as the transaction is not complete) and it can not be kept in the
+    transaction log (as this will be reset). Instead, on checkpoint, any incomplete transactions are stored in a special
+    variable record file called the incompleteTxnStore.
+    On recovery, this store is read to recover any incomplete transactions. Transactions can be removed from the incompleteTxnStore when they complete.
+    To ensure there is no window when transactional state is not persisted, completed transaction are only removed after the following
+    checkpoint, when the work is known to have been played to the message store.
+
+	<H4>Group commits</H4>
+
+	The transaction log implementation has been extended to allow group commits to be enabled, using the property:
+	"imq.persist.file.txnLog.groupCommit".
+	With this option set to true, writes to the transaction log are not performed directly by the calling thread.
+	Instead write operations are added to a queue.
+	A separate thread in the transaction log waits for notification that transactions are pending,
+	empties the queue and consolidates the queued writes into a single write operation.
+	This option can give higher performnace when there are many concurrent transactions in progress.
+	Performance may slightly deteriate for 2 or fewer transactional clients,
+	due to the additional thread context switch required to process the transactions.
+
+
+    <H4>Logging message removal to avoid duplicates on replay</H4>
+    If non-transacted message acknowledgements are not logged there is a danger that deleted messages will be added back
+    to the message store on txn log replay.
+    To avoid this, the ids all messages that have been logged since the last checkpoint are tracked by the broker.
+    If one of these logged messages is deleted from the store, and the last acknowledgement to that messages was not logged,
+    then a "remove message" event for this message id will be generated and logged.
+    On subsequent replay of the log, the message will be added back to the store but will then be removed again when the
+    "remove message" event is processed.
+    This new feature prevents the eroneous recreation of fully acknowledged or deleted messages on txn log replay.
+
+
+    <H4>Specifying sync mode of transaction log</H4>
+
+    When transaction logging is enabled, the transaction log file is opened in file mode "rw" by default.
+    To ensure that writes to the transaction log are synced to disk, the existing property:"imq.persist.file.sync.enabled" should be set to "true".
+    With this setting, the transaction log will be opened in mode "rwd", which means that writes calls should only return when
+    the written data has been persisted to disk. (In practice this can depend on the OS and storage system being used).
+    Other write operations to the message store will also be synced where appropriate if "imq.persist.file.sync.enabled" is set to "true".
+
+
+    <H4>Logging non-transacted messages and non-transacted message acks</H4>
+
+    If the transaction log is enabled then, by default, only the work associated with JMS transactions will be logged to the transaction log.
+    However, if the property "imq.persist.file.sync.enabled" is set true and transaction logging is enabled, non-transacted messages
+    and non-transacted message acks will also be logged to the transaction log. This is done for performance reasons as calling sync() on
+    a single transaction log file should generally be faster than calling sync on separate destination files.
+    Whether non-transacted messages and mesage acks are logged or not can also be explicitly set with the properties
+    "imq.persist.file.txnLog.logNonTransactedMsgAck" and "imq.persist.file.txnLog.logNonTransactedMsgAck".
+    The settings of these properties will override the default behavior.
+
+
+
+    <H4>New checkpoint command</H4>
+
+    A new checkpoint command had been implemented. Invoking this command on a broker triggers the transaction log to perform a
+    checkpoint, regardless of how full the transaction log fie is.
+    This command is intended principally for testing purposes, and will remain private.
+
+    <H4>Migrating transactional data between formats.</H4>
+
+    Persistent transactional state will be represented in different formats depending on whether transaction logging is enabled or not.
+
+     <UL>
+     <LI>If transaction logging is not enabled, then transactional state is stored in the files "txn" and "txnack".</LI>
+     <LI>If transaction logging is enabled, then transaction state is stored in the file "txnlog" and in VR record files
+     under the directory "incompleteTxnStore". </LI>
+
+    <LI>In order to ensure that transactional state is preserved across restarts of the broker, with different transaction log settings, transactional state will
+    be automatically converted between formats as required.</LI>
+
+    <LI>If the conversion process is interrupted, (e.g. due to the broker terminating before completing the conversion),
+    then on the next broker restart, any partially converted data will be rolled back and the transaction conversion will be re-applied.</LI>
+
+     </UL>
+
+
+<P><DT><b>5.0 Non-feature:</b><DD>
+	N/A
+
+<P><DT><b>6.0 Dependencies:</b><DD>
+
+<P>
+<TABLE border=1>
+<CAPTION> Internal interface dependencies</CAPTION>
+<TR>
+<TH>Project internal Interface</TH>
+<TH>Classification</TH>
+<TH>Comments/Specification</TH>
+</TR>
+<TR>
+<TD>Existing MQ transaction logging functionality</TD>
+<TD>Project Private </TD>
+<TD>http://jpgserv.red.iplanet.com/not/MQHarrier/engineering/funcspecs/TransactionLogging.txt
+http://jpgserv.red.iplanet.com/not/MQHarrier/engineering/funcspecs/transactionLogAPI/txnLogAPI.html
+</TD>
+</TR>
+<TR>
+<TD>Existing MQ Variable Record File</TD>
+<TD>Project Private </TD>
+<TD>http://jpgserv.red.iplanet.com/not/MQCrane/engineering/specs/store/vrfileformat.txt
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P><DT><b>7.0 Interfaces:</b><DD>
+
+
+
+<P>
+<TABLE border=1>
+<CAPTION>Exported Interfaces</CAPTION>
+
+<TR>
+<TH>Interface</TH>
+<TH>Classification</TH>
+<TH>Comments/Specification</TH>
+</TR>
+<TR>
+<TD>imq.persist.file.newTxnLog.enabled</TD>
+<TD>Uncommitted</TD>
+<TD>Property to enable new transaction logging. Will be renamed</TD>
+</TR>
+<TR>
+<TD>imq.persist.file.txnLog.groupCommit </TD>
+<TD>Uncommitted</TD>
+<TD>Property to control whether concurrent transactions can be grouped together into fewer write operations.</TD>
+</TR>
+<TR>
+<TD>imq.persist.file.txnLog.logNonTransactedMsgSend </TD>
+<TD>Uncommitted</TD>
+<TD>Property to override default behavior for logging non-transacted messages.</TD>
+</TR>
+<TR>
+<TD>imq.persist.file.txnLog.logNonTransactedMsgAck </TD>
+<TD>Uncommitted</TD>
+<TD>Property to override default behavior for logging non-transacted messages acks.</TD>
+</TR>
+<TR>
+<TD>IMQ_VARHOME/instances/instanceName/fs370/txnLog </TD>
+<TD>Proect Private</TD>
+<TD>Name of transaction log file.</TD>
+</TR>
+<TR>
+<TD>IMQ_VARHOME/instances/instanceName/fs370/incompleteTxnStore </TD>
+<TD>Project Private</TD>
+<TD>Name of directory holding incomplete transactions in VRFile format.</TD>
+</TR>
+<TR>
+<TD>Broker Log Information  </TD>
+<TD>Uncommitted     </TD>
+<TD>Modified an existing interface by adding new log messages (no format changes)</TD>
+</TR>
+<TR>
+<TD>imqcmd CLI </TD>
+<TD>Committed </TD>
+<TD>Add imqcmd checkpoint bkr</TD>
+</TR>
+<TR>
+<TD>imqcmd Ouput </TD>
+<TD>Uncommitted </TD>
+<TD>Modifies an existing interface to support outputtung completion of checkpoint command.</TD>
+</TR>
+
+</TABLE>
+
+
+
+
+<P><DT><b>8.0 Performance:</b><DD>
+
+
+For applications that require sync-to-disk behavior for file store persistence, (controlled by setting "imq.persist.file.sync.enabled=true"),
+then additionally enabling transaction logging with the property "imq.persist.file.newTxnLog.enabled" should significantly improve the performance of
+single broker and cluster transactions.<p>
+
+For applications that do not require sync-to-disk behavior ("imq.persist.file.sync.enabled=false"),
+enabling transaction logging may still improve transactional performance when compared to running the broker without a transaction log.
+This is because there are fewer io write operations needed
+to update the states of transactions. <p>
+
+With the transaction log feature enabled, all concurrently running transactions will have to write to the same transaction log
+file.
+This could introduce a performance penalty as the number of transactional clients increases, as each client thread will be
+competing to write to the transaction log.
+To mitigate against this issue, the group commit option can be activated (controlled with the property: "imq.persist.file.txnLog.groupCommit" ).
+This will allow writes to the transaction log from multiple clients to be grouped together into a smaller set of write operations.
+
+
+
+<P><DT><b>9.0 Configuration/Administration:</b><DD>
+
+    The new transaction logging feature is configured by setting broker properties.
+
+    The following configuration options have been added:<p>
+
+    <DL>
+    <DT>imq.persist.file.newTxnLog.enabled [default=false]</DT>
+    <DD>This option controls whether or not the new transactionLog is activated. At some stage this property may be renamed</DD>
+    <DT>imq.persist.file.txnLog.groupCommit [default=false]</DT>
+    <DD>This option controls whether concurrent transactions can be grouped together into fewer write operations. </DD>
+
+    <p>
+    The following existing configuration property still applies to the new transaction log feature: <p>
+
+     <DL>
+	    <DT>imq.persist.file.txnLog.file.size [default=1024*10]</DT>
+	    <DD>The size of the transaction log file in kbytes.</DD>
+    </DL>
+
+
+<P><DT><b>10.0 Instrumentation/Diagnostics:</b><DD>
+    This feature will not need to be specially monitored. It will service the same higher level objects that maintain
+    transactional information, and these will be monitored exactly as before. <p>
+
+    At a later stage we could consider adding additional metrics which could help when a user wishes to tune transaction log settings . E.g
+    <UL>
+    <LI> total number of checkpoints</LI>
+    <LI> rate of  checkpoints (over a certain time period)</LI>
+    <LI> number of transactions in a checkpoint </LI>
+    <LI> number of transactions committed in a group, when group commit optionis activated</LI>
+    </UL>
+
+    These might prove useful for tuning purposes and for diagnosing problems.<p>
+
+	There is extensive debug logging for this feature that can be activated by setting the following two properties:
+	 <UL>
+	    <LI> imq.debug.com.sun.messaging.jmq.jmsserver.persist.Store=true</LI>
+	    <LI> imq.log.level=DEBUGHIGH</LI>
+    </UL>
+
+
+<P><DT><b>11.0 Compatibility/Interoperability/Migration:</b><DD>
+
+<H4>Requirements for data migration</H4>
+<p>
+	 This feature implements a new mechanism for persisting transactional data.
+	 It is intended that activation of this feature will be configurable.
+	 This raises the issue of :
+	 <OL>
+	 <LI> how to handle any transactional state that
+	 is stored in "txn" and "txnack" files when starting a broker with transaction logging enabled. </LI>
+	 <LI> how to handle any transactional state that
+	 is stored in  transaction log or incompleteTxnStore files when starting a broker without transaction logging enabled. </LI>
+	 </OL>
+<p>
+<H4>Implementattion of data migration</H4>
+     This will be addressed by implementing automatic conversion between the different transactional persistence modes on broker
+     startup. If conversion is reqiuired, a warning message will be printed in the broker logs.
+     <p>
+
+     1) When starting in transaction logging mode:
+       <UL>
+         <LI>A check will be made to see if there is any partially converted transactional data. If so it will be rolled back.</LI>
+         <LI>A check will be made to ensure transaction state does not simultaneously  exist in both transaction mode formats.
+	     This should not happen, but an exception will be raised, an error will be printed in the log and
+	     the broker process will terminate if this is found to be the case.</LI>
+         <LI>Any transactional state will be read from non-transaction logging format ("txn" and "txnack" files).</LI>
+         <LI>Any completed transactions will be discarded. </LI>
+         <LI>Any incomplete prepared transactions or incomplete cluster transactions will be persisted in the incompleteTxnStore.</LI>
+         <LI>The "txn" and "txnAck" files will be cleared</LI>
+       </UL>
+     <p>
+
+     2)When starting in non transaction logging mode:
+	   <UL>
+	     <LI>A check will be made to see if there is any partially converted transactional data. If so it will be rolled back.</LI>
+         <LI>A check will be made to ensure transaction state does not simultaneously  exist in both transaction mode formats.
+	     This should not happen, but an exception will be raised, an error will be printed in the log and
+	     the broker process will terminate if this is found to be the case.</LI>
+	     <LI>Any transactional state will be read from transaction logging format (txnlog and incompleteTxnStore).</LI>
+	     <LI>Any completed transactions will be discarded. </LI>
+	     <LI>Any incomplete prepared transactions or incomplete cluster transactions will be persisted in the "txn" and "txnack" files.</LI>
+	     <LI>The txnlog and incompleteTxnStore will be cleared.</LI>
+	   </UL>
+<p>
+<H4>Support for older versions of the product</H4>
+  <UL>
+  <LI>Conversion of  transactional data (in non-transaction logging format), from older versions of the product
+     to the current version (4.4) will be supported.</LI>
+  <LI>Conversion of transactional data from the current version to older versions of the product will not be supported, in line with general data conversion policies for the product</LI>
+  </UL>
+
+<H4>Cluster requirements </H4>
+<p> All members of a cluster must use the same setting for transactional persistence. Brokers will be prevented from forming a cluster connection if they have different settings for transaction logging.
+<P><DT><b>12.0 Security:</b><DD>
+	This feature does not affect security
+
+<P><DT><b>13.0 Standards Conformance:</b><DD>
+	This feature does not implement any standard.
+
+<P><DT><b>14.0 Installation/packaging:</b><DD>
+	This feature should not affect the installation, removal or
+	 packaging of the product.
+
+<P><DT><b>15.0 Use Cases:</b><DD>
+
+
+	 <H4>Failure use cases</H4>
+	 The following failure and recovery use cases show how the state of
+	 transactions can be recovered if a failure occurs at specific critical points.
+
+	 <H5>case 1: 2-phase commit within a single checkpoint</H5>
+	 <OL>
+	 <LI>write prepared txn to txnLog</LI>
+	 <LI>write commit record to txnLog</LI>
+	 <LI>write txn to store</LI>
+	 <LI>checkpoint1</LI>
+	 </OL>
+
+ 	 <H5>case 2: 2-phase commit spanning a checkpoint</H5>
+     <OL>
+	 <LI>write prepared txn to txnLog</LI>
+	 <LI>checkpoint1</LI>
+	 <LI>write commit record to txnLog</LI>
+	 <LI>write txn to store</LI>
+	 <LI>write commit record to incompleteTxnStore</LI>
+	 <LI>checkpoint2</LI>
+     </OL>
+
+	 <H5>checkpoint sequence</H5>
+     <OL>
+	 <LI>sync message store</LI>
+	 <LI>write prepared txns (added since previous checkpoint) to incompleteTxnStore</LI>
+	 <LI>sync prepareTxnStore</LI>
+	 <LI>reset txn log</LI>
+	 <LI>remove committed txns (since last checkpoint) from incompleteTxnStore</LI>
+     </OL>
+
+	 <H5>replay after failure at 2.1 -> 2.2.2</H5>
+     <OL>
+	 <LI>read incompleteTxnStore (empty)</LI>
+	 <LI>read prepared txn from txnLog</LI>
+	 <LI>check if txn is in incompleteTxnStore. (add).</LI>
+	 <LI>checkpoint</LI>
+     </OL>
+
+	 <H5>replay after failure at 2.2.3 ->2.2.4</H5>
+     <OL>
+	 <LI>read txns from incompleteTxnStore</LI>
+	 <LI>read prepared txn from txnLog</LI>
+	 <LI>check if txn is in incompleteTxnStore. (already there)</LI>
+	 <LI>checkpoint</LI>
+	 </OL>
+
+	 <H5>replay after failure at 2.2.5</H5>
+     <OL>
+	 <LI>read preparedTxn from incompleteTxnStore</LI>
+	 <LI>checkpoint</LI>
+	 </OL>
+
+	 <H5>replay after failure at 2.3->2.5</H5>
+     <OL>
+	 <LI>read txns from incompleteTxnStore</LI>
+	 <LI>read commit record from txnLog</LI>
+	 <LI>write txn to message store (replace if there)</LI>
+	 <LI>write commit record to incompleteTxnStore (if not committed)</LI>
+	 <LI>checkpoint</LI>
+	 </OL>
+
+	 <H5>replay after failure at 2.6.4</H5>
+     <OL>
+	 <LI>read txns from incompleteTxnStore (find committed txn)</LI>
+	 <LI>do not replay (not in reset txnLog)</LI>
+	 <LI>checkpoint</LI>
+     </OL>
+
+
+
+
+
+
+
+
+<P><DT><b>16.0 Other:</b><DD>
+	N/A
+
+<P><DT><b>17.0 Documentation:</b><DD>
+
+
+<p>
+<TABLE border=1>
+<CAPTION>Documentation Impact</CAPTION>
+<TR>
+<TH>Book</TH>
+<TH>Comments</TH>
+</TR>
+
+<TR>
+<TD>Technical Overview</TD>
+<td>Brief summary of transaction log architecture &nbsp;</td>
+</TR>
+
+<TR>
+<TD>Administration Guide</TD>
+<td>New properties will need to be explained. New directories and files should be listed.&nbsp;</td>
+</TR>
+
+<TR>
+<TD>Developer's Guide for Java </TD>
+<td>no impact&nbsp;</td>
+</TR>
+
+<TR>
+<TD>Developer's Guide for C </TD>
+
+<td>no impact&nbsp;</td>
+</TR>
+
+<TR>
+<TD>Installation Guide</TD>
+<td>no impact&nbsp;</td>
+</TR>
+</TABLE>
+
+<P><DT><b>18.0 Open Issues:</b><DD>
+    <UL>
+    <LI> Need to test any effects of changing destinations and subscriptions in between checkpoints on message replay</LI>
+    <LI> Need to implement a set of fault injections to simulate failures at critical points in transaction log handling</LI>
+    <LI> Need to check error handling</LI>
+    <LI> Need to check if wildcard destinations have any impact</LI>
+    <LI> Consider support for separate txn logs for transactions involving sends only and transactions involving message acks (and sends)</LI>
+    <LI> Need to allow location of transaction log to be configured. For optimum perfoirmance it should be on a dedicated disk not used by other IO.</LI>
+    <LI> Need to internationalise any info messages (and error messages?).</LI>
+    </UL>
+
+<P><DT><b>19.0 Resolved Issues:</b><DD>
+    <UL>
+    <LI> Need to set a cookie in VRFile of incompleteTxnStore to identify version of transactional info being stored.
+         This should allow us, in future product versions, to introduce modifications to the format of stored transactional data in the VRFile.
+         The cookie should allow these different formats to be distinguished and converted appropriately.(Implemented)</LI>
+    <LI> Consider if we need to change FILE_VERSION in FileTransactionLogWriter.
+         It is actually the format of transaction log records themeselves rather than FileTransactionLogWriter that
+         are more likely to change.
+         We could read the first record (if one exists) to work out the version, but it would be more convenient if we
+         could determine this from the header.
+         Maybe we could introduce the concept of an application cookie that is written to the transaction log header, similar to VRFile.
+         There is currently an unused short field in the header that we could adopt for this. (Implemented)</LI>
+    <LI> Need to determine and implement policy for handling non-transactional message acknowledgments to transactional messages.
+         These acknowledgements can get overwritten by the transaction log replay mechanism, resulting in duplicate messages.
+         This was implemented by logging a remove message event when required to prevent erroneous replay</LI>
+    <LI> Need to ensure routing info is stored with messages in the transaction log. Routing information is now logged</LI>
+    <LI> Need to implement and test migration between transaction-log and non transaction log  persistence formats.
+         This has now been implemented. Conversion between formats will be done automatically if required on broker restart.</LI>
+    </UL>
+
+<P><DT><b>20.0 Version History:</b><DD>
+
+<table border="1">
+<tr><th>Date</th><th>Version</th><th>Change</th></tr>
+<tr><td>29/June/2009</td><td>1</td><td>Initial Draft</td></tr>
+<tr><td>13/July/2009</td><td>1.1</td><td>Added interfaces and migration sections.
+                                         Added description of checkpoint command.
+                                         Expanded Open issues section</td></tr>
+<tr><td>21/July/2009</td><td>1.2</td><td>Reviews interfaces with Linda.
+                                         Added section on logging non transacted messages.
+                                         Added section on logging non transacted message acknowledgements.
+                                         Added section on logging "remove message" events to avoid duplicates on replay.
+                                         Moved imported interfaces to dependencies.
+                                         Added open issue on separate logs for msg sends and msg acks. </td></tr>
+<tr><td>26/November/2009</td><td>1.3</td><td>Renamed properties (CR ).
+                                         Moved some open issues to resolved issues.
+                                         Changed property "imq.persist.file.txnLog.nonTransactedMsgSend.enabled" to "imq.persist.file.txnLog.logNonTransactedMsgSend".
+                                         Changed property "imq.persist.file.txnLog.nonTransactedMsgAck.enabled" to "imq.persist.file.txnLog.logNonTransactedMsgAck".
+                                         Modifies section on setting sync.
+                                         Remove all references to "imq.persist.file.txnLog.syncWrites".
+                                         Sync behavior is now controlled by existing property "imq.persist.file.sync.enabled"
+                                         Remove reference to property : "imq.persist.file.allowTxnFormatConversion". Any transaction state is now automatically converted as required.
+                                         Add issue about configuring location of transaction log.
+                                         </td></tr>
+</table>
+
+
+
+
+</DL>
+
+<H5><I>Copyright 2009, Sun Microsystems Inc. All Rights Reserved
+<P>
+(FS Version 1.1)</I></H5>
+</BODY>
+</HTML>

@@ -1,0 +1,314 @@
+One pager template version: 1.91
+
+1. Introduction
+    1.1. Project/Component Working Name:
+
+    Dynamic Change Master Broker
+
+    1.2. Name(s) and e-mail address of Document Author(s)/Supplier:
+
+    Amy Kang     (amyk@dev.java.net)
+    Nigel Deakin
+
+    1.3. Date of This Document:
+
+    26 July 2010: Initial version
+    10 Aug 2010: Updated resource adapter API
+
+2. Project Summary
+    2.1. Project Description:
+
+    Broker property imq.cluster.masterbroker specifies the master broker when
+    MQ conventional cluster running in master broker mode.  There is currently  
+    no way to dynamically change the master broker without shutting down the entire
+    cluster although one can dynamically change imq.cluster.brokerlist through
+    imqcmd.  This project is to add support for dynamic change of master broker.
+
+    This feature is especially needed when a MQ conventional cluster with master
+    broker running in a GlassFish cluster that has EMBEDDED or LOCAL JMS mode 
+    as GlassFish administrator dynamically removes a GlassFish instance that is
+    associated with the master broker.
+
+    2.2. Risks and Assumptions:
+
+    The assumptions are:
+
+    [#1 to #3, in concepts only, are specific for MQ in GlassFish EMBEDDED or
+     LOCAL JMS service
+
+    1) When the GlassFish instance that is associated with the EMBEDDED or LOCAL
+       master broker is removed from a GlassFish cluster, GlassFish JMS module
+       will initiate a change of master broker before GlassFish applies the dynamic
+       cluster configuration change.  To change the master broker GlassFish JMS 
+       module first contacts the JMS module in the GlassFish instance that is 
+       associated with the current master broker.
+
+    2) Only after GlassFish JMS module changing of master broker succeeds, will 
+       the dynamic removing of the GlassFish instance that is associated with
+       the old master broker be applied in GlassFish.
+
+    3) In GlassFish EMBEDDED and LOCAL JMS mode, GlassFish JMS module must propagate
+       dynamic change of master broker or broker list to JMSRA components in all
+       running GlassFish instances.
+
+    4) Both current master broker and the new master broker, and their associated
+       GlassFish instances if running as GlassFish EMBEDDED or LOCAL brokers,
+       must be running when dynamic changing of master broker.
+   
+    5) A broker must be running and established connection to the master broker
+       in order to have its master broker configuration dynamically changed.
+
+    6) All brokers must be 4.5 or later
+
+    7) JMS operations that require master broker can throw JMSException if 
+       changing of master broker is in progress or before a broker is switched
+       its master broker to the new master broker.
+
+3. Problem Summary
+    3.1. Problem Area:
+    3.2. Justification:
+
+    see 2.1
+
+4. Technical Description:
+     4.1. Details:
+
+     For MQ conventional cluster with master broker running outside of GlassFish
+     or running in GlassFish REMOTE JMS mode, this feature adds 'changemaster'
+     subcommand to imqcmd.
+
+     For MQ conventional cluster with master broker running in GlassFish EMBEDDED
+     or LOCAL mode, this feature can be used by GlassFish JMS module to dynamically
+     change master broker when its associated GlassFish instance is dynamically
+     removed by using private contract with JMS RA and MQ JMX interfaces.
+
+     4.2. Bug/RFE Number(s):
+
+     4.3. In Scope:
+
+     * MQ dynamic change of master broker via imqcmd or JMX for MQ conventional
+       cluster with master broker
+
+     * JMS RA and MQ JMX interfaces to allow GlassFish JMS module to use this 
+       feature for GlassFish EMBEDDED or LOCAL JMS modes when using master broker
+       for MQ conventional cluster.
+
+     4.4. Out of Scope:
+
+     This one-pager does not cover the changes needed in Glassfish JMS module
+     in order to use this feature.
+
+     4.5. Interfaces:
+
+        4.5.1.  Public Interfaces:
+        
+        1) New broker property
+
+           To use this feature, the following new broker property must set to true
+           to all brokers in the cluster,
+           imq.cluster.dynamicChangeMasterBrokerEnabled=true
+        
+        2) New imqcmd subcommand
+
+           For MQ conventional cluster with master broker running outside of GlassFish
+           or running in GlassFish REMOTE JMS mode, this feature introduces new imqcmd 
+           subcommand: 
+
+           imqcmd changemaster cls -o imq.cluster.masterbroker=<new-masterbroker-host:new-masterbroker-port>
+
+           This command must run on the current master broker. This command will return
+           error if run on a broker that is a GlassFish EMBEDDED or LOCAL broker.
+
+           When imq.cluster.dynamicChangeMasterBrokerEnabled=true, imq.cluster.masterbroker
+           is not allowed to be specified on the imqbrokerd command line or passed in as broker 
+           startup properties argument unless the broker is a GlassFish EMBEDDED or LOCAL
+           broker, that is, managed by JMS RA.
+        
+           imq.cluster.dynamicChangeMasterBrokerEnabled is ignored if broker is not in
+           a cluster that uses a master broker.
+        
+        3) MQ JMX API: New operation on the cluster configuration MBean
+           
+           Name: changeMasterBroker
+           
+           Parameters: oldMasterBroker (String), newMasterBroker (String)
+           
+           ResultType: CompositeData
+           
+           Description: Specify a change of master broker from oldMasterBroker to newMasterBroker,
+           where both arguments are in imq.cluster.masterbroker format (host:port).        
+                      
+           This operation may only be performed on the broker that is the current master broker.
+           If it is performed on any other broker it will have no effect and the CompositeDataObject
+           returned will contain details of the error.
+           
+           This operation must not be performed on a broker whose lifecycle is being managed by Glassfish.
+           In this case Glassfish tools much be used instead.         
+           
+           The value returned is a CompositeData object containing information about the success or otherwise 
+           of the operation. The lookup keys in this object are as follows: (These keys are defined as
+           static constants in the utility class ChangeMasterBrokerResultInfo for use with these objects).
+           
+           Key: Success
+           ValueType: Boolean
+           Description: Whether an error was encountered in executing the operation
+           If an error was encountered then the StatusCode and DetailMessage contain more information.
+                      
+           Key: StatusCode
+           ValueType: Integer
+           Description: Status code, set only when an error was encountered.
+           
+           Key: DetailMessage
+           ValueType: String
+           Description: Description of error, set only when an error was encountered.  
+
+        The return status of changing master broker operation for both #2) imqcmd and #3) JMX can be:
+        a) OK
+           The operation has returned successfully. It is guaranteed that both the old master broker 
+           and the new master broker have switched its master broker to the new master broker.
+
+           Please note that it is possible a non-master broker hasn't switched its master broker to
+           the new master broker due to wait timeout or network problem. In case of network problem
+           or other unlikely event,  the non-master broker instance may need to be shutdown and 
+           configured with the new master broker as its master broker then restarts.  Before a 
+           non-master broker swithes its master broker to the new master broker,  JMS operations
+           that needs the master broker will fail. 
+
+        b) BAD_REQUEST, NOT_ALLOWED, UNAVAILABLE, PRECONDITION_FAILED
+           When these status are returned,  the current master broker configuration in
+           the MQ cluster is not affected. 
+
+        c) An error status other than a) and b)
+           The cluster should be shutdown and configured with the new master broker as the 
+           master broker then restarts.
+
+        4.5.2.  Private Interfaces:
+
+        1) This feature adds new MQ cluster protocols
+           NEW_MASTER_BROKER_PREPARE
+           NEW_MASTER_BROKER
+
+        2) This feature adds new MQ admin protocol
+           CHANGE_CLUSTER_MASTER_BROKER
+
+        3) For MQ conventional cluster with master broker running in GlassFish 
+           EMBEDDED or LOCAL JMS mode, this feature updates the existing private contract between
+           JMS-RA and the GlassFish JMS module 
+           
+           Updated method on com.sun.messaging.jms.ra.ResourceAdapter 
+           (for use when the RA is being used for lifecycle management) 
+           and com.sun.messaging.jms.blc.LifecycleManagedBroker (for use when it isn't):
+
+           public void setMasterBroker(String masterBroker) throws Exception
+
+           where the masterBroker is the new master broker, and is in imq.cluster.masterbroker format.
+
+           If this is called before the RA is started then this causes the
+           property imq.cluster.masterbroker to be set on the broker.
+
+           If this is called after the RA is started then 
+           
+           (1) The master broker must have already been 
+               changed by performing the JMX changeMasterBroker operation on the old master broker.
+               The change is transmitted dynamically to the broker either for confirmation (If the broker
+               is the new or the old master broker) or for notification logging (see below).
+          
+           (2) if the broker is subsequently restarted (local mode only) then the
+               updated masterbroker will be used to set the property
+               imq.cluster.masterbroker on the restarted broker.
+               
+           Note that this method does not itself change the master broker. It simply
+           changes the master broker value stored in the resource adapter and specified when 
+           the managed broker is started or restarted. 
+           
+           Before calling this method to change the master broker, Glassfish must first execute the JMX 
+           changeMasterbroker operation on the old master broker. Only after this operation returns successfully 
+           should the setMasterBroker() method be called on the ResourceAdapter/LifecyclemanagedBroker 
+           instances of each running GlassFish JVMs in the cluster.
+           
+           If setMasterBroker() is called to specify a new master broker without the master broker 
+           having previously been changed then the managed broker may log an error and shut down
+           and setMasterBroker() will throw an Exception as a result. This will occur if the 
+           managed broker is either (1) the existing master broker or (2) the specified new master broker. 
+           
+           Note that this is an update to an existing method. This change is backwards-compatible.
+           The main change is that this method may now be called after the broker is started.
+           
+           For reasons of backwards compatibility with old Glassfish versions,
+           the imq.cluster.masterbroker property can continue to be set using setBrokerArgs().
+           However this use of setBrokerArgs() will be deprecated in 4.5.
+           Please note that setBrokerArgs() can only be called before the broker is started
+           and if it is used to specify the master broker then setMasterBroker()
+           must not be called subsequently to change it.
+                      
+             
+        4.5.3.  Deprecated/Removed Interfaces:
+
+        N/A
+
+     4.6. Doc Impact:
+
+     Yes. 
+
+     4.7. Admin/Config Impact:
+
+     Yes. 
+
+     4.8. HA Impact:
+
+     This feature applies only to MQ conventional cluster in master broker mode.
+
+     4.9. I18N/L10N Impact:
+
+     Yes.
+
+     4.10. Packaging, Delivery & Upgrade:
+
+        4.10.1. Packaging
+
+        N/A
+
+        4.10.2. Delivery
+
+        N/A
+    
+        4.10.3. Upgrade and Migration:
+
+        N/A
+    
+     4.11. Security Impact:
+
+     N/A     
+
+     4.12. Compatibility Impact
+
+     To use this feature, 
+     1) All brokers in the cluster must be >= 4.5.  This is enforced by the 
+        new broker property 
+        imq.cluster.dynamicChangeMasterBrokerEnabled
+
+     2) JMS RA must be the same version as the EMBEDDED or LOCAL broker
+
+     4.13. Dependencies:
+
+        4.13.1 Internal Dependencies
+
+        If this feature is used in GlassFish EMBEDDED or LOCAL JMS mode, it has
+        dependency on Glassfish JMS module. 
+
+        4.13.2 External Dependencies
+
+        None
+
+     4.14. Testing Impact
+
+     New tests need to be written and can be automated.
+
+5. Reference Documents:
+
+6. Schedule:
+    6.1. Projected Availability:
+
+    Milestone 4: MQ changes ready to be used
+    Milestone 5: feature complete
+

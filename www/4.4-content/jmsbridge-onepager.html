@@ -1,0 +1,179 @@
+<html>
+<TITLE>MQ 4.4: JMS Bridge</TITLE>
+<BODY>
+<H2>
+<CENTER>
+			New Work Analysis
+</CENTER>
+</H2>
+
+<DL>
+<dt>
+  <div align="center">Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. </div>
+</dt>
+<dd>&nbsp;</dd>
+<DT><b>Synopsis: </b><DD>
+JMS Bridge and Web Sphere MQ Integration
+
+<P><DT><b>Quick Questions:</b><DD>
+<UL><LI>Difficulity: Medium</LI>
+    </UL>
+
+<P><DT><b>Description:</b><DD>
+    JMS does not define a wire protocol for messaging.  Every JMS provider 
+    invariably uses its own propreitary protocol which causes "non- 
+    interoperability" across multiple JMS providers.  A MQ JMS Bridge
+    can bridge MQ with other JMS providers to allow messages to be passed
+    between MQ and other JMS providers. 
+<p>
+
+   The JMS specification makes bridging different JMS providers possible -
+   "A provider must be prepared to accept, from a client, a message
+    whose implementation is not one of its own. ..."
+    <p>
+
+    Web Sphere MQ (formerly named MQSeries) is IBM's messaging software. 
+    This feature proposes using JMS bridge to bridging Web Sphere MQ
+    so that existing Web Sphere MQ customers who wish to transit to use MQ
+    can inter-operate with existing Web Sphere MQ enterprise messaging system.  
+<P>
+    Web Sphere MQ supports JMS and XA interfaces (more in dependencies).
+<P><DT><b>Requestor:</b><DD>
+mq-interest alias, users@mq.java.net and MQ forum 
+
+<P><DT><b>Non-feature:</b><DD>
+<ul>
+<li>Bridging 2 foreign JMS providers are not supported. <br>
+<li>Bridging non-JMS providers are not supported.<br>
+<li>JMS 1.0.2 only providers are not supported<br>
+Connection factories must be JMS 1.1 either javax.jms.ConnectionFactory or javax.jms.XAConnectionFactory type
+</ul>
+<p>
+For Web Sphere MQ "client mode" (versus "bindings mode"), transacted (XA) link may not be 
+officially supported by Web Sphere MQ unless MQ JMS Bridge supports one of its officially supported transaction managers:
+according to its 6.0/7.0 documentation, Web Sphere MQ "client mode" supports
+XA through its extended transactional client. Although it says supports XA compliant external
+transaction managers but provided a list of "supported external transaction managers":<br>
+BEA Tuxedo, TXSeries,<br>
+WebSphere Application Server (use as a transaction manager in a WebSphere JMS application)<br>
+WebLogic<br>
+<p>
+<P><DT><b>Dependencies:</b><DD>
+<ul>
+<li>JMS 1.1<br>
+<li>Foreign JMS provider, such as IBM Web Sphere (6.0 or 7.0 and later)<br>
+    <ul>
+    <li>must be JMS 1.1 compliant<br>
+    <li>must support JNDI administrative objects<br>
+    <li>Connection factory must be either javax.jms.ConnectionFactory or javax.jms.XAConnectionFactory type<br>
+    <li>To use transacted link, must support the XA interfaces as a resource manager<br>
+    </ul>
+<li>JNDI and JNDI service provider(s) for lookup foreign JMS provider's or MQ's administrative objects
+<li>JTA intefaces for transacted links<br>
+</ul>
+<p>
+	Web Sphere MQ 6.0/7.0 supports JMS XA as following
+    according to its documentation
+    <ul>
+    <li>Web Sphere MQ bindings mode: JMS supports XA compliant transactions
+    <li>Web Sphere MQ client mode: XA is available through its extended 
+        transactional client jar, and support XA compliant external transaction 
+        managers but provided a list of "supported external transaction managers"<br> 
+    </ul>
+
+<P><DT><b>Phases:</b><DD>
+Phase 1 (4.4): Transacted (XA) and Non-Transacted links support; built-in XA transaction coordinator, XA recovery;
+<p>
+Phase 2 (post 4.4): MQ JMS bridge runs in HA-mode (be able to failover to the takeover broker) when running in a HA-clustered broker
+<P><DT><b>Direction of Implementation:</b><DD>
+<ol>   
+<li>Use MQ Pluggable Bridge Service Framework to embed JMS bridge in MQ broker 
+<li>Implement JMS bridge link management and connection management
+<li>Implement built-in XA transaction coordnator using JTA interfaces
+<li>Implement XA transaction coordinator transaction log using MQ persist HashMap utility classes and JDBC to use the same database as the broker's JDBC store
+<li>Implement XA transaction recovery
+</ol>
+</DL>
+<p>&nbsp;</p>
+<DL>
+  <DD>
+  <DT><b>Interfaces:</b>
+  <DD>
+    This feature will introduce new broker configuration properties and 
+    use the new administration utility - imqbridgemgr that used by the 
+    STOMP bridge - expand to support JMS bridge link management.
+    <p>
+      This feature will add new runtime subdirectores under broker instance's
+      directory when JMS bridge(s) are started.
+    <p>
+      This feature has dependency on JTA
+    <p>
+  <P>
+  <DT><b>Test Impact:</b>
+  <DD>
+    moderate. Tests for this feature can be automated.  
+    
+  <P>
+  <DT><b>Doc Impact:</b>
+  <DD>
+    This is a new feature that can be documented by adding new doc book. 
+    <p>
+      Admin GUI can be affected but it's not planned to do it in first release.
+  <P>
+  <DT><b>Support Impact:</b>
+  <DD>
+    moderate.  It can generate support questions related to IBM WebSphere MQ.
+    
+  <P>
+  <DT><b>Installation Impact:</b>
+  <DD>
+    This feature adds new jar files<br>
+    <ul>
+      <li>imqjmsbridge.jar  The JMS Bridge implementation classes
+      <li>jta.jar  The JTA interface classes
+     </ul>
+  
+
+  <P>
+  <DT><b>Admin/Config Impact:</b>
+  <DD>
+    This feature does not affect existing administration tools. It will
+    use the new administration tool, imqbridgemgr, which is the same
+    utility used by imqbridgemgr to be expanded to suport JMS Bridge link
+    management.
+    
+  <P>
+  <DT><b>I18N/L10N Impact:</b>
+  <DD>
+    I18N in logging messages
+    
+  <P>
+  <DT><b>Security Impact:</b>
+  <DD>
+    This feature will use MQ Bridge internal queues by the JMS Bridge runtime
+    "admin user" which can be protected by MQ access control.
+    
+  <P>
+  <DT><b>Risks:</b>
+  <DD>
+    This feature has foreign JMS provider, namely IBM Web Sphere MQ,  dependency.
+    However this feature uses stable standards JMS 1.1 and JTA 1.1 to interact 
+    with foreign JMS provider.
+    
+  <P>
+  <DT><b>See Also:</b>
+  <DD>
+    <a href="http://java.sun.com/javaee/technologies/jta/">JTA</a><br>
+    <a href="http://publib.boulder.ibm.com/infocenter/wmqv7/v7r0/index.jsp">Web Sphere MQ 7.0</a><br>
+    <a href="http://publib.boulder.ibm.com/infocenter/wmqv6/v6r0/index.jsp">Web Sphere MQ 6.0</a><br>
+    
+  <P>
+  <DT><b>Author/Date:</b>
+  <DD>
+    [Amy Kang 12/15/2008]
+</DL>
+<P>
+<i>Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. </i>
+<P><i>template version: @(#)onepager.txt	1.10 04/03/18</i>
+</BODY>
+</HTML>

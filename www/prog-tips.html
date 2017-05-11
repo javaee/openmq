@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<link rel="stylesheet" media="all" type="text/css" href="style.css" />
+<title>Open MQ: Programming Tips</title>
+<!-- hide the project info -->
+<style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+</style>
+
+</head>
+
+<body>
+<table border="0" cellspacing="0" cellpadding="0" id="main2" width="100%">
+<tr valign="bottom" class="nav1">
+<td nowrap colspan="3"><!-- tab 4--></td>
+</tr>
+<form><tr class="sub1">
+<td nowrap><strong>&nbsp;Open Message Queue -- Developer Tips </strong></td>
+<td align="right" nowrap>&nbsp;</td>
+</tr></form>
+<tr><td colspan="3" class="white"><div class="min1">&nbsp;</div></td></tr>
+</table>
+
+<p>This is a collection of tips that will help you use Open MQ efficiently and effectively. This is an evolving section, but if you have questions about a part of the product you don't see mentioned here, <a href="mailto:users@mq.java.net">drop us a line</a> and we can help you directly, or we'll see about putting an answer into our queue for writing up a tip. To start with, we thought it would be useful to create a collection of tips, pulled out of the existing product documentation. As we hear from you, we'll be able to add more information that will help you succeed with Open MQ. </p>
+<p>You might also want to check out the <a href="https://glassfish.java.net/wiki-archive/OpenMQFAQ.html">Open MQ FAQ</a> or perhaps the <a href="http://mq.java.net/nonav/javadoc/4.2/javadoc/index.html">JavaDocs</a>. </p>
+<hr width="45%" size="4" />
+<p><strong>Managing Memory </strong><br />
+  <br />
+A client application running in a JVM needs enough memory to  accommodate incoming messages as well as messages the client creates.  If the client gets OutOfMemory errors, you will need to do some memory  management. This may include taking one or more of the following steps:</p>
+<ol>
+  <li> Increasing the heap size allotted to your application</li>
+  <li> Breaking large messages into smaller parts and making sure they are  concatenated properly.</li>
+  <li> Compressing messages</li>
+</ol>
+<p>For additional information and an example showing how you set and send  a compressed message, go to <a href="http://download.oracle.com/docs/cd/E19798-01/821-1796/aeqdd/index.html">Managing Memory and Resources</a> in the <em>MQ Developers Guide for Java Clients</em>. </p>
+<p align="center"><a href="mailto:users@mq.java.net">e-mail us feedback </a></p>
+<hr width="45%" size="4" />
+<p><br />
+  <strong>The Impact of Selector Use on Performance</strong><br />
+  <br />
+How you use selectors can have a significant impact on application  performance. It's hard to measure the impact exactly because it will  vary with the complexity of selector expression and with the paths most  often traveled as a result of user action. However, there are steps  you can take to eliminate selectors or minimize their complexity. This  might involve using multiple destinations to sort messages, having  consumers share selectors, and making judicious use of selectors. For a  detailed discussion, see the heading &quot;Using Selectors Efficiently&quot; in <a href="http://download.oracle.com/docs/cd/E19798-01/821-1796/aeqcr/index.html">Client Design Considerations: Producers and Consumers</a> in the <em>Message Queue Developers Guide for Java Clients</em>. </p>
+<p align="center"><a href="mailto:users@mq.java.net">e-mail us feedback </a></p>
+<hr width="45%" size="4" />
+<p><strong>Using Threads<br />
+  </strong><br />
+Using client threads effectively requires that you balance performance,  throughput, and resource needs. To do this, you need to understand JMS  restrictions on thread usage, what threads the Message Queue service  allocates for itself, and the architecture of your applications. The Managing Client Threads section of the <em>MQ Developer's Guide  for Java Clients</em>, provides additional information about JMS  restrictions and Message Queue thread allocation. When it comes to the  architecture of your applications however, you are the expert. If your  application needs to run certain operations sequentially, using threads  to execute these in parallel can lead to very undesirable results. Make  sure that the threading strategy you use actually supports the way in  which clients will use your application. For more details on this, browse to <a href="http://download.oracle.com/docs/cd/E19798-01/821-1796/aeqda/index.html">Managing Client Threads</a> in the <em>MQ Developers Guide to Java Clients</em>. </p>
+<p align="center"><a href="mailto:users@mq.java.net">e-mail us feedback </a></p>
+<hr width="45%" size="4" />
+<p> <strong>Debugging: Using the Dead Message Queue</strong><br />
+  <br />
+The Message Queue service provides a special queue, the dead message  queue, where it will automatically store messages that cannot be  delivered. You can set properties to specify whether a message should  be sent to this queue if it cannot be delivered, whether information  should be logged about a message that is destroyed or placed on this  queue, and the kind of information you want to know about the dead  message. You can examine messages on the dead message queue to  determine why they could not be delivered and to determine the broker  that produced the message and the broker that placed the message on the  dead message queue.&nbsp; For more information, see the heading &quot;Managing the Dead Message Queue&quot; in the <a href="http://download.oracle.com/docs/cd/E19798-01/821-1796/aeqdd/index.html">Managing Memory and Resources section</a> of the <em>MQ Developers Guide for Java Clients</em>. </p>
+<p align="center"><a href="mailto:users@mq.java.net">e-mail us feedback </a></p>
+<hr width="45%" size="4" />
+<p> <strong>Detecting Connection Loss</strong><br />
+  <br />
+Certain clients may need additional support to determine whether a  connection has been lost. For example, clients who send messages  infrequently may not be aware that a connection is no longer available.  Or, clients who exclusively receive messages may not know that the  absence of messages is due to connection failure. To help such clients,  Message Queue allows you to define a ping interval (using a connection  factory attribute). At the time specified by this interval&nbsp; the client  runtime checks the client's connection to the broker. A failed  connection will raise a JMSException and alert an exception listener to  this condition. For more details, see <a href="http://download.oracle.com/docs/cd/E19798-01/821-1796/aeqdl/index.html">Programming Issues for Message Consumers</a> in the <em>MQ Developers Guide for Java Clients</em>. </p>
+<p align="center"><a href="mailto:users@mq.java.net">e-mail us feedback </a></p>
+<hr width="45%" size="4" />
+<p> <strong>Improving Performance</strong><br />
+  <br />
+In order to improve performance, you must understand how various  factors affect performance. These include the message delivery mode  used, the use of transactions, the acknowledgement mode set, and the  use of durable or non durable subscriptions. Other factors, such as the  use of selectors, message size, and message body type, also have an  impact.<br />
+For further discussion about how to balance reliability and throughput, please  have a look at <a href="http://download.oracle.com/docs/cd/E19798-01/821-1796/aeqdp/index.html">Factors Affecting Performance</a> in the <em>MQ Developers Guide for Java Clients</em>. </p>
+<p align="center"><a href="mailto:users@mq.java.net">e-mail us feedback </a></p>
+<hr width="45%" size="4" />
+<p><strong>Automatic Reconnection </strong><br />
+  <br />
+  Connection event notifications allow a Message Queue Client to  listen for closure and reconnection events and to take appropriate  action based on the notification type and the connection state. The  client can use these events to exit gracefully or to capture  information that may be useful in resolving problems. The client  listens for notification events using an event listener. The client  runtime calls this listener when the following happens: </p>
+<ul>
+  <li>The broker is about to close a connection due to a shutdown requested by the administrator. </li>
+  <li>A connection is closed due to a broker error or administrative shutdown. </li>
+  <li>The client runtime has reconnected to the same or a different broker. </li>
+  <li>The client runtime has failed to reconnect to a broker. </li>
+</ul>
+<p>For information about how to create an event listener see <a href="http://download.oracle.com/docs/cd/E19798-01/821-1796/gcbkz/index.html">Connection Event Notification</a> section of the <em>MQ Developers Guide for Java Clients</em>. <br />
+  <br />
+For information about how to enable auto-reconnect and how to handle exceptions in a variety of fail over situations, see the <a href="http://download.oracle.com/docs/cd/E19798-01/821-1796/aeqdx/index.html">Auto Connection Fail over</a> section in the <em>MQ Developer's Guide for Java Clients</em>. </p>
+<p align="center"><a href="mailto:users@mq.java.net">e-mail us feedback </a></p>
+<hr width="45%" size="4" />
+<p><strong>Improving Performance by Using No Acknowledge Mode </strong><br />
+  <br />
+  No-acknowledge mode is a nonstandard extension to the JMS API. It  allows consuming clients to forgo acknowledging the receipt of  messages. This feature can be useful by non durable subscribers  consuming non persistent messages, but it can be used by any consumer. <br />
+  Using this feature improves performance by reducing protocol  traffic and&nbsp; broker work involved in acknowledging messages. This  feature can also improve performance for brokers dealing with clients  who do not acknowledge messages and therefore waste broker memory  resources. <br />
+  Using this feature does raise the risk of message loss. For more  information on how to create no-acknowledge sessions, see &quot;<a href="http://download.oracle.com/docs/cd/E19798-01/821-1796/aeqef/index.html">Using No  Acknowledge Mode</a>&quot; in the <em>MQ Developers Guide for Java Clients</em>.</p>
+<p align="center"><a href="mailto:users@mq.java.net">e-mail us feedback </a></p>
+<hr width="45%" size="4" />
+<p>We'll add more of these from time to time. Check back when you have time.  </p>
+</body>
+</html>

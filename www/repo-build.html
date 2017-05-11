@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Open MQ Repo. Build</title>
+<link rel="stylesheet" media="all" type="text/css" href="style.css" />
+
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache" />
+<META HTTP-EQUIV="Expires" CONTENT="-1" />
+<!-- hide the project info -->
+<style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+.style1 {
+	font-size: x-large;
+	font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Open MQ Repository Build Instructions </div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<h1>
+  <div id="section">Builds</div>
+  <div id="title">Software License </div>
+</h1>
+<table width="100%" border="0">
+  <thread>
+    <tr>
+      <td bgcolor="#FFFF99"><p class="generic1"> Open MQ is dual licensed with either CDDL or GPL v2 with ClassPath Exception. <a href="LICENSE.txt">Click here to view the license</a>. In addition, Open MQ Binaries include Mozilla <a href="http://www.mozilla.org/projects/security/pki/nss/">Network Security Services</a> and <a href="http://www.mozilla.org/projects/nspr/">Network Security Portable Runtime</a> (NSS / NSPR) which are licensed under the LGPL. You may only use these products under the terms of these licenses. By downloading the source or binary archives from this site, you are agreeing to the terms of these licenses.</p></td>
+    </tr>
+  </thread>
+</table>
+<p>Use these instructions begriming with the final MQ 4.5 release, and, higher versions. </p>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Checking out the Open MQ Source</div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p><br />
+To download the most recent Open MQ source code you'll need <a href="http://www.selenic.com/mercurial/wiki/">Mercurial</a>.</p>
+<p>
+  Mercurial is available in <a href="http://opensolaris.org/os/">OpenSolaris</a> and most Linux distros. You can probably also use Mercurial with Cygwin, or, a Mercurial client for Windows such as <a href="http://tortoisehg.org">TortoiseHG</a>. Please note, you may need to modify these instructions to build with Cygwin due to path name inconsistencies. If anyone would like to recommend updates, for a Cygwin build, send them to <a href="mailto:users@mq.java.net">users@mq.java.net</a>. If you want to be notified whenever the repository is updated, subscribe to commits@mq.java.net (As of this writing, we use a single commit alias, for all our repositories. You may filter your mail by selecting only messages to the commit alias with this string 'mq~mq-hg').</p>
+<p>You can also read about using Mercurial with Kenai at this <a href="http://java.net/projects/help/pages/SourceControl">Kenai help page</a>, and reading the sections about Mercurial. Finally, the repository is also available for on-line viewing by clicking on <a href="http://java.net/projects/mq/sources/mq-hg/show">http://java.net/projects/mq/sources/mq-hg/show</a><br />
+  <br />
+  Once you've installed Mercurial, the following command will check out a  copy of the source code:<br />
+  <br />
+&nbsp;% hg clone <a href="https://hg.java.net/hg/mq%7Emq-hg">https://hg.java.net/hg/mq~mq-hg</a><br />
+<br />
+Or, to check out the version corresponding to a particular release, use  a tag. For example, to<br />
+check out the MQ4.5 version:<br />
+<br />
+&nbsp;% hg clone -r MQ4.5 <a href="https://hg.java.net/hg/mq%7Emq-hg">https://hg.java.net/hg/mq~mq-hg</a> mq<br />
+<br />
+To build OpenMQ you'll need:<br />
+1. <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">JDK 1.6.0_13 or higher</a><br />
+2. <a href="http://ant.apache.org/bindownload.cgi">Ant 1.7.1 or higher</a></p>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Building OpenMQ the source</div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p>&nbsp;1. Make sure you have 'wget' in your PATH.<br />
+  &nbsp;&nbsp;&nbsp; On Solaris, wget is available in /usr/sfw/bin.<br />
+  <br />
+  &nbsp;2. set JAVA_HOME to a JDK 1.6.0_13 or higher.<br />
+  &nbsp;&nbsp;&nbsp; set ANT_HOME to Ant 1.7.1 or higher.<br />
+  &nbsp;&nbsp;&nbsp; Add 'ant' to your PATH<br />
+  <br />
+  &nbsp;3. Bootstrap the external dependencies:&nbsp; (see &quot;Troubleshooting the  Build&quot; below if this fails)<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; % cd $TOP/mq<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; % ant bootstrap<br />
+  <br />
+  &nbsp;4. Build everything from the top:<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; % ant<br />
+  <br />
+  &nbsp;&nbsp;&nbsp; Note: If executing ant returns &quot;java.lang.OutOfMemoryError: Java  heap space&quot;,<br />
+  &nbsp;&nbsp;&nbsp; you should set ANT_OPTS to -Xmx512m to limit the amount of heap per  java process.</p>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Running OpenMQ</div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p><br />
+&nbsp;1. From this point, IMQ_HOME is considered to be $TOP/mq/dist/mq<br />
+  <br />
+&nbsp;2. To run the OpenMQ broker:<br />
+  <br />
+&nbsp;&nbsp;&nbsp; cd IMQ_HOME/bin<br />
+&nbsp;&nbsp;&nbsp; ./imqbrokerd -tty [-javahome &quot;&lt;javahome&gt;&quot;] (unix)<br />
+&nbsp;&nbsp;&nbsp; .\imqbrokerd -tty [-javahome &quot;&lt;javahome&gt;&quot;] (windows)<br />
+  <br />
+&nbsp;3. To run an OpenMQ client:<br />
+  <br />
+&nbsp;&nbsp;&nbsp; (In the mq/examples directory, run the HelloWorldMessage sample  program<br />
+&nbsp;&nbsp;&nbsp; to verify the build was successful.)<br />
+  <br />
+&nbsp;&nbsp;&nbsp; cd IMQ_HOME/mq/examples/helloworld/helloworldmessage<br />
+  <br />
+&nbsp;&nbsp;&nbsp; set CLASSPATH to include<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $IMQ_HOME/lib/jms.jar<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $IMQ_HOME/lib/imq.jar<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $IMQ_HOME/examples/helloworld/helloworldmessage<br />
+  <br />
+&nbsp;&nbsp;&nbsp; java HelloWorldMessage<br />
+  <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sending Message: Hello World<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Read Message: Hello World</p>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Troubleshooting the Build</div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p><br />
+  * If 'ant bootstrap' fails, you can workaround this by<br />
+&nbsp; downloading the external jars files manually.<br />
+  <br />
+&nbsp;&nbsp; 1. Download the following files into $TOP/mq/extlib/<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="http://download.java.net/maven/2/javax/javaee-api/6.0/javaee-api-6.0.jar">http://download.java.net/maven/2/javax/javaee-api/6.0/javaee-api-6.0.jar</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="http://download.java.net/maven/2/com/sun/grizzly/grizzly-nio-framework/1.9.18a/grizzly-nio-framework-1.9.18a.jar">http://download.java.net/maven/2/com/sun/grizzly/grizzly-nio-framework/1.9.18a/grizzly-nio-framework-1.9.18a.jar</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="http://download.java.net/maven/2/com/sun/woodstock/dependlibs/jhall/2.0/jhall-2.0.jar">http://download.java.net/maven/2/com/sun/woodstock/dependlibs/jhall/2.0/jhall-2.0.jar</a><br />
+  <br />
+&nbsp;&nbsp; 2. Rename grizzly-nio-framework-1.9.18a.jar to grizzly.jar<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Rename jhall-2.0.jar to jhall.jar<br />
+  <br />
+&nbsp;&nbsp; 3.&nbsp; Then continue to build the product by typing 'ant'.<br />
+  <br />
+  * If executing ant returns &quot;java.lang.OutOfMemoryError: Java heap  space&quot;,<br />
+&nbsp; you should set ANT_OPTS to -Xmx512m to limit the amount of heap per  java process.</p>
+<hr width="40%" size="3" />
+<p align="center">Feedback is always welcome -- e-mail to: <a href="mailto:users@mq.java.net">users@mq.java.net</a></p>
+
+<CENTER>
+<SCRIPT LANGUAGE="JavaScript">
+
+<!-- This script and many more are available free online at -->
+<!-- The JavaScript Source!! http://javascript.internet.com -->
+
+<!-- Begin
+var days = new Array(8);
+days[1] = "Sunday";
+days[2] = "Monday";
+days[3] = "Tuesday";
+days[4] = "Wednesday";
+days[5] = "Thursday";
+days[6] = "Friday";
+days[7] = "Saturday";
+var months = new Array(13);
+months[1] = "January";
+months[2] = "February";
+months[3] = "March";
+months[4] = "April";
+months[5] = "May";
+months[6] = "June";
+months[7] = "July";
+months[8] = "August";
+months[9] = "September";
+months[10] = "October";
+months[11] = "November";
+months[12] = "December";
+var dateObj = new Date(document.lastModified)
+var wday = days[dateObj.getDay() + 1]
+var lmonth = months[dateObj.getMonth() + 1]
+var date = dateObj.getDate()
+var fyear = dateObj.getYear()
+if (fyear < 2000) 
+fyear = fyear + 1900
+document.write("Last Updated " + wday + ", " + lmonth + " " + date + ", " + fyear)
+// End -->
+</SCRIPT>
+</CENTER>
+</body>
+
+
+</html>

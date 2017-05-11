@@ -1,0 +1,596 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+
+
+/* default css */
+
+table {
+  font-size: 1em;
+  line-height: inherit;
+}
+
+
+tr {
+  
+  text-align: left;
+  
+}
+
+
+div, address, ol, ul, li, option, select { 
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+p {
+  margin: 0px;
+}
+
+body {
+  margin: 6px;
+  padding: 0px;
+  font-family: Verdana, sans-serif;
+  font-size: 10pt;
+  background-color: #ffffff;
+}
+
+@media screen {
+  html.pageview {
+    background-color: #f3f3f3 !important;
+  }
+
+  
+    
+  body { 
+    min-height: 1100px; 
+  }
+  * html body { 
+    height: 1100px; 
+  }
+  .pageview body {
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-right: 2px solid #bbb;
+    border-bottom: 2px solid #bbb;
+    width: 648px !important;
+    margin: 15px auto 25px !important;
+    padding: 40px 50px; 
+  }
+  /* IE6 */
+  * html.pageview body {
+    overflow-x: auto;
+  }
+  
+  
+
+  
+
+}
+
+h6 { font-size: 10pt }
+h5 { font-size: 11pt }
+h4 { font-size: 12pt }
+h3 { font-size: 13pt }
+h2 { font-size: 14pt }
+h1 { font-size: 16pt }
+
+blockquote {padding: 10px; border: 1px #DDD dashed }
+
+a img {border: 0}
+
+.pb {height: 1px}
+
+div.google_header, div.google_footer {
+  position: relative;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+
+/* Table of contents */
+.editor div.writely-toc {
+  background-color: #f3f3f3;
+  border: 1px solid #ccc;
+}
+.writely-toc > ol {
+  padding-left: 3em;
+  font-weight: bold;
+}
+ol.writely-toc-subheading {
+  padding-left: 1em;
+  font-weight: normal;
+}
+.writely-toc-none {
+  list-style-type: none;
+}
+.writely-toc-decimal {
+  list-style-type: decimal;
+}
+.writely-toc-upper-alpha {
+  list-style-type: upper-alpha;
+}
+.writely-toc-lower-alpha {
+  list-style-type: lower-alpha;
+}
+.writely-toc-upper-roman {
+  list-style-type: upper-roman;
+}
+.writely-toc-lower-roman {
+  list-style-type: lower-roman;
+}
+.writely-toc-disc {
+  list-style-type: disc;
+}
+
+/* end default css */
+
+
+  /* default print css */
+  
+  @media print {
+    body { 
+      padding: 0; 
+      margin: 0; 
+    }
+
+    div.google_header, div.google_footer {
+      display: block;
+      min-height: 0;
+      border: none;
+    }
+
+    div.google_header {
+      flow: static(header);
+    }
+
+    /* used to insert page numbers */
+    div.google_header::before, div.google_footer::before {
+      position: absolute;
+      top: 0;
+    }
+
+    div.google_footer {
+      flow: static(footer);
+    }
+
+    /* always consider this element at the start of the doc */
+    div#google_footer {
+      flow: static(footer, start);
+    }
+
+    span.google_pagenumber {
+      content: counter(page);
+    }
+
+    span.google_pagecount {
+      content: counter(pages);
+    }
+
+    /* Table of contents */
+    #WritelyTableOfContents a::after {
+      content: leader('.') target-counter(attr(href), page);
+    }
+
+    #WritelyTableOfContents a {
+      text-decoration: none;
+      color: black;
+    }
+  }
+
+  @page {
+    @top {
+      content: flow(header);
+    }
+    @bottom {
+      content: flow(footer);
+    }
+  }
+  /* end default print css */
+ 
+
+/* custom css */
+
+
+/* end custom css */
+
+
+
+  /* ui edited css */
+  
+  body {
+    font-family: Verdana;
+    
+    font-size: 10.0pt;
+    line-height: normal;
+    background-color: #ffffff;
+  }
+  /* end ui edited css */
+
+
+
+/* editor CSS */
+.editor a:visited {color: #551A8B}
+.editor table.zeroBorder {border: 1px dotted gray}
+.editor table.zeroBorder td {border: 1px dotted gray}
+.editor table.zeroBorder th {border: 1px dotted gray}
+
+
+.editor div.google_header, .editor div.google_footer {
+  border: 2px #DDDDDD dashed;
+  position: static;
+  width: 100%;
+  min-height: 2em;
+}
+
+.editor .misspell {background-color: yellow}
+
+
+.editor .pb {
+  border-top: 1px dashed #C0C0C0; 
+  border-bottom: 1px dashed #C0C0C0
+}
+.editor .writely-comment {
+  font-size: 9pt; 
+  line-height: 1.4; 
+  padding: 1px; 
+  border: 1px dashed #C0C0C0
+}
+
+
+/* end editor CSS */
+</style>
+
+
+<base target="_top">
+
+</head>
+
+<body
+    
+    revision="ddrx2fnj_4zghwbfr:331">
+
+    
+    
+<div id=ixt4>
+  <h2 id=k:ir>
+    Set Up High-Availability Open MQ with MySQL Cluster
+  </h2>
+  Version 1.0<br id=bg7n>
+  Author: Phuong Nguyen<br id=bg7n0>
+  Last edited 07/15/2008<br id=elc30>
+  <h3 id=ak92>
+    Introduction
+  </h3>
+  This guide shows how to configure Open MQ with two brokers and MySQL Cluster
+  with two storage nodes and one management node that provides high-availability
+  for a minimal hardware configuration. This setup requires four servers.<br id=e-.5>
+  <h3 id=e_6y0>
+    Server Topology
+  </h3>
+  MySQL Cluster requires a minimum of three servers to provide true redundancy:
+  two MySQL/NDB servers and one management server. As the management server is a
+  light-weight process and does not use many resources, we can also run MQ
+  Broker instance 1 on the same machine.&nbsp; This means that a fourth server
+  is needed for the 2nd Broker instance. This topology is known as the
+  <i id=g..4>Separate Tier Topology</i>; the Broker instances and the MySQL/NDB
+  nodes are on different machines (hence the name separate tier).<br id=p9y3>
+  <br id=p9y30>
+  Another variation known as the Co-located Topology, run the Broker instance
+  and MySQL server on the same machine (hence the name co-located) so the NDB
+  node can run by itself on a single server. For simplicity, we'll use the
+  <i id=j95t>Separate Tier Topology</i> in this setup.<br id=y-2o>
+  <br id=sy.g>
+  <div align=center id=y1ux>
+    <table bgcolor=#cfe2f3 border=2 bordercolor=#9fc5e8 cellpadding=10 cellspacing=0 height=200 id=bvr8 width=500>
+      <tbody id=y1ux0>
+      <tr align=center height=50% id=y1ux1 valign=top>
+        <td align=center height=50% id=y1ux2 style=TEXT-ALIGN:center valign=top width=50%>
+          <font id=a-5k size=3><b id=xo-h style=COLOR:#0000ff>Server
+          3</b></font><br id=cl68>
+          <br id=twyv>
+          <div align=center id=xs5b>
+            <table bgcolor=#fce5cd border=1 bordercolor=#f9cb9c cellpadding=5 cellspacing=0 id=fy-f style="TEXT-ALIGN:left; MARGIN-LEFT:auto; MARGIN-RIGHT:auto" width=200>
+              <tbody id=xs5b0>
+              <tr align=left id=xs5b1 style=COLOR:#660000>
+                <td id=xs5b2 width=100%>
+                  <b id=de8q>Broker Instance 1</b><br id=xs5b3>
+                </td>
+              </tr>
+              <tr align=center id=nbfa style=COLOR:#660000>
+                <td id=nbfa0 width=100%>
+                  <b id=de8q0>Management Node</b><br id=nbfa1>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </td>
+        <td id=y1ux4 style=TEXT-ALIGN:center width=50%>
+          <font id=a-5k0 size=3><b id=xo-h0 style=COLOR:#0000ff>Server
+          4</b></font><br id=cl680>
+          <br id=p53g>
+          <div align=center id=e.-g>
+            <table bgcolor=#fce5cd border=1 bordercolor=#f9cb9c cellpadding=5 cellspacing=0 id=hns_ width=200>
+              <tbody id=e.-g0>
+              <tr id=e.-g1>
+                <td id=e.-g2 width=100%>
+                  <b id=de8q1 style=COLOR:#660000>Broker Instance
+                  2</b><br id=e.-g3>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <br id=y1ux5>
+        </td>
+      </tr>
+      <tr align=center height=50% id=y1ux6 valign=top>
+        <td id=y1ux7 style=TEXT-ALIGN:center width=50%>
+          <font id=a-5k1 size=3><b id=xo-h1 style=COLOR:#0000ff>Server
+          1</b></font><br id=cl681>
+          <br id=p53g0>
+          <div align=center id=li1q>
+            <table bgcolor=#fce5cd border=1 bordercolor=#f9cb9c cellpadding=5 cellspacing=0 id=yyup width=200>
+              <tbody id=li1q0>
+              <tr id=li1q1 style=COLOR:#660000>
+                <td id=li1q2 width=100%>
+                  <b id=de8q2>MySQL Node 1</b><br id=li1q3>
+                </td>
+              </tr>
+              <tr id=li1q4 style=COLOR:#660000>
+                <td id=li1q5 width=100%>
+                  <b id=de8q3>NDB Node 1</b><br id=li1q6>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </td>
+        <td align=center height=50% id=y1ux9 style=TEXT-ALIGN:center valign=top width=50%>
+          <font id=a-5k2 size=3><b id=xo-h2 style=COLOR:#0000ff>Server
+          2</b></font><br id=cl682>
+          <br id=p53g1>
+          <div align=center id=ztzl>
+            <table bgcolor=#fce5cd border=1 bordercolor=#f9cb9c cellpadding=5 cellspacing=0 id=vgm7 width=200>
+              <tbody id=ztzl0>
+              <tr id=ztzl1>
+                <td id=ztzl2 width=100%>
+                  <b id=de8q4 style=COLOR:#660000>MySQL Node 2</b><br id=ztzl3>
+                </td>
+              </tr>
+              <tr id=ztzl4>
+                <td id=ztzl5 width=100%>
+                  <b id=de8q5 style=COLOR:#660000>NDB Node 2</b><br id=ztzl6>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <br id=m6fg>
+  <h3 id=cm.f>
+    Step 1: Download and install MySQL Cluster 7.0.9<br id=ejdy>
+  </h3>
+  Download the appropriate MySQL Cluster binary distribution for you platform.
+  <a href=http://dev.mysql.com/downloads/cluster/ id=awt_ title="Download link"></a><a href=http://dev.mysql.com/downloads/cluster/ id=tbud target=_blank title="Download link">Download
+  link</a><br id=p:ii1>
+  <br id=gl6y>
+  Alex Davies has written an excellent write up on
+  <a href=http://dev.mysql.com/tech-resources/articles/mysql-cluster-for-two-servers.html id=jh1q target=_blank title="MySQL Cluster: Two webserver setup">MySQL
+  Cluster: Two webserver setup</a>.&nbsp; Please follow the steps described in
+  his guide to setup MySQL Cluster with two storage nodes. If all goes well, you
+  should have MySQL/NDB node running on both Server 1 and Server 2 with the
+  management node running on Server 3.<br id=qhcq0>
+  <h3 id=pk2p>
+    Step 2: Download Open MQ 4.4</h3>
+  Download the appropriate Open MQ binary distribution for you platform.
+  <a href=http://mq.java.net/download.html id=rcbv target=_blank title="Download link">Download
+  link</a><br id=l8jo>
+  <h3 id=crmj>
+    Step 3: Install Open MQ Community Bundles (Compressed Archive)
+  </h3>
+  Do the following to install MQ on both Server 3 and Server 4:<br id=zqul>
+  <br id=zqul0>
+</div>
+<ul id=q5.u>
+  <li id=q5.u0>
+    Unzip the binary (.jar) bundle<br id=kszw>
+    <br id=kzvg3>
+  </li>
+  <li id=s4ca0>
+    Edit the file $TOP/mq/etc/imqenv.conf to set
+    <i id=s4ca>IMQ_DEFAULT_JAVAHOME</i> to JDK 1.5 or later version<br id=kszw1>
+    <br id=kszw2>
+  </li>
+  <li id=x53a>
+    Generate the instance configuration file by starting the broker:<br id=t47v0>
+    <blockquote id=wdtp>
+      <span id=ngn. style="FONT-FAMILY:Courier New">cd
+      $TOP/mq/bin</span><br id=ka3c style="FONT-FAMILY:Courier New">
+      <span id=ngn.0 style="FONT-FAMILY:Courier New">./imqbrokerd
+      -tty</span><br id=dkgu>
+    </blockquote>
+  </li>
+  <li id=dkgu1>
+    Type CTRL-C to shutdown the broker<br id=kszw3>
+    <br id=kszw4>
+  </li>
+  <li id=qp64>
+    Edit the broker’s instance configuration file:<br id=jr9q0>
+    <blockquote id=h9e0>
+      <span id=weyw style="FONT-FAMILY:Courier New">$TOP/mq/var/instances/imqbroker/props/config.properties</span><br id=jr9q1>
+    </blockquote>
+  </li>
+  <li id=jr9q3>
+    Set the following JDBC-related properties in the broker’s instance
+    configuration file:<br id=rs44>
+    <blockquote id=rs440>
+      <span id=bd-g style="FONT-FAMILY:Courier New">imq.cluster.ha=true</span><br id=iym_1 style="FONT-FAMILY:Courier New">
+      <span id=bd-g0 style="FONT-FAMILY:Courier New">
+      imq.brokerid=broker1</span><br id=iym_2 style="FONT-FAMILY:Courier New">
+      <span id=bd-g1 style="FONT-FAMILY:Courier New">
+      imq.cluster.clusterid=mqcluster</span><br id=iym_3 style="FONT-FAMILY:Courier New">
+      <span id=bd-g2 style="FONT-FAMILY:Courier New">
+      imq.persist.store=jdbc</span><br id=iym_4 style="FONT-FAMILY:Courier New">
+      <span id=bd-g3 style="FONT-FAMILY:Courier New">
+      imq.persist.jdbc.mysql.user=&lt;</span><i id=t923 style="FONT-FAMILY:Courier New">db_username</i><span id=bd-g4 style="FONT-FAMILY:Courier New">&gt;</span><br id=igqh style="FONT-FAMILY:Courier New">
+      <span id=bd-g5 style="FONT-FAMILY:Courier New">
+      imq.persist.jdbc.mysql.password=&lt;</span><i id=kfxu style="FONT-FAMILY:Courier New">db_user_password</i><span id=bd-g6 style="FONT-FAMILY:Courier New">&gt;</span><br id=iym_5 style="FONT-FAMILY:Courier New">
+      <span id=bd-g7 style="FONT-FAMILY:Courier New">
+      imq.persist.jdbc.dbVendor=mysql</span><br id=iym_6 style="FONT-FAMILY:Courier New">
+      <span id=bd-g8 style="FONT-FAMILY:Courier New">
+      imq.persist.jdbc.mysql.property.url=jdbc:mysql://&lt;</span><i id=c_6: style="FONT-FAMILY:Courier New">Server_1_hostname</i><span id=bd-g9 style="FONT-FAMILY:Courier New">&gt;:3306,&lt;</span><i id=c_6:0 style="FONT-FAMILY:Courier New">Server_2_hostname</i><span id=bd-g10 style="FONT-FAMILY:Courier New">&gt;:3306/mqdb
+      </span><br id=iym_8 style="FONT-FAMILY:Courier New">
+      <span id=bd-g11 style="FONT-FAMILY:Courier New">
+      imq.persist.jdbc.mysql.tableoption=ENGINE=NDBCLUSTER</span><br id=egbb>
+    </blockquote>
+    Note: We use <b id=vrkn><i id=vrkn0>broker1</i></b> as the brokerID for the
+    1st instance and <b id=vrkn1><i id=vrkn2>mqcluster</i></b> as the clusterID.
+    You'll also need to specify the username and password for the database, and
+    the hostname of Server 1 and Server 2 for the JDBC's URL property of your
+    setup.<br id=kdv1>
+    <br id=kdv10>
+  </li>
+  <li id=kdv11>
+    Place a copy of MySQL Connector/J JDBC driver in the following directory:
+    <a href=http://dev.mysql.com/downloads/#connector-j id=v_zg target=_blank title="Download link">Download
+    link</a>
+    <blockquote id=weyw1>
+      <span id=seaf style="FONT-FAMILY:Courier New">$TOP/mq/lib/ext</span><br id=f8n4>
+    </blockquote>
+  </li>
+  <li id=qi1g>
+    Create the database schema needed for MQ persistence:<br id=vkmb0>
+    <blockquote id=weyw2>
+      <span id=seaf0 style="FONT-FAMILY:Courier New">cd
+      $TOP/mq/bin</span><br id=ka3c0 style="FONT-FAMILY:Courier New">
+      <span id=seaf1 style="FONT-FAMILY:Courier New">./imqdbmgr create
+      tbl</span><br id=pip9>
+    </blockquote>
+    Note: You'll only need to do this step once on either MQ installation
+    (Server 3 or Server 4)<br id=vr-:>
+    <br id=vr-:0>
+  </li>
+</ul>
+For Server 4, change the brokerID to <i id=fegn><b id=fegn0>broker2</b></i> in
+the broker's configuration file.<br id=nci0>
+<h3 id=nci00>
+  Step 4: Start the Broker Clusters<br id=vhid>
+</h3>
+<ul id=okcn>
+  <li id=okcn0>
+    Start the broker on both Server 3 and Server
+    4<span id=ylwa style="FONT-FAMILY:Courier New"><br id=ylwa0>
+    </span>
+    <blockquote id=ablv>
+      <span id=ablv0 style="FONT-FAMILY:Courier New">cd
+      $TOP/mq/bin</span><br id=ylwa1 style="FONT-FAMILY:Courier New">
+      <span id=ylwa2 style="FONT-FAMILY:Courier New">./imqbrokerd
+      -tty</span><br id=okcn2>
+    </blockquote>
+  </li>
+  <li id=okcn5>
+    Check the output on the console or the broker's log file for log message
+    <i id=olrh><b id=olrh0>B1179</b></i> &amp;
+    <i id=s9k1><b id=s9k10>B1071</b></i> to verify that Broker 1 is connected to
+    Broker 2 in an HA cluster; below is a snippet from an actual log file:<br id=cqv3>
+    <blockquote id=cqv30>
+      <span id=qikf style="FONT-FAMILY:Courier New">...<br id=z8dx>
+      <br id=xxld>
+      [15/Jul/2008:15:14:04 PDT] [B1185]: Starting heartbeat to broker2<br id=xxld0>
+      [15/Jul/2008:15:14:04 PDT] [B1181]: Added heartbeat endpoint
+      /129.145.130.96:7676 [brokerID=broker2, brokerSession=4896287081875276288]
+      (seq#=0, ts=1216160044852, interval=2, len=207)<br id=xxld1>
+      [15/Jul/2008:15:14:04 PDT] [B1179]: Activated broker<br id=xxld2>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Address =
+      mq://129.145.130.96:7676/?instName=imqbroker&amp;brokerID=broker2&amp;brokerSessionUID=4896287081875276288&amp;ha=true&amp;storeSessionUID=4896287081875276288<br id=xxld3>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; StartTime = 1216160039901<br id=xxld4>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ProtocolVersion = 410<br id=xxld5>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HeartbeatHost = 129.145.130.96<br id=xxld6>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HeartbeatPort = 7676<br id=xxld7>
+      [15/Jul/2008:15:14:04 PDT] [B1071]: Established cluster connection to
+      broker
+      mq://129.145.130.96:7676/?instName=imqbroker&amp;brokerID=broker2&amp;brokerSessionUID=4896287081875276288&amp;ha=true&amp;storeSessionUID=4896287081875276288[/129.145.130.96:35654]<br id=zpmv>
+      <br id=z8dx0>
+      </span><span id=z8dx1 style="FONT-FAMILY:Courier New">...</span><br id=cqv31>
+    </blockquote>
+  </li>
+</ul>
+<h3>5. Additional considerations</h3>
+<h4>5.1 Availability considerations</h4>
+<p>The two broker / NDB node topology provides redundancy between each of the broker nodes. Data will be replicated between the NDB cluster nodes, there will not be any data-loss and transactional integrity will be maintained across broker failures. For message service continuation, it it necessary to give a quick review of the fail over/takeover process of Open MQ. Here is a rough outline sequence of takeover processing of Open MQ:</p>
+<ol>
+  <li> Brokers are operating</li>
+  <li> Broker ping suspects broker failure</li>
+  <li> Broker ping determines broker failure</li>
+  <li> Broker cluster elects take-over broker (in the case of two brokers, the remaining broker will take-over) </li>
+  <li> Take-over broker initiates take-over processing
+    <ol>
+      <li> Broker takes responsibility for all messages, formerly managed by the now down broker (consistency check is performed, message stores are integrated with existing messages already owned by this broker) </li>
+      <li> All transactions in-flight are taken over by the remaining broker</li>
+      <li> All active connections from the failed broker are redirected to the take-over broker</li>
+      <li> Takeover broker notifies brokers in cluster that it has completed take-over and is providing service </li>
+    </ol>
+  </li>
+  <li>All service resumes with remaining broker(s) </li>
+  <li>&lt;sometime later, the failed broker can return to the cluster&gt; </li>
+</ol>
+<p>&nbsp;</p>
+<p>During the take-over processing, the broker which is taking over for the failed broker, pause it's message service. This is to ensure that all messages are all properly integrated together and all in flight transactions are continued correctly based on the state last recorded prior to the failed broker going down. In the case of two broker nodes -- once a take-over processing starts, service will be suspended for the duration of the take-over processing. The length of time for this service interruption will vary due to several factors, including on the number of in-flight messages currently in the store, the number of active subscriptions, etc. A broker cluster can continue providing JMS service if it has other brokers that are configured as part of this cluster. </p>
+<p> Since there will be fewer brokers in the cluster, overall message capacity will be reduced during take-over processing. During take-over, there will be two brokers which will not provide service (the failed broker, and the take-over broker). After the takeover, the remaining brokers will be required to carry the load, now without the failed broker, until that failed broker can be returned to service. Depending on the spare capacity available to the brokers in the cluster cluster, the aggregate capacity may be impacted. Proper simulation and capacity sizing will be critical to ensure that the service requirements are met during all phases of this processing. Capacity overhead must be balanced against the cost and overhead of additional broker nodes and/or servers.</p>
+<p>In summary, for service availability, while a broker is in the act of taking over for a failed broker, consider using three or more broker nodes in your broker cluster. For systems with a low number in-flight messages, where a pause can be tolerated, two broker nodes may suffice, though please remember, for the duration of the failed broker outage, there is no longer any broker redundancy (though depending on the NDB Cluster settings and operational status, there may still be data redundancy). Additional broker cluster nodes may be required depending on your message volume or capacity requirements and the amount of spare capacity available during any of the processing phases of the broker cluster. </p>
+<h4>5.2 MySQL NDB Cluster Considerations</h4>
+<p>MySQL NDB storage engine clusters provide data redundancy as well as several features that enable additional resiliency and load-balancing. These features can help deployed systems balance load as required by the application. </p>
+<h5>Specifying the SQL nodes</h5>
+<p>SQL nodes are specified in a URL format as described above. This format is defined in the <a href="http://dev.mysql.com/doc/refman/5.4/en/connector-j-reference-configuration-properties.html">Connector/J manual</a>. An example of a multi-sql node definition is</p>
+<blockquote>
+  <p>imq.persist.jdbc.mysql.property.url=jdbc\:mysql\://mqsflinux2\:3306,mqsflinux3\:3306/mqdb</p>
+</blockquote>
+<p>This is broken down as: jdbc -- the database type; mysql -- the database vendor; this is followed by two SQL node server names (can be IP addresses), each are followed by the port which should be used to connect. in this example, the two nodes: mqsflinux2 and mqflinux3 are the server name (which must be resolved by your name-service lookup), and in this case, both are using the same port, 3306. The final argument is the name of the database, mqdb. </p>
+<p>In this configuration, MQ will connect to the first URL that provides service. If a failure occurs, service connections will be searched, in order, until an available service is found. </p>
+<p>An additional keyword, for use on the URL string, with NDB cluster nodes, is &quot;loadbalance,&quot; which tells the connector that it should provide balancing functions between the the available NDB storage nodes. To enable this feature the URL string is modified as follows:</p>
+<blockquote>
+  <p>imq.persist.jdbc.mysql.property.url=jdbc\:mysql\:loadbalance\://mqsflinux2\:3306,mqsflinux3\:3306/mqdb</p>
+</blockquote>
+<p>With this setting, a loadbalance policy will be used to decide which SQL server node should be used to provide service. As of this writing, there were two policies that can be selected: Random, or Best Response Time. This is set via the Connector/J property: loadBalanceStrategy (default is random). For the most up to date information, see the current Connector/J product documentation. </p>
+<p>Please note that, using MQ with this feature requires the use of MySQL Cluster v7.0.9, OR, 7.0.8a with the Connector/J 5.1.11 or 5.1.10 with patch described in <a href="http://bugs.mysql.com/bug.php?id=48442">MySQL ConnectorJ bug 48442</a>. </p>
+<h5>Setting SQL Connector/J Properties  </h5>
+<p>Open MQ provides a standard mechanism for setting properties as recommended by most DB vendors, as well as MySQL. These properties are defined in theJDBC   connector which is provided by MySQL. They are manipulated  via getter/setter methods during connection initialization. Users are encouraged to consult the product manual page for this connector. MQ will interpret any property that begins with: imq.persist.jdbc.mysql.property, as a property to be set via getter/setter and will attempt to invoke this setter when the connection is initialized.</p>
+<p>Properties that have relevance to NDB Cluster configuration with MQ for HA include:</p>
+<ul>
+  <li>loadBalanceStrategy -- random or bestResponseTime (default is random) </li>
+  <li>loadBalanceBlacklistTimeout -- Length of time (ms) before the host is taken off the connect URL. Useful if an NDB node might crash and be down for an extended period of time. 60000-300000 might be a good range, if this is needed (default is 0, never remove)</li>
+  <li>connectTimeout (in ms) -- if needed, start with 3000 (default is 0, never timeout) </li>
+</ul>
+<p>&nbsp;</p>
+<p>A typical high-availability configuration with dynamic SQL node selection will include &quot;loadbalance&quot; on the connection URL. In the broker properties file, this might look like:</p>
+<blockquote>
+  <p># ... Other settings ... </p>
+  <p>imq.cluster.ha=true</p>
+  <p>imq.persist.jdbc.dbVendor=mysql</p>
+  <p>imq.persist.store=jdbc</p>
+  <p>imq.persist.jdbc.mysql.tableoption=ENGINE\=NDBCLUSTER</p>
+  <p>imq.persist.jdbc.mysql.property.url=jdbc\:mysql\:loadbalance\://mqsflinux2\:3306,mqsflinux3\:3306/mqdb</p>
+  <p>imq.persist.jdbc.mysql.property.loadBalanceBlacklistTimeout=60000</p>
+  <p>imq.persist.jdbc.mysql.property.connectTimeout=3000</p>
+  <p># more settings ..</p>
+</blockquote>
+<p>Finally, note that it is also possible to use the URL string to specify the connector property settings. This is described in the Connector/J documentation as well. We recommend that users select one method or the other for setting connector specific properties, not both. MQ, starting with version 4.4u1, will show the properties which are being set in the broker log. </p>
+<hr width="75%" size="3">
+<p><br id=t58l>
+  Notes:</p>
+<ol><li>Java Composite Application Platform (Java CAPS), users may wish to review the clustering information provided by Louis Polycarpou's &quot;Polyblog&quot; articles: <a href="http://blogs.sun.com/polyblog/entry/jms_high_availability_in_caps">Part  1</a>, <a href="http://blogs.sun.com/polyblog/entry/jms_ha_in_caps_6">Part  2</a>, <a href="http://blogs.sun.com/polyblog/entry/caps_6_java_mq_part">Part 3</a>. </li>
+</ol>
+</body>
+</html>

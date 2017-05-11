@@ -1,0 +1,627 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<link rel="stylesheet" media="all" type="text/css" href="style.css" />
+<TITLE>Open MQ (4.2): Wildcard Topics</TITLE>
+<!-- hide the project info -->
+<style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+.style3 {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 12px;
+}
+</style>
+
+</head>
+
+<BODY>
+<h1><a name="top"></a></h1>
+<table border="0" cellspacing="0" cellpadding="0" id="main2" width="100%">
+  <tr valign="bottom" class="nav1">
+    <td nowrap="nowrap" colspan="3"><!-- tab 4--></td>
+  </tr>
+  <form>
+    <tr class="sub1">
+      <td nowrap="nowrap"><div align="center"><strong>&nbsp;Open Message Queue 4.2 -- Wildcard Topics </strong></div></td>
+      <td align="right" nowrap="nowrap">&nbsp;</td>
+    </tr>
+  </form>
+  <tr>
+    <td colspan="3" class="white"><div class="min1">&nbsp;</div></td>
+  </tr>
+</table>
+<p align="center"><em>(Note: This is a new feature in Open MQ 4.2) </em> <br />
+  <a href="http://mq.java.net/4.2.html">Back to Open MQ 4.2 Index </a></p>
+<table width="90%" border="1" align="center">
+  <tr>
+    <th scope="col"><a href="#desc">Description</a></th>
+    <th scope="col"><a href="#admin">Administration</a></th>
+    <th scope="col"><a href="#jmx">JMX Commands </a></th>
+    <th scope="col"><a href="#eratta">Errata</a></th>
+    <th scope="col"><a href="#top">Top</a></th>
+  </tr>
+</table>
+<h2><a name="desc"></a>Description of the feature:</h2>
+<P>
+This feature will allow destinations to be of the form:
+
+<blockquote>
+    &lt;element&gt;.&lt;element&gt;.&lt;element&gt;
+</blockquote>
+
+
+Publishers and Subscribers will then uses these destinations to send to/receive from multiple destinations.
+<P>
+
+The following wildcard syntax will be used:
+<UL>
+   <LI>.*. - matches a single element</LI>
+
+   <LI>.**. - matches one or more elements</LI>
+
+   <LI>&gt; - matches any number of  elements</LI>
+</UL>
+<P>
+For example:
+
+<blockquote>
+    <i>stock.*.quotes</i> will match:
+<UL>
+
+    <LI> stock.java.quotes</LI>
+    <LI> stock.msft.quotes</LI>
+</UL>
+
+but not
+<UL>
+
+    <LI> stock.quotes</LI>
+    <LI> stock.sun.news</LI>
+</UL>
+
+    <i>stock.**.quotes</i> will match:
+<UL>
+
+    <LI> stock.java.sun.quotes</LI>
+    <LI> stock.msft.quotes</LI>
+</UL>
+
+but not
+
+<UL>
+    <LI> stock.quotes</LI>
+    <LI> stock.java.sun.news</LI>
+</UL>
+
+
+ <i>stock.java&gt;</i>  will match:
+
+<UL>
+    <LI> stock.java</LI>
+    <LI> stock.java.news</LI>
+    <LI> stock.java.quotes</LI>
+    <LI> stock.java.news.headlines</LI>
+</UL>
+
+but not
+
+<UL>
+    <LI> quotes.java</LI>
+    <LI> stock.news</LI>
+</UL>
+
+ <i>stock&gt;java</i>  will match:
+
+<UL>
+    <LI> stock.java</LI>
+    <LI> stock.sun.java</LI>
+</UL>
+
+but not
+
+<UL>
+    <LI> quotes.java</LI>
+    <LI> stock.news</LI>
+    <LI> stock.java.news</LI>
+    <LI> stockjava</LI>
+</UL>
+
+</blockquote>
+<P>
+To use this feature, an application will create a destination with the following syntax. This syntax will only be valid for topic destinations.  Creating a Queue using wildcard syntax will throw an exception.
+<P>
+
+
+Once a destination has been created, the application can create publishers or subscribers. Publishers will place a copy of the message on any destination which matches the syntax (if no destinations match it will be thrown away).  Consumers will retrieve messages from any consumer that matches.  There "must" be at least one concrete (non-wildcarded)  destination (either admin or auto created)  or createSubscriber will return an exception.
+<h2>Example:</h2>
+
+<P>
+<b>Publisher:</b>
+<pre>
+<code>
+    Topic t = session.createTopic("stock.*.quotes");
+
+    TopicPublisher publisher = session.createPublisher(t);
+
+    publisher.send (message);
+</core></pre>
+<P>
+<b>Subscriber:</b>
+<pre>
+<code>
+
+   Topic t = session.createTopic("stock.>");
+
+   TopicSubscriber subscriber = session.createSubscriber(t);
+
+   Message m = subscriber.receive();
+
+</core><hr width="45%" size="2"></pre>
+
+<table width="90%" border="1" align="center">
+  <tr>
+    <th scope="col"><a href="#desc">Description</a></th>
+    <th scope="col"><a href="#admin">Administration</a></th>
+    <th scope="col"><a href="#jmx">JMX Commands </a></th>
+    <th scope="col"><a href="#eratta">Errata</a></th>
+    <th scope="col"><a href="#top">Top</a></th>
+  </tr>
+</table>
+<H2><a name="admin"></a>Administration Support</H2>
+<p>Administration support includes changes to the output of imqcmd as well  as the addition of several new attributes and operations to MQ's JMX  MBeans. These changes basically allow the administrator to get  information related to wildcard topics from the MQ broker.<br>
+  <br>
+</p>
+<h3>imqcmd output changes</h3>
+<p>The 'imqcmd list dst' command now shows not just the total number of  producers and consumers, but also the number of producers and consumers  that are wildcards (in bold below):<br>
+  <br>
+</p>
+<table>
+  <tbody>
+    <tr>
+      <td><pre> # imqcmd list dst
+       </pre>
+          <pre> ...
+               
+             ------------------------------------------------------------------------------------
+             &nbsp;&nbsp; Name&nbsp;&nbsp;&nbsp;&nbsp; Type&nbsp;&nbsp;&nbsp;  State&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Producers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Consumers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Msgs&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Total&nbsp; Wildcard&nbsp; Total&nbsp; Wildcard</strong>&nbsp;  Count&nbsp; UnAck&nbsp; Avg Size
+             ------------------------------------------------------------------------------------
+             mq.sys.dmq&nbsp; Queue&nbsp; RUNNING&nbsp;  0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.0
+             sun.stock&nbsp;&nbsp; Topic&nbsp; RUNNING&nbsp;  1  &nbsp;&nbsp;&nbsp;&nbsp; 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.0
+             
+             Successfully listed destinations. </pre></td>
+    </tr>
+  </tbody>
+</table>
+<p><br>
+  <br>
+Similarly, the 'imqcmd query dst' command now shows the number of  wildcard producers and consumers. Additionally, it also lists each  wildcards used and the number of producers and consumers for a given  wildcard (in bold below):<br>
+<br>
+</p>
+<table>
+  <tbody>
+    <tr>
+      <td><pre> % imqcmd query dst -t t -n sun.stock
+       </pre>
+        <pre>
+         Querying the destination where:
+         
+         ------------------------------------
+         Destination Name&nbsp;&nbsp;&nbsp; Destination Type
+         ------------------------------------
+         sun.stock&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Topic
+         
+         On the broker specified by:
+         
+         -------------------------
+         Host&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Primary Port
+         -------------------------
+         localhost&nbsp;&nbsp;&nbsp; 7676
+         
+         Destination  Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  sun.stock
+         Destination  Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Topic
+         Destination  State&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  RUNNING
+         Created  Administratively&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  true
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;
+         Current Number of  Messages&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;
+         &nbsp;&nbsp;&nbsp;  Actual&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  45
+         &nbsp;&nbsp;&nbsp; Held in  Transaction&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  0
+         Current Message  Bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;
+         &nbsp;&nbsp;&nbsp;  Actual&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  6390
+         &nbsp;&nbsp;&nbsp; Held in  Transaction&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  0
+         Current Number of  Producers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  1
+         <strong>Current Number of Producer Wildcards&nbsp;&nbsp;&nbsp;   1
+           &nbsp;&nbsp;&nbsp; sun.*&nbsp;  (1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;
+         Current Number of  Consumers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  2
+         <strong>Current Number of Consumer Wildcards&nbsp;  &nbsp;&nbsp; 2
+           &nbsp;&nbsp;&nbsp; sun.*&nbsp;  (1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;
+           &nbsp;&nbsp;&nbsp; *.stock&nbsp;  (1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;
+         Max Number of  Messages&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  unlimited (-1)
+         Max Total Message  Bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  unlimited (-1)
+         Max Bytes per  Message&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  unlimited (-1)
+         Max Number of  Producers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  100
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;
+         Limit  Behavior&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  REJECT_NEWEST
+         Consumer Flow  Limit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  1000
+         Is Local  Destination&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  false
+         Use Dead Message  Queue&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  true
+         
+         Successfully queried the destination. </pre></td>
+    </tr>
+  </tbody>
+</table>
+<p><br>
+  The output above shows that the sun.stock topic has a total of 1  producer and 2 consumers. There is 1 wildcard producer on this topic  and the wildcard used is "sun.*". There are 2 wildcard consumers on  this topic and the wildcards used are "sun.*" and "*.stock".<br>
+</p>
+<hr width="45%" size="2">
+<table width="90%" border="1" align="center">
+  <tr>
+    <th scope="col"><a href="#desc">Description</a></th>
+    <th scope="col"><a href="#admin">Administration</a></th>
+    <th scope="col"><a href="#jmx">JMX Commands </a></th>
+    <th scope="col"><a href="#eratta">Errata</a></th>
+    <th scope="col"><a href="#top">Top</a></th>
+  </tr>
+</table>
+<h2><a name="jmx"></a>JMX related changes</h2>
+The following MBeans have been updated so that JMX applications can  extract information related to wildcard topics:<br>
+<ul>
+  <li>Destination Monitor</li>
+  <li>Consumer Manager Monitor</li>
+  <li>Producer Manager Monitor<br>
+  </li>
+</ul>
+<p><strong> Destination  Monitor MBean: </strong></p>
+<table border="1" cellpadding="2" cellspacing="2">
+  <caption>
+    Destination Monitor - new Attributes<br>
+  </caption>
+  <tbody>
+    <tr>
+      <th valign="middle">Name<br>
+      </th>
+      <th align="center" valign="middle">Set/Get<br>
+      </th>
+      <th valign="middle">Type<br>
+      </th>
+      <th valign="middle">Description</th>
+    </tr>
+    <tr>
+      <td valign="middle">NumWildcards<br>
+      </td>
+      <td align="center" valign="middle">G<br>
+      </td>
+      <td valign="middle">Integer<br>
+      </td>
+      <td valign="middle">Number of wildcard producers and  consumers used on this destination.</td>
+    </tr>
+    <tr>
+      <td valign="middle">NumWildcardProducers<br>
+      </td>
+      <td align="center" valign="middle">G<br>
+      </td>
+      <td valign="middle">Integer<br>
+      </td>
+      <td valign="middle">Number of wildcard producers  used on this destination.</td>
+    </tr>
+    <tr>
+      <td valign="middle">NumWildcardConsumers<br>
+      </td>
+      <td align="center" valign="middle">G<br>
+      </td>
+      <td valign="middle">Integer<br>
+      </td>
+      <td valign="middle">Number of wildcard consumers  used on this destination.</td>
+    </tr>
+  </tbody>
+</table>
+<p>&nbsp;</p>
+<table border="1" cellpadding="2" cellspacing="2">
+  <caption>
+    Destination Monitor - new Operations<br>
+  </caption>
+  <tbody>
+    <tr>
+      <th>Operation Name<br>
+      </th>
+      <th align="center">Return Type<br>
+      </th>
+      <th align="center">Parameters<br>
+      </th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td>getWildcards<br>
+      </td>
+      <td align="center">String[]<br>
+      </td>
+      <td align="center">none<br>
+      </td>
+      <td>Returns an array containing the  list of all wildcard strings used by consumers and producers on this  destination.</td>
+    </tr>
+    <tr>
+      <td>getConsumerWildcards<br>
+      </td>
+      <td align="center">String[] </td>
+      <td align="center">none<br>
+      </td>
+      <td>Returns an array containing the  list of all wildcard strings used by consumers on this destination. </td>
+    </tr>
+    <tr>
+      <td>getProducerWildcards<br>
+      </td>
+      <td align="center">String[] </td>
+      <td align="center">none<br>
+      </td>
+      <td>Returns an array containing the  list of all wildcard strings used by producers on this destination. </td>
+    </tr>
+    <tr>
+      <td>getNumWildcardConsumers<br>
+      </td>
+      <td align="center">Integer<br>
+      </td>
+      <td align="center">wildcard - String<br>
+      </td>
+      <td>Returns the number of consumers  on the destination using the specified wildcard.</td>
+    </tr>
+    <tr>
+      <td>getNumWildcardProducers</td>
+      <td align="center">Integer<br>
+      </td>
+      <td align="center">wildcard - String<br>
+      </td>
+      <td>Returns the number of producers  on the destination using the specified wildcard.</td>
+    </tr>
+  </tbody>
+</table>
+<p><br>
+</p>
+<p> <strong>ConsumerManager Monitor MBean:</strong><em><br>
+</em> </p>
+<p>The  following table lists new keys that are valid for the CompositeData  object  returned by existing operations of this MBean eg. getConsumerInfo()<br>
+    <br>
+</p>
+<table border="1" cellpadding="2" cellspacing="2">
+  <caption>
+    Consumermanager Monitor - new keys for  CompositeData<br>
+  </caption>
+  <tbody>
+    <tr>
+      <th>Key<br>
+      </th>
+      <th>Value Type<br>
+      </th>
+      <th>Description<br>
+      </th>
+    </tr>
+    <tr>
+      <td>DestinationNames<br>
+      </td>
+      <td>String[]<br>
+      </td>
+      <td>Array of destination names that  match wildcards used by wildcard consumers. Valid for topic consumers  only.<br>
+      </td>
+    </tr>
+    <tr>
+      <td height="63">Wildcard<br>
+      </td>
+      <td>Boolean<br>
+      </td>
+      <td>True if this consumer is a  wildcard consumer, false if not. Valid for topic consumers only.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><br>
+</p>
+<table border="1" cellpadding="2" cellspacing="2">
+  <caption>
+    ConsumerManager Monitor - new Attributes<br>
+  </caption>
+  <tbody>
+    <tr>
+      <th>Name<br>
+      </th>
+      <th>Set/Get<br>
+      </th>
+      <th>Type<br>
+      </th>
+      <th>Description<br>
+      </th>
+    </tr>
+    <tr>
+      <td>NumWildcardConsumers<br>
+      </td>
+      <td>G<br>
+      </td>
+      <td>Integer<br>
+      </td>
+      <td>Number of wildcard consumers for  the broker.</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<table border="1" cellpadding="2" cellspacing="2">
+  <caption>
+    ConsumerManager Monitor - new Operations<br>
+  </caption>
+  <tbody>
+    <tr>
+      <th>Operation Name<br>
+      </th>
+      <th>Return Type<br>
+      </th>
+      <th>Parameters<br>
+      </th>
+      <th>Description<br>
+      </th>
+    </tr>
+    <tr>
+      <td>getConsumerWildcards<br>
+      </td>
+      <td>String[] </td>
+      <td>none<br>
+      </td>
+      <td>Returns an array containing the  list of all wildcard strings used by consumers on the broker. </td>
+    </tr>
+    <tr>
+      <td>getNumWildcardConsumers<br>
+      </td>
+      <td>Integer<br>
+      </td>
+      <td>wildcard - String<br>
+      </td>
+      <td>Returns the number of consumers  using the specified wildcard on the broker.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<p> <strong>ProducerManager Monitor MBean:</strong><em><br>
+</em> </p>
+<p>The  following table lists new keys that are valid for the CompositeData  object  returned by existing operations of this MBean eg. getProducerInfo()<br>
+    <br>
+</p>
+<table border="1" cellpadding="2" cellspacing="2">
+  <caption>
+    Producermanager Monitor - new keys for  CompositeData<br>
+  </caption>
+  <tbody>
+    <tr>
+      <th>Key<br>
+      </th>
+      <th>Value Type<br>
+      </th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td>DestinationNames<br>
+      </td>
+      <td>String[]<br>
+      </td>
+      <td>Array of destination names that  match wildcards used by wildcard producers. Valid for topic producers  only.<br>
+      </td>
+    </tr>
+    <tr>
+      <td>Wildcard<br>
+      </td>
+      <td>Boolean<br>
+      </td>
+      <td>True if this producer is a  wildcard producer, false if not. Valid for topic producers only.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><br>
+</p>
+<table border="1" cellpadding="2" cellspacing="2">
+  <caption>
+    ProducerManager Monitor - new Attributes<br>
+  </caption>
+  <tbody>
+    <tr>
+      <th>Name<br>
+      </th>
+      <th>Set/Get<br>
+      </th>
+      <th>Type<br>
+      </th>
+      <th>Description<br>
+      </th>
+    </tr>
+    <tr>
+      <td>NumWildcardProducers<br>
+      </td>
+      <td>G<br>
+      </td>
+      <td>Integer<br>
+      </td>
+      <td>Number of wildcard producers for  the broker.</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<table border="1" cellpadding="2" cellspacing="2">
+  <caption>
+    ProducerManager Monitor - new Operations<br>
+  </caption>
+  <tbody>
+    <tr>
+      <th>Operation Name<br>
+      </th>
+      <th>Return Type<br>
+      </th>
+      <th>Parameters<br>
+      </th>
+      <th>Description<br>
+      </th>
+    </tr>
+    <tr>
+      <td>getProducerWildcards<br>
+      </td>
+      <td>String[] </td>
+      <td>none<br>
+      </td>
+      <td>Returns an array containing the  list of all wildcard strings used by producers on the broker. </td>
+    </tr>
+    <tr>
+      <td>getNumWildcardProducers<br>
+      </td>
+      <td>Integer<br>
+      </td>
+      <td>wildcard - String<br>
+      </td>
+      <td>Returns the number of producers  using the specified wildcard on the broker.</td>
+    </tr>
+  </tbody>
+</table>
+<hr width="45%" size="2">
+<table width="90%" border="1" align="center">
+  <tr>
+    <th scope="col"><a href="#desc">Description</a></th>
+    <th scope="col"><a href="#admin">Administration</a></th>
+    <th scope="col"><a href="#jmx">JMX Commands </a></th>
+    <th scope="col"><a href="#eratta">Errata</a></th>
+    <th scope="col"><a href="#top">Top</a></th>
+  </tr>
+</table>
+<H2><a name="eratta"></a>Feature Limitations</H2>
+<UL>
+<LI> This feature is only supported for topics.  A queue sender or receiver will receive an exception if they attempt to use wildcards. We are not planning to extend this feature to include Queue support. </LI>
+<LI>Reserved destination names: Destinations created by a client can not start with <i>mq.</i> or <i>temporary</i> this is reserved for special destinations (metrics, the dead message queue) by the product</LI>
+<LI>Messages can not be published to any destination which starts with <i>mq.</i></LI>
+<LI>If a message is published to multiple destinations using a wildcard and that fails, only the last exception will be returned to the client.</LI>
+<LI>You cannot use wildcards to register for temporary destinations (although there is a bug in this area)</LI>
+</UL>
+
+<H2>Issues with the Current version</H2>
+<h3>Work remaining</h3>
+<ul>
+  <li>ACL Support is not completed. While it may work, it probably will not do what you expect (currently only exact matches are supported).</li>
+</ul>
+<h3>Known Bugs</h3>
+<UL><LI> If a generic wildcard (e.g. *, &gt; or **) is used on a Subscriber, it will create a consumer on any existing temporary topics and may throw an exception.</LI>
+<LI>the W flag is not used on the client or broker (performance improvement)</LI>
+</UL>
+
+<h2>Untested in the current version</h2>
+<UL>
+    <LI>how the system responds to destination limits (producer, consumer, msg)</LI>
+    <LI> wildcards when there are temporary topics </LI>
+</UL>
+<h2>Feedback</h2>
+<p>Please post feedback to <a href="mailto:users@mq.java.net">users@mq.java.net</a> </p>
+</BODY>
+</HTML>
+

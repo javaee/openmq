@@ -1,0 +1,116 @@
+
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    </head>
+
+    <body>
+        <meta charset="utf-8">
+        <title>WebSocket JSON Client</title>
+        <script language="javascript" type="text/javascript">
+            var websocket = null;
+            var nmsg = 0;
+
+            function init() {
+                output = document.getElementById("output");
+                document.getElementById('run').disabled = true;
+                var wsUri = "ws://localhost:7670/wsjms/mqjsonstomp";
+                websocket = new WebSocket(wsUri);
+                websocket.onopen = function(evt) { onOpen(evt) };
+                websocket.onclose = function(evt) { onClose(evt) };
+                websocket.onmessage = function(evt) { onMessage(evt) };
+                websocket.onerror = function(evt) { onError(evt) };
+            }
+
+            function send_json() {
+                document.getElementById('run').disabled = true;
+                nmsg = 0;
+                var jmsframe = {};
+                jmsframe.command = "CONNECT";
+                jmsframe.headers = {"login":"guest", "passcode":"guest", "accept-version":"1.2"};
+                data = JSON.stringify(jmsframe)
+                websocket.send(data);
+                writeToScreen("SENT: " + data, "blue");
+            }
+
+            function onOpen(evt) {
+                writeToScreen("CONNECTED", "green");
+                document.getElementById('run').disabled = false;
+            }
+
+            function onClose(evt) {
+                writeToScreen("DISCONNECTED", "green");
+                init();
+            }
+
+            function onMessage(evt) {
+                writeToScreen("RECEIVED: "+evt.data, "red");
+                var jmsframe = JSON.parse(evt.data);
+                writeToScreen("RECEIVED:\n");
+                writeToScreen("\tcommand="+jmsframe.command);
+                writeToScreen("\theaders="+jmsframe.headers);
+                writeToScreen("\tbody="+jmsframe.body);
+                if (nmsg < 1) { 
+                    var jmsframe = {}
+                    jmsframe.command = "SEND";
+                    jmsframe.headers = {"destination":"/queue/myqueue"}; 
+                    jmsframe.body = {"text": "This is a message from websocket json client. #"+nmsg};
+                    var data = JSON.stringify(jmsframe);
+                    websocket.send(data);
+                    writeToScreen("SENT: " + data, "blue");
+                }
+                if (nmsg == 0) {
+                    var jmsframe = {};
+                    jmsframe.command = "SUBSCRIBE";
+                    jmsframe.headers = {"destination":"/queue/myqueue", "id":"mysubid"};
+                    var data = JSON.stringify(jmsframe);
+                    websocket.send(data);
+                    writeToScreen("SENT: " + data, "blue");
+                }
+                if (nmsg == 1) { 
+                    var jmsframe = {};
+                    jmsframe.command = "UNSUBSCRIBE";
+                    jmsframe.headers = {"destination":"/queue/myqueue", "id":"mysubid"};
+                    var data = JSON.stringify(jmsframe);
+                    websocket.send(data);
+                    writeToScreen("SENT: " + data, "blue");
+
+                    jmsframe = {};
+                    jmsframe.command = "DISCONNECT";
+                    jmsframe.headers = {"receipt-id":"mydisconnectid"};
+                    data = JSON.stringify(jmsframe);
+                    websocket.send(data);
+                    writeToScreen("SENT: " + data, "blue");
+                    websocket.close();
+                    websocket = null;
+                }
+                nmsg = nmsg + 1;
+            }
+
+            function onError(evt) {
+                writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+            }
+
+            function writeToScreen(message, usecolor) {
+                var pre = document.createElement("p");
+                pre.style.wordWrap = "break-word";
+                pre.style.color = usecolor;
+                pre.innerHTML = message;
+                output.appendChild(pre);
+            }
+
+            window.addEventListener("load", init, false);
+        </script>
+
+        <h2 style="text-align: center;">A WebSocket JSON Client</h2>
+        <br></br>
+        <center><i>Click RUN to send/receive a JSON messages over WebSocket to/from MQ Broker</i></center>
+        <br></br>
+        <div style="text-align: center;">
+            <form action=""> 
+                <input onclick="send_json(); return false;" id="run" value="RUN" type="button"> 
+            </form>
+        </div>
+        <div id="output"></div>
+    </body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- @(#)funcspec.html	1.8 01/27/05  -->
+
+<html>
+<head>
+<title>
+MQ: Functional Specification
+</title>
+</head>
+<body>
+<H5 align="center"><em>Copyright Sun Microsystems, Inc. All Rights Reserved </em></H5>
+<H2><center>
+			Functional Specification
+</center></H2>
+
+<P>
+[Remove bracketed text when completing this functional specification]
+<P>
+[The functional specification is the blueprint that the implementation will
+ be based on, the basis for the documentation and it will contain key
+ material that will be used during the ARC review.  This spec should describe
+ what the feature is, how it will work and how it fits into the rest of
+ the product.  The details are important.  Someone interested in how an
+ external part of a feature will work should be able to read the functional
+ spec and find that information.]
+<DL>
+      <P><DT><b>1.0 Author/Date:</b>
+<DD>
+	[A. Developer 11/20/2002]
+
+      <P><DT><b>2.0 Synopsis:</b><DD>
+	[One sentence synopsis of the work to be performed.  Can be copied
+	 from the existing one-pager]
+
+<P><DT><b>3.0 PRD Requirement #:</b><DD>
+	[Requirement # from the Product Requirements Document for the
+         requirement this feature helps to address]
+
+<P><DT><b>4.0 Description:</b><DD>
+	[A precise description of the work to be implemented.  Give details.
+	 This can also be copied from the one-pager but it should only
+	 describe the aspects of the feature that will be implemented in
+	 this release and will likely require more detail than what was
+	 provided in the one-pager.  Use this section to describe what it 
+	 is and how it will work.  Describe it from a functional point of 
+	 view. If someone wants to know the details of the feature this is 
+	 where they will find the information.]
+
+<P><DT><b>5.0 Non-feature:</b><DD>
+	[If there is some aspect of this feature that you are not implementing
+	 that a reasonable person might normally expect to find in the feature
+	 list it here.]
+
+<P><DT><b>6.0 Dependencies:</b><DD>
+	[List all (technology) dependencies this work has.  What impact will
+	 it have on other groups?  Can be copied from the one-pager.]
+
+<P><DT><b>7.0 Interfaces:</b><DD>
+	[Create a table that lists the imported and exported interfaces this
+	 feature consumes or produces.  For each exported interface you
+	 should assign a stability classification as defined in the
+	 <A href="http://opensolaris.org/os/community/arc/policies/interface-taxonomy/">
+	 Interface Taxonomy</a>
+<P>
+	 Interfaces include API, protocols, jar files, config files, CLI's
+	 (command names, options and output), GUI's, port numbers, etc.  As 
+	 an example take a look at the interface table in the 
+	 <A href="http://opensolaris.org/os/community/arc/caselog/2008/648/proposal-html/">
+	 Proposal submission for MQ 4.3 (ARC case 2008/648) </a>.
+<P>
+	 This information is required prior to our ARC review. You can see a sample ARC document <a href="http://opensolaris.org/os/community/arc/caselog/2008/648/">here</a> ]
+<P>
+<TABLE border=1>
+<CAPTION>Exported Interfaces</CAPTION>
+<TR>
+<TH>Interface</TH>
+<TH>Classification</TH>
+<TH>Comments/Specification</TH>
+</TR>
+<TR>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+</TR>
+</TABLE>
+<P>
+<TABLE border=1>
+<CAPTION>Imported Interfaces</CAPTION>
+<TR>
+<TH>Interface</TH>
+<TH>Classification</TH>
+<TH>Comments/Specification</TH>
+</TR>
+<TR>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD>&nbsp;</TD>
+</TR>
+</TABLE>
+
+
+<P><DT><b>8.0 Performance:</b><DD>
+	[If this feature has performance implications or requirements, 
+	 describe them here.  What are the performance goals and how will
+	 performance be measured.  Are there risks to the product's 
+	 performance introduced because of this feature?  Think about
+	 performance from both a throughput and scalability point of view.]
+
+<P><DT><b>9.0 Configuration/Administration:</b><DD>
+	[Describe how this feature can be configured.  For example if 
+	 new properties are being introduced list the property name, 
+	 its default value, what it controls and where the property can 
+	 be set.  What are the specific changes to the administration tools 
+	 to support this feature?]
+
+<P><DT><b>10.0 Instrumentation/Diagnostics:</b><DD>
+	[How will the feature be monitored?  How will a user know when the
+	 feature is not operating normally?  What will be available to 
+	 Customer Support to help diagnose problems related to this feature?
+	 Describe how the feature will use logging, stderr, syslog and
+	 other debugging options.
+
+<P><DT><b>11.0 Compatibility/Interoperability/Migration:</b><DD>
+	[Will the implementation of this feature require the migration of
+	 existing user's data?  How will this be accomplished?  Are there
+	 compatibility and/or interoperability issues introduced by this
+	 feature (Will this feature work with an older version of the 
+	 product)?  Do the compatibility/interoperability issues need 
+	 to be mitigated?  How?]
+
+<P><DT><b>12.0 Security:</b><DD>
+	[Does this feature impact the security of the product? What are
+	 the security implications of this feature?  If the feature 
+	 interacts directly with any security-related APIs or interfaces, 
+	 make a note here. If the feature expects to have any Java 
+	 policy or platform user/permissions implications, note them here.
+	 If the feature exposes any new ports, listeners, or any similar 
+	 communication points which may have security implications, note 
+	 these here.  This information may be copied from the one-pager]
+
+<P><DT><b>13.0 Standards Conformance:</b><DD>
+	[Is there any particular standard that this feature is implementing?
+	 e.g. JMS 1.1, SAAJ 1.2]
+
+<P><DT><b>14.0 Installation/packaging:</b><DD>
+	[Describe how this feature effects the installation, removal or
+	 packaging of the product.  If there are specific changes required 
+	 to the installer due to this feature list those changes here.  May 
+	 be copied from the one-pager.]
+
+<P><DT><b>15.0 Use Cases:</b><DD>
+	[A use case defines a single task, performed by the user of a system,
+	 that has some useful outcome.  As defined in the UML Specification 
+	 v1.3: ``You apply use cases to capture the intended behavior of the 
+	 system you are developing, without having to specify how that 
+	 behavior is implemented. Use cases provide a way for your developers
+	 to come to a common understanding with your system's end users and 
+	 domain experts. In addition, use cases serve to help validate your
+	 architecture and to verify your system as it evolves during 
+	 development.''] 
+
+<P><DT><b>16.0 Other:</b><DD>
+	[List other useful information about this feature here.  If this
+	 feature impacts another part of the product make a note of it here.]
+
+<P><DT><b>17.0 Documentation:</b><DD>
+        [List your expected impact on each book listed in the table below.
+         For example: "New chapter to describe HA clusters",
+                      "Minor updates to imqdbmgr options", etc.
+         Also include in this section any additional information that you
+         feel would be useful to the writers that does not appear elsewhere
+         in this document.]
+
+<p>
+<TABLE border=1>
+<CAPTION>Documentation Impact</CAPTION>
+<TR>
+<TH>Book</TH>
+<TH>Comments</TH>
+</TR>
+
+<TR>
+<TD>Technical Overview</TD>
+<td>&nbsp;</td>
+</TR>
+
+<TR>
+<TD>Administration Guide</TD>
+<td>&nbsp;</td>
+</TR>
+
+<TR>
+<TD>Developer's Guide for Java </TD>
+<td>&nbsp;</td>
+</TR>
+
+<TR>
+<TD>Developer's Guide for C </TD>
+<td>&nbsp;</td>
+</TR>
+
+<TR>
+<TD>Installation Guide</TD>
+<td>&nbsp;</td>
+</TR>
+
+</TABLE>
+
+<P><DT><b>18.0 Open Issues:</b><DD>
+        [List open issues]
+
+<P><DT><b>19.0 Version History:</b><DD>
+
+<table border="1">
+<tr><th>Date</th><th>Version</th><th>Change</th></tr>
+<tr><td>XX/XX/2005</td><td>1</td><td>Initial Draft</td></tr>
+</table>
+
+
+
+</DL>
+
+<H5><I>
+Sun Proprietary/Confidential: Internal Use Only
+<P>
+(FS Version 1.1)
+</I></H5>
+</BODY>
+</HTML>

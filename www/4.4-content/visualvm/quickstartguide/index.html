@@ -1,0 +1,201 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>VisualVM Plugin for MQ</title>
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+
+<style type="text/css">
+p {width:800px}
+</style>
+
+<h1>VisualVM plugin for MQ - Quick Start guide</h1>
+
+<p>Click on any of the pictures on this page to see a larger view.<br>
+
+<h2>What is the VisualVM plugin for MQ?</h2>
+
+<p>The VisualVM plugin for MQ is a simple GUI application which provides a very easy way to display the monitoring and configuration attributes exposed by a MQ broker using JMX.  It is provided as a plugin to the VisualVM tool included in Java 6 (version 1.6.0_14 or later). 
+
+<p>You can already view MQ's JMX MBeans directly using the MBean plugins for VisualVM or JConsole. This new plugin provides access to the same information but is intended to be much easier to use, providing access to most information in only a few mouse clicks, and should make it much easier to see how a group of broker attributes varies over time.
+
+<p>The plugin provides information about a running broker on a series of tabbed panes. The main pane provides general information about the broker. Other panes display lists of connections, consumers, producers, destinations and open transactions and show their configured and runtime attributes in a series of simple tables. You can also list the brokers in a running cluster. When you first open the tool a limited subset of all configuration and monitoring attributes exposed by MQ's JMX interface can be viewed, though you can configure the information displayed to show virtually any attribute available through JMX.
+
+<p>The plugin is dynamic and continually refreshed to show the current value of each attribute. So you can watch the number of messages in a queue grow and fall, see how connections come and go or view the number of open transactions. 
+
+<p>The plugin can be used to monitor both standalone MQ brokers and those running embedded in a Glassfish instance.
+
+<h2>Installation instructions</h2>
+
+See <a href="http://mq.java.net/4.4-content/visual-vm-plugin.html">VisualVM Plugin for Message Queue</a>.
+
+<h2>Connecting to a local MQ broker JVM</h2>
+
+<p>When you start VisualVM with the MQ plugin installed, any MQ brokers running on the same machine will be automatic detected, 
+given a distinctive "Duke holding plugs" icon and the name "Message Queue Broker".
+
+If the broker is embedded in a Glassfish instance the broker will be identified as a Glassfish instance. 
+</p>
+
+<p>Under the "Message Queue Broker" or "Glassfish" nodes (which represent the JVM) there will be a "Broker" note which represents the broker itself.
+</p>
+
+<p><a href="target0.html"><img align="center" src="thumbnails/java_visualvm_16062009_174241.jpg" width="640" height="458" title="General view" border="0"></a><br/>
+
+
+<p>
+Double-click on the Broker node to display a tab of general information about the broker.
+</p>
+<p>
+This is composed of two "detail views", each of which can be toggled off and on again using the checkboxes on the top right.
+</p>
+<a href="target1.html"><img align="center" src="thumbnails/java_visualvm_16062009_174250.jpg" width="640" height="458" title="Broker" border="0"></a><br/>
+
+<p>If the broker is not JMX-enabled, clicking on the "Broker" tab displays an error message. (This feature is only available for standalone brokers running on the same machine.)
+</p>
+<p><a href="target2.html"><img align="center" src="thumbnails/java_visualvm_16062009_175632.jpg" width="640" height="458" title="If the broker is not JMX enabled" border="0"></a><br/>
+
+<h2>Connecting to a remote MQ broker JVM</h2>
+
+<p>You can also use the MQ plugin for VisualVM to monitor a broker running on another machine. </p>
+
+<p>The main things to know are:</p>
+
+<ul>
+<li><p>You can use "File -> Add JMX Connection" to connect directly to the remote broker. The JMX URL to use is explained in the  <a href="https://glassfish.java.net/wiki-archive/OpenMQJMXQuestions.html">FAQ for JMX related issues in Open Message Queue</a>. 
+
+<li><p>If you want VisualVM to "discover" JVMs running on the remote machine you must 
+
+<ul>
+<li>Use "File -> Add remote host" to add the remote host to the tree view.</li>
+<li>Run a <tt>jstat</tt> daemon on the remote host</li>
+</ul>
+<p>See <a href="https://visualvm.java.net/applications_remote.html">Working with Remote Applications</a> in the VisualVM documentation for details.
+</li>
+</ul>
+ 
+<p>
+Once you have connected to it you can monitor remote brokers (included those embedded in Glassfish) in the same way as local brokers. 
+The only difference is that you don't see a distinctive icon for remote brokers.
+</p>
+
+<h2>Subnodes of the "broker" node</h2>
+
+<p>You can expand the "Broker" node to see eight sub-nodes, each of which represents a particular aspect of the broker (and a particular MBean or set of MBeans):</p>
+
+<p><a href="target3.html"><img align="center" src="thumbnails/java_visualvm_16062009_174256.jpg" width="640" height="458" title="Expanded treeview" border="0"></a><br/>
+
+<h2>Producers subnode</h2>
+
+<p>Double-click on the "Producer" node to open a new "Producers" tab which displays a list of producers.</p>
+
+<p><a href="target4.html"><img align="center" src="thumbnails/java_visualvm_16062009_174305.jpg" width="640" height="458" title="Producers" border="0"></a><br/>
+
+<p>On the "Producers" tab, click on the "Producer manager (monitor)" checkbox to display some generic information about producers in general.</p>
+
+<p><a href="target5.html"><img align="center" src="thumbnails/java_visualvm_16062009_174422.jpg" width="640" height="458" title="Producers (select producer monitor checkbox)" border="0"></a><br/>
+
+<h2>Transactions subnode</h2>
+
+<p>Double-click on the "Transactions" node to open a new "Transactions" tab which displays a list of open transactions
+as well as some generic information about transactions in general.</p>
+
+<p><a href="target6.html"><img align="center" src="thumbnails/java_visualvm_16062009_174313.jpg" width="640" height="458" title="Transactions" border="0"></a><br/>
+
+<h2>Services subnode</h2>
+
+<p>Double-click on the "Services" node to open a new "Services" tab which displays a list of services running in the broker
+as well as some generic information about services in general.</p>
+
+<p><a href="target7.html"><img align="center" src="thumbnails/java_visualvm_16062009_174318.jpg" width="640" height="458" title="Services" border="0"></a><br/>
+
+<h2>Consumers subnode</h2>
+
+<p>Double-click on the "Consumers" node to open a new "Consumers" tab which displays a list of consumers.</p>
+
+<p><a href="target8.html"><img align="center" src="thumbnails/java_visualvm_16062009_174325.jpg" width="640" height="458" title="Consumers" border="0"></a><br/>
+
+<p>On the "Consumers" tab, click on the "Consumer manager (monitor)" checkbox to display some generic information about consumers in general.</p>
+
+<p><a href="target9.html"><img align="center" src="thumbnails/java_visualvm_16062009_174438.jpg" width="640" height="458" title="Consumers + Consumer manager monitor checkbox" border="0"></a><br/>
+
+<h2>Log subnode</h2>
+
+<p>Double-click on the "Log" node to open a new "Log" tab which displays some generic information about logging  in general.</p>
+
+<p><a href="target10.html"><img align="center" src="thumbnails/java_visualvm_16062009_174329.jpg" width="640" height="458" title="Log" border="0"></a><br/>
+
+<h2>Connections subnode</h2>
+
+<p>Double-click on the "Connections" node to open a new "Connections" tab which displays a list of connections.</p>
+
+<p><a href="target11.html"><img align="center" src="thumbnails/java_visualvm_16062009_174335.jpg" width="640" height="458" title="Connections" border="0"></a><br/>
+
+<p>On the "Connections" tab, click on the "Connection manager (monitor)" checkbox to display some generic information about connections in general.</p>
+
+<p><a href="target12.html"><img align="center" src="thumbnails/java_visualvm_16062009_174452.jpg" width="640" height="458" title="Connections + Connection manager monitor checkbox" border="0"></a><br/>
+
+<h2>Cluster subnode</h2>
+
+<p>Double-click on the "Cluster" node to open a new "Cluster" tab which displays a list of brokers in the cluster
+as well as some generic information about the cluster configuration in general of this broker.</p>
+
+<p><a href="target13.html"><img align="center" src="thumbnails/java_visualvm_16062009_170328.jpg" width="640" height="458" title="Cluster" border="0"></a><br/>
+
+<h2>Destinations subnode</h2>
+
+<p>Finally, double-click on the "Destinations" node to open a new "Destinations" tab which displays a list of destinations in this broker
+as well as some generic information about destinations in general.</p>
+
+<p><a href="target14.html"><img align="center" src="thumbnails/java_visualvm_16062009_174347.jpg" width="640" height="458" title="Destinations" border="0"></a><br/>
+
+<p>As with all other tab views, individual "detail panes" within the "Destinations" view can be switched on and off using the checkboxes towards the top of the tab view.
+In this example, only the "Destination list (monitor)" detail pane is switched on. The other three detail panes are switched off.</p>
+
+<p><a href="target15.html"><img align="center" src="thumbnails/java_visualvm_16062009_174528.jpg" width="640" height="458" title="Destinations - disable various checkboxes" border="0"></a><br/>
+
+<h2>Context menu features</h2>
+
+<p>In all detail view panes you can use the mouse to open a context menu. This has either one or two entries:
+
+<ul>
+<li>Configure attributes displayed</li>
+<li>Auto reload</li>
+</ul>
+
+<p><a href="target16.html"><img align="center" src="thumbnails/fullscreen_capture_16062009_175927.jpg" width="640" height="458" title="fullscreen_capture_16062009_175927.jpg" border="0"></a><br/>
+
+<p>
+<b>Auto reload</b> is simply an on/off toggle. 
+By default, attribute values will be refreshed every 2 seconds. 
+The time interval is not configurable, but you can disable auto refresh using this menu item.
+</p>
+
+<p>
+<b>Configure attributes displayed</b> is available in those detail view panes which display a table showing multiple attribute values for a list of items (connections, destinations etc),
+and where there are more attributes available than are actually displayed. Selecting this menu item opens a dialog window that allows you to choose which attributes you want to display.</p>
+
+<p><a href="target17.html"><img align="center" src="thumbnails/fullscreen_capture_16062009_175953.jpg" width="487" height="342" title="fullscreen_capture_16062009_175953.jpg" border="0"></a><br/>
+
+<p>The dialog shows two lists. The right list shows all the attributes currently being displayed. 
+The left list shows all the attributes available for display that are not being displayed. 
+To move an attribute from one list to the other, select it and then press "-->" or "<--" as appropriate.
+When you have completed your selection, press "OK".
+</p>
+
+<p>
+You can change the order of columns by selecting the column header with the mouse and dragging it to the desired position.
+</p>
+
+<h2>Coexistence with Glassfish plugin for VisualVM</h2>
+
+If the MQ instance being viewed is embedded in a Glassfish instance then the JVM will be represented by a Glassfish icon rather than a MQ icon,
+
+If you have the Glassfish plugin for VisualVM installed then this will operate as normal: you will see both the subnodes added by the Glassfish plugin
+and the Broker subode added by the MQ plugin:
+
+<p><a href="target19.html"><img align="center" src="thumbnails/java_visualvm_16062009_180452.jpg" width="640" height="458" title="java_visualvm_16062009_180452.jpg" border="0"></a><br/>
+
+</body>
+</html>

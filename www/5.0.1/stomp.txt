@@ -1,0 +1,97 @@
+
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    </head>
+
+    <body>
+        <meta charset="utf-8">
+        <title>WebSocket STOMP Client</title>
+        <script language="javascript" type="text/javascript">
+            var websocket = null;
+            var nmsg = 0;
+            var NULL = '\x00';
+
+            function init() {
+                output = document.getElementById("output");
+                document.getElementById('run').disabled = true;
+                var wsUri = "ws://localhost:7670/wsjms/mqstomp";
+                websocket = new WebSocket(wsUri);
+                websocket.binaryType="blob";
+                websocket.onopen = function(evt) { onOpen(evt) };
+                websocket.onclose = function(evt) { onClose(evt) };
+                websocket.onmessage = function(evt) { onMessage(evt) };
+                websocket.onerror = function(evt) { onError(evt) };
+            }
+
+            function send_stomp() {
+                document.getElementById('run').disabled = true;
+                nmsg = 0;
+                sendData("CONNECT\nlogin:guest\npasscode:guest\naccept-version:1.2\n\n"+NULL);
+            }
+
+            function onOpen(evt) {
+                writeToScreen("CONNECTED", "green");
+                document.getElementById('run').disabled = false;
+            }
+
+            function onClose(evt) {
+                writeToScreen("DISCONNECTED", "green");
+                init();
+            }
+
+            function onMessage(evt) {
+                var f = new FileReader();
+                f.onload = function(e) {
+                    writeToScreen("RECEIVED: "+e.target.result, "red");
+                };
+                f.readAsText(evt.data);
+                if (nmsg < 1) { 
+                    sendData("SEND\ndestination:/queue/stompq\n\nThis is a message from websocket client. #"+nmsg+"\n"+NULL);
+                }
+                if (nmsg == 0) {
+                    sendData("SUBSCRIBE\ndestination:/queue/stompq\nid:mysubid\n\n"+NULL);
+                   
+                }
+                if (nmsg == 1) { 
+                    sendData("UNSUBSCRIBE\ndestination:/queue/stompq\nid:mysubid\n\n"+NULL);
+
+                    sendData("DISCONNECT\n\n"+NULL);
+                    websocket.close();
+                    websocket = null;
+                }
+                nmsg = nmsg + 1;
+            }
+
+            function onError(evt) {
+                writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+            }
+
+            function sendData(data) {
+                websocket.send(data);
+                writeToScreen("SENT " + data, "blue");
+            }
+
+            function writeToScreen(message, usecolor) {
+                var pre = document.createElement("p");
+                pre.style.wordWrap = "break-word";
+                pre.style.color = usecolor;
+                pre.innerHTML = message;
+                output.appendChild(pre);
+            }
+
+            window.addEventListener("load", init, false);
+        </script>
+
+        <h2 style="text-align: center;">A WebSocket STOMP Client</h2>
+        <br></br>
+        <center><i>Click RUN to send/receive a STOMP message over WebSocket to/from MQ Broker</i></center>
+        <br></br>
+        <div style="text-align: center;">
+            <form action=""> 
+                <input onclick="send_stomp(); return false;" id="run" value="RUN" type="button"> 
+            </form>
+        </div>
+        <div id="output"></div>
+    </body>
+</html>

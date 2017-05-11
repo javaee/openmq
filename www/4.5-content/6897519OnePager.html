@@ -1,0 +1,362 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>One Pager for: Passing passwords securely to a managed MQ broker</title>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+</head>
+<body style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
+<h2>One Pager: Passing passwords securely to a managed MQ broker<br>
+</h2>
+(template version: 1.91)<br>
+<table border="1" cellpadding="2" width="756">
+  <tbody>
+    <tr>
+      <td>
+      <p><b>Table of Contents</b><br>
+      <a href="#1">1. Introduction</a><br>
+      </p>
+      <blockquote> <a href="#11">1.1 Project/Component Working Name</a><br>
+        <a href="#12">1.2 Name(s) and e-mail address of Document
+Author(s)/Supplier</a><br>
+        <a href="#13">1.3. Date of This Document</a><br>
+      </blockquote>
+      <a href="#2">2. Project Summary</a><br>
+      <blockquote> <a href="#21">2.1 Project Description</a><br>
+        <a href="#22">2.2 Risks and Assumptions</a><br>
+      </blockquote>
+      <a href="#3">3. Problem Summary</a><br>
+      <blockquote>
+        <a href="#31">3.1 Problem Area</a><br>
+        <a href="#32">3.2 Justification</a><br>
+      </blockquote>
+      <a href="#4">4. Technical Description</a><br>
+      <blockquote>
+        <p><a href="#41">4.1 Details</a><br>
+        <a href="#42">4.2 Bugs/RFE's</a><br>
+        <a href="#43">4.3 Scope</a><br>
+        <a href="#44">4.4 Out-of-scope</a><br>
+        <a href="#45">4.5 Interfaces</a><br>
+        <a href="#46">4.6 Documentation Impact</a><br>
+        <a href="#47">4.7 Configuration/administration Impact</a><br>
+        <a href="#48">4.8 High Availability Impact</a><br>
+        <a href="#49">4.9 Internationalization</a><br>
+        <a href="#410">4.10 Packaging</a><br>
+        <a href="#411">4.11 Security Impact</a><br>
+        <a href="#412">4.12 Compatibility</a><br>
+        <a href="#413">4.13 Dependencies</a><br>
+        <a href="#414">4.14 Testing Impact</a></p>
+      </blockquote>
+      <p><a href="#5">5. References</a><br>
+      <a href="#6">6. Schedule </a> <br>
+      </p>
+      <p><br>
+      </p>
+      <h3><a name="1"></a>1. Introduction<br>
+      </h3>
+      <p><a name="11"></a><b>1.1. Project/Component Working Name</b></p>
+      <p>Passing passwords securely to a managed MQ broker<br>
+      </p>
+      <p><a name="12"></a><b>1.2. Name(s) and e-mail address of
+Document
+Author(s)/Supplier</b></p>
+      <p>Nigel Deakin<br>
+nigel.deakin@oracle.com</p>
+      <p><a name="13"></a><b>1.3. Date of This Document</b></p>
+      <p>15 May 2010: Initial version<br>
+      9 July 2010: Updated to reflect new <tt>setBrokerProps</tt> method</p>
+      <h3><a name="2"></a>2. Project Summary</h3>
+      <p><br>
+      <a name="21"></a><b>2.1. Project Description</b></p>
+      <p>This one-pager defines changes that will be made in MQ 4.5 (and which will be backported to MQ 4.4U2) to allow all the passwords
+required by a managed MQ broker (both local and embedded)
+to be passed to it in a secure manner. 
+      <p><a name="22"></a><b>2.2. Risks and Assumptions</b></p>
+      <p>This project has no particular risks</p>
+      <h3><a name="3"></a>3. Problem Summary</h3>
+      <p><a name="31"></a><b>3.1. Problem Area</b></p>
+    
+<p>    
+Glassfish V3 (which used MQ 4.4.1) allowed the following password to be passed to a managed MQ broker:
+
+<ul>
+<li>Broker administrator password
+</ul>  
+
+It passed to the broker using a clear text password file. This has been deemed to be insecure 
+(see <a href="#42">related bug reports</a>)
+and needs to be replaced by a more secure technique.
+
+<p>Glassfish V2.1.1  (which used MQ 4.4) allowed the following passwords to be passed to a managed MQ broker:
+
+<ul>
+<li>Broker administrator password
+<li>HADB database password (not needed in Glassfish V3)
+</ul> 
+
+The broker administrator password was passed using a clear text file, whilst the HADB password was passed to a LOCAL broker on the command line. 
+That second technique has long been considered to be insecure.
+
+<p>Glassfish 3.0.1 (which will use MQ 4.4U2) addressed the security vulnerability in Glassfish V3 by allowing the broker administrator password
+to be passed to the managed broker without the use of a clear text password file. This was achieved by changes to the JMSRA broker lifecycle code
+to (1) write the password to the LOCAL broker's standard input and (2) pass the password to an EMBEDDED broker as a Java method argument. These changes
+were part of Glassfish 3.0.1 and for the purposes of this document are assumed to have already been implemented. 
+Since those changes were implemented as a security fix they were not documented in a one-pager. For completeness, and to allow some interface changes
+to be documented, those changes are 
+described here.
+
+<p>For Glassfish 3.1 (which will use MQ 4.5) the vulnerability in respect of the HADB database password will also be addressed 
+(even though it is not expected that Glassfish will use HADB). This one-pager describes the changes
+to MQ to allow this. Any corresponding changes to Glassfish are beyond the scope of this document.     
+  
+<p>
+In addition, there is a requirement for Glassfish 3.1 to allow other passwords
+to be passed securely to the managed broker, such as the HA database password, the config database password, the SSL keystore password,
+the bridge manager password and the LDAP password. It is considered that the solution to this should make it possible
+to pass arbitrary passwords securely rather than require the hard-coding of property names in JMSRA. 
+This requirement will be addressed by a separate one-pager <a href="configuringBrokerPropsInGlassfish-one-pager.html">JMSRA changes to allow arbitrary broker properties (including passwords) to be configured</a>
+and is not considered further here.
+
+      
+      <p><a name="32"></a><b>3.2. Justification</b></p>
+      <p>This project is necessary to remove several security vulnerabilities (see <a href="#42">related bug reports.</a>)
+      </ul>
+      <h3><a name="4"></a>4. Technical Description</h3>
+      <p><a name="41"></a><b>4.1. Details</b></p>
+      <p>
+      
+<p>It was decided in MQ 4.4U2 to replace the previous ways in which Glassfish passed a password to the managed broker
+(use of a clear text password file and the use of command line arguments) with a single, secure technique. 
+<p>
+In this
+new technique, Glassfish passed the necessary passwords to the resource adapter's broker lifecycle management code
+using ordinary Java method calls, and the broker lifecycle management code took responsibility for passing them on
+to the managed broker in a secure way.
+<p>
+For embedded brokers the solution was simple: since the broker is running in the same JVM any passwords can be passed as an ordinary Java method argument.
+<p>
+For local brokers, running in a separate JVM, the broker lifecycle management code in the JMSRA resource adapter would write the passwords to the standard input of the broker. 
+This technique is already used by the Glassfish  <tt>asadmin</tt> command to pass a password to a  Glassfish instance: see <a href="https://glassfish.java.net/wiki-archive/GlassFishV3AdminSecurity.html">this page on the Glassfish wiki</a>.
+
+
+      <p> <a name="42"></a><b>4.2. Bug/RFE Number(s)</b></p>
+      <p>
+Internal Oracle RFE 6897519 (MQ password exposed in cleartext inside temporary files when run in LOCAL/EMBEDDED mode)
+and internal oracle bug 6942298 (Problem with /tmp directory contents) specify the need to change
+to a more secure method for passing passwords from Glassfish to a managed broker. 
+<p>Internal Oracle MQ CR 6944162 (Remove need to send a clear text password file to a managed MQ broker), covers the same issue from a MQ standpoint.
+<p>
+Glassfish issue <a href="https://glassfish.java.net/issues/show_bug.cgi?id=11721">11721</a> requests that Glassfish be enhanced to support the full range of
+passwords required by MQ. Note that in addition to the work described in this one-pager, changed are needed to Glassfish to resolve that issue.
+
+
+
+
+      <p> <a name="43"></a><b>4.3. In Scope</b></p>
+      <p>This one-pager describes the changes that are needed to MQ, and in particular the MQ resource adapter,
+      to allow the full range of passwords to be passed to a local or embedded broker in a secure way.</p>
+      <p> <a name="44"></a><b>4.4. Out of Scope</b></p>
+      <p>This one-pager does not cover the changes needed to Glassfish to make use of the changes to MQ.</p>
+      <p>The changes described in this one-pager address the high-priority security vulnerabilities of (1) Glassfish creating unprotected clear text password files 
+      and passing them to MQ (which has been reported by others) and (2) JMSRA passing the database password to a local broker on the command line (which has not).
+      These changes are not intended to be a full audit to confirm whether MQ conforms to the full security requirements of Oracle.
+      <p>This one-pager is concerned only with addressing existing security vulnerabilities.
+      It does not cover the changes to allow the full range of password properties to be supported or handled securely.
+      That work is covered in a separate 
+      one-pager <a href="configuringBrokerPropsInGlassfish-one-pager.html">JMSRA changes to allow arbitrary broker properties (including passwords) to be configured</a>.
+
+      <p> <a name="45"></a><b>4.5. Interfaces</b></p>
+
+      <p> <b>4.5.1 Public Interfaces</b></p>
+
+<p>This project does not change any public interfaces.
+<p>
+      <b>4.5.2 Private interfaces</b></p>
+
+<p>This project adds several new private interfaces. These will constitute a contract between JMSRA and the Glassfish JMS module.
+
+<p>For convenience, the existing interface used by MQ 4.4.1 (for Glassfish V3) and the new interfaces introduced in MQ 4.4U2 (for Glassfish 3.0.1) are listed as well. 
+
+<h4>Existing interfaces in MQ 4.4.1 (Glassfish V3)</h4>
+
+<p>API on <tt>com.sun.messaging.jms.ra.ResourceAdapter</tt> (private contract with Glassfish)
+<p>
+<table border="1">
+<tr><td><tt>setAdminPassword(String adminPassword)</tt></td> <td>Currently used only on the client. Used by the RA to connect to the newly-started broker.</td></tr>
+<tr><td><tt>setAdminPassFile(String adminPassFile)</tt></td> <td>Currently written to a text file which is passed to a LOCAL broker using the <tt>-passfile</tt> command line option</td></tr>
+
+<tr><td><tt>setDSProps(Properties dbProps)</tt></td><td>
+Used to configure HADB (only)<br>
+To specify the HADB server list, set the property <tt>hadb.serverList</tt>. <br>
+<ul>
+<li>This is passed to a LOCAL broker by a command line property <tt>-Dimq.persist.jdbc.hadb.property.serverList=bar</tt>.<br>
+<li>This is passed to a EMBEDDED broker by passing in the property <tt>imq.persist.jdbc.hadb.property.serverList</tt> in a method call
+</ul>
+</td></tr>
+
+<tr><td><tt>setDBProps(Properties dbProps)</tt></td><td>
+Used to configure HADB (only)<br>
+To specify the HADB password, set the property <tt>hadb.password</tt>. 
+<ul>
+<li>This is passed to a LOCAL broker by a command line property <tt>-Dimq.persist.jdbc.hadb.password=foo</tt> (not secure).<br>
+<li>This is passed to a EMBEDDED broker by the same passing in the property <tt>imq.persist.jdbc.hadb.password</tt> in a method call
+</ul>
+To specify the HADB user, set the property <tt>hadb.user</tt>. <br>
+<ul>
+<li>This is passed to a LOCAL broker by a command line property <tt>-Dimq.persist.jdbc.hadb.user=foo</tt>.<br>
+<li>This is passed to a EMBEDDED broker by passing in the property <tt>imq.persist.jdbc.hadb.user</tt> in a method call<br>
+</ul>
+</td></tr>
+
+</table>
+
+<h4>Modified interfaces in MQ 4.4U2 (Glassfish 3.0.1)</h4>
+
+<p>Changed API on <tt>com.sun.messaging.jms.ra.ResourceAdapter</tt> (private contract with Glassfish)
+ 
+<p>
+<table border="1">
+<tr><td><tt>setAdminPassword(String adminPassword)</tt></td><td>Unchanged API but new usage</td> <td>will be passed to broker using standard input (LOCAL) or method call (EMBEDDED). Broker uses it to set <tt>imq.imqcmd.password</tt>.</td></tr>
+<tr><td><tt>setAdminPassFile(String adminPassFile)</tt></td><td>Unchanged API but now deprecated</td> <td>Unchanged behaviour but now deprecated</td></tr>
+</table>
+
+<p>New <tt>imqbrokerd</tt> command line arguments (private contract with JMSRA lifecycle code)
+
+<p>
+<table border="1">
+<tr>
+<td>Argument name</td>
+<td>Description</td>
+<tr>
+<td><tt>-read-stdin</tt></td>
+<td>If supplied, the broker will attempt to read from standard input until an EOF received.  
+The broker will read this data and processes it as if it were a properties file.
+</td>
+</tr>
+<tr>
+<td><tt>-managed</tt></td>
+<td>If supplied, the restart behaviour of the <tt>imqbrokerd</tt> script (and its equivalents <tt>imqbrokerd.exe</tt> and <tt>imqbrokersvc.exe</tt>) be changed.<br>
+Normally if the broker JVM terminates with an exit code of 255, the script restarts the broker. <br>
+However if <tt>-managed</tt> is supplied then
+it does not but simply returns the exit code back to the JMSRA lifecycle code that started it. The  JMSRA lifecycle code will be responsible for restarting the broker
+and supplying the password information via standard input once again.
+</td>
+</tr>
+</table>
+
+<h4>Further modified interfaces in MQ 4.5 API</h4>
+
+<p>In MQ 4.5, broker lifecycle management is now provided by a new class <tt>com.sun.messaging.jms.blc.LifecycleManagedBroker</tt>,
+as well as on <tt>com.sun.messaging.jms.ra.ResourceAdapter</tt> for reasons of backward compatibility. Either can be used. 
+
+<p>
+<table border="1">
+<tr><td><tt>setDSProps(Properties dbProps)</tt></td><td>Unchanged API for HADB.</td>
+<td>
+To specify the HADB server list, set the property <tt>hadb.serverList</tt>. <br>
+<ul>
+<li>This is passed to a LOCAL broker by a command line property <tt>-Dimq.persist.jdbc.hadb.property.serverList=bar</tt>.<br>
+<li>This is passed to a EMBEDDED broker by passing in the property <tt>imq.persist.jdbc.hadb.property.serverList</tt> in a method call
+</ul>
+</td>
+</tr>
+
+<tr><td><tt>setDBProps(Properties dbProps)</tt></td><td>Unchanged API for HADB, but now implemented securely.</td>
+<td>
+To specify the HADB password, set the property <tt>hadb.password</tt>. 
+<ul>
+<li>This is passed to a LOCAL broker by writing <tt>imq.persist.jdbc.hadb.password=foo</tt> to standard input of the broker<br>
+<li>This is passed to a EMBEDDED broker by the same passing in the property <tt>imq.persist.jdbc.hadb.password</tt> in a method call<br>
+</ul>
+To specify the HADB user, set the property <tt>hadb.user</tt>. <br>
+<ul>
+<li>This is passed to a LOCAL broker by a command line property <tt>-Dimq.persist.jdbc.hadb.user=foo</tt>.<br>
+<li>This is passed to a EMBEDDED broker by passing in the property <tt>imq.persist.jdbc.hadb.user</tt> in a method call<br>
+</ul>
+</td>
+</tr>
+
+</table>
+
+<p>
+Note that the separate one-pager <a href="configuringBrokerPropsInGlassfish-one-pager.html">JMSRA changes to allow arbitrary broker properties (including passwords) to be configured</a>
+proposes to deprecate both these methods. See that one-pager for more information.
+
+
+
+      <p> <b>4.5.3 Deprecated/Removed Interfaces</b></p>
+      
+      <p>Deprecated API on <tt>com.sun.messaging.jms.ra.ResourceAdapter</tt> (private contract with Glassfish)
+
+<table  border="1">
+<tr><td><tt>setAdminPassFile(String adminPassFile)</tt></td><td>Deprecated API</td> <td>May continue to be used to pass password information to the managed broker. However this is not considered secure and is deprecated.</td></tr>
+<tr><td><tt>getAdminPassFile(String adminPassFile)</tt></td><td>Deprecated API</td> <td>Deprecated because its corresponding setter method is deprecated.</td></tr>
+</table>
+
+
+      <p> <a name="46"></a><b>4.6. Doc Impact</b></p>
+      <p>
+<p>The revised API will be documented in Javadocs and in the functional specification.
+There is no impact on user documentation.</p>
+      <p> <a name="47"></a><b>4.7. Admin/Config Impact</b></p>
+      <p>This work is not itself expected to affect administration or configuration.
+<p>The changes needed in Glassfish to incorporate this work will probably have an impact on administration and configuration, but this
+is beyond the scope of this one-pager.
+      <p> <a name="48"></a><b>4.8. HA Impact</b></p>
+      <p>This work imposes no new requirements on the high
+availability or clustering aspects of MQ of Glassfish.
+Note that database passwords, as described above, are normally only necessary when running an enhanced MQ cluster.</p>
+      <p> <a name="49"></a><b>4.9. I18N/L10N Impact</b>inks</p>
+      <p>This proposal has no particular impact on internationalization or localization</p>
+      <p> <a name="410"></a><b>4.10. Packaging, Delivery &amp; Upgrade</b></p>
+      <p> <b>4.10.1 Packaging</b></p>
+      <p>// What packages does this proposal impact?  How will the packages<br>
+// be impacted?  Will new IPS/pkg(5) packages need to be created?</p>
+      <p> <b>4.10.2 Delivery</b></p>
+      <p>This proposal has no particular impact on product installation</p>
+
+      <p> <b>4.10.3 Upgrade and Migration</b></p>
+      <p>This proposal has no impact on product upgrade and/or
+ migration from prior releases.</p>
+      <p> <a name="411"></a><b>4.11. Security Impact</b></p>
+      <p>This proposal does not itself rely on security-related APIs or interfaces? 
+	<p>This proposal concernes with passing passwords securely between Glassfish and MQ. It does not concern itself with how those passwords are used.
+	Some passwords are used internally by MQ, others are passed to third-party components such as databases.     
+
+      <p> <a name="412"></a><b>4.12. Compatibility Impact</b></p>
+      <p> These proposals are completely backwards compatible and will not introduce any compatibility isses. 
+      Password files, as used in older versions of Glassfish, will continue to be supported though this usage will be deprecated.</p>
+      <p> <a name="413"></a><b>4.13. Dependencies</b></p>
+ 
+      <p> <b>4.13.1 Internal Dependencies</b></p>
+      <p>This proposal has no dependencies on other parts of Glassfish. 
+      The changes to Glassfish needed to take advantage of this proposal are of course
+      dependent on this proposal.</p>
+      <p> <b>4.13.2 External Dependencies</b></p>
+      <p>This proposal has no dependencies on other software.
+      
+      <p> <a name="414"></a><b>4.14. Testing Impact</b></p>
+      <p>These changes will be tested as part of the development process to ensure that the appropriate password-related properties
+      are correctly passed to the broker, for both local and embedded brokers. This will ensure that the core functionality works correctly. 
+      In addition, tests are needed to ensure that when a local broker is restarted the password information is sent again to the restarted broker. 
+      This will be tested as part of the development process</p>
+      
+      <p>Once Glassfish has been changed to make use of these features, additional Glassfish-level tests will be needed,
+      by Glassfish QE. These should include local broker restart. 
+      
+      
+      <h3><a name="5"></a>5. Reference Documents</h3>
+      <p>See <a href="#42">Section 4.2 above</a>.
+      <h3><a name="6"></a>6. Schedule</h3>
+      <p><b>6.1. Projected Availability</b></p>
+      <p>The changes to MQ described in this document will be implemented and developer-tested by the end of Glassfish 3.1 Milestone 1. 
+      <p>
+      Glassfish then needs to be changed to make use of these features. That work is beyond the scope of this one-pager but the
+      current <a href="https://glassfish.java.net/wiki-archive/3.1JMS.html#section-3.1JMS-MilestoneSchedule">plan</a>  is for those changes to be released
+      as feature JMS-24 in Glassfish 3.1 Milestone 5.
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>One Pager for: MQ Broker Lifecycle API</title>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+</head>
+<body style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
+<h2>One Pager: MQ Broker Lifecycle API <br>
+</h2>
+(template version: 1.91)<br>
+<table border="1" cellpadding="2" width="756">
+  <tbody>
+    <tr>
+      <td>
+      <p><b>Table of Contents</b><br>
+      <a href="#1">1. Introduction</a><br>
+      </p>
+      <blockquote> <a href="#11">1.1 Project/Component Working Name</a><br>
+        <a href="#12">1.2 Name(s) and e-mail address of Document
+Author(s)/Supplier</a><br>
+        <a href="#13">1.3. Date of This Document</a><br>
+      </blockquote>
+      <a href="#2">2. Project Summary</a><br>
+      <blockquote> <a href="#21">2.1 Project Description</a><br>
+        <a href="#22">2.2 Risks and Assumptions</a><br>
+      </blockquote>
+      <a href="#3">3. Problem Summary</a><br>
+      <blockquote>
+        <a href="#31">3.1 Problem Area</a><br>
+        <a href="#32">3.2 Justification</a><br>
+      </blockquote>
+      <a href="#4">4. Technical Description</a><br>
+      <blockquote>
+        <p><a href="#41">4.1 Details</a><br>
+        <a href="#42">4.2 Bugs/RFE's</a><br>
+        <a href="#43">4.3 Scope</a><br>
+        <a href="#44">4.4 Out-of-scope</a><br>
+        <a href="#45">4.5 Interfaces</a><br>
+        <a href="#46">4.6 Documentation Impact</a><br>
+        <a href="#47">4.7 Configuration/administration Impact</a><br>
+        <a href="#48">4.8 High Availability Impact</a><br>
+        <a href="#49">4.9 Internationalization</a><br>
+        <a href="#410">4.10 Packaging</a><br>
+        <a href="#411">4.11 Security Impact</a><br>
+        <a href="#412">4.12 Compatibility</a><br>
+        <a href="#413">4.13 Dependencies</a><br>
+        <a href="#414">4.14 Testing Impact</a></p>
+      </blockquote>
+      <p><a href="#5">5. References</a><br>
+      <a href="#6">6. Schedule </a> <br>
+      </p>
+      <p><br>
+      </p>
+      <h3><a name="1"></a>1. Introduction<br>
+      </h3>
+      <p><a name="11"></a><b>1.1. Project/Component Working Name</b></p>
+      <p>MQ Broker Lifecycle API <br>
+      </p>
+      <p><a name="12"></a><b>1.2. Name(s) and e-mail address of
+Document
+Author(s)/Supplier</b></p>
+
+Nigel Deakin<br>
+nigel.deakin@oracle.com</p>
+      <p><a name="13"></a><b>1.3. Date of This Document</b></p>
+      <p>15 May 2010</p>
+      <h3><a name="2"></a>2. Project Summary</h3>
+      <p><br>
+      <a name="21"></a><b>2.1. Project Description</b></p>
+      <p>This one-pager describes a piece of work in which the existing MQ
+broker lifecycle management code in the JMSRA resource adapter
+(imqjmsrar.rar)
+will be extracted into a separate jar, with a separate API, to make it
+available to a new Glassfish component that performs MQ lifecycle
+management
+without any dependency on JMSRA.<br>
+
+      <p><a name="22"></a><b>2.2. Risks and Assumptions</b></p>
+      <p>This work is a refactoring of existing functionality and is low-risk.</p>
+      <h3><a name="3"></a>3. Problem Summary</h3>
+      <p><a name="31"></a><b>3.1. Problem Area</b></p>
+
+      <p> One of the most significant features currently provided by the JMSRA resource adapter
+      is its ability to start and stop an "embedded" (in-process) or "local" (separate JVM) MQ broker. When
+the JMSRA RA is started, the broker starts. When the JMSRA is shut down, the
+broker terminates. In this document we call this "broker lifecycle management".
+
+      <p>This one-pager describes a piece of work in which the existing MQ
+broker lifecycle management code in the JMSRA resource adapter
+(imqjmsrar.rar) will be extracted into a separate jar, with a separate API, to make it
+available to a new Glassfish component that performs MQ lifecycle
+management without any dependency on JMSRA, and which can be used even when JMSRA is nor deployed and a different JMS resource adapter is being used.
+      
+<pThis work was originally proposed part of the project to consolidate Sun's three JMS resource adapters (JMSRA, JMSJCA
+and GenericJMSRA) into a single RA, based on JMSRA. The goal of that project was to discontinue the use of JMSRA 
+in favour of a merged RA based on JMSJCA. As part of that work, it was planned to extract the part of  JMSRA that performs
+broker lifecycle management and place it in a separate component
+so that it could be used by the merged RA. 
+
+<p>Although that project is currently on hold, there remains a good case for separating the two functions of JMSRA into two: 
+one part to contain the resource adapter and another part containing the broker lifecycle management code.
+This makes sense in software engineering terms: the two parts are essentially independent:
+
+<ul>
+<li>The resource adapter part can be used on its own to connect to a REMOTE broker, avoiding the need for the broker lifecycle management code.
+<li>The broker lifecycle management code can be used on its own to start a LOCAL or EMBEDDED broker, with some other RA such as GenericJMSRA used to connect to it.
+</ul>
+
+<p>One of the big ideas of Glassfish 3 is to make it modular, so that only those components that are actually needed are loaded into the running instance.
+This one-pager proposes that the MQ broker lifecycle management code be separated from the MQ resource adapter, so that they can each be used
+without the need to use the other.
+</p>
+
+<p>This one-pager covers only the changes to MQ that are necessary to make this possible. 
+Changes will also need to be made to Glassfish to take advantage of this separation,
+to allow the user to start and stop the broker without the need to start and stop the JMSRA.
+These changes are beyond the scope of this one-pager and need to be specified separately.
+</p>
+
+      <p><a name="32"></a><b>3.2. Justification</b></p>
+      <p>See <a href="#21">Section 2.1</a> above.
+
+</p>
+      <h3><a name="4"></a>4. Technical Description</h3>
+      <p><a name="41"></a><b>4.1. Details</b></p>
+      
+ 
+<p><b>Packaging changes</b>
+
+</p><p>At present the JMSRA resource adapter (<tt>imqjmsrar.rar</tt>) contains the following jars:
+</p><ul>
+<li><tt>imqjmsra.jar</tt> (contains the RA, numerous MQ client classes copied from <tt>imq.jar</tt>, and the broker lifecycle code)
+</li><li><tt>fscontext.jar</tt> (copy of server-side jar needed to run a managed broker)   
+</li><li><tt>imqbroker.jar</tt> (copy of server-side jar needed to run a managed broker)     
+</li><li><tt>imqjmsbridge.jar</tt> (copy of server-side jar needed to run a managed broker)  
+</li><li><tt>imqjmx.jar</tt> (copy of server-side jar needed to run a managed broker)        
+</li><li><tt>imqstomp.jar</tt> (copy of server-side jar needed to run a managed broker) 
+</li></ul>
+
+<p>This will <b>remain</b> for use with versions of Glassfish prior to 3.1 and will continue to work as at present.
+
+<p>For Glassfish 3.1 this will be split into two. A new pure client-side resource adapter <tt>imqra.rar</tt> (provisional name) will be provided. This will consist of the following single jar:
+</p><ul>
+<li><tt>imqjmsra.jar</tt> (contains the RA only and no lifecycle management code)
+</li></ul>
+<p>
+
+<p>This will not contain copies of MQ client classes and so will be dependent on the MQ client jar <tt>imq.jar</tt> also being on the classpath.
+
+<p>A separate jar, <tt>imqblc.jar</tt> (provisional name ; BLC is Broker Life Cycle) will be created which contains the broker lifecycle code formerly in <tt>imqjmsra.jar</tt>.
+This will be delivered into the new Glassfish module for MQ broker lifecycle management, together with a copy of the MQ client jar <tt>imq.jar</tt> (needed by the new RA)
+and copies of the other jars needed to run a managed broker, <tt>fscontext.jar</tt>,<tt>imqbroker.jar</tt>,<tt>imqjmsbridge.jar</tt>,<tt>imqjmx.jar</tt> and <tt>imqstomp.jar</tt>.
+
+<p><b>New broker lifecycle management API</b>
+
+<p>A new class <tt>com.sun.messaging.jms.blc.LifecycleManagedBroker</tt> will be added (note new package name). This will be the public API for broker lifecycle management
+and will allow a LOCAL or EMBEDDED broker to be configured, started and stopped. The properties and methods provided to allow this will be the same as those 
+currently provided by <tt>com.sun.messaging.jms.ra.ResourceAdapter</tt>.
+
+<p><b>Changes to <tt>com.sun.messaging.jms.ra.ResourceAdapter</tt></b>
+
+<p>Because of the need to be able to use JMSRA with older versions of Glassfish (prior to 3.1),
+the <tt>com.sun.messaging.jms.ra.ResourceAdapter</tt> class will retain the ability to perform broker lifecycle management 
+exactly as before.
+
+<p>A new JavaBean property <tt>manageBrokerLifecycle</tt> will be added. This is set to <tt>true</tt> by default, but with Glassfish 3.1 this needs to be set
+to <tt>false</tt> to specify that lifecycle management is not required.
+
+<p>If this is set to <tt>true</tt> then those properties of 
+<tt>com.sun.messaging.jms.ra.ResourceAdapter</tt> which relate to broker lifecycle management will not be appropriate, and an exception will be thrown
+if they are used.
+
+<p><b>Summary</b>
+<p>
+<table border="1">
+
+<tr>
+<th><tt>imqjmsra.rar</tt><br>Existing multi-purpose RA<br> for use with Glassfish 3.0 and older</th>
+<th><tt>imqa.rar</tt><br>New client-only RA<br> for use with Glassfish 3.1</th>
+<th>New broker lifecycle bundle<br> for use with Glassfish 3.1</th>
+</tr>
+
+<tr>
+<td><tt>imqjmsra.jar</tt> (existing composite RA)</td>
+<td><tt>imqra.jar</tt> (new client-only RA)</td>
+<td>&nbsp;</td>
+</tr>
+
+<tr>
+<td><tt>imqblc.jar</tt> (new BLC jar)</td>
+<td>&nbsp;</td>
+<td><tt>imqblc.jar</tt> (new BLC jar)</td>
+</tr>
+
+<tr>
+<td><tt>fscontext.jar</tt></td>
+<td>&nbsp;</td>
+<td><tt>fscontext.jar</tt></td>
+</tr>
+
+<tr>
+<td><tt>imqbroker.jar</tt></td>
+<td>&nbsp;</td>
+<td><tt>imqbroker.jar</tt></td>
+</tr>
+
+<tr>
+<td><tt>imqjmsbridge.jar</tt></td>
+<td>&nbsp;</td>
+<td><tt>imqjmsbridge.jar</tt></td>
+</tr>
+
+<tr>
+<td><tt>imqjmx.jar</tt></td>
+<td>&nbsp;</td>
+<td><tt>imqjmx.jar</tt></td>
+</tr>
+
+<tr>
+<td><tt>imqstomp.jar</tt></td>
+<td>&nbsp;</td>
+<td><tt>imqstomp.jar</tt></td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td><tt>imq.jar</tt></td>
+
+<tr>
+<td>&nbsp;</td>
+<td>Note that <tt>imqra.jar</tt> uses <tt>imq.jar</tt>.<br>
+It also depends on <tt>imqblc.jar</tt> being on the classpath<br> though it doesn't actually use it when not performing<br> broker lifecycle management.</td>
+<td>&nbsp;</td>
+</tr>
+
+</tr>
+
+</table>
+
+
+      <p> <a name="42"></a><b>4.2. Bug/RFE Number(s)</b></p>
+      <p>
+
+None
+
+      <p> <a name="43"></a><b>4.3. In Scope</b></p>
+      <p>All changes to MQ, including changes to the way MQ is packaged when it is delivered to Glassfish</p>
+      <p> <a name="44"></a><b>4.4. Out of Scope</b></p>
+      <p>All other changes to Glassfish, including modifications to the JMS module to make use of the new API described here</p>
+      <p> <a name="45"></a><b>4.5. Interfaces</b></p>
+
+      <p> <b>4.5.1 Public Interfaces</b></p>
+      <p>This proposal will not change any public interfaces
+      <p>
+      <b>4.5.2 Private interfaces</b></p>
+      <p>This proposal will create new, private interfaces, between MQ and Glassfish as follows: (names are provisional)<br>
+      </p>
+      <table border="1" width="80%">
+        <tbody>
+          <tr>
+            <td width="60%">Interface</td>
+            <td width="40%">Comments</td>
+          </tr>
+          <tr>
+            <td width="60%">resource adapter <tt>imqra.rar</tt></td>
+            <td width="40%">New resource adapter offering the same RA features as before, but with no support for broker lifecycle management.</td>
+          </tr>
+          <tr>
+            <td width="60%">broker lifecycle jar <tt>imqblc.jar </tt></td>
+            <td width="40%">New jar for use by Glassfish to provide support for broker lifecycle management.
+            This will need to be used with various existing MQ server jars as listed above.</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <p>Note that the existing resource adapter, <tt>jmqjmsra.rar</tt> will continue to be provided for use with older versions of Glassfish only.</tt>
+
+      <p> <b>4.5.3 Deprecated/Removed Interfaces</b></p>
+
+      <table border="1" width="80%">
+        <tbody>
+          <tr>
+            <td width="60%">Interface</td>
+            <td width="40%">Comments/Reason for removal</td>
+          </tr>
+          <tr>
+            <td width="60%">Existing resource adapter <tt>imqjmsra.rar</tt></td>
+            <td width="40%">Deprecated in favour of the new resource adapter <tt>imqra.rar</tt></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p> <a name="46"></a><b>4.6. Doc Impact</b></p>
+      <p>This work may require small changes to the MQ admin guide, which is where the JMSRA API is documented. 
+      Since this is essentially a private interface it is not documented in detail in the user guide which will minimise the changed needed.</p>
+      <p>(Note that changes to Glassfish, and their documentation impact, are out of scope for this pne-pager).
+      <p> <a name="47"></a><b>4.7. Admin/Config Impact</b></p>
+<p>
+This work itself has no impact on the administration or configuration of either MQ or Glassfish.
+</p>      <p>(Note that changes to Glassfish, and their admin/config impact, are out of scope for this pne-pager).
+
+      <p> <a name="48"></a><b>4.8. HA Impact</b></p>
+      <p>This change places no new requirements on the way that MQ clustering is supported</p>
+      <p> <a name="49"></a><b>4.9. I18N/L10N Impact</b>inks</p>
+      <p>This work has no particular internationalisation or localisation issues. </p>
+      <p> <a name="410"></a><b>4.10. Packaging, Delivery &amp; Upgrade</b></p>
+      <p> <b>4.10.1 Packaging</b></p>
+      <p>
+      This work does not create any new packages. <tt>imqra.rar</tt> (and the deprecated <tt>imqjmsra.rar</tt> package) 
+      will be included in the <tt>mq-core</tt> package. <tt>imqblc.jar</tt> will be included in the <tt>mq-server</tt> package.
+      
+      </p>
+      <p> <b>4.10.2 Delivery</b></p>
+      <p>This work does not have any impact on a MQ installation, since a MQ installation does not in itself use JMSRA.
+      <p>(Note that changes to Glassfish, and their impact on installation, are out of scope for this pne-pager).
+      <p> <b>4.10.3 Upgrade and Migration</b></p>
+      <p>This is dependent on the changes to Glassfish, which are out of scope for this one-pager.</p> 
+      
+      <p> <a name="411"></a><b>4.11. Security Impact</b></p>
+      <p>This work introduces no new security implications.</p>
+      <p> <a name="412"></a><b>4.12. Compatibility Impact</b></p>
+      <p>This work will not break compatibility. The old resource adapter will continue to be delivered,
+      so older versions of Glassfish, and an unmodified version of Glassfish 3.1, will continue towork unchanged. </p>
+
+      <p> <a name="413"></a><b>4.13. Dependencies</b></p>
+
+      <p> <b>4.13.1 Internal Dependencies</b></p>
+      <p>This work introduces no new external dependencies.</p>
+      <p> <b>4.13.2 External Dependencies</b></p>
+      <p>This work introduces no new external dependencies. Note that changes need to be made to Glassfish to allow users to benefit from
+      this work. Changes to Glassfish can only be carried out when the work described in this one-pager is complete.</p>
+      <p> <a name="414"></a><b>4.14. Testing Impact</b></p>
+      <p>The MQ test suite contains tests for both the resource adapter and the lifecycle management parts of JMSRA.
+      These tests will need to be refactored to test the new RA and lifecycle jar instead.
+      Since the old dual-purpose resource adapter will continue to be supported the existing tests will need to remain.
+      </p>
+      <p>Once the necessary changes to Glassfish have been made then appropriate testing will be needed in Glassfish.
+      This is out of scope of this document.
+      <h3><a name="5"></a>5. Reference Documents</h3>
+      <p>None
+      </p>
+      <h3><a name="6"></a>6. Schedule</h3>
+      <p><b>6.1. Projected Availability</b></p>
+      <p>This work is currently assessed as priority P4 so is not scheduled for inclusion in Glassfish 3.1.
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

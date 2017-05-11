@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<link rel="stylesheet" media="all" type="text/css" href="../style.css" />
+<title>Using WebSockets in Open MQ</title>
+<!-- hide the project info -->
+<style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+.style3 {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 12px;
+}
+</style>
+
+</head>
+
+<body>
+<table border="0" cellspacing="0" cellpadding="0" id="main2" width="100%">
+<tr valign="bottom" class="nav1">
+<td nowrap colspan="3"><!-- tab 4--></td>
+</tr>
+<form><tr class="sub1">
+<td nowrap><div align="center"><strong>&nbsp;Open Message Queue 5.0.1--WebSocket Integration</strong></div></td>
+<td align="right" nowrap>&nbsp;</td>
+</tr></form>
+<tr><td colspan="3" class="white"><div class="min1">&nbsp;</div></td></tr>
+</table>
+
+<p align="center"><em>(WebSockets are introduced in Open MQ 5.0.1. You must have build 3 or higher)</em><a href="index.html"><br />
+Back to Open MQ 5.0.1 Index Page</a></p>
+<p>WebSocket is an HTML5 technology that provides bidirectional communication which starts via an HTTP request. Open MQ provides WebSocket support in two ways -- Java JMS over WebSocket and STOMP (1.2), and we include an experimental mapping via JSON. In addition, we provide support for both unencrypted and secure WebSocket connections.</p>
+<p>This page provides setup details for using WebSocket in Open MQ.</p>
+<h3>Enable Broker for 'wsjms' WebSocket Service</h3>
+<p>The default 'ws' WebSocket service in a broker is named 'wsjms'.  To   enable the 'wsjms' service, add it to the following broker property   setting<br />
+  <strong>imq.service.activelist</strong><br />
+  By default it is set to following<br />
+  <strong>imq.service.activelist=jms,admin</strong><br />
+  To add 'wsjms',<br />
+  <strong>imq.service.activelist=jms,admin,wsjms</strong></p>
+<p>A broker 'ws' WebSocket service, by default, listens at port 7670 which is set by broker property<br />
+  <strong>imq.wsjms.ws.port=7670</strong></p>
+<p>A broker WebSocket service can support 3 types of WebSocket clients</p>
+<ul>
+  <li><strong>mqjms</strong> - Java JMS client over WebSocket</li>
+  <li><strong>mqstomp</strong> - Any WebSocket client that sends the <a href="http://stomp.github.io/stomp-specification-1.2.html" rel="nofollow">STOMP 1.2 protocol</a> to broker</li>
+  <li><strong>mqjsonstomp</strong> - Any WebSocket client that sends <a href="#HowtoUseMQWebSocketFeatures-jsonstomp">JSON formatted STOMP</a><a href="stomp.txt"></a> 1.2 protocol to broker</li>
+</ul>
+<p>The type(s) of WebSocket clients that a broker can support is controlled by the broker property<br />
+  <strong>imq.&lt;websocket-service-name&gt;.services</strong></p>
+<p>By default, the 'wsjms' and 'wssjms' (see next section) WebSocket services support all 3 types of clients,<br />
+  <strong>imq.wsjms.services=mqjms,mqstomp,mqjsonstomp</strong></p>
+<h3><a name="HowtoUseMQWebSocketFeatures-EnableBrokerfor'wss'WebSocketService" id="HowtoUseMQWebSocketFeatures-EnableBrokerfor'wss'WebSocketService"></a>Enable Broker for 'wss' WebSocket Service</h3>
+<ul>
+  <li>Before start broker, please follow the Administration Guide on how to <a href="http://docs.oracle.com/cd/E18930_01/html/821-2438/aeogb.html#scrolltoc" rel="nofollow">set up broker SSL certificate</a></li>
+  <li>Add a 'wss' WebSocket service to broker property<br />
+    <strong>imq.service.activelist</strong> <br clear="all" />
+    <br clear="all" />
+    The default 'wss' WebSocket service in a broker is named 'wssjms'.  To enable the 'wssjms' service, for example,<br />
+    <strong>imq.service.activelist=jms,admin,wssjms</strong> <br clear="all" />
+    <br clear="all" />
+    The 'wssjms' service, by default, listens at port 7671 which is set by broker property<br />
+    <strong>imq.wssjms.wss.port=7671</strong> <br clear="all" />
+    <br clear="all" />
+  </li>
+  <li>Start the broker with -<a href="http://docs.oracle.com/cd/E18930_01/html/821-2438/aeogq.html#scrolltoc" rel="nofollow">passfile</a> option that specifies <strong>imq.keystore.password</strong></li>
+</ul>
+<h3><a name="HowtoUseMQWebSocketFeatures-BrokerWebSocketConfiguration" id="HowtoUseMQWebSocketFeatures-BrokerWebSocketConfiguration"></a>Broker WebSocket Configuration</h3>
+<p>Please see mq/lib/props/broker/default.properties for a current list   of broker properties that configures a WebSocket service.  Some of them   have been mentioned in above sections. The following broker property can   also be set</p>
+<p>imq.&lt;websocket-service-name&gt;.allowedOrigins - A list of comma   separated origins (protocol scheme and hostname are checked) that are   allowed to access the WebSocket service.  When it is not set (default),   all origins are allowed<br />
+  imq.&lt;wss-service-name&gt;.wss.requireClientAuth - Set to true to   require (default not) SSL client authentication for the 'wss' service</p>
+<h1><a name="HowtoUseMQWebSocketFeatures-HowtoConnectaJavaJMSClienttoBrokeroverWebSocket(mqjms)" id="HowtoUseMQWebSocketFeatures-HowtoConnectaJavaJMSClienttoBrokeroverWebSocket(mqjms)"></a>How to Connect a Java JMS Client to Broker over WebSocket (<strong>mqjms</strong>)</h1>
+<ul>
+  <li>To make a Java JMS client communicate broker over WebSocket,
+    <ul>
+      <li>Set connection factory property<br />
+        <strong>imqAddressList=mqws://&lt;broker-host&gt;:&lt;broker-ws-port&gt;/&lt;ws-service-name&gt;</strong><br />
+        for 'ws' WebSocket service, or<br />
+        <strong>imqAddressList=mqwss://&lt;broker-host&gt;:&lt;broker-wss-port&gt;/&lt;wss-service-name&gt;</strong><br />
+        for 'wss' WebSocket service <br clear="all" />
+        <br clear="all" />
+        For example,<br />
+        imqAddressList=mqws://mybrokerhost:7670/wsjms <br clear="all" />
+        <br clear="all" />
+      </li>
+      <li>Add following jar files to application classpath in addition to imq.jar, jms.jar. These jar files are in mq/lib<br />
+        javax.websocket-api.jar<br />
+        tyrus-client.jar<br />
+        tyrus-core.jar<br />
+        tyrus-websocket-core.jar<br />
+        tyrus-spi.jar<br />
+        tyrus-container-grizzly.jar<br />
+        grizzly-http-server.jar<br />
+        grizzly-framework.jar<br />
+        grizzly-http.jar <br clear="all" />
+        <br clear="all" />
+        There are JMS client examples in mq/examples.  These examples can be run over WebSocket by setting connection factory property imqAddressList appropriately. For example,
+        <p>
+        <ul>
+          <li><a href="http://download.java.net/mq/open-mq/5.0.1/latest/">Download latest OpenMQ 5.0.1</a></li>
+          <li>Start broker with the default WebSocket service 'wsjms' enabled<br/>
+              mq/bin/imqbrokerd -Dimq.service.activelist=wsjms,admin -tty<br/>
+          </li>
+          <p>
+          <li>to run the mq/examples/jms20/syncqueue example over WebSocket connecting to the broker 'wsjms' service,
+            <ul>
+              <li>
+                <ol>
+                  <li>set CLASSPATH to include above jar files and mq/lib/jms.jar, mq/lib/imq.jar</li>
+                  <li>run, for example, on the broker host<br />
+                    java -DimqAddressList=mqws://localhost:7670/wsjms SendObjectMsgsToQueue &lt;queue-name&gt; <br clear="all" />
+                    <br clear="all" />
+                  </li>
+                </ol>
+              </li>
+            </ul>
+          </li>
+          <li>to run the mq/examples/applications/uclient (UniversalClient), connecting to the broker 'wsjms' service,
+            <ul>
+              <li>
+                <ol>
+                  <li>set CLASSPATH to include above jar files and mq/lib/jms.jar, mq/lib/imq.jar</li>
+                  <li>run<br />
+                    java UniversalClient</li>
+                  <li>When the UniversalClient GUI comes up, click   'Actions'-&gt;'Connect ...',  the 'Universal Client: Connection   information' dialog will show up, then in the 'Connection Factory   Attributes' text field, set 'imqAddressList' to<br />
+                    imqAddressList=mqws://&lt;broker-host&gt;:7670/wsjms<br />
+                    then click 'Connect'</li>
+                </ol>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<ul>
+  <li>To work with 'wss' WebSocket service<br />
+    Use Java keytool to export/import broker certificate and use Java SSL   system properties to configure client for Secure WebSocket communication   with broker<br />
+    javax.net.ssl.keyStorePassword<br />
+    javax.net.ssl.trustStorePassword<br />
+    java.net.ssl.keyStore<br />
+    javax.net.ssl.trustStore <br clear="all" />
+    <br clear="all" />
+  </li>
+  <li>To Work with HTTP proxy<br />
+    Use Java system HTTP proxy properties<br />
+    http.proxyHost<br />
+    http.proxyPort<br />
+    https.proxyHost<br />
+    https.proxyPort</li>
+</ul>
+<h1><a name="HowtoUseMQWebSocketFeatures-HowtoConnectaSTOMPClient(mqstomp)toBrokeroverWebSocket" id="HowtoUseMQWebSocketFeatures-HowtoConnectaSTOMPClient(mqstomp)toBrokeroverWebSocket"></a>How to Connect a STOMP Client (<strong>mqstomp</strong>) to Broker over WebSocket</h1>
+<ul>
+  <li>Simply create a WebSocket using URL<br />
+    <strong>ws://&lt;broker-host&gt;:&lt;broker-ws-port&gt;/&lt;ws-service-name&gt;/mqstomp</strong><br />
+    for 'ws' WebSocket service, or<br />
+    <strong>wss://&lt;broker-host&gt;:&lt;broker-wss-port&gt;/&lt;wss-service-name&gt;/mqstomp</strong><br />
+    for 'wss' WebSocket service <br clear="all" />
+    <br clear="all" />
+    For example,<br />
+    ws://mybrokerhost:7670/wsjms/mqstomp <br clear="all" />
+    <br clear="all" />
+  </li>
+  <li>For STOMP JavaScript client, set the WebSocket binaryType to either &quot;blob&quot; or &quot;arraybuffer&quot;</li>
+</ul>
+<p><a href="https://mq.java.net/nonav/5.0.1/stomp.txt" target="new" rel="nofollow">Here</a> is a simple example of STOMP client in JavaScript.</p>
+<h1><a name="HowtoUseMQWebSocketFeatures-HowtoConnectaJSONformatSTOMPClient(mqjsonstomp)toBrokeroverWebSocket" id="HowtoUseMQWebSocketFeatures-HowtoConnectaJSONformatSTOMPClient(mqjsonstomp)toBrokeroverWebSocket"></a>How to Connect a JSON format STOMP Client (<strong>mqjsonstomp</strong>) to Broker over WebSocket</h1>
+<ul>
+  <li>Simply create a WebSocket using URL <br clear="all" />
+    <br clear="all" />
+    <strong>ws://&lt;broker-host&gt;:&lt;broker-ws-port&gt;/&lt;ws-service-name&gt;/mqjsonstomp</strong><br />
+    for 'ws' WebSocket service, or<br />
+    <strong>wss://&lt;broker-host&gt;:&lt;broker-wss-port&gt;/&lt;wss-service-name&gt;/mqjsonstomp</strong><br />
+    for 'wss' WebSocket service <br clear="all" />
+    <br clear="all" />
+    For example,<br />
+    ws://mybrokerhost:7670/wsjms/mqjsonstomp</li>
+</ul>
+<p><a href="https://mq.java.net/nonav/5.0.1/json.txt" target="new" rel="nofollow">Here</a> is a simple example of JSON format STOMP client in JavaScript.</p>
+<p><a name="HowtoUseMQWebSocketFeatures-jsonstomp" id="HowtoUseMQWebSocketFeatures-jsonstomp"></a></p>
+<h1><a name="HowtoUseMQWebSocketFeatures-JSONObjectsforJSONFormatSTOMPClientoverWebSocket(mqjsonstomp)" id="HowtoUseMQWebSocketFeatures-JSONObjectsforJSONFormatSTOMPClientoverWebSocket(mqjsonstomp)"></a>JSON Objects for JSON Format STOMP Client over WebSocket (<strong>mqjsonstomp</strong>)</h1>
+<ul>
+  <li>A <strong>mqjsonstomp</strong> client sends JSON formatted STOMP frames to broker.  A JSON formatted STOMP frame is a JSON object that consists
+    <ul>
+      <li>A JSON String field '<strong>command</strong>' whose value is a STOMP command</li>
+      <li>A JSON Object for '<strong>headers</strong>' representing a STOMP frame headers</li>
+      <li>A JSON Object for '<strong>body</strong>' representing a STOMP frame body<br />
+        The '<strong>body</strong>' JSON Object contains
+        <ul>
+          <li>An optional JSON String field '<strong>type</strong>' which can have value '<strong>text</strong>' or '<strong>bytes</strong>'.  If this field is omitted, it defaults to '<strong>text</strong>'</li>
+          <li>An optional JSON String field '<strong>encoder</strong>', which currently can only be '<strong>base64</strong>' to specify the encoding scheme used for the message body if '<strong>type</strong>' is '<strong>bytes</strong>'</li>
+          <li>A JSON Object '<strong>text</strong>' which represents the message body</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>The following shows some JavaScript example code of a <strong>mqjsonstomp</strong> client sending/receiving a STOMP frame to/from broker<br />
+    <em>var jmsframe = {};</em><br />
+    <em>jmsframe.command = &quot;CONNECT&quot;;</em><br />
+    <em>jmsframe.headers = {&quot;login&quot;:&quot;guest&quot;, &quot;passcode&quot;:&quot;guest&quot;, &quot;accept-version&quot;:&quot;1.2&quot;};</em><br />
+    <em>var data = JSON.stringify(jmsframe);</em><br />
+    <em>websocket.send(data);</em><br clear="all" />
+    <br clear="all" />
+    <em>function onMessage(evt) {</em><br />
+    &nbsp;&nbsp;&nbsp; <em>var jmsframe = JSON.parse(evt.data);</em><br />
+    &nbsp;&nbsp;&nbsp; <em>//process jmsframe.command</em><br />
+    &nbsp;&nbsp;&nbsp; <em>//process jmsframe.headers</em><br />
+    &nbsp;&nbsp;&nbsp; <em>//process jmsframe.body</em><br />
+    <em>}</em></li>
+</ul>
+<h1><a name="HowtoUseMQWebSocketFeatures-UsingBrokerWebSocketServiceswithGlassFishServer" id="HowtoUseMQWebSocketFeatures-UsingBrokerWebSocketServiceswithGlassFishServer"></a>Using Broker WebSocket Services with GlassFish Server</h1>
+<p>OpenMQ (GlassFish MQ) is the system JMS provider for GlassFish   server.  To use broker WebSocket services with GlassFish server,   currently</p>
+<ul>
+  <li>Download latest <a href="http://dlc.sun.com.edgesuite.net/glassfish/4.0.1/" rel="nofollow">GlassFish 4.0.1 build</a> (date &gt;= 09_23_2013)</li>
+  <li>Example steps to enable the 'wsjms' in the GlassFish embedded broker
+    <ul>
+      <li>asadmin start-domain</li>
+      <li>asadmin create-local-instance myinst</li>
+      <li>asadmin set myinst.jms-service.start-args=&quot;-Dimq.service.activelist=jms,admin,wsjms&quot;</li>
+      <li>asadmin start-instance myinst</li>
+      <li>run any imqcmd to lazily start the embedded broker, for example, on the 'myinst' host<br />
+        imqcmd list dst -b :&lt;broker-portmapper-port&gt;<br />
+        where &lt;broker-portmapper-port&gt; is the JMS_PROVIDER_PORT in 'asadmin create-local-instance' output</li>
+    </ul>
+  </li>
+</ul>
+<p>&nbsp;</p>
+<blockquote class="style3">&nbsp;</blockquote>
+<pre class="style3">&nbsp;</pre>
+</body>
+</html>

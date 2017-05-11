@@ -1,0 +1,1034 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<TITLE>STOMP Protocol Support Functional Specification</TITLE>
+</HEAD>
+<BODY> 
+<H2 ALIGN=CENTER>Functional Specification</H2>
+
+<DL>
+
+<DT><B>1.0 Author/Date:<BR><BR></B><DT>
+    <DD>Amy Kang 09/09/2008 Initial Draft and Updates</DD><br>
+
+<DT><B>2.0 Synopsis:<BR><BR></B></DT>
+    <DD><b>STOMP Protocol Support</b></DD> 
+<HR>
+</DL>
+
+<a href="#description">4.0 Description</a><br>
+<a href="#impl">4.2 MQ STOMP Implementation</a><br>
+<a href="#depends">6.0 Dependencies</a><br>
+<a href="#interface">7.0 Interfaces</a><br>
+<a href="#config">9.0 Configuration/Administration</a><br>
+<a href="#diag">10.0 Instrumentation/Diagnostics</a><br>
+<a href="#interop">11.0 Compatibility/Interoperability</a><br>
+<a href="#enhance">11.3 MQ STOMP Clarification/Enhancement to the STOMP Protocool</a><br>
+<a href="#security">12.0 Security</a></br>
+<a href="#usecases">15.0 Use Cases</a>
+
+<DL>
+
+<DT><B>3.0 PRD Requirement#:</B></DT>
+[Requirement # from the Product Requirements
+ Document for the requirement this feature helps to address]
+
+<p>
+<a NAME="description"></a>
+<DT><B>4.0 Description:<BR><BR></B></DT>
+
+    <DD>
+    <DL>
+  
+    <DT><b>Overview</b></DT>
+        <br>
+        <a href="http://stomp.codehaus.org/Protocol">STOMP protocol</a>
+        is a streaming text orientated messaging protocol.  The protocol provides an 
+        interoperable wire format so that any STOMP client can communicate with any 
+        broker that supports the STOMP protocol.  Because the simplicity of the protocol,
+        it is easy to write a STOMP client using available languages for examples, 
+        PHP, Perl, Python, Ruby, Java, C, C++, C# and .Net, ...
+        <P>
+        <DD><IMG SRC="./stompbridge-clients.gif"></IMG></DD>
+        <P>
+<a name="impl"></a>
+        Although stomp.codehaus.org provides <a href="http://stomp.codehaus.org/StompConnect">StompConnect</a>
+        (stompconnect-1.0.jar), a small Java library (under Apache License) claimed to expose any JMS provider 
+        as a Stomp Broker, we do not use StompConnect and its source code for the following reasons,
+        <ol>
+        <li>Its quality is only at prototype level. 
+        <li>It has foundamental issues in ack and transaction handling.
+        </ol>
+        <p>
+        We support the STOMP protocol by implementing STOMP protocol natively as a 
+        STOMP bridge that embeds in MQ broker's JVM using <a href="#pluggable">MQ Pluggable Bridge Service Framework</a>.
+        To provide reliable messaging, MQ STOMP
+        bridge further <a href="#enhance">clarifies and enchances</a>  certain aspects 
+        of the STOMP protocol, and MQ STOMP implementation uses private contract with MQ embeded client
+        runtime which is necessary for reliable transaction support to STOMP clients (which by nature are remote, non-JMS clients). 
+        MQ STOMP implementation provides <a href="http://mq.java.net/nonav/javadoc/4.4/javadoc/index.html?com/sun/messaging/bridge/service/MessageTransformer.html" target="_blank">MessageTransformer API</a> to allow customerized message transformation 
+        to/from STOMP message frame. MQ STOMP implementation allows transacted or client-ack subscriptions from STOMP clients to be flowcontroled. At transport layer, MQ STOMP
+        bridge implementation uses Grizzly acclaimed high performance and high scalable Java NIO framework. 
+
+    <a NAME="pluggable"></a>
+    <DT><b>MQ Pluggable Bridge Service Framework</b></DT>
+        <br>
+        The MQ STOMP implementation will be embeded in the broker as a bridge through a pluggable bridge service framework.
+        Please see the <a href="http://mq.java.net/nonav/javadoc/4.4/javadoc/index.html" target="_self">MQ Pluggable Bridge Service Framework Javadoc</a>
+        <p>
+
+    <DL>
+    <DT><b>Bridge States and State Transition</b></DT>
+    <br>
+    An embeded bridge can be automatically started at broker startup or
+    start/stop on demand through the MQ bridge administration utility. 
+    while broker is running.<p>
+        <DD>
+
+<TABLE BORDER=1 CELLPADDING=4 CELLSPACING=3>
+<CAPTION>Bridge States and State Transition</CAPTION>
+    <COL WIDTH=76>
+    <COL WIDTH=68>
+    <COL WIDTH=60>
+    <COL WIDTH=71>
+    <THEAD>
+        <TR VALIGN=TOP>
+            <TH>
+                <P><BR>
+                </P>
+            </TH>
+            <TH>
+                <P><FONT SIZE=1 STYLE="font-size: 8pt">STOPPED<br>
+                </FONT><FONT SIZE=2>s1</FONT></P>
+                </TH>
+            <TH>
+                <P><FONT SIZE=1 STYLE="font-size: 8pt">STARTED<br>
+                </FONT><FONT SIZE=2>s2</FONT></P>
+                </TH>
+            <TH>
+                <P><FONT SIZE=1 STYLE="font-size: 8pt">PAUSED<br>
+                </FONT><FONT SIZE=2>s3</FONT></P>
+                </TH>
+        </TR>
+        </THEAD>
+        <TBODY>
+          <TR VALIGN=TOP>
+            <TH>
+                <P ALIGN=LEFT><FONT SIZE=2 STYLE="font-size: 9pt">start</FONT></P>
+            </TH>
+            <TD>
+                <P ALIGN=CENTER>s2</P>
+            </TD>
+            <TD>
+                <P ALIGN=CENTER>s2</P>
+            </TD>
+            <TD>
+                <P ALIGN=CENTER>s2</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TH>
+                <P ALIGN=LEFT><FONT SIZE=2 STYLE="font-size: 9pt">pause</FONT></P>
+            </TH>
+            <TD>
+                <P ALIGN=CENTER>[error]</P>
+            </TD>
+            <TD>
+                <P ALIGN=CENTER>s3</P>
+            </TD>
+            <TD>
+                <P ALIGN=CENTER>s3</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TH>
+                <P ALIGN=LEFT><FONT SIZE=2 STYLE="font-size: 9pt">resume</FONT></P>
+            </TH>
+            <TD>
+                <P ALIGN=CENTER>[error]</P>
+            </TD>
+            <TD>
+                <P ALIGN=CENTER>s2</P>
+            </TD>
+            <TD>
+                <P ALIGN=CENTER>s2</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TH>
+                <P ALIGN=LEFT><FONT SIZE=2 STYLE="font-size: 9pt">stop</FONT></P>
+            </TH>
+            <TD>
+                <P ALIGN=CENTER>[no-op]</P>
+            </TD>
+            <TD>
+                <P ALIGN=CENTER>s1</P>
+            </TD>
+            <TD>
+                <P ALIGN=CENTER>s1</P>
+            </TD>
+         </TR>
+    </TBODY>
+</TABLE>
+[Note: <FONT SIZE=2 STYLE="font-size: 9pt">pause</FONT> and <FONT SIZE=2 STYLE="font-size: 9pt">resume</FONT> 
+ of STOMP bridge service is not supported in 4.4]
+       
+        </DD>
+<p>
+<DT><b>Bridge Service Manager</b></DT>
+<br>
+The Bridge Service Manager is part of the Pluggable Bridge Service Framework.  It provides 
+management functionalities, such as stop/start a bridge. <i><a href="#bridgemgr">imqbridgemgr</a></i>
+is a  Java utility program that provides a command line interface for the Bridge Service Manager.
+<p>
+<DD><IMG SRC="./bridgemanager.gif"></DD>
+<p>
+A JMX interface for the Bridge Service Manager will be added post 4.4 release.
+</DL>
+</DL>
+</DD>
+
+<p>
+<DT><B>5.0 Non-feature:<BR><BR></B></DT>
+<a NAME="depends"></a>
+<DT><B>6.0 Dependencies:<BR><BR></B></DT>
+<ul>
+<li>The <a href="http://stomp.codehaus.org/Protocol">STOMP Protocol</a>
+<li>At transport layer, this feature will use <a href="https://grizzly.java.net">Grizzly</a>,
+which is acclaimed as a high performance and high scalable Java NIO framework built on top of
+Java NIO.  Grizzly is used in Glassfish/SailFin and JXTA according to its
+websites.  
+</ul>
+<p>
+<a NAME="interface"></a>
+<DT><B>7.0 Interfaces:<BR><BR></B></DT>
+<DD>
+<P ALIGN=CENTER STYLE="margin-bottom: 0.2in">
+Exported Interfaces</P>
+<p>
+<DL>
+    <DT>
+    <TABLE WIDTH=95% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+        <COL WIDTH=250>
+        <COL WIDTH=243>
+        <COL WIDTH=768>
+        <TR>
+            <TH>
+            <P align="left"><A NAME="bgie34"></A><A NAME="bgie35"></A>Interface</P>            </TH>
+            <TH>
+            <P align="center"><A NAME="bgie36"></A>Classification</P>            </TH>
+            <TH>
+            <P><A NAME="bgie37"></A><A NAME="bgie38"></A>Comments/Specification</P>            </TH>
+        </TR>
+        <TR>
+            <TD>
+            <P align="left">The STOMP Protocol 1.0</P>            </TD>
+            <TD>
+            <P align="center">External/Evolving</P>            </TD>
+            <TD>
+            <P>The <a href="http://stomp.codehaus.org/Protocol">STOMP protocol</a> is used as wire format for data exchange between STOMP clients and the MQ STOMP bridge service. The <a href="http://stomp.codehaus.org/Protocol">specification</a> of the protocol is licensed under <a href="http://creativecommons.org/licenses/by/2.5/">Creative Commons Attribution v2.5</a></P>            </TD>
+        </TR>
+        <TR>
+            <TD>
+            <P align="left">The STOMP JMS Bindings</P>            </TD>
+            <TD>
+            <P align="center">Committed</P>            </TD>
+            <TD>
+            <P>For support JMS semantics, MQ STOMP implementation uses the <a href="http://stomp.codehaus.org/Stomp+JMS">STOMP JMS Bindings</a> with the STOMP protocol</a></P>            </TD>
+        </TR>
+        <TR>
+            <TD>
+            <P align="left"><A HREF="#config">MQ Bridge Service and MQ STOMP Configurations</A></P>            </TD>
+            <TD>
+            <P align="center">Evolving</P>            </TD>
+            <TD>
+            <P>Configuration parameters specified as broker properties</P>            </TD>
+        </TR>
+        <TR>
+            <TD>
+            <P align="left"><A HREF="#bridgemgr">imqbridgemgr</A></P>            </TD>
+            <TD>
+            <P align="center">Evolving</P>            </TD>
+            <TD>
+            <P>The bridge service manager administration command line utility</P>            </TD>
+        </TR>
+        <TR>
+            <TD>
+            <P align="left">The MQ bridge MessageTransformer abstract class</A></P>            </TD>
+            <TD>
+            <P align="center">Evolving</P>            </TD>
+            <TD>
+            <P><a href="http://mq.java.net/nonav/javadoc/4.4/javadoc/index.html?com/sun/messaging/bridge/service/MessageTransformer.html" target="_blank">MessageTransformer</a></P>            </TD>
+        </TR>
+    </TABLE>
+    </DT><DD></DD>
+    </DL>
+
+<P ALIGN=CENTER STYLE="margin-bottom: 0.2in">
+Imported Interfaces</P>
+<DL>
+    <DT>
+    <TABLE WIDTH=75% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+        <COL WIDTH=379>
+        <COL WIDTH=320>
+        <COL WIDTH=568>
+        <TR>
+            <TH>
+            <P>Interface</P>            </TH>
+            <TH>
+            <P align="center">Classification</P>            </TH>
+            <TH>
+            <P align="center">Comments/Specification</P>            </TH>
+        </TR>
+        <TR>
+            <TD>
+            <P>The STOMP Protocol 1.0</P>            </TD>
+            <TD>
+            <P align="center">External/Evolving</P>            </TD>
+            <TD>
+                <P align="center">
+            <a href="http://stomp.codehaus.org/Protocol">specification</a></P>            </TD>
+        </TR>
+        <TR>
+            <TD>
+            <P>com.sun.grizzly.*</P>            </TD>
+            <TD>
+            <P align="center">Evolving</P>            </TD>
+            <TD>
+            <P align="center"><a href=https://grizzly.java.net>Grizzly NIO Framework</a></P>            </TD>
+        </TR>
+    </TABLE>
+   </DT>
+   <DD></DD>
+   </DL>
+
+</DD>
+<p>
+<DT><B>8.0 Performance:<BR><BR></B></DT>
+<DD>
+This feature will provide better performance for STOMP clients because
+the MQ STOMP implementation (MQ STOMP bridge service) runs in the same JVM as the broker.
+</DD>
+<p>
+<a NAME="config"></a>
+<DT><B>9.0 Configuration/Administration:<BR><BR></B></DT>
+<DD>
+<b>Broker Configuration Properties for Bridge Services</b>
+<TABLE WIDTH=95% BORDER=1 CELLPADDING=4 CELLSPACING=3>
+    <COL WIDTH=76>
+    <COL WIDTH=75>
+    <COL WIDTH=68>
+    <TR>
+        <TH> <P>Name</P></TH>
+            <TH> <P align="center">Default</P></TH>
+            <TH>Description</P></TH>
+    </TR>
+    <TR>
+        <TD> <P>imq.bridge.enabled</P></TD>
+            <TD> <P align="center">false</P></TD>
+            <TD>Set true to enable broker to run embeded bridge service(s)</P></TD>
+    </TR>
+    <TR>
+        <TD> <P>imq.bridge.activelist</P></TD>
+            <TD> <P align="center">not set</P></TD>
+            <TD>A list of comma separated bridge service names to be auto-started at broker startup. For the STOMP bridge, its name must be "stomp". </P></TD>
+    </TR>
+    <TR>
+        <TD> <P>imq.bridge.admin</P></TD>
+            <TD> <P align="center">not set</P></TD>
+            <TD>Bridge service manager administration user name which can be any MQ broker admin user</P></TD>
+    </TR>
+    <TR>
+        <TD> <P>imq.bridge.password</P></TD>
+            <TD> <P align="center">not set</P></TD>
+            <TD>Bridge service manager administration user password (can also be specified in broker's -passfile) </P></TD>
+    </TR>
+</TABLE>
+<br>
+<p>
+<a NAME="stompconfig"></a>
+<b>Broker Configuration Properties for STOMP Bridge Service</b>
+<TABLE WIDTH=95% BORDER=1 CELLPADDING=4 CELLSPACING=3>
+    <COL WIDTH=76>
+    <COL WIDTH=75>
+    <COL WIDTH=68>
+    <TR>
+        <TH> <P>Name</P></TH>
+            <TH> <P align="center">Default</P></TH>
+            <TH>Description</P></TH>
+    </TR>
+    <TR>
+        <TD> <P>imq.bridge.stomp.type (<b>private</b>)</P></TD>
+            <TD> <P align="center">stomp</P></TD>
+        <TD><p>Specifies the type (case insensitive) of the stomp bridge. This is set internally by broker and can't be changed</P></TD>
+    </TR>
+    <TR>
+        <TD> <P>imq.bridge.stomp.class (<b>private</b>)</P></TD>
+            <TD> <P align="center">com.sun.messaging.bridge.service.stomp.StompBridge</P></TD>
+        <TD><p>This is a private property and can't be changed</P></TD>
+    </TR>
+    <TR>
+        <TD> <P>imq.bridge.stomp.tcp.enabled</P></TD>
+            <TD> <P align="center">true</P></TD>
+        <TD><p>Enable stomp TCP transport</P></TD>
+    </TR>
+    <TR>
+        <TD> <P>imq.bridge.stomp.tcp.port</P></TD>
+            <TD> <P align="center">7672</P></TD>
+        <TD><p>The stomp bridge tcp transport listening port</P></TD>
+    </TR>
+    <TR>
+        <TD> <P>imq.bridge.stomp.consumerFlowLimit</P></TD>
+            <TD> <P align="center">MQ client imqConsumerFlowLimit default (1000) </P></TD>
+        <TD><p>For transacted STOMP subscription, when its unacked messages exceed this limit, no more messages will be delivered to the STOMP subscription until the STOMP client ack the messages then commit the transaction</P></TD>
+    </TR>
+    <TR>
+        <TD> <P>imq.bridge.stomp.messageTransformer</P></TD>
+            <TD> <P align="center">not set</P></TD>
+        <TD><p>The fully qualified class name of a class that extends the <a href="http://mq.java.net/nonav/javadoc/4.4/javadoc/index.html?com/sun/messaging/bridge/service/MessageTransformer.html" target="_blank">MessageTransformer</a> abstract class by implementing the transform() method.  Place this class under MQ_HOME/lib/ext directory</P></TD>
+    </TR>
+    <TR>
+        <TD> <P>imq.bridge.stomp.tls.enabled</P></TD>
+            <TD> <P align="center">false</P></TD>
+        <TD><p><p>Enable stomp SSL/TLS transport. Key store must created using imqkeytool before start the broker</P></TD>
+    </TR>
+    <TR>
+        <TD> <P>imq.bridge.stomp.tls.port</P></TD>
+            <TD> <P align="center">7673</P></TD>
+        <TD><p><p>The stomp bridge SSL/TLS transport listening port</P></TD>
+    </TR>
+    <TR>
+        <TD> <P>imq.bridge.stomp.tls.requireClientAuth</P></TD>
+            <TD> <P align="center">false</P></TD>
+        <TD><p><p>require client authentication </P></TD>
+    </TR>
+</TABLE>
+
+</DD>
+
+<DD>
+<a NAME="bridgemgr"></a>
+<b>imqbridgemgr</b>
+<p>
+imqbrokermgr is the command line interface for the MQ Bridge Service Manager. 
+imqbridgemgr is described in detail in the <a href="jmsbridge-funcspec.html">JMS Bridge functional specification</a>
+<DD>
+<a NAME="jmx"></a>
+<b>JMX Interfaces</b>
+A JMX interface for the MQ bridge service manager will be provided post 4.4 release.
+</DD>
+<p>
+<a NAME="diag"></a>
+<DT><B>10.0 Instrumentation/Diagnostics:<BR><BR></B></DT>
+<DD>
+    imqbridgemgr provides "list" subcommand to show bridge's state.</a>
+    <p>
+    MQ STOMP Bridge service will be advertised through MQ broker's portmapper service 
+    <p>
+    The MQ STOMP implementation uses Java logging which can be configured by Java system property<br>
+        java.util.logging.config.file
+    <p>
+    JMX interfaces will be added for the MQ Bridge Service Manager.
+</DD>
+<p>
+<a NAME="interop"></a>
+<DT><B>11.0 Compatibility/Interoperability/Migration:<BR><BR></B></DT>
+<DD>
+<b>Messages produced from STOMP clients</b><br>
+A STOMP frame message sent from a STOMP client is converted to a JMS 
+BytesMessage if content-length header presents else it is converted
+to a JMS TextMessage.<p>
+<p>
+The encoding is assumed to be UTF-8. 
+<p>
+
+<b>Messages delivered to STOMP clients</b><br>
+Uses UTF-8 encoding for headers and for message body of JMS TextMessage<p>
+
+By default only JMS TextMessage or BytesMessage are delivered to STOMP 
+client subscriptions by converting to STOMP frame messages; other type 
+of JMS messages are not delivered to STOMP client subscriptions and results 
+RuntimeException logged in the STOMP bridge.
+<p>
+<a NAME="transform"></a>
+User can provide a message transformer class that extends the MQ bridge abstract class <a href="http://mq.java.net/nonav/javadoc/4.4/javadoc/index.html?com/sun/messaging/bridge/service/MessageTransformer.html" target="_blank">MessageTransformer</a> by implementing the transform() method.  The following are specific for STOMP bridge 
+<ul>
+<li>The formal type paramters of <b>T</b> and <b>S</b> must be javax.jms.Message 
+<li>For STOMP SEND frame, the transform() method is called after MQ STOMP bridge has converted the frame to a JMS Message and before the call to MessageProducer.send() 
+<li>For a JMS message going to a STOMP client, first the transform() method is called, then the returned JMS message is converted to a STOMP frame message
+<li>transform() arguments
+<ul>
+<li>The <i>readOnly</i> argument will be false for <i>source</i> "STOMP" and true for <i>source</i> "SUN_MQ"
+<li>The <i>charsetName</i> argument specifies the message body character encoding if the passed in <i>message</i> is a JMS BytesMessage from STOMP client (ie. <i>source</i> is "STOMP"), otherwise either null or should be ignored
+<li>The <i>source</i> and <i>target</i> provider names will be either "STOMP" and "SUN_MQ" or "SUN_MQ" and "STOMP"
+<li>When <i>source</i> is "STOMP", the passed in <i>message</i> is from a STOMP client SEND frame going to MQ
+<li>When <i>source</i> is "SUN_MQ", the passed in <i>message</i> is from MQ going to a STOMP client
+<li>When <i>source</i> is "STOMP", the <i>properties</i> argument, if not null, contains all remaining user arbitrary headers as key/value pairs that are failed to set as JMS message properties to the <i>message</i>
+<li>The returned message must be in write-only mode if <i>source</i> is "STOMP" and must be in read-only mode when <i>source</i> is "SUN_MQ" (Please see javadoc of javax.jms.Message and its specific subclass)
+</ul>
+</ul>
+
+<p>
+<a NAME="enhance"></a>
+<b>MQ STOMP Clarifications and Enhancements to <a href="http://stomp.codehaus.org/Protocol">STOMP Protocol</a></b><br>
+<p>
+MQ STOMP implementation supports all additional STOMP headers for the STOMP JMS Bindings listed at <a href="http://stomp.codehaus.org/Stomp+JMS">http://stomp.codehaus.org/Stomp+JMS</a> 
+<p>
+The following list MQ STOMP bridge's clarifications/enhancements to the STOMP protocol,
+<p>
+<TABLE WIDTH=95% BORDER=1 CELLPADDING=2 CELLSPACING=3>
+        <COL WIDTH=250>
+        <COL WIDTH=243>
+        <COL WIDTH=243>
+       <TR>
+            <TH>
+         <P align="center">STOMP Frame Command</P>         </TH>
+            <TH>
+                <P align="center">STOMP Frame Header</P>         </TH>
+            <TH>
+                <P>Comments</P>         </TH>
+      </TR>
+        <TR>
+            <TD>
+          <P align="center">CONNECT</P>          </TD>
+            <TD> 
+               <P align="center">login<br>passcode<br></P>          </TD>
+            <TD> 
+               <P>MQ STOMP bridge enforces these headers must be specified otherwise return ERROR frame</P>          </TD>
+        </TR>
+        <TR>
+            <TD>
+          <P align="center">SEND<br>SUBSCRIBE<br>UNSUBSCRIBE<br>MESSAGE</P>          </TD>
+            <TD> 
+               <P align="center">destination</P>          </TD>
+            <TD> 
+               <P>MQ STOMP bridge interprets a STOMP destination header as following:<p>
+                  "/queue/" prefix denotes a Queue with name follows the prefix<br>
+                  "/topic/" prefix denotes a Topic with name follows the prefix<br>
+                  "/temp-queue/" prefix denotes a TemporaryQueue with name follows the prefix<br>
+                  "/temp-topic/" prefix denotes a TemoparryTopic with name follows the prefix<p>
+                  (ie. use the same destination header syntax as codehaus's StompConnect
+                   so that existing STOMP clients run with StompConnect will still run with MQ STOMP bridge)
+				   <p> 
+				   Temporary destination prefix "temporary_destination://queue/" or "temporary_destination://topic/" after 
+                   STOMP prefix /temp-queue/ or /temp-topic/ are reserved (SEND/MESSAGE reply-to header) to be only used 
+                   for send reply messages to a MESSAGE frame's reply-to destination and it should only be used in the
+          same CONNECT session that the MESSAGE is received in.          </TD>
+        </TR>
+        <TR>
+            <TD>
+          <P align="center">SEND</P>          </TD>
+            <TD> 
+               <P align="center">expires<br>priority<br>persistent</P>          </TD>
+            <TD> 
+               <P>When these headers are not specified for SEND, the message will
+               be sent with the same default values as MQ JMS Java client</P>          </TD>
+        </TR>
+        <TR>
+            <TD>
+          <P align="center">SEND</P>          </TD>
+            <TD> 
+               <P align="center">user specific headers</P>          </TD>
+            <TD> 
+               <P>User can specify additional headers other than the ones specified in the <a href="http://stomp.codehaus.org/Protocol">STOMP protocol</a> and <a href="http://stomp.codehaus.org/Stomp+JMS">STOMP JMS Bindings</a> on SEND. These headers will be set as String properties to the converted JMS message. Therefore the keys for these headers must be valid JMS property names unless imq.bridge.stomp.messageTransformer is specified then these invalid headers will be passed to the MessageTransformer.transform() method as the <i>properties</i> argument</p>          </TD>
+        </TR>
+        <TR>
+            <TD>
+          <P align="center">SUBSCRIBE</p>          </TD>
+            <TD> 
+               <P align="center">selector</P>          </TD>
+            <TD> 
+               <P>MQ STOMP supports the 'selector' header as described in <a href="http://stomp.codehaus.org/Stomp+JMS">STOMP JMS Bindings</a> on SUBSCRIBE</P>          </TD>
+        </TR>
+        <TR>
+            <TD>
+          <P align="center">SUBSCRIBE</P>          </TD>
+            <TD> 
+               <P align="center">id</P>          </TD>
+            <TD> 
+               <P>STOMP client should always specify a "id" header for SUBSCRIBE.
+               If no "id" header is specified, the MQ STOMP bridge assigns it a default
+               id as "/subscription-to/&lt;STOMP-destination-name&gt;. </p>
+               <p>
+			   All SUBSCRIBE "id"s
+          must be unique to the scope of STOMP client connection to the MQ STOMP server otherwise ERROR frame will be returned.          </TD>
+        </TR>
+        <TR>
+            <TD>
+          <P align="center">SUBSCRIBE</P>          </TD>
+            <TD> 
+               <P align="center">transaction</P>          </TD>
+            <TD> 
+               <P>For a STOMP subscription to receive messages in a transaction, the SUBSCRIBE
+               frame must specify a transaction header with a transaction identifier whose 
+               transaction state is started.  If the transaction does not exist, an ERROR 
+               frame will be returned.  After the transaction completes (either COMMIT or ABORT)
+               message delivery to the transacted subscription will be paused until next transaction
+               BEGIN </p>          </TD>
+        </TR>
+        <TR>
+            <TD>
+          <P align="center">ABORT</P>          </TD>
+            <TD> 
+               <P align="center">transaction</P>          </TD>
+            <TD> 
+               <P>For transacted subscription, ABORT a transaction will cause the STOMP server take the following actions<p> 
+               <ul>
+               <li>stop message delivery to all transacted subscriptions in the CONNECT session
+               <li>unpon next BEGIN, restart message delivery sequence to all the transacted subscriptions in the CONNECT session
+               including all unconsumed messages that had been previously delivered
+              </ul>
+               </p>          </TD>
+        </TR>
+        <TR>
+        <TR>
+            <TD>
+          <P align="center">SUBSCRIBE</p>          </TD>
+            <TD> 
+               <P align="center">ack</P>          </TD>
+            <TD> 
+               <P>For STOMP ack:auto (default), a subscribed message is considered acknowledged as soon as it's sent to the STOMP client</P>          </TD>
+        </TR>
+            <TD>
+              <P align="center">UNSUBSCRIBE</P>            </TD>
+            <TD> 
+               <P align="center">durable-subscriber-name</P>            </TD>
+            <TD> 
+              <P>unsubscribe a durable subscription. If specified, destination or id header will be ignored; If the connection (CONNECT) has no client-id, ERROR frame will be returned; If an active subscriber with the durable name exists on the connection, it will be first close then the durable subscriber is unsubscribed.            </TD>
+        </TR>
+        <TR>
+            <TD>
+          <P align="center">BEGIN</P>          </TD>
+            <TD> 
+               <P align="center">transaction</P>          </TD>
+            <TD> 
+               <P>Tranactions are at STOMP CONNECT session level. No nested transaction is allowed
+               or else ERROR frame will be returned</p>
+               <p>The transaction identifier will also be used for SUBSCRIBE frame to create a
+          transacted subscription.          </TD>
+        </TR>
+        <TR>
+            <TD>
+          <P align="center">ACK</P>          </TD>
+            <TD> 
+               <P align="center">subscription</P>          </TD>
+            <TD> 
+               <P>ACK should always specify a "subscription" header for the subscription id that
+                  the message to be acked was delivered to .
+              <p>
+                  If a subcriber id is not specified, the MQ STOMP bridge default subscription
+                  id prefix will be used to find the first matching subscription id with the prefix
+                  to ack the message;
+              <p>
+                  If the subscription for the subscription id was not created transacted,
+                  and a transaction header is specified for the ACK, ERROR frame will be
+                  returned; 
+              <p>
+                  ACK on a message id, if found, will ACK all messages before and include this message 
+          delivered to the subscription.          </TD>
+        </TR>
+        <TR>
+            <TD>
+          <P align="center">ACK</P>          </TD>
+            <TD> 
+               <P align="center">transaction</P>          </TD>
+            <TD> 
+               <P>For transacted subscription,  a ACK for a message ID automatically ACK all messages sent to the transacted subscription
+  before and including the message with that message ID.  For transacted subscription, a message is considered
+  consumed only when it is explicit or implicit ACKed in a transaction and subsequently successful COMMIT on 
+  that transaction.  If transaction header is not specified but subscription header is specified and the subscription is a transacted subscription, the message is ACKed in the current transaction if there is a current transaction, if no current transaction ERROR frame will be returned.			  </p>          </TD>
+        </TR>
+        <TR>
+            <TD>
+          <P align="center">MESSAGE<br>ERROR</P>          </TD>
+            <TD> 
+               <P align="center">content-length</P>          </TD>
+            <TD> 
+               <P>MQ always set content-length for MESSAGE or ERORR frame sent to STOMP clients			  </p>          </TD>
+        </TR>
+        <TR>
+            <TD>
+          <P align="center">SEND<br>MESSAGE</P>          </TD>
+            <TD> 
+               <P align="center">reply-to</P>          </TD>
+            <TD> 
+               <P>MQ allows SEND from different STOMP CONNECT sessions as well as from the same CONNECT session to send reply messages to a STOMP reply-to
+                  header of temporary destination.  <p>1. In the same CONNECT session, when SUBSCRIBE and SEND reply, use the same temporary destination
+                  string that is used in the SEND's reply-to header; <p>2. In different CONNECT session, unpon receiving a MESSAGE with a reply-to header
+                  of temporary destination, use the same temporary destination string in the MESSAGE's reply-to header to SEND a reply to the reply-to
+                  temporary destination. This method can also be used for sending reply message when in the same CONNECT session.  
+				  </p>          </TD>
+        </TR>
+</TABLE>
+
+</DD>
+<p>
+<a NAME="security"></a>
+<DT><B>12.0 Security:<BR><BR></B></DT>
+<DD>
+The STOMP bridge supports SSL/TLS transport.
+</DD>
+<DT><B>13.0 Standards Conformance:<BR><BR></B></DT>
+N/A
+<DT><B>14.0 Installation/packaging:<BR><BR></B></DT>
+<DD>
+The MQ STOMP bridge implementation classes will be in imqstomp.jar. 
+imqstomp.jar and its dependency grizzly.jar will be installed to MQ 
+lib/ directory.
+</DD>
+<P>
+<a NAME="usecases"></a>
+<DT><B>15.0 Use Cases:<BR><BR></B></DT>
+<DL>
+<DT><b>(1). Configure and start the STOMP bridge</b></DT>
+<br>
+Start the broker with following broker properties set,<br>
+imq.bridge.enabled=true<br>
+imq.bridge.activelist=stomp<br>
+<p>
+<DT><b>(2). Telnet broker portmapper to get stomp bridge listen port</b></DT>
+<pre>
+telnet &lt;broker-host&gt; 7676
+Trying 192.18.86.225...
+......
+101 imqbroker 4.3
+portmapper tcp PORTMAPPER 7676 [...]
+......
+admin tcp ADMIN 60511
+jms tcp NORMAL 60510
+......
+stomp[bridge] stomp stomp[bridge] 62525
+.
+</pre>
+<DT><b>(3). STOMP Client Use Cases</b></DT>
+Assuming MQ STOMP bridge service is listening on port 62525. 
+The following examples use a telnet STOMP client. 
+<DD>
+<ol>
+<li><a href="#1001"><i>Producing/Consuming message from STOMP client</i></a>
+<li><a href="#1002"><i>Transacted producing/consuming messages from STOMP client</i></a>
+</ol>
+</DD>
+<p>
+<DT><b>(4). imqbridgemgr use cases</b></DT>
+Please see <a href="http://jpgserv.red.iplanet.com/MQCrane/engineering/onepagers/bridgeservice/jmsbridge/jmsbridge-funcspec.html#bridgemgrusecase">imqbridgemgr Use Cases</a> in the JMS Bridge function specification.
+<p>
+<hr>
+</DL>
+  <DL>
+  <a NAME="1001"></a>
+  <DT><b><i>Producing/Consuming from STOMP client</i></b></DT>
+<pre>
+telnet localhost 62525
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+CONNECT
+login:guest
+passcode:guest
+
+^@
+CONNECTED
+session:9013423334783962624[null]
+
+SEND
+destination:/queue/queue1
+
+hellooo
+^@
+[imqcmd shows 1 message count in destination queue1]
+SUBSCRIBE
+destination:/queue/queue1
+id:sub-1
+
+^@
+<b>
+MESSAGE
+destination:/queue/queue1
+timestamp:1223058761314
+redelivered:false
+priority:4
+expires:0
+subscription:sub-1
+message-id:ID:15-192.18.86.225(d4:ce:df:4a:c1:f4)-46206-1223058761314
+
+hellooo
+</b>
+[imqcmd shows 0 message count in destination queue1]
+</pre>
+
+  <a NAME="1002"></a>
+  <DT><b><i>Transacted producing/consuming from STOMP Client</b></i></DT>
+<pre>
+telnet localhost 62525
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+CONNECT
+login:guest
+passcode:guest
+
+^@
+CONNECTED
+session:9013423334783962624[null]
+
+BEGIN
+transaction:1000
+
+^@
+SEND
+destination:/queue/queue1
+transaction:1000
+
+hello1
+
+^@
+SEND
+destination:/queue/queue1
+transaction:1000
+
+hello2
+
+^@
+[imqcmd will show 2 unack message count in destination "queue1"]
+COMMIT
+transaction:1000
+
+^@
+[imqcmd will show 2 message count in destination "queue1"]
+BEGIN
+transaction:2000
+
+^@
+SUBSCRIBE
+transaction:2000
+id:sub-2
+destination:/queue/queue1
+
+^@
+<b>
+MESSAGE
+destination:/queue/queue1
+timestamp:1223058761314
+redelivered:false
+priority:4
+expires:0
+subscription:sub-2
+message-id:ID:15-192.18.86.225(d4:ce:df:4a:c1:f4)-46206-1223058761314
+
+hello1
+</b>
+<b>
+MESSAGE
+destination:/queue/queue1
+timestamp:1223068504548
+redelivered:false
+priority:4
+expires:0
+subscription:sub-2
+message-id:ID:15-192.18.86.225(a9:9b:ce:e2:e5:e1)-46280-1223068504548
+
+hello2
+</b>
+[imqcmd will show 2 message count and 2 unack count in destination "queue1"]
+COMMIT
+transaction:2000
+
+^@
+[imqcmd will show 2 message count and 2 unack count in destination "queue1", because the 2 messages were not acked in transaction 2000]
+BEGIN
+transaction:3000
+
+^@
+ACK
+message-id:ID:15-192.18.86.225(a9:9b:ce:e2:e5:e1)-46280-1223068504548
+receipt:1
+transaction:3000
+subscription:sub-2
+
+^@
+[imqcmd will show 2 message count and 2 unack count in destination "queue1", because transaction 3000 not committed yet]
+<b>
+RECEIPT
+receipt-id:1
+</b>
+COMMIT
+transaction:3000
+
+^@
+[imqcmd will show 0 message count and 0 unack count in destination "queue1"]
+SEND
+destination:/queue/queue1
+
+another message
+^@
+[imqcmd will show 1 message count in destination "queue1"]
+[The message is not delivered to subscription "sub-2" because no
+ transaction begined] 
+BEGIN
+transaction:5000
+
+^@
+<b>
+MESSAGE
+destination:/queue/queue1
+timestamp:1223058762314
+redelivered:false
+priority:4
+expires:0
+subscription:sub-2
+message-id:ID:15-192.18.86.225(d4:ce:df:4a:c1:f4)-46206-1223058761315
+
+another message
+</b>
+[message delivered to subscription "sub-2"]
+ACK
+subscription:sub-2
+message-id:ID:15-192.18.86.225(d4:ce:df:4a:c1:f4)-46206-1223058761315
+transaction:5000
+
+^@
+COMMIT
+transaction:5000
+
+^@
+</pre>
+  <br>
+  </DL>
+<DT><B>16.0 Other:</B></DT>
+[List other useful information about this feature here. If this
+feature impacts another part of the product make a note of it here.]
+<p>
+<DT><B>17.0 Documentation:</B></DT>
+<br>
+The following documentation will be impacted:
+<p>
+<dd>
+<TABLE width="95%" BORDER=1 CELLPADDING=2 CELLSPACING=2>
+        <TR>
+            <TH>
+                <P><A NAME="bgie88"></A><A NAME="bgie89"></A>Book</P>
+            </TH>
+            <TH>
+                <P><A NAME="bgie90"></A><A NAME="bgie91"></A>Comments</P>
+            </TH>
+        </TR>
+        <TR>
+            <TD>
+                <P><A NAME="bgie92"></A>Technical Overview</P>
+            </TD>
+            <TD>
+                <P><A NAME="bgie93"></A><A NAME="bgie94"></A>&nbsp;</P>
+            </TD>
+        </TR>
+        <TR>
+            <TD>
+                <P><A NAME="bgie95"></A>Administration Guide</P>
+            </TD>
+            <TD>
+                <P><A NAME="bgie96"></A><A NAME="bgie97"></A>How to enable broker bridge service, configure the stomp bridge, imqbridgemgr, link to examples of STOMP clients README</P>
+            </TD>
+        </TR>
+        <TR>
+            <TD>
+                <P><A NAME="bgie104"></A>Installation Guide</P>
+            </TD>
+            <TD>
+                <P>&nbsp;</P>
+            </TD>
+        </TR>
+    </TABLE>
+</dd>
+<p>
+
+<DT><B>18.0 Open Issues:</B></DT>
+[List open issues]
+<p>
+<DT><B>19.0 Version History<BR><BR></B></DT>
+    <DD>
+    <TABLE WIDTH=503 BORDER=1 CELLPADDING=2 CELLSPACING=3>
+        <COL WIDTH=92>
+        <COL WIDTH=103>
+        <COL WIDTH=282>
+        <TR>
+            <TH WIDTH=92>
+                <P><A NAME="bgie114"></A><A NAME="bgie115"></A>Date</P>
+            </TH>
+            <TH WIDTH=103>
+                <P><A NAME="bgie116"></A>Version</P>
+            </TH>
+            <TH WIDTH=282>
+                <P><A NAME="bgie117"></A><A NAME="bgie118"></A>Change</P>
+            </TH>
+        </TR>
+        <TR>
+            <TD WIDTH=92>
+                <P><A NAME="bgie119"></A>05/29/2009</P>
+            </TD>
+            <TD WIDTH=103>
+                <P><A NAME="bgie120"></A>1.0</P>
+            </TD>
+            <TD WIDTH=282>
+                <P>Requirement on read-only/write-only mode for MessageTransformer.transform()</P>
+            </TD>
+        </TR>
+        <TR>
+            <TD WIDTH=92>
+                <P><A NAME="bgie119"></A>03/10/2009</P>
+            </TD>
+            <TD WIDTH=103>
+                <P><A NAME="bgie120"></A>1.0</P>
+            </TD>
+            <TD WIDTH=282>
+                <P>clarified ACK semantic</P>
+            </TD>
+        </TR>
+        <TR>
+            <TD WIDTH=92>
+                <P><A NAME="bgie119"></A>02/04/2009</P>
+            </TD>
+            <TD WIDTH=103>
+                <P><A NAME="bgie120"></A>1.0</P>
+            </TD>
+            <TD WIDTH=282>
+                <P>imqbrdgemgr linked to JMS Bridge func spec</P>
+            </TD>
+        </TR>
+        <TR>
+            <TD WIDTH=92>
+                <P><A NAME="bgie119"></A>11/03/2008</P>
+            </TD>
+            <TD WIDTH=103>
+                <P><A NAME="bgie120"></A>0.9</P>
+            </TD>
+            <TD WIDTH=282>
+                <P>SSL configuration for STOMP bridge</P>
+            </TD>
+        </TR>
+        <TR>
+            <TD WIDTH=92>
+                <P><A NAME="bgie119"></A>09/09/2008</P>
+            </TD>
+            <TD WIDTH=103>
+                <P><A NAME="bgie120"></A>0.8</P>
+            </TD>
+            <TD WIDTH=282>
+                <P>Initial Draft</P>
+            </TD>
+        </TR>
+    </TABLE>
+    </TABLE>
+    </DD>
+
+
+</DL>
+<H5><I>Sun Proprietary/Confidential: Internal Use Only </I>
+</H5>
+<H5><I>(FS Version 1.1) </I>
+</H5>
+<P STYLE="margin-bottom: 0.2in"><BR><BR>
+</P>
+</body>
+</html>
+<html><body></body></html>
+

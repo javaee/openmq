@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jmsbridge SYSTEM "sun_jmsbridge_1_0.dtd">
+<!--
+   Copyright  2000-2008 Sun Microsystems, Inc.  All rights reserved.
+   Use is subject to license terms.
+-->
+<jmsbridge name="series2mqbridge">
+  <link name="FromSeriesToMQ" enabled="true">
+    <source connection-factory-ref="XASeries" destination-ref="seriesq">
+    </source>
+    <target connection-factory-ref="MQ" destination-ref="mqq">
+    </target>
+  </link>
+
+  <link name="FromMQtoSeries" enabled="false">
+    <source connection-factory-ref="MQ" destination-ref="mqq">
+    </source>
+    <target connection-factory-ref="XASeries" destination-ref="seriesq">
+    </target>
+  </link>
+
+  <connection-factory ref-name="MQ"/>
+
+  <connection-factory ref-name="XASeries" lookup-name="ivtXACF">
+    <property name="java.naming.factory.initial"
+              value="com.sun.jndi.fscontext.RefFSContextFactory"/>
+    <property name="java.naming.provider.url" value="file:/tmp/jndimqseries"/>
+  </connection-factory>
+
+  <destination ref-name="mqq" name="mqq" type="queue">
+  </destination>
+
+  <destination ref-name="seriesq" lookup-name="ivtQ" type="queue">
+    <property name="java.naming.factory.initial"
+              value="com.sun.jndi.fscontext.RefFSContextFactory"/>
+    <property name="java.naming.provider.url" value="file:/tmp/jndimqseries"/>
+  </destination>
+
+</jmsbridge>
+

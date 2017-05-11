@@ -1,0 +1,128 @@
+One pager template version: 1.91
+
+1. Introduction
+    1.1. Project/Component Working Name:
+
+    JAAS LoginModules for the Built-in Ldap/File-based Authentication
+
+    1.2. Name(s) and e-mail address of Document Author(s)/Supplier:
+
+    Amy Kang     (amyk@dev.java.net)
+
+    1.3. Date of This Document:
+
+    01/25/2010
+
+2. Project Summary
+    2.1. Project Description:
+
+    JAAS allows multiple LoginModules to be chained together so that more than
+    one authentication technology can participate in the authentication process.
+
+    This feature is to provide JAAS LoginModules for the MQ built-in Ldap and
+    File-based authentication so that they can be used as LoginModules either
+    by themself or  chained with customer LoginModule(s) to participate JAAS
+    authentication process when MQ "jaas" authentication type is enabled.
+
+    2.2. Risks and Assumptions:
+
+3. Problem Summary
+    3.1. Problem Area:
+    3.2. Justification:
+
+    see 2.1
+
+4. Technical Description:
+     4.1. Details:
+
+     Implements the JAAS LoginModule interface for the built-in Ldap and 
+     File-based authentication server-side components 
+
+     Provide the new LoginModules as MQ built-in JAAS LoginModules
+
+     4.2. Bug/RFE Number(s):
+     http://bugs.sun.com/view_bug.do?bug_id=6903030
+
+     4.3. In Scope:
+
+     4.4. Out of Scope:
+
+     4.5. Interfaces:
+
+        4.5.1.  Public Interfaces:
+        
+        1) Publish predefined JAAS module names MQLdap, MQFile
+        2) Publish the class names that implements the JAAS LoginModule interface
+           com.sun.messaging.jmq.auth.module.LdapLoginModule
+           com.sun.messaging.jmq.auth.module.FileLoginModule
+
+        4.5.2.  Private Interfaces:
+
+        N/A 
+
+        4.5.3.  Deprecated/Removed Interfaces:
+
+        N/A
+
+     4.6. Doc Impact:
+
+     MQ Admin Guide
+
+     4.7. Admin/Config Impact:
+
+     User will be able to use these login modules in their JAAS
+     configuration files
+
+     4.8. HA Impact:
+
+     N/A
+
+     4.9. I18N/L10N Impact:
+
+     This feature will introduce new resource and log strings 
+
+     4.10. Packaging, Delivery & Upgrade:
+
+        4.10.1. Packaging
+
+        None. The LoginModule implementation classes will be
+        placed in imqbroker.jar.
+
+        4.10.2. Delivery
+
+        N/A
+    
+        4.10.3. Upgrade and Migration:
+
+        N/A
+    
+     4.11. Security Impact:
+     
+     This feature makes existing built-in ldap/file-based authentication 
+     to be usable in MQ "jaas" authentication type.
+
+     4.12. Compatibility Impact
+
+     None
+ 
+     4.13. Dependencies:
+
+        4.13.1 Internal Dependencies
+
+        None
+
+        4.13.2 External Dependencies
+
+        None
+
+     4.14. Testing Impact
+
+     New tests need to be written and can be automated.
+
+5. Reference Documents:
+
+6. Schedule:
+    6.1. Projected Availability:
+
+    Milestone 5 or later: feature complete 
+

@@ -1,0 +1,137 @@
+<html>
+<TITLE>MQ 4.4: STOMP OnePager</TITLE><BODY>
+<H2>
+<CENTER>
+			New Work Analysis
+</CENTER>
+</H2>
+
+<DL>
+<dt>
+  <div align="center">Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. </div>
+</dt>
+<DT><b>Synopsis: </b><DD>
+STOMP Protocol Support
+
+<P><DT><b>Quick Questions:</b><DD>
+<UL><LI>Difficulity: Medium</LI>
+    </UL>
+
+<P><DT><b>Description:</b><DD>
+STOMP protocol (from http://stomp.codehaus.org/)  is a streaming text orientated
+messaging protocol.  The protocol provides an interoperable wire format so that 
+any STOMP client can communicate with any broker that supports the STOMP protocol.
+Because the simplicity of the protocol, it is easy to write a STOMP client using 
+available languages for examples, PHP, Perl, Python, Ruby, Java, C, C++, C# and .Net
+...
+
+<p>
+This feature will enable MQ broker to support  STOMP protocol by implementing a 
+STOMP bridge (without using codehaus's StompConnect) that embeds in the broker JVM.
+Any available STOMP client written in any language will be able to do reliable messaging
+using MQ as broker.
+<p>
+<img src="./stompbridge-clients.gif"></img>
+<P><DT><b>Requestor:</b><DD>
+
+<P><DT><b>Non-feature:</b><DD>
+
+<P><DT><b>Dependencies:</b><DD>
+<ol>
+<li>STOMP protocol
+<li>At transport layer, this feature initially will use Grizzly 
+(from http://grizzly.java.net), which is acclaimed as a high
+performance and high scalable Java NIO framework built on top of 
+Java NIO.  Grizzly is used in Glassfish/SailFin and JXTA according to its 
+websites.  If required,  this feature can be changed to use MQ broker's 
+existing transport/thread pool layer classes which would involve 
+some changes to the classes for reuse.
+</ol>
+
+<P>
+<b>Other Implementations:</b>
+<DD>
+<a href="http://activemq.apache.org/stomp.html">ActiveMQ supports STOMP protocol</a>
+<p>
+<a href="https://jira.jboss.org/jira/browse/JBMESSAGING-1406">JBoss has a task to support STOMP protocol</a>
+<P><DT><b>Phases:</b><DD>
+Phase 1 (first release): use JMS API (with private contract between 
+MQ client runtime and the STOMP bridge) in implementing the embeded STOMP bridge
+<p>
+Phase 2 (future release): support DIRECT mode between the embeded STOMP bridge and broker
+<P><DT><b>Direction of Implementation:</b><DD>
+<ol>   
+<li>Design and implement a pluggable bridge service framework for the broker 
+<li>Design and implement STOMP bridge using JMS API (phase 1) with private contract 
+between MQ client runtime and the STOMP bridge.  The private contract is necessary
+for reliable transaction support for transactions driven from non-JMS client,
+such as STOMP clients
+<li>Implement a bridge service manager and bridge service manager administration utility 
+<li>Use Grizzly at the transport layer by implementing custom protocol parser and filter chain
+</ol>
+
+<P>
+<b>Interfaces:</b>
+<DD>
+    This feature will introduce new broker configuration properties and 
+    add a new administration utility - imqbridgemgr
+    <p>
+    This feature will add new runtime subdirectory under broker instance's
+    directory when the bridge is enabled and started.
+    <p>
+    This feature has dependency on STOMP protocol
+    <p>
+<P><DT><b>Test Impact:</b><DD>
+    moderate. Tests for this feature can be automated.  Most of functional
+    and stress tests can be written in Java.  Tests using different languages
+    are also needed.
+
+<P><DT><b>Doc Impact:</b><DD>
+    This is a new feature that can be documented by expanding existing doc. 
+    <p>
+    Admin GUI can be affected but it's not planned to do it in first release.
+<P><DT><b>Support Impact:</b><DD>
+     It can have support questions from user's STOMP clients written 
+     in different languages.  Since STOMP protocol is a simple protocol,
+     with clear documentation, sufficient scenario tests/examples, 
+     and good logging and error reporting, support impact can be minimized.
+   
+<P><DT><b>Installation Impact:</b><DD>
+     This feature adds new jar files<br>
+     <ul>
+	 <li>stomp.jar  stomp bridge
+     <li>grizzly.jar Grizzly NIO frame work<br>
+        ls -l grizzly.jar<br>
+        -rw-r--r--  257356 grizzly.jar
+     </ul>
+
+
+<P><DT><b>Admin/Config Impact:</b><DD>
+    This feature does not affect existing administration tools. It will
+    add a new administration tool, named imqbridgemgr.
+
+<P><DT><b>I18N/L10N Impact:</b><DD>
+    STOMP protocol: UTF-8 encoding for text <br>
+    I18N in logging messages
+
+<P><DT><b>Security Impact:</b><DD>
+    This feature will support SSL transport. This feature introduces 
+    new port - that is,  the STOMP bridge (as a STOMP server) listening port
+
+<P><DT><b>Risks:</b><DD>
+    Grizzly stability. It's said been used in Glassfish, SailFin, JXTA, ... so
+    would expect it stable and good quality.  Grizzly project is planned to
+    have a major release (2.0, current version is 1.8.6.1) by the end of this year.
+
+<P><DT><b>See Also:</b><DD>
+<a href="http://stomp.codehaus.org/Protocol">STOMP protocol</a><br>
+<a href="https://grizzly.java.net">Grizzly</a><br>
+
+<P><DT><b>Author/Date:</b><DD>
+	[Amy Kang 9/12/2008]
+</DL>
+<P>
+<i>Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. </i>
+<P><i>template version: @(#)onepager.txt	1.10 04/03/18</i>
+</BODY>
+</HTML>

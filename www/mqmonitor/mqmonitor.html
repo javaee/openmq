@@ -1,0 +1,88 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Broker Monitoring Tool Sample Application</title>
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+
+<style type="text/css">
+p {width:800px}
+</style>
+
+<h1>Broker Monitoring Tool Sample Application</h1>
+
+<h2>What it is</h2>
+
+<p>
+This is a simple monitoring example which demonstrates how to retrieve information about the state of a broker cluster(s).
+
+<p>
+It is just an example to help you write your own monitoring tools; 
+it is not intended to be used for any other purpose and is not supported.
+
+<p>Most of the broker data displayed by this example is obtained using the MQ JMS API. For more information,
+see the <i>Developer's Guide for JMX Clients</i> in the MQ documentation set.
+
+<p>Data about individual messages is obtained using the unsupported msgadmin API classes. 
+A copy of these classes can be found in the examples.mm.model.jms package.
+
+<p>For more information on the msgadmin API classes, see the
+<a href="https://glassfish.java.net/wiki-archive/OpenMQUnsupportedFeaturesQuestions.html">FAQ for unsupported features in Open Message Queue</a>
+on the Open Message Queue wiki.
+
+<h2>How to run it</h2>
+
+<p>Source code and classes can be found in <a href="MQMonitor.zip">MQMonitor.zip</a>.
+
+<p>The example requires the following jars:</p>
+
+<ul>
+<li><tt>imq.jar</tt></li>
+<li><tt>imqjmx.jar</tt></li>
+<li><tt>jms.jar</tt></li>
+<li><tt>imqadmin.jar</tt></li>
+<li><tt>imqutil.jar</tt></li>
+</ul>
+
+<p>To run type:
+
+<p><tt>java -cp &lt;<i>class path to mq jars and the example class files</i>&gt; examples.mm.MQMonitor</tt>
+
+<h2>How to use it</h2>
+
+<p>
+When you run the tool an empty window opens. Press "Connect to cluster". Enter the details of a broker in the cluster and press OK.
+
+<p>
+<a href="Connect To Broker 11092009 122736.bmp"><img align="center" src="Connect To Broker 11092009 122736.bmp" width="268" height="189" title="Message detail" border="0"></a><br/>
+
+<p>
+The window is then populated with details of the specified broker and all the others in the same cluster.
+
+<p>
+Each broker is shown in a separate tab. The first tab is entitled "All Brokers" and collates the information for all the brokers in the cluster.
+Subsequent tabs are used to display information for individual brokers.
+
+<p><a href="Broker Monitoring Tool 11092009 120159.bmp.jpg"><img align="center" src="Broker Monitoring Tool 11092009 120159.bmp.jpg" width="1000" height="750" title="General view" border="0"></a><br/>
+
+<p>
+In the destinations table, select a destination and then press "display message". A new window opens which lists the messages in that destination.
+
+<p>
+Note that the "display message" button will be disabled if you are viewing the "All Brokers" tab. You need to select a specific broker to view its messages.
+
+<p><a href="Display Queue 11092009 120209.jpg"><img align="center" src="Display Queue 11092009 120209.jpg" width="476" height="505" title="List of messages" border="0"></a><br/>
+
+<p>Select an individual message and then press "Show Message" to view details of an individual message:
+
+<p><a href="Message 11092009 120215.jpg"><img align="center" src="Message 11092009 120215.jpg" width="506" height="532" title="Message detail" border="0"></a><br/>
+
+<p>You can configure what information is displayed by opening the "File" menu and choosing "Configuration":
+
+<p><a href="Configuration Preferences 11092009 123646.bmp"><img align="center" src="Configuration Preferences 11092009 123646.bmp" width="268" height="626" title="General view" border="0"></a><br/>
+
+<p>Once you have understood these basics, the operation of the tool should be self-explanatory. 
+
+</body>
+</html>

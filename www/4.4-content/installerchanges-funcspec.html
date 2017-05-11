@@ -1,0 +1,738 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE"
+ content="text/html; charset=iso-8859-1">
+  <title>MQ 4.4: Functional Specification: Installer Changes for MessageQueue 4.4</title>
+  <meta name="GENERATOR" content="StarOffice 8  (Solaris Sparc)">
+  <meta name="AUTHOR" content="Jill Nakata">
+  <meta name="CREATED" content="0;0">
+  <meta name="CHANGED" content="20090115;14272600">
+</head>
+<body dir="ltr" lang="en-US">
+<h5>Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. </h5>
+<h2 align="center">Functional Specification </h2>
+<dl>
+  <dt><b>1.0 Author/Date:</b> </dt>
+  <dd style="margin-bottom: 0.2in;"> Jill
+Nakata&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Last Updated:02/11/2009</dd>
+  <dt><b>2.0 Synopsis:</b> </dt>
+  <dd> Installer Changes for Message Queue 4.4</dd>
+  <dt> <br>
+  </dt>
+  <dt> <b>3.0 PRD Requirement #:</b> </dt>
+  <dd> N/A</dd>
+  <dt> <br>
+  </dt>
+  <dt> <b>4.0 Description:</b></dt>
+</dl>
+<div style="margin-left: 40px;"><span style="font-weight: bold;">4.1&nbsp;
+MQ 4.4 Installers</span><br>
+</div>
+<dl>
+  <dd>In MQ 4.3, the OpenMQ installed a zip-based format and SJSMQ
+installed native pkging (Solaris/Linux) or zip-based (Windows,
+AIX).&nbsp; In MQ 4.4, as we move to creating IPS packages for our
+product, both the OpenMQ and SJSMQ installers will install IPS "user
+images".&nbsp; For those platforms where Update Center is not supported
+(AIX, other UNIX), we will still install an IPS user image but updates
+will not be available through the Update Center.</dd>
+</dl>
+<dl>
+</dl>
+<table border="1">
+  <caption><span style="font-weight: bold;">MQ Installers</span><br>
+  </caption><tbody>
+    <tr>
+      <th>Platform<br>
+      </th>
+      <th>Installer Type</th>
+      <th>MQ 4.3 Format<br>
+      </th>
+      <th>MQ 4.4 Format<br>
+      </th>
+      <th
+ style="text-align: center; vertical-align: top; font-weight: bold;">Installer
+Name</th>
+      <th style="vertical-align: top;">Update Center<br>
+Support<br>
+      </th>
+    </tr>
+    <tr>
+      <td rowspan="2">Solaris/SPARC</td>
+      <td style="vertical-align: top;" rowspan="1" colspan="1">OpenMQ<br>
+      </td>
+      <td colspan="1" style="vertical-align: top;">Zip-Based<br>
+      </td>
+      <td colspan="1" style="vertical-align: top;">IPS<br>
+      </td>
+      <td style="vertical-align: top;">openmq4_3-installer-SunOS.zip<br>
+      </td>
+      <td style="vertical-align: top;">Yes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">SJSMQ<br>
+      </td>
+      <td style="vertical-align: top;">SVR4 Pkgs<br>
+      </td>
+      <td style="vertical-align: top;">IPS<br>
+      </td>
+      <td style="vertical-align: top;">mq4_3-installer-SunOS.zip</td>
+      <td style="vertical-align: top;">Yes</td>
+    </tr>
+    <tr>
+      <td rowspan="2">Solaris/x86</td>
+      <td>Open MQ<br>
+      </td>
+      <td>Zip-Based<br>
+      </td>
+      <td>IPS<br>
+      </td>
+      <td style="vertical-align: top;">openmq4_3-installer-SunOS_X86.zip</td>
+      <td style="vertical-align: top;">Yes</td>
+    </tr>
+    <tr>
+      <td>SJSMQ<br>
+      </td>
+      <td>SVR4 Pkgs<br>
+      </td>
+      <td>IPS<br>
+      </td>
+      <td style="vertical-align: top;">mq4_3-installer-SunOS_X86.zip</td>
+      <td style="vertical-align: top;">Yes</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: middle;" rowspan="2">Windows<br>
+      </td>
+      <td>OpenMQ<br>
+      </td>
+      <td>Zip-Based<br>
+      </td>
+      <td>IPS</td>
+      <td style="vertical-align: top;">openmq4_3-installer-WINNT.zip</td>
+      <td style="vertical-align: top;">Yes</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">SJSMQ<br>
+      </td>
+      <td style="vertical-align: top;">Zip-Based<br>
+      </td>
+      <td style="vertical-align: top;">IPS<br>
+      </td>
+      <td style="vertical-align: top;">mq4_3-installer-WINNT.zip</td>
+      <td style="vertical-align: top;">Yes</td>
+    </tr>
+    <tr>
+      <td rowspan="2" style="vertical-align: top;">Linux<br>
+      <br>
+      </td>
+      <td style="vertical-align: top;">OpenMQ<br>
+      </td>
+      <td style="vertical-align: top;">Zip-Based<br>
+      </td>
+      <td style="vertical-align: top;">IPS<br>
+      </td>
+      <td style="vertical-align: top;">openmq4_3-installer-Linux_X86.zip</td>
+      <td style="vertical-align: top;">Yes</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">SJSMQ<br>
+      </td>
+      <td style="vertical-align: top;">RPMs<br>
+      </td>
+      <td style="vertical-align: top;">IPS<br>
+      </td>
+      <td style="vertical-align: top;">mq4_3-installer-Linux_X86.zip</td>
+      <td style="vertical-align: top;">Yes</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;" rowspan="2">AIX<br>
+      </td>
+      <td style="vertical-align: top;">OpenMQ<br>
+      </td>
+      <td style="vertical-align: top;">Zip-Based<br>
+      </td>
+      <td style="vertical-align: top;">IPS<br>
+      </td>
+      <td style="vertical-align: top;">openmq4_3-installer-AIX.zip</td>
+      <td style="vertical-align: top;">No<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">SJSMQ<br>
+      </td>
+      <td style="vertical-align: top;">Zip-Based<br>
+      </td>
+      <td style="vertical-align: top;">IPS<br>
+      </td>
+      <td style="vertical-align: top;">mq4_3-installer-AIX.zip</td>
+      <td style="vertical-align: top;">No<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">UNIX<br>
+      </td>
+      <td style="vertical-align: top;">OpenMQ<br>
+      </td>
+      <td style="vertical-align: top;">Zip-Based<br>
+      </td>
+      <td style="vertical-align: top;">IPS <br>
+      </td>
+      <td style="vertical-align: top;">openmq4_3-installer-Unix.zip</td>
+      <td style="vertical-align: top;">No<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<div style="margin-left: 40px;">The difference between each of the
+installers per platform is the presence of the MQ C-API IPS Package, MQ
+Native IPS Package, and the NSS/NSPR IPS packages pre-installed within
+each of the IPS user images.&nbsp;&nbsp; We chose to "preinstall" the
+native code within each of our user images rather than bootstrap the
+native code after the install to avoid risk of those who do not have a
+network connection.&nbsp; AIX is not supported in Update Center so for
+that platform we cannot preinstall the NSS IPS packages.&nbsp; Instead,
+we will have to include the libs within the MQ C-API IPS Package.<br>
+<br>
+</div>
+<span style="font-weight: bold;"></span>
+<div style="margin-left: 40px;"><span style="font-weight: bold;">4.2&nbsp;
+IPS<br>
+</span>The MQ 4.4 IPS packages conform to the file-layout described in
+the <a
+ href="http://wiki.updatecenter.java.net/Wiki.jsp?page=MultiInstall">Multi-Install
+File Layout Specification</a>.&nbsp; See the <a
+ href="http://jpgserv.red.iplanet.com/not/MQRobin/engineering/funcspecs/ips.html">MQ
+IPS Packaging Functional Spec</a> for a detailed file-layout.&nbsp; In
+addition, while the MQ 4.3 zip-based installers did not install IPS
+user images, they did install in a very similar file-layout as the MQ
+4.4 IPS packages.&nbsp; Therefore, a zip-based install with MQ 4.3 will
+look very similar (if not identical) to what you will see in an MQ 4.4
+install.&nbsp; The MQ 4.4 install might have the extra IPS tools
+installed in the user image when compared with the MQ 4.3 install.<br>
+<br>
+<span style="font-weight: bold;">4.3 IPS Tools in Installed User Image
+(for supported platforms only)<br>
+</span>We have a couple of options for a user to update their installed
+image.&nbsp; If we have extra time, we would do #3.&nbsp; If not, then
+we'll do #1 or #2.<br>
+<ol>
+  <li>We could pre-install the platform's IPS tools within the user
+image.&nbsp; The user could later run these tools to update their
+installed image.</li>
+  <li>We could provide the skeletal <span style="font-style: italic;">pkg</span>
+or <span style="font-style: italic;">updatetool</span> versions in our
+IPS user image being installed.&nbsp; The user could later run those
+tools to bootstrap the tools to their system.&nbsp; Once the IPS tools
+are installed, the user would run them to update their installed image.</li>
+  <li>We could provide an option in the installer to ask if they wish
+to
+install the Update Center tools upon installation.&nbsp;&nbsp; The
+installer
+could popup the updatetool with a list of latest packages to install.</li>
+</ol>
+<span style="font-weight: bold;">4.3&nbsp; No Native Packaging
+Installers<span style="font-weight: bold;"><br>
+</span></span>In MQ 4.4, we will no longer provide an installer to
+install SVR4 packages on Solaris or install RPMs on Linux.&nbsp; We
+will continue to create the native packaging in our builds but they
+will only be available for supported customers.<br>
+<br>
+<span style="font-weight: bold;">4.4&nbsp; Remove Text Support in
+Installers</span><br>
+Text support in installers really never worked well (hangs, exceptions,
+crashes).&nbsp; There have been many bugs filed against the MQ
+installers which as passed onto OpenInstaller.&nbsp; Nobody is fixing
+bugs in OpenInstaller so we are dropping the text support feature for
+MQ 4.4.&nbsp; Text support was previously supported only on
+Solaris/Linux.<br>
+<br>
+<span style="font-weight: bold;">4.4&nbsp; OpenMQ vs. SJSMQ Installers<br>
+</span>
+<ul>
+  <li>As in MQ 4.3, the MQ 4.4 OpenMQ installer will register a
+different swordfish ID as the SJSMQ installer.&nbsp;&nbsp; <br>
+  </li>
+  <li>An OpenMQ install should show "Open Message Queue" product
+version strings while an SJSMQ install should show "Sun Java System
+Message Queue" strings.&nbsp; This is differentiated with the
+mq-commerial IPS Package install.</li>
+</ul>
+</div>
+<span style="font-weight: bold;"></span>
+<dl>
+  <dd><span style="font-weight: bold;">4.4&nbsp; No JRE/JDK Installed</span></dd>
+  <dd>A user will be required to have a JRE installed to run the
+installers.&nbsp; In addition, no JRE/JDK will be installed with any of
+the installers.<br>
+  </dd>
+</dl>
+<div style="margin-left: 40px;"><span style="font-weight: bold;">4.5&nbsp;
+OpenInstaller engine-wrapper script <br>
+(Probably can't do this for MQ 4.4 timeframe now)<br>
+<br>
+</span>The OpenInstaller framework originally provided an
+engine-wrapper script for products to call the main OpenInstaller
+engine class upon start up.&nbsp; This engine-wrapper script is a shell
+script on Unix and a .vbs script on Windows.&nbsp; If time permits,
+we'd like to bypass the engine-wrapper script and find a means to call
+the OI Engine class directly from our own Java class.<br>
+<ol>
+  <li>We have multiple bugs filed against our installer for not
+i18n'ing any text in the engine-wrapper class (usage statements, error
+messages).&nbsp; Using a Java class as a launcher will enable us to
+i18n the text in engine-wrapper via resource bundles.</li>
+  <li>VBS on windows is very difficult to debug.&nbsp; We've had many
+complaints from customers as to why we chose to use a .vbs script for
+our installer/uninstaller launcher.&nbsp; We'd like to rid of
+engine-wrapper.vbs and implement our own Java class that contains the
+same functionality of engine-wrapper.vbs.</li>
+  <li>VBS on windows Vista will not allow a user to double click the
+installer.vbs file and execute for security reasons.&nbsp;&nbsp; We
+presume it is because .vbs files are notorious for spreading viruses.</li>
+  <li>&lt;more reasons here&gt;<span style="font-weight: bold;">&nbsp;</span><br>
+    <span style="font-weight: bold;"></span></li>
+</ol>
+</div>
+<dl>
+</dl>
+<dl>
+</dl>
+<div style="margin-left: 40px; text-align: left;"><span
+ style="font-weight: bold;">4.6&nbsp; Remove L10n Screen<br>
+<br>
+</span>The preinstalled IPS user image installed by the installer will
+already contain the localizations so we will need to remove the
+installer screen that asks if localizations need to be installed.<span
+ style="font-weight: bold;"><br>
+</span></div>
+<dl style="margin-left: 40px;">
+  <dt><span style="font-weight: bold;"></span><span
+ style="font-weight: bold;">4.7&nbsp; Swordfish IDs</span></dt>
+</dl>
+<div style="margin-left: 40px;">There will be two different Swordfish
+IDs registered by the installers; one by the OpenMQ installer and one
+by the SJSMQ installer.&nbsp; This should be distinguished when loggin
+into the sysnet registration page.<br>
+<br>
+<span style="font-weight: bold;">4.8&nbsp; NSS Dependency<br>
+<br>
+</span>The mq-capi IPS package has a hard dependency on the nss-libs
+IPS pkg.&nbsp; The former NSPR libs are now combined within the
+nss-libs IPS pkg.&nbsp; This&nbsp; nss-libs package will also be
+installed with the MQ Installers (except for AIX) inside the user
+image.&nbsp; Because NSS is installed as a separate shared component,
+the location of nss is now at the same level as the "mq" directory
+(e.g., nss/lib/*).&nbsp; On Solaris and Linux we added the library
+runpath inside the MQ-C-API library to find ../../nss/lib/*.so during
+runtime.&nbsp; On windows, users will have to add ../../nss/lib to
+their %PATH% to locate the NSS libs.<span style="font-weight: bold;"><span
+ style="font-weight: bold;"></span></span><b><br>
+</b></div>
+<dl>
+  <dt style="margin-bottom: 0.2in;"> <b>6.0 Non-feature:</b> </dt>
+</dl>
+<dl>
+  <dd style="margin-bottom: 0.2in;">Exact IPS file breakdown for MQ and
+file-layout detailed are described in the <a
+ href="http://jpgserv.red.iplanet.com/not/MQRobin/engineering/funcspecs/ips.html">MQ
+IPS Packaging Functional Spec</a>. </dd>
+  <dt style="margin-bottom: 0.2in;"> <b>6.0 Dependencies:</b> </dt>
+</dl>
+<p style="margin-left: 0.42in;">
+IPS nss-libs, IPS nss-utils, IPS pkgs.</p>
+<dl>
+  <dt><br>
+  </dt>
+  <dt> <b>7.0 Interfaces:</b></dt>
+</dl>
+<p style="margin-bottom: 0in; font-weight: bold;" align="center">
+Exported Interfaces - MQ Installer Names (Table 7.1)</p>
+<dl>
+  <dd>
+    <table border="1" cellpadding="2" cellspacing="2">
+      <tbody>
+        <tr>
+          <th>
+          <p>Interface</p>
+          </th>
+          <th>
+          <p>Classification</p>
+          </th>
+          <th>
+          <p>Comments/Specification</p>
+          </th>
+        </tr>
+        <tr>
+          <td>openmq4_3-installer-SunOS.zip</td>
+          <td>
+          <p>Uncommitted </p>
+          </td>
+          <td>
+          <p>OpenMQ Solaris/SPARC installer.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          <p>mq4_3-installer-SunOS.zip </p>
+          </td>
+          <td>
+          <p>Uncommitted </p>
+          </td>
+          <td>
+          <p>SJSMQ Solaris/SPARC installer.<br>
+          </p>
+          </td>
+        </tr>
+        <tr>
+          <td>openmq4_3-installer-SunOS_X86.zip</td>
+          <td>
+          <p>Uncommitted </p>
+          </td>
+          <td>
+          <p>OpenMQ Solaris/X86 installer.<br>
+          </p>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          <p>mq4_3-installer-SunOS_X86.zip</p>
+          </td>
+          <td>
+          <p>Uncommitted </p>
+          </td>
+          <td>
+          <p>SJSMQ Solaris/X86 installer.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>openmq4_3-installer-WINNT.zip</td>
+          <td>
+          <p>Uncommitted</p>
+          </td>
+          <td>
+          <p>OpenMQ Windows installer.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          <p>mq4_3-installer-WINNT.zip</p>
+          </td>
+          <td>
+          <p>Uncommitted</p>
+          </td>
+          <td>
+          <p>SJSMQ Windows installer.<br>
+          </p>
+          </td>
+        </tr>
+        <tr>
+          <td>openmq4_3-installer-Linux_X86.zip</td>
+          <td>
+          <p>Uncommitted</p>
+          </td>
+          <td>
+          <p>OpenMQ Linux installer.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;">mq4_3-installer-Linux_X86.zip</td>
+          <td style="vertical-align: top;">Uncommitted</td>
+          <td style="vertical-align: top;">SJSMQ Linux installer.</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;">openmq4_3-installer-AIX.zip</td>
+          <td style="vertical-align: top;">Uncommitted</td>
+          <td style="vertical-align: top;">OpenMQ AIX installer.</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;">mq4_3-installer-AIX.zip</td>
+          <td style="vertical-align: top;">Uncommitted</td>
+          <td style="vertical-align: top;">SJSMQ AIX installer.</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;">openmq4_3-installer-Unix.zip</td>
+          <td style="vertical-align: top;">Uncommitted</td>
+          <td style="vertical-align: top;">OpenMQ Unix installer.</td>
+        </tr>
+      </tbody>
+    </table>
+  </dd>
+</dl>
+<br>
+<p style="margin-bottom: 0in; font-weight: bold;" align="center">Imported
+Interfaces
+(Table
+7.3)<br>
+(If we decide to add new installer screen option to install/enable
+Update Center)<br>
+</p>
+<table style="margin-left: 40px;" border="1">
+  <tbody>
+    <tr>
+      <th>Interface</th>
+      <th>Classification</th>
+      <th style="vertical-align: top;">Arc Case #<br>
+      </th>
+      <th>Comments/Specification</th>
+    </tr>
+    <tr>
+      <td>Syntax of files for defining<br>
+      <ul>
+        <li>flow/order of installer screens</li>
+        <li>labels for screens</li>
+        <li>splash screen image</li>
+        <li>welcome text</li>
+        <li>license page</li>
+      </ul>
+      </td>
+      <td>Uncommitted</td>
+      <td><a
+ href="http://sac.sfbay.sun.com/arc/LSARC/2007/099/20070214_manpreet.singh">LSARC/2007/099</a></td>
+      <td>Added new screens, including their labels and associated text.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+<br>
+</p>
+<div style="text-align: center; font-weight: bold;">Imported Interfaces
+(Table 7.4)&nbsp;</div>
+<p>
+<table border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <th>
+      <p>Interface</p>
+      </th>
+      <th>
+      <p>Classification</p>
+      </th>
+      <th>
+      <p>Arc Case #</p>
+      </th>
+      <th>
+      <p>Comments/Specification</p>
+      </th>
+    </tr>
+    <tr>
+      <td> <span style="font-style: italic;">pkg</span><br
+ style="font-style: italic;">
+      <span style="font-style: italic;">pkgsend</span><br
+ style="font-style: italic;">
+      <span style="font-style: italic;">pkg.depotd</span> </td>
+      <td>
+      <p>Committed</p>
+      </td>
+      <td>
+      <p><a href="http://sac.eng/arc/PSARC/2008/290/">PSARC Case</a><br>
+      </p>
+      </td>
+      <td>
+      <p>IPS tools<br>
+      </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">nss-libs IPS pkg<br>
+nss-utils IPS pkg<br>
+      </td>
+      <td style="vertical-align: top;">Uncommitted<br>
+      </td>
+      <td style="vertical-align: top;">Not available as of 01/16/09.<br>
+      </td>
+      <td style="vertical-align: top;">NSS/NSPR IPS pkgs<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</p>
+<p><br>
+</p>
+<dl>
+  <dt><b>8.0 Performance:</b> </dt>
+  <dd> <br>
+  </dd>
+  <dd> Not Applicable. </dd>
+  <dt> <br>
+  </dt>
+  <dt> <b>9.0 Configuration/Administration:</b> </dt>
+  <dd> <br>
+  </dd>
+  <dd> Not Applicable. </dd>
+  <dt> <br>
+  </dt>
+  <dt style="margin-bottom: 0.2in;"> <b>10.0
+Instrumentation/Diagnostics:</b> </dt>
+</dl>
+<p style="margin-left: 0.42in;">
+Not Applicable.</p>
+<dl>
+  <dt><br>
+  </dt>
+  <dt style="margin-bottom: 0.2in;"> <b>11.0
+Compatibility/Interoperability/Migration:</b> </dt>
+</dl>
+<p style="margin-left: 0.42in;">Installing MQ IPS pkgs will enable
+customers to upgrade through the Update Center.<br>
+</p>
+<dl>
+  <dt><br>
+  </dt>
+  <dt style="margin-bottom: 0.2in;"> <b>12.0 Security:</b> </dt>
+</dl>
+<p style="margin-left: 0.42in;">
+Not Applicable.</p>
+<dl>
+  <dt><br>
+  </dt>
+  <dt> <b>13.0 Standards Conformance:</b> </dt>
+  <dd> <br>
+  </dd>
+  <dd> Not Applicable. </dd>
+  <dt> <br>
+  </dt>
+  <dt> <b>14.0 Installation/packaging:</b> </dt>
+  <dd> <br>
+  </dd>
+  <dd> This document describes the IPS pkging.<br>
+  </dd>
+  <dt> <br>
+  </dt>
+  <dt style="margin-bottom: 0.2in;"> <b>15.0 Use Cases:</b> </dt>
+</dl>
+<p style="margin-left: 0.42in; font-weight: bold;">MQ Install (pkg
+needs to be installed)<br>
+</p>
+<ol style="margin-left: 40px;">
+  <li>User downloads any MQ installer.</li>
+  <li>MQ Installer is run to register and install MQ software for the
+platform being used.</li>
+  <li>User runs pkg and gets prompted if they wish to install Update
+Center.<br>
+  </li>
+  <li>User runs pkg and updates the install to the
+latest version.</li>
+</ol>
+<div style="margin-left: 40px;"><span style="font-weight: bold;">MQ
+Install (pkg tools are an option in Installer)<br>
+</span>
+<ol>
+  <li>User downloads any MQ installer.</li>
+  <li>Installer asks if he wishes to install Update Center.</li>
+  <li>User selects "install Update Center".</li>
+  <li>pkg tools are downloaded after the MQ install</li>
+  <li>pkg or Update Tool is run to update the current MQ install.<br>
+  </li>
+</ol>
+<span style="font-weight: bold;"><span style="font-weight: bold;"></span></span></div>
+<p>
+</p>
+<p></p>
+<p>
+</p>
+<p></p>
+<dl>
+  <dt><b>16.0 Other:</b> </dt>
+</dl>
+<ul>
+  <li><a
+ href="http://wikis.sun.com/display/IpsBestPractices/Image+Packaging+System+Best+Practices/">IPS
+Best Practices</a></li>
+  <li><a
+ href="http://wikis.sun.com/display/IpsBestPractices/Assembling+Distributions">Assembling
+Instructions</a> </li>
+  <li><a
+ href="http://wikis.sun.com/display/IpsBestPractices/Producing+and+Maintaining+Packages">Producing
+and Maintaining Packages</a></li>
+  <li><a href="http://wiki.updatecenter.java.net/Wiki.jsp?page=Download">Update
+Center</a></li>
+</ul>
+<ul>
+</ul>
+<dl>
+  <dt style="margin-bottom: 0.2in;"><b>17.0 Documentation:</b> </dt>
+</dl>
+<p style="margin-bottom: 0in; text-align: left; margin-left: 40px;">
+Documentation Impact<br>
+</p>
+<ol>
+  <ol>
+    <li>Installation Guide.</li>
+    <li>OpenMQ website ?</li>
+    <li>Release Notes<br>
+    </li>
+  </ol>
+</ol>
+<dl>
+  <dt><br>
+  </dt>
+  <dt><b>18.0 Open Issues:</b> </dt>
+</dl>
+<ol>
+  <ol>
+    <li>No AIX IPS Packages for NSS so we'll have to include the AIX
+NSS libs without our MQ image.</li>
+  </ol>
+</ol>
+<dl>
+  <dt> <b>19.0 Version History:</b> </dt>
+  <dd>
+    <table border="1" cellpadding="2" cellspacing="2">
+      <tbody>
+        <tr>
+          <th>
+          <p>Date</p>
+          </th>
+          <th>
+          <p>Version</p>
+          </th>
+          <th>
+          <p>Change</p>
+          </th>
+        </tr>
+        <tr>
+          <td>
+          <p>01/15/2009</p>
+          </td>
+          <td>
+          <p>1</p>
+          </td>
+          <td>
+          <p>Initial Draft</p>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          <p>02/05/2009</p>
+          </td>
+          <td>
+          <p>2</p>
+          </td>
+          <td>
+          <p>Add note about no IPS NSS for AIX in IPS user image.<br>
+Added note to remove L10n
+installer screen.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;">02/11/2009<br>
+          </td>
+          <td style="vertical-align: top;">3<br>
+          </td>
+          <td style="vertical-align: top;">Add note in Description that
+NSS will be located in a different location.<br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </dd>
+</dl>
+<p><br>
+Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. </p>
+<p style="font-style: normal; font-weight: bold;"><a name="FileList"></a></p>
+</body>
+</html>

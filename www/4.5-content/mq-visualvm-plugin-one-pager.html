@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>One Pager for: MQ operational monitor: a plugin for VisualVM</title>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+</head>
+<body style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
+<h2>One Pager: MQ operational monitor: a plugin for VisualVM<br>
+</h2>
+(template version: 1.91)<br>
+<table border="1" cellpadding="2" width="756">
+  <tbody>
+    <tr>
+      <td>
+      <p><b>Table of Contents</b><br>
+      <a href="#1">1. Introduction</a><br>
+      </p>
+      <blockquote> <a href="#11">1.1 Project/Component Working Name</a><br>
+        <a href="#12">1.2 Name(s) and e-mail address of Document
+Author(s)/Supplier</a><br>
+        <a href="#13">1.3. Date of This Document</a><br>
+      </blockquote>
+      <a href="#2">2. Project Summary</a><br>
+      <blockquote> <a href="#21">2.1 Project Description</a><br>
+        <a href="#22">2.2 Risks and Assumptions</a><br>
+      </blockquote>
+      <a href="#3">3. Problem Summary</a><br>
+      <blockquote>
+        <a href="#31">3.1 Problem Area</a><br>
+        <a href="#32">3.2 Justification</a><br>
+      </blockquote>
+      <a href="#4">4. Technical Description</a><br>
+      <blockquote>
+        <p><a href="#41">4.1 Details</a><br>
+        <a href="#42">4.2 Bugs/RFE's</a><br>
+        <a href="#43">4.3 Scope</a><br>
+        <a href="#44">4.4 Out-of-scope</a><br>
+        <a href="#45">4.5 Interfaces</a><br>
+        <a href="#46">4.6 Documentation Impact</a><br>
+        <a href="#47">4.7 Configuration/administration Impact</a><br>
+        <a href="#48">4.8 High Availability Impact</a><br>
+        <a href="#49">4.9 Internationalization</a><br>
+        <a href="#410">4.10 Packaging</a><br>
+        <a href="#411">4.11 Security Impact</a><br>
+        <a href="#412">4.12 Compatibility</a><br>
+        <a href="#413">4.13 Dependencies</a><br>
+        <a href="#414">4.14 Testing Impact</a></p>
+      </blockquote>
+      <p><a href="#5">5. References</a><br>
+      <a href="#6">6. Schedule </a> <br>
+      </p>
+      <p><br>
+      </p>
+      <h3><a name="1"></a>1. Introduction<br>
+      </h3>
+      <p><a name="11"></a><b>1.1. Project/Component Working Name</b></p>
+      <p>VisualVM plugin for MQ<br>
+      </p>
+      <p><a name="12"></a><b>1.2. Name(s) and e-mail address of
+Document
+Author(s)/Supplier</b></p>
+      <p>Nigel Deakin<br>
+nigel.deakin@oracle.com</p>
+      <p><a name="13"></a><b>1.3. Date of This Document</b></p>
+      <p>17 May 2010</p>
+      <h3><a name="2"></a>2. Project Summary</h3>
+      <p><br>
+      <a name="21"></a><b>2.1. Project Description</b></p>
+      <p>
+An unsupported plugin for VisualVM was released with MQ 4.4. 
+This is a simple GUI application which provides an easy way to display the monitoring and configuration attributes exposed by a MQ broker using JMX.
+It is provided as a plugin to the VisualVM tool included in Java 6. 
+This one-pager describes a second phase of work which will upgrade the plugin to be a normal supported component of MQ known provisionally as 
+the "MQ operational monitor" and add a number of additional features.
+
+      <p><a name="22"></a><b>2.2. Risks and Assumptions</b></p>
+      <p>This one-pager makes two working assumptions about the nature of this plugin:</p>
+      <ul>
+      <li>The plugin will be a standalone component, separate from any other Visual-VM-based tools offered by Glassfish.
+      <li>The plugin will be open source and made available to users using the same licence and support terms as the remainder of MQ
+      rather than being a closed-source value-added component available only to customers who have purchased support licences.
+      </ul>
+      <p>
+      <p>From a technical point of view, this project is low risk. Its technical feasibility has already been demonstrated by the development
+      of the current plugin. There is, however, a slight technical risk in the plugin being dependent on the capabilities of VisualVM,
+      Although this is a powerful development platform which allows a sophisticated tool to be developed rapidly,
+      experience suggests that there will be times when restrictions in a given version of VisualVM may prevent particular features being added 
+      or cause features to behave in a slightly different way than would be ideal.
+      <p>
+      <h3><a name="3"></a>3. Problem Summary</h3>
+      <p><a name="31"></a><b>3.1. Problem Area</b></p>
+      <p>An MQ installation is a complex thing. It may consist of a single broker or of a cluster of brokers.
+      The cluster might be "conventional" (service HA) or "enhanced" (data HA). 
+      The brokers in the cluster may be running on different machines.
+      And the brokers may be running in their own JVMs or embedded in the JVMs of Glassfish instances.
+      There is currently no tool that allows an operator to view the cluster as a whole and monitor the state of each 
+      broker within it.
+      
+      <p>Within an individual MQ broker, there is a large amount of runtime information available via the JMS API
+      that may be of interest to an administrator who is monitoring a MQ installation. For example,
+      for each queue or topic, there are forty possible runtime attributes that the user may wish to monitor.
+      There is currently no tool that allows these attributes to be easily viewed.
+      
+      <p>The MQ operational monitor is intended to address this gap in the functionality of MQ by provding a simple GUI tool
+      that can use used by an operator to monitor the heath and performance of an entire broker cluster, irrespective
+      of where the broker is running, and identify whether there are any problems that need intervention, either immediately (e.g. a broker has failed)
+      or at some point in the future (e.g. a broker is running short of memory, or a downstream system has failed causing messages to build up on a MQ queue).      
+      </p>
+      <p>
+      The key features of the tool will be as follows (this is not a complete list):
+      <p>
+      <ul>
+      <li>Provide a view of the whole cluster from within a single tool, even if brokers are running on different machines.
+      <li>Allow the health of each broker in the cluster to be confirmed at a glance. Colour will be used to show the health of a broker:
+      Green means that the broker is running. Red means the broker has failed. Other colours will be used to show a broker operating beyond
+      some defined operating limit, e.g. system memory usage (as defined by MQ)
+      has reached the orange, yellow or red state, or the broker log is recording error messages. 
+      <li>Provide a simple way to view the JMS entities being managed by the broker: connections, producers, consumers, transactions, queues, topics, messages stc.
+      <li>Provide a easy way to view the current value of any monitoring attribute currently exposed via MQ's JMX API, such as memory usage, queue depth.
+      <li>Allow simple graphs to be generated which show how a particular monitoring attribute varies over time.
+     
+      </ul>
+      
+      <p><a name="32"></a><b>3.2. Justification</b></p>
+      <p>This project is necessary because it fills a gap in the toolset available to MQ administrators.
+      <p>
+      <h3><a name="4"></a>4. Technical Description</h3>
+      <p><a name="41"></a><b>4.1. Details</b></p>
+
+<p>This project will be based on the existing plugin for VisualVM that was released, in an unsupported form, and without releasing the source code,
+alongside MQ 4.4.
+
+<p>An overview of the existing plugin can be found at 
+<a href="http://mq.java.net/4.4-content/visual-vm-plugin.html">http://mq.java.net/4.4-content/visual-vm-plugin.html</a>.
+The plugin can be downloaded from that page.
+
+<p>A "quick start guide" for the existing plugin can be found at <a href="http://mq.java.net/4.4-content/visualvm/quickstartguide/index.html">
+http://mq.java.net/4.4-content/visualvm/quickstartguide/index.html</a>. This contains lots of screenshots of the existing plugin.
+
+<p>VisualVM is an open source GUI application from Oracle. It is described as an "all-on-one java troubleshooting tool". It contains various simple 
+tools to monitor the memory usage and performance of JVMs but its main significant is that it is also an extensible platform for writing more specialised
+"plugins" for monitoring and performance analysis. 
+
+<p>A key characteristic of all VisualVM applications is that they monitor a JVM running on the local machine or on some remote machine, using JMX.
+If  the JVM being monitored is running on the local machine, it is automatically detected by VisualVM. 
+If the JVM being monitored us running on a remote machine, the user needs to explicitly specify the JVM to be monitored, e.g. by providing a JMX URL.
+<p>
+The VisualVM project website is <a href="https://visualvm.java.net/">https://visualvm.java.net/</a> and the latest versions of VisualVM can be
+downloaded from that site. VisualVM is also included in the Java SE JDK. Usually the version available from <a href="https://visualvm.java.net/">https://visualvm.java.net/</a>
+is more recent than the version included in the JDK. The existing plugin for MQ was built using the version of VisualVM included in Java 6 (version 1.6.0_14 or later).
+However further development of the MQ plugin will rely on new features of VisualVM for graphing which are currently available only in VisualVM 1.2.2, which must
+be downloaded from <a href="https://visualvm.java.net/">https://visualvm.java.net/</a>. 
+
+<p>From a user's point of view, the proposed plugin will behave as follows:
+
+<ul>
+<li>Automatically display a list of all the MQ brokers running on the local system, irrespective of whether they are running in their own JVM
+or embedded in a Glassfish JVM. 
+<li>If the broker is part of a cluster, the cluster is shown as a parent node with the individual brokers in the cluster as subnodes.
+<li>All brokers in a cluster are shown, even if they are running on remote machines. To allow remote brokers to be monitored, the user
+will automatically be prompted for the broker administrator username and password.
+<li>If the use double-clicks on the node that represents a broker, the node expands further to show subnodes representing various aspects of the broker. 
+These correspond to the MBeans exposed by the broker, and are: 
+<ul>
+<li>Cluster members
+<li>Running services (jms, ssl, http etc)
+<li>Connections to the broker
+<li>JMS consumers in use
+<li>JMS producers in use
+<li>JMS queues and topics
+<li>Messages on a queuye or topic, including message attributes and, if appropriate, payload.
+<li>Open XA transactions
+<li>A view on the log file
+</ul>
+Clicking on each of these opens a graphical pane that provides details of the chosen aspect.
+</ul>  
+</p>
+
+For a more detailed description of the proposed plugin, see the following documents:
+
+      <ul>
+      <li>Overview of the existing plugin: 
+<a href="http://mq.java.net/4.4-content/visual-vm-plugin.html">http://mq.java.net/4.4-content/visual-vm-plugin.html</a>.
+The plugin can be downloaded from that page.
+<li>"Quick start" user guide for the existing plugin: <a href="http://mq.java.net/4.4-content/visualvm/quickstartguide/index.html">
+http://mq.java.net/4.4-content/visualvm/quickstartguide/index.html</a>.
+<li>Proposed list of enhancements to be added to existing plugin: <a href="http://mq.java.net/4.5-content/visualvm-plugin/VisualVMPluginStage2.html">
+http://mq.java.net/4.5-content/visualvm-plugin/VisualVMPluginStage2.html</a>.
+      </ul>
+
+      <p> <a name="42"></a><b>4.2. Bug/RFE Number(s)</b></p>
+      <p>
+None.
+
+
+      <p> <a name="43"></a><b>4.3. In Scope</b></p>
+      <p>The development of the MQ operational monitor GUI, as a plugin for VisualVM</p>
+      <p> <a name="44"></a><b>4.4. Out of Scope</b></p>
+      <p>
+      <ul>
+      <li>VisualVM itself. 
+      <li>Any monitoring information not related to a MQ broker, such as information about MQ clients or Glassfish instances (apart from showing when
+      a MQ broker is running embedded in a Glassfish instance)
+      <li>This tool is aimed at being a passive monitoring tool rather than a tool for changing the state of the broker. 
+      Although the MQ JMX API does provide a small number of JMX operations for changing the state of the broker (e.g. restarting it)
+      this tool will not provide access to those operations. This is because the tool will be so easy to use that 
+      a careless or inexperienced operator might inadvertently damage the running system. For example,
+      no authentication is required to monitor a broker running on the local machine.
+      In order to achieve adoption, this tool needs to be positioned as being safe for non-expert operators to use.
+      It is therefore proposed to omit any tools that might damage the operation of the system, at least from this particular release.
+      </ul>
+      <p> <a name="45"></a><b>4.5. Interfaces</b></p>
+
+      <p> <b>4.5.1 Public Interfaces</b></p>
+<p>This project does not introduce any new public interfaces, apart from the GUI itself.
+<p>
+      <b>4.5.2 Private interfaces</b></p>
+<p>This project does not introduce any new private interfaces.
+<p>
+<b>4.5.3 Deprecated/Removed Interfaces</b></p>
+<p>This project does not deprecate or remove any new private interfaces.
+
+      <p> <a name="46"></a><b>4.6. Doc Impact</b></p>
+      <p>The new tool will require full documentation, probably in a new chapter of the MQ administration guide.
+      <p> <a name="47"></a><b>4.7. Admin/Config Impact</b></p>
+      <p>The new tool will offer a new way for system administrators and others to monitor a running MQ installation.
+      All the existing tools for administration and monitoring (imqcmd, imqadmin, etc) will remain.
+      The system administrator will not be required to use the new tool if the existing tools are adequate. </p>
+      <p> <a name="48"></a><b>4.8. HA Impact</b></p>
+      <p>This tool is expressly intended to allow the high availability and clustering aspects of MQ to be monitored more easily.
+      However this does not place any new requirement on those aspects. 
+      <p> <a name="49"></a><b>4.9. I18N/L10N Impact</b>inks</p>
+      <p>This tool has a GUI and displays text to the user. This will need to be localised as required.</p>
+      <p> <a name="410"></a><b>4.10. Packaging, Delivery &amp; Upgrade</b></p>
+      <p> <b>4.10.1 Packaging</b></p>
+
+      <p>The plugin consists of a single file <tt>com-sun-messaging-visualvm.nbm</tt>.
+      it is proposed that this be packaged in a new IPS package mq-monitor.
+      However if this is considered unnecessary for a single file it can be packaged in one of the existing IPS packages.
+      <p> <b>4.10.2 Delivery</b></p>
+      <p>The plugin file will be delivered to users in two ways:</p>
+      <ul>
+      <li>A copy of the file will be placed in the MQ installation in <tt>mq/monitor/com-sun-messaging-visualvm.nbm</tt>.
+      To install this, the user will need to download and install VisualVM 1.2.2 and then use 
+      manually install the plugin into their VisualVM installation in the standard VisualVM way.
+      <li>A copy of the file will also be placed in the VisualVM 1.2.2 plugin repository.
+      This allows by VisualVM 1.2.2 user to download and install it directly from the VisualVM update centre.
+      </ul>
+      <p> <b>4.10.3 Upgrade and Migration</b></p>
+      <p>
+      Users of the existing version of the plugin will need to uninstall it before they install the new version.
+      Apart from this, this project raises no upgrade or migration issues.      
+      </p>
+      <p> <a name="411"></a><b>4.11. Security Impact</b></p>
+      <p>This tool does not interact with any security-related APIs or interfaces.
+      It does not expose any new ports</p>
+      <p>This is a monitoring tool which is intended to be safe for use by non-expert administrators.
+      For this reason it deliberately omits features which will change the state of the broker (see <a href="#44">Section 4.4</a> above).
+      <p>Because of the nature of the JMX API, no authentication is required to monitor brokers running on the same machine as the tool.
+      This means that anyone with access to the machine will be able to view destination names, 
+      view message contents, and obtain other potentially sensitive information. Note that this does not introduce a new vulnerability:
+      any application using the MQ JMX API (such as JConsole) already has  this capability.
+      <p>The tool uses JMX to monitor brokers running on remote (i.e. other) machines. 
+      In order to obtain the JMX URL of the remote broker, the tool connects to its port mapper first.
+      This means that any firewall in between the broker and VisualVM should not prevent port mapper or JMX traffic,
+      by opening the following ports:
+      <ul>
+      <li>Broker port mapper port
+      <li>JMX RMI connector port (this is dynamically-allocated by default: would need to define static port using <tt>imq.jmx.connector.jmxrmi.port</tt>).
+      </ul>
+      
+      <p> <a name="412"></a><b>4.12. Compatibility Impact</b></p>
+      <p> 
+      This tool does not expose any private or public interfaces (other than a GUI),
+      No other components are dependent on this one, so there is no possibilty of the changes
+      described here "breaking" another component.
+      <p>
+      This tool is intended to be compatible with older versions of MQ than 4.5 that support the JMX API,
+      so long as the broker is run using a Java 6 JVM, or, in the case of a Java 5 JVM, that JMX is enabled
+      using the appropriate JVM parameters.
+
+      <p> <a name="413"></a><b>4.13. Dependencies</b></p>
+      <p> <b>4.13.1 Internal Dependencies</b></p>
+      <p>This tool is dependent on the MQ JMX API, since this is how the tool connects to a MQ broker.
+      <p> <b>4.13.2 External Dependencies</b></p>
+      <p>
+      This tool is dependent on VisualVM (<a href="https://visualvm.java.net">https://visualvm.java.net</a>), version 1.2.2.
+      This is an Oracle product. It is open source. It is released under the GPL 2 licence with classpath exception:
+      <a href="https://visualvm.java.net/legal/gplv2+ce.html">https://visualvm.java.net/legal/gplv2+ce.html</a>
+      
+      </p>
+      <p> <a name="414"></a><b>4.14. Testing Impact</b></p>
+      <p>It is expected that this product be tested manually by following a detailed test script.</p>
+      <h3><a name="5"></a>5. Reference Documents</h3>
+      <p>
+      <ul>
+      <li>Overview of the existing plugin: 
+<a href="http://mq.java.net/4.4-content/visual-vm-plugin.html">http://mq.java.net/4.4-content/visual-vm-plugin.html</a>.
+The plugin can be downloaded from that page.
+<li>"Quick start" user guide for the existing plugin: <a href="http://mq.java.net/4.4-content/visualvm/quickstartguide/index.html">
+http://mq.java.net/4.4-content/visualvm/quickstartguide/index.html</a>.
+<li>Proposed list of enhancements to be added to existing plugin: <a href="http://mq.java.net/4.5-content/visualvm-plugin/VisualVMPluginStage2.html">
+http://mq.java.net/4.5-content/visualvm-plugin/VisualVMPluginStage2.html</a>.
+      </ul>
+      <h3><a name="6"></a>6. Schedule</h3>
+      <p><b>6.1. Projected Availability</b></p>
+      <p>For the milestone schedule, see feature JMS-22 in the <a href="https://glassfish.java.net/wiki-archive/3.1JMS.html#section-3.1JMS-TaskList">task list</a>.      
+This shows handoff to QA expected in Glassfish 3.1 Milestone 5. It is proposed that earlier releases be made to QA to allow a test plan to be developed
+and to allow testing to start at an earlier stage.
+<p>These changes are expected to be suitable for production when Glassfish 3.1 is suitable for production.
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

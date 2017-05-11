@@ -1,0 +1,223 @@
+<html>
+<TITLE>
+Enhancements to the MQ plugin for VisualVM
+</TITLE>
+<BODY style="width:1000px">
+<H2>
+<CENTER>
+Enhancements to the MQ plugin for VisualVM
+<br><small>Version 3, 17th May 2010</small>
+</CENTER>
+</H2>
+
+<DL>
+
+<p>This is a summary of the proposed changes to the MQ plugin for VisualVM for MQ 4.5 / Glassfish 3.1.
+Please read in conjunction with the <a href="http://mq.java.net/4.5-content/mq-visualvm-plugin-one-pager.html">one-pager</a>.
+
+<P><DT><b>Synopsis: </b><DD>
+An unsupported version of the MQ plugin for VisualVM was made available with MQ 4.4. 
+This document lists some enhancements to the plugin to make it more useful and easier to use. 
+
+<P><DT><b>Description:</b><DD>
+
+<p>The following enhancements are proposed:</p>
+
+<ul>
+<li><a href="#cluster">Improved display of cluster information</a>
+<li><a href="#navigation">Allow navigation between host, connection, destination, producer and consumer</a>
+<li><a href="#browsing">Destination browsing</a>
+<li><a href="#charting">Charting</a>
+<li><a href="#misc">Miscellaneous improvements</a>
+</ul>
+
+<p>The following enhancements are also considered desirable, but due to resource constraints are
+currently out of scope for this phase of work:</p>
+
+<ul>
+<li><a href="#summary">Critical parameter status summary</a>
+<li><a href="#logging">Access to logging data</a>
+</ul>
+
+
+<p><b><a name="cluster"/>Improved display of cluster information</b></p>
+
+<p>When the user starts VisualVM with the MQ plugin installed, VisualVM will identify any clustered brokers running
+on the local machine and create a new root-level node representing that cluster. </p>
+
+<p>For HA clusters the cluster node is labelled with the cluster ID is shown.
+For conventional clusters, where cluster ID is not used, the cluster node is simply labelled with the word "cluster".</p>
+
+<p><img src="VisualVM1.bmp" /></p>
+	
+<p>The cluster node can be expanded to display all the brokers in the cluster.
+For those brokers which are running on the local machine, a "broker" node is created which behaves
+identically to that created in the current version of the plugin, except that it is placed under
+the cluster root node rather than the application node. 
+
+<p>Note that the application node is still displayed and labelled as a "Message Queue Broker", 
+allowing other plugins to be used to monitor its memory usage, etc,
+but has no special MQ functionality apart from being identified as a MQ broker.
+
+<p><img src="VisualVM7.bmp" /></p>
+
+<p>The list of brokers in the cluster is determined by aggregating the brokers listed in the cluster monitor MBean 
+of each local broker, and so may include brokers running on other machines.
+
+<p><img src="VisualVM2.bmp"/>
+	
+<p>Brokers running on other machines are initially shown simply as "disconnected": 
+ 	
+<p><img src="VisualVM3.bmp"/>
+	
+<p>If the user clicks on a disconnected broker, they will be prompted for username and password and a JMX connection is created.
+This creates the subnodes under the broker node to give full access to monitoring information. See how the disconnected broker that was
+highlighted in the previous screenshot is now shown as connected, with a "+" icon to provide access to the new subnodes:</p>	
+
+<p><img src="VisualVM4.bmp"/>
+
+<p>Under each connected broker is a node called "cluster". This shows that broker's view of the cluster. It has a subnode representing each broker in the cluster. 
+If the broker has successfully established a cluster connection to that broker it is represented by a green icon and its state is shown as "OPERATING":
+	
+<p><img src="VisualVM5.bmp"/>
+	
+<p>If one of the other brokers in the cluster is not running or has failed, the icon is shown in red and its state shown as "BROKER DOWN". 
+If the broker subsequently restarts and a cluster connection is established the icon
+will change to green and its state changes to "OPERATING"
+				
+<p><img src="VisualVM6.bmp"/> 
+
+<p>The icon for a broker (whether connected or not) should be shown in agreen or red colour that reflects 
+whether that broker is actually running, as determined by periodically connecting to its portmapper (no user/password required).
+When a broker goes down, the broker node should remain but change back to "disconnected" and its colour should change to red.
+When the broker goes back up, it should change to "green" and become available for connection once more.
+
+<p><b><a name="navigation"/>Allow navigation between host, connection, destination, producer and consumer</b></p>
+
+<p>This requirement is not fully-defined. But there is a need to be able to see the relationship between these entities more clearly. Ideally the tool should allow the user to:
+
+<ul>
+<li>Group connections by host
+<li>Group producers/consumers by connection 
+<li>Group producers/consumers by destination 
+</ul>
+
+<p><b><a name="browsing"/>Destination browsing</b></p>
+
+<p>The user should be able to browse all the messages on a destination and inspect individual messages.
+
+<p><b><a name="charting"/>Charting</b></p>
+
+<p>Each table of monitoring information (e.g. the destination monitor list) will offer the ability to display a given attribute value in a chart
+which is updated whenever the table is updated (2 seconds by default). The chart will look something like this:
+
+<p><img src="VisualVM8.bmp"/> 
+
+<p>To keep things simple, each chart will display a single attribute for several rows in the table. 
+For example, the above table shows the NumMsgs attribute for two specific destinations.
+
+<p>If more than one attribute needs to be charted, the user can open a second chart.
+	
+<p><b><a name="misc"/>Miscellaneous improvements</b></p>	
+
+<p>In addition to the above, the following miscellaneous improvements will be added:
+
+<ul>
+<li><p><b>More obvious subview labels.</b> In the current version of the plugin, each MBean is shown using a separate subview, with the subviews given names such as "destination manager (config)" for static configuration
+information common to all destinations and "destination list (monitor)" for dynamic monitoring info for each destination. These descriptions reflect the MBean names, which means they are a bit obscure.
+They should be replaced by more obvious names. 
+<li><p><b>Review attributes displayed by default.</b> Many tables allow large numbers of attributes to be displayed. We need to review which attributes are displayed by default see see if any changes are needed. For example, the
+connection list should show clientID by default. 
+<li><p><b>Save preferences.</b> Currently the user can choose which attributes are displayed. They can also change the column order and column width. It should be possible to save this information
+in the logged-in user's profile.
+<li><p><b>Show all broker properties.</b> Enhance the broker view to allow all broker properties listed in the manual to be viewed. 
+They should be presented in the same groups in which they are listed in the admin guide. If possible, properties should be shown on the relevant tab: 
+e.g. logging properies shown on the existing "log" tab.
+<li><b>Configure refresh interval.</b> Allow the refresh interval for each table of attributes to be configured. 
+Currently the refresh interval is 2 seconds and cannot be changed, though automatic refreshing can be turned on and off.
+</ul>
+
+<p><b><a name="summary"/>Critical parameter status summary</b></p>
+
+<i>This enhancement is out of scope for this one-pager but is included here for completeness and so that it may be considered
+for implementation in the future.</i>
+
+<p>It is proposed that a new "critical information panel" be added which shows in a single place a selection of monitoring properties
+which are considered critical.
+
+<p>When a parameter shown on this panel deviates from some defined "normal" value it would be highlighted in
+some way and perhaps the broker icon could be changed to draw attention to this.
+
+<p>Examples of critical properties:
+
+<ul>
+<li>Whether flow control is active
+<li>Whether memory limits are exceeded
+<li>Whether destinations are full
+</ul>
+
+<p>The idea is that an operator, who thinks there's something amiss with the JMS service 
+but doesn't know what, can start the tool and identify quickly those aspects of broker operation
+which are operating outside of the normal parameters. This would allow the operator quickly to 
+correct the situation and/or decide that the problem(s) are elsewhere.
+
+<p>The list of critical properties, and the bounds of normal operation, might be user-configurable.
+ 
+ <p><b><a name="logging"/>Access to logging data</b></p>
+
+<i>This enhancement is out of scope for this one-pager but is included here for completeness and so that it may be considered
+for implementation in the future.</i>
+
+<p>The plugin will provide quick and convenient access to logging data, to allow the operator to find out quickly whether the broker has logged
+any errors or warnings recently which may require attention.
+
+<p>When a new logging message arrives after the plugin has been started it will be displayed on an appropriate tab. The user will
+be able to choose the level of logging that they wish to see. This feature would use the 
+<a href="http://download.oracle.com/docs/cd/E19798-01/821-1797/6nmooe00o/index.html">logging notification feature of the JMX API</a>. 
+<p>When a critical (or equivalent) error message is logged, this will be highlighted on the logging tab and perhaps by changing the broker icon.
+Since this would only be possible for errors logged after the plugin has been started this would be of limited value, so 
+further investigation is needed to determine how best to provide JMX access to messages which were logged prior to starting the VisualVM plugin.
+
+<P><DT><b>Non-feature:</b><DD>
+
+<p>The new features described in this document are for monitoring only. 
+They will not include the ability to change the state of the broker. 
+
+<p>None of the following operations supported by the JMX API will be possible through this tool:
+
+<ul>
+<li>Requesting the broker to reload its cluster configuration file
+<li>Broker shutdown, restart, quiesce, unquiesce, takeover and resetMetrics of a broker
+<li>Creating, pausing, compacting, resuming and purging of a destination
+<li>Purging a durable subscription
+<li>Commit or rollback of a transaction
+</ul>
+
+<p>None of the following non-JMX operations will be possible through this tool:
+
+<ul>
+<li>Changing individual messages
+<li>Deleting individual messages
+</ul>
+
+<p>No new JMX monitoring features will be added.
+
+<p>Other items described above but stated explicitly as being "out of scope" will not be included:
+
+<ul>
+<li>Critical parameter status summary
+<li>Access to logging data
+</ul>
+
+<p>Note that this does not preclude the adding of these features in a later version of the plugin.
+
+
+<P><DT><b>Author/Date:</b><DD>
+<p>Version 1: Nigel Deakin, 20th Jan 2010<br>
+Version 2: Nigel Deakin, 26th Jan 2010<br>
+Version 3: Nigel Deakin, 15th May 2010
+</DL>
+<P>
+<i>template version: @(#)onepager.txt	1.10 04/03/18</i>
+</BODY>
+</HTML>

@@ -1,0 +1,76 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<title>MQ 4.4: Inprocess Broker Improvements</title>
+</head><body>
+<h2>
+<center>
+			<p>New Work Analysis            </p>
+  </center>
+</h2>
+
+<dl>
+<p align="center">Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. </p><dt><b>Synopsis: </b></dt><dd>
+	Support the ability for a broker to run "in process" with any client.
+
+<p></p></dd><dt><b>Quick Questions:</b></dt><dd>
+<ul><li>Difficulity: Easy</li>
+    </ul>
+
+<p></p></dd><dt><b>Description:</b></dt><dd>
+     A new service will be added to the broker that allows messages from the client to be
+     directly routed inside the client.<p>
+
+     A client application will start the broker "in process" using supported api's and
+     then send messages to this service using a different connection implementation.
+              
+`
+<p></p></dd><dt><b>Requestor:</b></dt><dd>
+        JMSJCA RA and OpenMQ users
+
+<p></p></dd><dt><b>Non-feature:</b></dt><dd>
+	Does not support memory management or flow control for the broker
+
+<p></p></dd><dt><b>Dependencies:</b></dt><dd>
+        None</dd><dd><p></p></dd><dt><b>Phases:</b></dt><dd>
+        Single phase
+
+<p></p></dd><dt><b>Direction of Implementation:</b></dt><dd>
+	Code will be development in-house. Functionality will be split between broker and client engineers.
+
+<p></p></dd><dt><b>Interfaces:</b></dt><dd>
+	Will add new client apis 
+
+<p></p></dd><dt><b>Test Impact:</b></dt><dd>
+	Will be easy to test. All tests can be automated.
+
+<p></p></dd><dt><b>Doc Impact:</b></dt><dd>
+	new feature will require documentation in client and admin guides
+
+<p></p></dd><dt><b>Support Impact:</b></dt><dd>
+	minimal support impact
+
+<p></p></dd><dt><b>Installation Impact:</b></dt><dd>
+	None`
+
+<p></p></dd><dt><b>Admin/Config Impact:</b></dt><dd>
+	No new admin functionally
+
+<p></p></dd><dt><b>I18N/L10N Impact:</b></dt><dd>
+	None (only log strings)
+
+<p></p></dd><dt><b>Security Impact:</b></dt><dd>
+        No security policys or class loader will be set up for the broker.  This means that the client and the
+        broker can affect each other. It is unlikely that this will cause a security issue since they will be
+        operating as a single process.
+
+<p></p></dd><dt><b>Risks:</b></dt><dd>
+	No obvious risks
+
+
+<p></p></dd><dt><b>Author/Date:</b></dt><dd>
+	Linda Schneider  1/9/09
+</dd></dl>
+<p align="center">Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. </p>
+<p><i>template version: @(#)onepager.txt	1.10 04/03/18</i>
+</p>
+</body></html>

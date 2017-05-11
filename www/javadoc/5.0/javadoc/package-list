@@ -1,0 +1,8 @@
+com.sun.messaging
+com.sun.messaging.bridge.api
+com.sun.messaging.jms
+com.sun.messaging.jms.management.server
+com.sun.messaging.jms.notification
+com.sun.messaging.xml
+javax.jms
+javax.xml.messaging

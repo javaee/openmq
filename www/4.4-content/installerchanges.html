@@ -1,0 +1,293 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>MQ 4.4 Installer Changes</title>
+</head>
+<body>
+<h2>
+<center> New Work Analysis
+</center>
+</h2>
+<dl>
+<dt>
+  <div align="center">Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. </div>
+</dt>
+  <dt><b>Synopsis: </b></dt>
+  <dd> Changes to the installers for OpenMQ 4.4 and SJSMQ 4.4. </dd>
+  <dt><b>Quick Questions:</b></dt>
+  <dd>
+    <ul>
+      <li>Difficulity: Medium</li>
+    </ul>
+  </dd>
+</dl>
+<p>&nbsp;</p>
+<dl>
+  <dt><b>Description:</b></dt>
+  <dd> In MQ 4.3, there was a set of file-based installers that
+    installed zip files for all platforms for OpenMQ and there was a
+    corresponding set of native installers for the SJSMQ product.
+    <p> For MQ 4.4, we will be making some changes to the installers.
+    Here is a summary of the changes to the installers: </p>
+    <ul>
+      <li>The OpenMQ installers will install IPS pkgs rather than zip
+          files. Except for the
+          location of the shared components, the final bits layed out onto the
+          filesystem should be similar
+      to what you see in MQ 4.3.</li>
+      <li>The SJSMQ solaris and linux installers installed native pkgs
+          for MQ 4.3, but for MQ 4.4,
+      they will now install IPS pkgs.</li>
+      <li>The SJSMQ windows and AIX installers installed zip files in
+          MQ 4.3, but will now install IPS.
+          Again, except for the location of the shared components, the final bits
+          layed out onto the
+      filesystem should be similar to what you see in MQ 4.3.</li>
+      <li>We will continue to build Solaris pkgs and RedHat RPMs but
+          those bits will not be
+          available in a GUI installer. Native pkgs will still be available only
+          for supported customers
+          who are not ready to migrate to IPS. These pkgs will be posted to
+          usr.sfbay, a support
+      server, and possible a JES server for former JES customers.</li>
+      <li>Text support in the installer will be dropped in MQ 4.4. The
+          text mode libraries will
+          still be in the installer image but the "-t" text option will no longer
+          be public. If text
+      mode works, then great, otherwise is it no longer supported.</li>
+      <li>If we have time, we'd like to get rid of the OI engine-wrapper
+          script and call the OI EngineBootstrap class directly to fix i18n bugs and
+          get rid of .vbs.
+      <li>Still under investigation is how many installers we will
+            need. At most, we will
+            need:
+        <ul>
+          <li>OpenMQ Sparc, X86, Linux, AIX, Windows Installer (IPS)</li>
+          <li>SJSMQ Sparc, X86, Linux, AIX, Windows Installer (IPS)</li>
+          <li>OpenMQ Unix Installer (IPS)</li>
+          <li>The installers will not install a JDK/JRE. A user is
+              required to have a JRE on the
+          system in order for the installer to run.</li>
+          <li>For the installers that install the C-API pkg, it should
+              also install an nss-libs and
+          nss-utils IPS pkgs.</li>
+an IPS pkg available.
+        </ul>
+        <p> If we can build the Unix installers to bootstrap the
+            correct C-API pkg and the Server
+            Native package, then we might be able to get away with a Unix-only
+            installer. Otherwise, we'll
+            build a separate installer for sparc, x86, linux, AIX for OpenMQ and
+        SJSMQ. </p>
+      </li>
+    </ul>
+    <p> </p>
+    <p>
+    <table border="1">
+      <caption><span style="font-weight: bold;">MQ Installers</span><br>
+      </caption><tbody>
+        <tr>
+          <th>Platform<br>          </th>
+          <th>Installer Type</th>
+          <th>MQ 4.3 Format<br>          </th>
+          <th>MQ 4.4 Format<br>          </th>
+          <th style="vertical-align: top;">Update Center<br>
+            Support<br>          </th>
+        </tr>
+        <tr>
+          <td rowspan="2">Solaris/SPARC</td>
+          <td style="vertical-align: top;" rowspan="1" colspan="1">OpenMQ<br>          </td>
+          <td colspan="1" style="vertical-align: top;">Zip-Based<br>          </td>
+          <td colspan="1" style="vertical-align: top;">IPS<br>          </td>
+          <td style="vertical-align: top;">Yes<br>          </td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;">SJSMQ<br>          </td>
+          <td style="vertical-align: top;">SVR4 Pkgs<br>          </td>
+          <td style="vertical-align: top;">IPS<br>          </td>
+          <td style="vertical-align: top;">Yes</td>
+        </tr>
+        <tr>
+          <td rowspan="2">Solaris/x86</td>
+          <td>Open MQ<br>          </td>
+          <td>Zip-Based<br>          </td>
+          <td>IPS<br>          </td>
+          <td style="vertical-align: top;">Yes</td>
+        </tr>
+        <tr>
+          <td>SJSMQ<br>          </td>
+          <td>SVR4 Pkgs<br>          </td>
+          <td>IPS<br>          </td>
+          <td style="vertical-align: top;">Yes</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: middle;" rowspan="2">Windows<br>          </td>
+          <td>OpenMQ<br>          </td>
+          <td>Zip-Based<br>          </td>
+          <td>IPS</td>
+          <td style="vertical-align: top;">Yes</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;">SJSMQ<br>          </td>
+          <td style="vertical-align: top;">Zip-Based<br>          </td>
+          <td style="vertical-align: top;">IPS<br>          </td>
+          <td style="vertical-align: top;">Yes</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;" rowspan="2">Linux<br>
+            <br>          </td>
+          <td style="vertical-align: top;">OpenMQ<br>          </td>
+          <td style="vertical-align: top;">Zip-Based<br>          </td>
+          <td style="vertical-align: top;">IPS<br>          </td>
+          <td style="vertical-align: top;">Yes</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;">SJSMQ<br>          </td>
+          <td style="vertical-align: top;">RPMs<br>          </td>
+          <td style="vertical-align: top;">IPS<br>          </td>
+          <td style="vertical-align: top;">Yes</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;" rowspan="2">AIX<br>          </td>
+          <td style="vertical-align: top;">OpenMQ<br>          </td>
+          <td style="vertical-align: top;">Zip-Based<br>          </td>
+          <td style="vertical-align: top;">IPS<br>          </td>
+          <td style="vertical-align: top;">No<br>          </td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;">SJSMQ<br>          </td>
+          <td style="vertical-align: top;">Zip-Based<br>          </td>
+          <td style="vertical-align: top;">IPS<br>          </td>
+          <td style="vertical-align: top;">No<br>          </td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;">UNIX<br>          </td>
+          <td style="vertical-align: top;">OpenMQ<br>          </td>
+          <td style="vertical-align: top;">Zip-Based<br>          </td>
+          <td style="vertical-align: top;">IPS <br>          </td>
+          <td style="vertical-align: top;">No<br>          </td>
+        </tr>
+        </tbody>
+    </table>
+    </p>
+  </dd>
+  <dt><b>Requestor:</b></dt>
+  <dd> With the move to the IPS pkging format, our installers will need
+    to migrate over to installing IPS instead of zips. In addition, as IPS
+    becomes more prevalent, native install formats will gradually be phased
+  out and we will move our native installers over to IPS installers. </dd>
+  <dt><b>Non-feature:</b></dt>
+  <dd> This one-pager does not describe the IPS breakdown and exact
+    file layout. See the <a
+ href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/ips.html">IPS
+      Packaging one-pager</a> and IPS spec for more info on the IPS
+    breakdown.&nbsp; <br>
+  </dd>
+  <dd><br>
+  </dd>
+  <dd>This also does not describe our deliverables that are not
+    installer-based (e.g., deliverables to GFv3, JES, OpenSolaris).<br>
+  </dd>
+</dl>
+<dl>
+  <dt><b>Dependencies:</b></dt>
+  <dd>
+    <ul>
+      <li>OpenInstaller</li>
+      <li>IPS Packaging</li>
+    </ul>
+  </dd>
+  <dt><b>Competitive Analysis:</b></dt>
+  <dd> <br>
+  </dd>
+  <dt><b>Phases:</b></dt>
+  <dd>
+    <ul>
+      <li>Investigate how to bootstrap the C-API and Server Native pkg
+from our installer. What if
+they are on MacOS where there is no C-API? </li>
+      <li>Changes to IPS files.</li>
+      <li>Create OpenMQ installers for each platform to install IPS.</li>
+      <li>Create SJSMQ installers for each platform to install IPS.</li>
+    </ul>
+  </dd>
+  <dt><b>Direction of Implementation:</b></dt>
+  <dd>We will continue to use the OpenInstaller framework to install
+the product initially.
+Any updates to the product will probably be done through the Update
+Framework. </dd>
+  <dt>&nbsp;</dt>
+  <dd>&nbsp;</dd>
+  <dt><b>Interfaces:</b></dt>
+  <dd>
+    <ul>
+      <li>New installer bundle names.</li>
+      <li>Default locations for installers.</li>
+    </ul>
+  </dd>
+  <dt><b>Test Impact:</b></dt>
+  <dd>Testing is very similar to MQ 4.3 installer testing.
+We will have OpenMQ installers for each platform and SJSMQ installers
+for each platform.
+For any installers that used to install MQ 4.3 zips, the final layout
+should
+look similar except for the shared component (nss) locations.&nbsp; On
+platforms where Update Center is supported, testing should be done to
+update the product (if updates posted) to the latest bits.<br>
+  </dd>
+</dl>
+<dl>
+  <dt><b>Doc Impact:</b></dt>
+  <dd> Install Guide will need to be updated. The installer screens
+probably won't change but we will have to change install locations,
+SVR4 pkgs and rpms -&gt; IPS pkgs, shared components installed, how to
+get updates. We will also need to document the note under Issues (see
+below).
+    <p></p>
+  </dd>
+  <dt><b>Support Impact:</b></dt>
+  <dd>
+    <p></p>
+    <br>
+  </dd>
+  <dt><b>Installation Impact:</b></dt>
+  <dd> This is installation.
+    <p></p>
+  </dd>
+  <dt><b>Admin/Config Impact:</b></dt>
+  <dd> N/A.
+    <p></p>
+  </dd>
+  <dt><b>I18N/L10N Impact:</b></dt>
+  <dd> Any new installer strings will need to be i18n'ed.
+    <p></p>
+  </dd>
+  <dt><b>Security Impact:</b></dt>
+  <dd> N/A.
+    <p></p>
+  </dd>
+  <dt><b>Risks:</b></dt>
+  <dd> OI has not been staffed for a while now so bugs are not being
+fixed.
+    <p></p>
+  </dd>
+  <dt><b>Issues:</b></dt>
+  <dd> OI writes out install data (product version, oi versions) to the
+system. If a user updates their product through the Update Center, the
+product version in OI and the product version actually installed on the
+system will get out of sync.
+    <p></p>
+  </dd>
+  <dt><b>See Also:</b></dt>
+  <dd>
+    <p></p>
+    <br>
+  </dd>
+  <dt><b>Author/Date:</b></dt>
+  <dd> [Jill Nakata 01/14/2009] </dd>
+</dl>
+<p>
+Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. </p>
+<p><i>template version: @(#)onepager.txt 1.10 04/03/18</i></p>
+</body>
+</html>

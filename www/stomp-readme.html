@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>New in Open MQ 4.3: STOMP</title>
+<link rel="stylesheet" media="all" type="text/css" href="style.css" />
+
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache" />
+<META HTTP-EQUIV="Expires" CONTENT="-1" />
+<!-- hide the project info -->
+<style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+.style1 {font-size: small}
+</style>
+</head>
+
+<body>
+<p>User example for STOMP integration with Open MQ. This was introduced in build 2 of Open MQ 4.3. </p>
+<h3>Support for STOMP Example</h3>
+<p>Please note: The Open MQ Project (members, sponsors, or underwriters) does not support the STOMP runtime (i.e. we are not committers, nor authors, of the STOMP project). Through the community (i.e. <a href="mailto:users@mq.java.net">users@mq.java.net</a> or the <a href="http://forum.java.sun.com/forum.jspa?forumID=711">Open MQ Forum</a>), we will do our best to help answer questions and offer our experience, however you may need to refer to the STOMP project (<a href="http://stomp.codehaus.org">stomp.codehaus.org</a>) for additional details and possibly for assistance with STOMP configuration and internals. </p>
+<p>This example is provided on an As Is Basis. You are welcome to use this example, but your use is entirely at your own risk. </p>
+<h3>Using the example</h3>
+<p>First, install the promoted build (build 2 or higher), then you will find this example in the directory: &lt;Need Directory where StompClient.html will ultimately reside&gt; . The following README, and a companion C# example are available in <a href="stomp-example.zip">this .zip archive</a> (right click and choose save as) </p>
+<hr width="45%" size="5" />
+<p>The following describes how you can use STOMP from a Windows client, using .NET and C#. (This is a viewable version of the file included in the .zip archive above) </p>
+<pre class="style1">
+Steps to run the C# Stomp Client:
+--------------------------------
+1. Download StompConnect from 
+   http://stomp.codehaus.org/ 
+
+2. Start MQ broker 
+
+   for example, 
+   imqbrokerd -tty 
+
+3. Create a MQ administrative object of ConnectionFactory
+
+   for example on Windows, with #2 example, on the broker running machine,
+
+   imqobjmgr add -t qf -l cn=QCF -j "java.naming.factory.initial=com.sun.jndi.fscontext.RefFSContextFactory" -j "java.naming.provider.url=file:///C:/mq_admin_objects" 
+ 
+4. Create a JNDI resource file jndi.properties
+
+   for example, with #3 example, a jndi.properties contains,
+    
+   java.naming.factory.initial=com.sun.jndi.fscontext.RefFSContextFactory
+   java.naming.provider.url=file:///C:/mq_admin_objects
+
+   place the jndi.properties file in a location that is on #5's classpath
+   
+5. Start StompConnect
+
+   for example, with #3 example, on the broker running machine, 
+
+   java -classpath &lt;classpath&gt; org.codehaus.stomp.jmsMain tcp://localhost:6666 cn=QCF
+
+   The StompConnect needs following jar files: 
+
+   . StompConnect jar file
+
+   . commons-logging jar file - dependency of StompConnect 
+     [download from http://commons.apache.org/logging/]
+  
+   File System JNDI Service Provider:
+   . fscontext.jar    - dependency because of #3 
+   . providerutil.jar - dependency because of #3
+     [download from  http://java.sun.com/products/jndi/downloads/index.html]
+
+   . imq.jar - MQ client runtime
+   . jms.jar - dependency of MQ client runtime and StompConnect
+
+6. On a Windows machine that has Microsoft .NET Framework
+   (can be the same machine or different from #5)
+
+   (1) Compile the StompClient.cs 
+
+       csc Stompclient.cs
+
+   (2) Run the StompClient
+
+       a. run as sender 
+          StompClient s &lt;stompconnect-host&gt; &lt;stompconnect-port&gt; &lt;queue-name&gt; 
+
+          for example, with #5 example,
+          StompClient s &lt;stompconnect-host&gt; 6666 &lt;queue-name&gt;
+
+       b. run as receiver 
+          StompClient r &lt;stompconnect-host&gt; &lt;stompconnect-port&gt; &lt;queue-name&gt; 
+
+</pre> 
+<hr width="45%" size="5" />
+Send feedback to <a href="mailto:users@mq.java.net">users@mq.java.net
+</a>
+</body>
+</html>

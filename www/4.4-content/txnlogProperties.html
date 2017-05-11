@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="StarOffice 9  (Win32)">
+	<META NAME="CREATED" CONTENT="20091208;18060400">
+	<META NAME="CHANGED" CONTENT="20091209;18062600">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { size: 8.27in 11.69in; margin: 0.79in }
+		H1.western { font-family: "Albany", sans-serif; font-size: 16pt }
+		H1.cjk { font-family: "Andale Sans UI"; font-size: 16pt }
+		H1.ctl { font-family: "Tahoma"; font-size: 16pt }
+		H3.western { font-family: "Thorndale", serif }
+		H5.western { font-family: "Albany", sans-serif; font-size: 11pt }
+		H5.cjk { font-size: 11pt }
+		H5.ctl { font-size: 11pt }
+		A:visited { so-language: en-US }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1 CLASS="western">New transaction log</H1>
+<P><BR><BR>
+</P>
+<H3 CLASS="western">Feature description</H3>
+<P>MQ 4.4u1 introduces a new transaction log optimization. This
+provides a mechanism which will store intermediate transactional
+state updates into a single &ldquo;log&rdquo; file which can be used
+to recover state, if a failure occurs. (Please note, this file is not
+intended to be read by humans.) When the transaction is finally
+committed, all the details are reliably written to the main message
+storage tables. Periodically this mechanism will perform
+&ldquo;check-point&rdquo; operations to synchronize main storage
+tables with the transaction log. This feature reduces the number of
+disk writes and, can improve performance for transactional message
+operations. The new transaction log implementation supports single
+brokers as well as broker clusters.</P>
+<P>The new transaction log is enabled by setting the new property:
+imq.persist.file.newTxnLog.enabled=true</P>
+<P>To maintain compatibility, this property is set false, by default.
+We may change this default setting in a future release.</P>
+<H3 CLASS="western">Performance Tests</H3>
+<P>Lab tests show as much as 50% performance improvement for
+transactional messages.</P>
+<P>In our lab tests the best overall performance was shown with:
+newTxnLog.enabled=true; autoStartTxn=true,
+noBlockUntilTxnCompletes=true. User are encouraged to experiment with
+these settings to determine which features meet their requirements
+and balance speed, with notification and recovery characteristics.</P>
+<H3 CLASS="western">Tuning Parameters</H3>
+<P>The transaction log also provides several tuning parameters to
+allow users to customize the operations as their requirements allow.
+These properties are categorized into Broker tuning properties and
+Client tuning properties.</P>
+<H3 CLASS="western">Functional Specification</H3>
+<H3 CLASS="western">The functional specification is available at this <a href="newTxnLogFuncSpecV1.3.html">open-mq link</a>.</H3>
+<H3 CLASS="western">MQ Broker (Server side) tuning parameters 
+</H3>
+<P>(These property descriptions will be added to the MQ Broker
+Property reference chapter in the MQ  Administration Guide)</P>
+<P>(default settings are indicated in <U>underline</U> text)</P>
+<H5 CLASS="western">imq.persist.file.newTxnLog.enabled (true/<U>false</U>)
+</H5>
+<P>Enables transaction logging.</P>
+<UL>
+	<LI><BLOCKQUOTE>If true, JMS transactions will be written first to a
+	transaction log. The transactional work will be written to main
+	storage only on transaction commit. Transactional state will be
+	cleared periodically by a checkpoint. With this configuration there
+	are fewer overall write operations, but message data will be written
+	twice. Tests have shown that this configuration can improve
+	performance for transactions.</BLOCKQUOTE>
+	<LI><BLOCKQUOTE>If false, no transaction log will be used.
+	Transactional atomicity will instead be implemented by recording new
+	transactions and  transaction state changes in a separate file.
+	Messages that form a JMS transaction will be written directly to
+	main message store prior to commit. Message acknowledgements that
+	form a JMS transaction will be written in a separate file and
+	applied to main message store on commit. Transactional state will be
+	be removed after commit or rollback.</BLOCKQUOTE>
+</UL>
+<H5 CLASS="western">imq.persist.file.sync.enabled  (true/<U>false</U>)</H5>
+<P>Enables sync-to-disk behaviour.</P>
+<P>If the transaction log is not enabled
+(imq.persist.file.newTxnLog.enabled = false), then existing broker
+behaviour will be maintained.  Files in the message store  will be
+synced as required to ensure consistency in the event of failure of
+disk buffers.  
+</P>
+<P>Note that performance will be significantly improved if
+transaction logging is enabled in conjunction with this property.
+This is because the number of sync-to-disk calls can be minimised and
+as all writes are appended to the end of a single transaction log
+file, the disk io required will be minimised.</P>
+<P>If the transaction log is enabled
+(imq.persist.file.newTxnLog.enabled = true), then:</P>
+<UL>
+	<LI><P>If imq.persist.file.sync.enabled=true, writes to transaction
+	log will be written synchronously to disk. Non-transacted messages
+	and non-transacted message acknowledgements will also be written
+	synchronously to the transaction log before being written
+	asynchronously to main storage.</P>
+	<LI><P>If imq.persist.file.sync.enabled=false, writes to the
+	transaction log will be written asynchronously to disk. This should
+	be faster but the data may not be recoverable under some failure
+	scenarios (loss of disk buffers). Non-transacted messages and
+	non-transacted message acknowledgements will not be written to the
+	transaction log.</P>
+</UL>
+<H5 CLASS="western">imq.persist.file.txnLog.groupCommit (true/<U>false</U>)</H5>
+<P>Only applicable when imq.persist.file.newTxnLog.enabled = true.</P>
+<P STYLE="margin-bottom: 0in">May improve overall performance when
+sync-to-disk is enabled (imq.persist.sync.enabled = true)  and there
+is a high number of concurrent transactions being processed.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in">If true, transactions will not be
+	logged directly by client connection threads, but instead will be
+	added to a transaction queue. The client threads will then wait
+	until they are notified that the transactions have been logged. A
+	separate thread will then periodically drain the  transaction queue
+	and apply the queued write operations to the transaction log. Where
+	possible, this thread will group together multiple active
+	transactions and write them to the transaction log in a single
+	operation. After the write completes, waiting client threads will be
+	notified. This configuration may reduce the total number of
+	synchronous writes to disk and so improve overall performance. 
+	</P>
+	<LI><P STYLE="margin-bottom: 0in">If false, writes to the
+	transaction log will be handled by individual connection threads.
+	Only one thread at a time will be able to write to the log. This
+	configuration may give the best performance when there are just a
+	few active client connections.</P>
+	<P STYLE="margin-bottom: 0in"></P>
+</UL>
+<H5 CLASS="western">imq.persist.file.txnLog.logNonTransactedMsgSend
+(true/<U>false</U>)</H5>
+<P>Only applicable when imq.persist.file.newTxnLog.enabled = true. 
+</P>
+<P>This property overrides the default behaviour for logging
+non-transacted messages, which is controlled by the property:  
+imq.persist.sync.enabled</P>
+<UL>
+	<LI><P>If true non-transacted messages will be logged first to the
+	transaction log before being written to main storage</P>
+	<LI><P>If false, non-transacted messages will be logged directly to
+	main storage</P>
+</UL>
+<H5 CLASS="western">imq.persist.file.txnLog.logNonTransactedMsgAck
+(true/<U>false</U>)</H5>
+<P>Only applicable when imq.persist.file.newTxnLog.enabled = true. 
+</P>
+<P>This property overrides the default behaviour for logging
+non-transacted message acknowledgments, which is controlled by the
+property:   imq.persist.sync.enabled</P>
+<UL>
+	<LI VALUE=1><P>If true non-transacted message acknowledgments will
+	be logged first to the transaction log before being written to main
+	storage</P>
+	<LI><P>If false, non-transacted message acknowledgments will be
+	logged directly to main storage</P>
+</UL>
+<H5 CLASS="western">imq.persist.file.minimizeWrites (true/<U>false</U>)</H5>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in">If true, reduces slightly the
+	number of write operations to store messages. Also transaction ends
+	will not be stored when transaction logging is disabled.</P>
+</UL>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H3 CLASS="western" STYLE="margin-top: 0in; margin-bottom: 0in">MQ
+Client side tuning parameters (set as system property)</H3>
+<H5 CLASS="western">imq.autoStartTxn (true/<U>false</U>)</H5>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in">If set to true, for transacted
+	sessions, a new transaction is started automatically by the broker
+	on commit and the new txn id returned to the client. Setting this
+	property avoids the client having to issue a separate start
+	transaction request 
+	</P>
+	<P STYLE="margin-bottom: 0in"></P>
+</UL>
+<H5 CLASS="western">imq.noBlockUntilTxnCompletes (true/<U>false</U>)</H5>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in">If true, message sends and message
+	acks inside a transaction are sent without the client having to wait
+	for a reply. The client only blocks waiting for a reply on commit.
+	The disadvantage of this setting is that any errors arising from
+	message sends or acks will not be immediately detected. 
+	</P>
+</UL>
+<P><BR><BR><BR><BR>
+</P>
+</BODY>
+</HTML>

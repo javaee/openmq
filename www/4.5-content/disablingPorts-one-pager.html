@@ -1,0 +1,289 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>One Pager: Allowing unwanted ports in an embedded MQ broker to be switched off</title>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+</head>
+<body style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
+<h2>One Pager: Allowing unwanted ports in an embedded MQ broker to be switched off<br>
+</h2>
+(template version: 1.91)<br>
+<table border="1" cellpadding="2" width="756">
+  <tbody>
+    <tr>
+      <td>
+      <p><b>Table of Contents</b><br>
+      <a href="#1">1. Introduction</a><br>
+      </p>
+      <blockquote> <a href="#11">1.1 Project/Component Working Name</a><br>
+        <a href="#12">1.2 Name(s) and e-mail address of Document
+Author(s)/Supplier</a><br>
+        <a href="#13">1.3. Date of This Document</a><br>
+      </blockquote>
+      <a href="#2">2. Project Summary</a><br>
+      <blockquote> <a href="#21">2.1 Project Description</a><br>
+        <a href="#22">2.2 Risks and Assumptions</a><br>
+      </blockquote>
+      <a href="#3">3. Problem Summary</a><br>
+      <blockquote>
+        <a href="#31">3.1 Problem Area</a><br>
+        <a href="#32">3.2 Justification</a><br>
+      </blockquote>
+      <a href="#4">4. Technical Description</a><br>
+      <blockquote>
+        <p><a href="#41">4.1 Details</a><br>
+        <a href="#42">4.2 Bugs/RFE's</a><br>
+        <a href="#43">4.3 Scope</a><br>
+        <a href="#44">4.4 Out-of-scope</a><br>
+        <a href="#45">4.5 Interfaces</a><br>
+        <a href="#46">4.6 Documentation Impact</a><br>
+        <a href="#47">4.7 Configuration/administration Impact</a><br>
+        <a href="#48">4.8 High Availability Impact</a><br>
+        <a href="#49">4.9 Internationalization</a><br>
+        <a href="#410">4.10 Packaging</a><br>
+        <a href="#411">4.11 Security Impact</a><br>
+        <a href="#412">4.12 Compatibility</a><br>
+        <a href="#413">4.13 Dependencies</a><br>
+        <a href="#414">4.14 Testing Impact</a></p>
+      </blockquote>
+      <p><a href="#5">5. References</a><br>
+      <a href="#6">6. Schedule </a> <br>
+      </p>
+      <p><br>
+      </p>
+      <h3><a name="1"></a>1. Introduction<br>
+      </h3>
+      <p><a name="11"></a><b>1.1. Project/Component Working Name</b></p>
+      <p>Allowing unwanted services in an embedded MQ broker to be switched off<br>
+      </p>
+      <p><a name="12"></a><b>1.2. Name(s) and e-mail address of
+Document
+Author(s)/Supplier</b></p>
+      <p>Nigel Deakin<br>
+nigel.deakin@oracle.com</p>
+      <p><a name="13"></a><b>1.3. Date of This Document</b></p>
+      <p>10 May 2010</p>
+      <h3><a name="2"></a>2. Project Summary</h3>
+      <p><br>
+      <a name="21"></a><b>2.1. Project Description</b></p>
+      <p>
+      There is a requirement that when a MQ broker is embedded in a Glassfish instance which is itself embedded in the user's application
+      it should be possible to reduce the ports opened by the broker to an absolute minimum.
+      It should even be possible to configure the embedded broker so that it opens no ports at all.
+      <p>This document reviews the various services that are started by default and the ports that they use,
+      and whether they can be disabled using existing functionality.
+      Where a service cannot be disabled, this document proposes changes to make that possible,
+      and discusses the impact this will have on the operation of the broker.
+      
+      <p><a name="22"></a><b>2.2. Risks and Assumptions</b></p>
+ 	  This document will focus on allowing unwanted services (and the ports they use) to be switched off in an embedded MQ broker,
+ 	  though where possible it will also allow this for local or remote MQ brokers. 
+ 	  It only covers changes to the MQ server, client or resource adapter.
+ 	  It does not cover any changes needed to Glassfish. These will be the subject of a separate document.
+ 	  
+      <h3><a name="3"></a>3. Problem Summary</h3>
+      <p><a name="31"></a><b>3.1. Problem Area</b></p>
+      <p>This is not really a problem in that Glassfish will operate perfectly satisfactorily even if it is running services that are not needed
+      and so is listening on ports that are not being used.
+      <p>However the Glassfish engineering team has a desire that an embedded Glassfish instance be as lightweight an entity as possible,
+      and only opens ports that are actually needed. 
+      <p>In addition, some MQ users monotor the ports opened by a MQ broker and ask what they are all for.
+      Some users report that they are operating in a high-security environment where every open port needs to be accounted for.
+      It is therefore considered desirable to give the user complete control over what ports are opened.
+       
+      <p><a name="32"></a><b>3.2. Justification</b></p>
+      <p>This main justification is that Glassfish engineering has requested it. 
+      It is a useful product enhancement, but definitely not an absolute priority.</p>
+      <h3><a name="4"></a>4. Technical Description</h3>
+      <p><a name="41"></a><b>4.1. Details</b></p>
+<p>If a Glassfish V3 instance is started which contains an embedded MQ broker, then by default the following ports are opened:</p>
+
+<table border="1" width="80%">
+<tr>
+<th>Purpose</th><th>Port number</th><th>Can it be disabled?</th>
+</tr>
+<tr>
+<td>Port mapper</td><td>Default is 7676<br>Defined by <tt>imq.portmapper.port</tt> broker config property or <tt>-port</tt> broker arg</td>
+<td>No (note that in order to support lazy broker startup, this port is actually opened by the Grizzly proxy 
+and connections forwarded to the port mapper)</td>
+</tr>
+<tr>
+<td>Cluster discovery service</td><td>Dynamically-allocated</td><td>Not used. Removed permanently in Glassfish 3.0.1 (Bug 6900776)</td>
+</tr>
+<tr>
+<td>JMS service</td><td>Dynamically-allocated by default<br>May define static port using <tt>imq.jms.tcp.port</tt></td>
+<td>Yes, by configuring <tt>imq.service.activelist</tt></td>
+</tr>
+<tr>
+<td>Admin service</td><td>Dynamically-allocated by default<br>May define static port using <tt>imq.admin.tcp.port</tt></td>
+<td>Yes, by configuring <tt>imq.service.activelist</tt></td>
+</tr>
+<tr><td>JMX RMI connector</td><td>Dynamically-allocated by default<br>May define static port using <tt>imq.jmx.connector.jmxrmi.port</tt></td>
+<td>Yes, by configuring <tt>imq.jmx.connector.activelist</tt></td></tr>
+
+</table>
+
+<p>
+This document therefore proposes adding new functionality to MQ to prevent the following services being started:
+
+<p>
+<table border="1" width="100%">
+<tr>
+<th>Service</th><th>How to disable</th><th>Consequences</th>
+</tr>
+<tr>
+<td>Port mapper</td><td>Set <tt>imq.portmapper.port.enabled=false</tt> (default = <tt>true</tt>)</td>
+<td>If the port mapper is disabled, the broker will not be able to accept jms or jmsssl connections using URLs of the forms
+<tt>mq://[hostName][:portMapperPortNumber]/jms</tt>
+<tt>mq://[hostName][:portMapperPortNumber]/ssl</tt>
+<tt>mq://[hostName][:portMapperPortNumber]</tt>
+<p>
+The broker will still be able to accept jms (and jmsssl, if that service is explicitly enabled) connections so long as 
+a static jms (and jmsssl) port is defined, and clients connect using URLs of the form<br> 
+<tt>mqtcp://[hostName][:jmsPortNumber]/jms</tt><br>
+<tt>mqssl://[hostName][:jmsSSLPortNumber]/jmsssl</tt>
+<p>
+It will not be possible to connect to the broker using <tt>imqcmd</tt>.
+<p>
+It will not be possible to use a <tt>com.sun.messaging.AdminConnectionFactory</tt>
+to create a JMX connection to the broker. 
+<p>It will, however, still be possible to create a JMX connection
+by looking up the RMI stub from the RMI registry, if one is being used. (Note that the URL used to store the RMI stub in the registry
+includes, for uniqueness, the configured port mapper port number, even though no port mapper is running.)
+</td>
+</tr>
+</table>
+
+<p>
+
+<table border="1" width="100%">
+<tr>
+<th>Service</th><th>How to disable</th><th>Consequences</th>
+</tr>
+<tr>
+<td>Cluster service</td>
+<td>Set <tt>imq.cluster.enabled=false</tt> (default = <tt>true</tt>)</td>
+<td>If the cluster service is disabled, the broker will not be able to particpate in a cluster of any kind. 
+<p>
+(Note that this document does nor define what circumstances, of any, an embedded broker is permitted to participate in a cluster.)</td>
+</tr>
+</table>
+
+<p>The work defined in this document will include testing to ensure that all the properties mentioned above,
+including those what are already supported, can be passed to the embedded broker via the resource adapter (or MQ broker lifecycle code),
+and that they have the expected effect.    
+
+      <p> <a name="42"></a><b>4.2. Bug/RFE Number(s)</b></p>
+      <p>
+Not applicable.
+
+      <p> <a name="43"></a><b>4.3. In Scope</b></p>
+Not applicable.
+
+      <p> <a name="44"></a><b>4.4. Out of Scope</b></p>
+
+<p>
+This document covers changes to MQ (including the resource adapter and broker lifecycle code) to offer the configuration options described above.
+It does not cover changes to the Glassfish JMS module or any other part of Glassfish to allow these configuration to be specified by the user
+and then passed on to MQ. These will be the subject of a separate specification.
+<p>
+This document describes how an embedded MQ broker can be configured to disable various services that are started by default.
+This document does not consider the circumstances under which it is appropriate to disable these services. 
+In general, it is strongly recommended that these services not be disabled, except for the cluster service,
+as they will prevent the normal operation and management of the embedded MQ broker.
+
+      <p> <a name="45"></a><b>4.5. Interfaces</b></p>
+
+      <p> <b>4.5.1 Public Interfaces</b></p>
+      <p>This project adds the following new public interfaces. 
+      
+      <p>
+      <table border="1" width="80%">
+        <tbody>
+          <tr>
+            <td width="60%">Interface</td>
+            <td width="40%">Comments</td>
+          </tr>
+          <tr>
+            <td width="60%">New broker property <tt>imq.cluster.enabled</tt><br>(default = <tt>true</tt>)</td>
+            <td width="40%">Allows the cluster connection service to be disabled.</td>
+          </tr>
+          <tr>
+            <td width="60%">New broker property <tt>imq.portmapper.port.enabled</tt><br>(default = <tt>true</tt>)</td>
+            <td width="40%">Allows the port mapper to be disabled.</td>
+          </tr>          
+        </tbody>
+      </table>
+      <p>
+      Note however that although these interfaces are public, Glassfish users will not use them directly 
+      but will configure Glassfish (in a manner which is out of scope of this document) to use these interfaces.
+      <p>
+      <b>4.5.2 Private interfaces</b></p>
+      
+      <p>There are none.
+
+      <p> <b>4.5.3 Deprecated/Removed Interfaces</b></p>
+
+     <p>There are none.
+     
+      <p> <a name="46"></a><b>4.6. Doc Impact</b></p>
+      <p>This work will require updates to the Message Queue Administration Guide</p>
+      <p> <a name="47"></a><b>4.7. Admin/Config Impact</b></p>
+
+	<p>This work defines new broker configuration properties. These will be configured using Glassfish tools which are out of scope of this document.
+	
+	<p>Note that if the port mapper, admin service or JMS RMI connector is disabled in a broker, as discussed in this document,
+	then this will have a severe effect on the ability to administer the broker
+	since these services are essential for the normal administration of such a broker.
+
+
+      <p> <a name="48"></a><b>4.8. HA Impact</b></p>
+      
+      <p>The features described in this document are not intended for use in clustered or HA deployments
+      and should not be used in such cases, since disabling key services will prevent clustered or HA operation. 
+      
+      <p> <a name="49"></a><b>4.9. I18N/L10N Impact</b>inks</p>
+      <p>This work does not impact internationalization or localization.</p>
+      
+      <p> <a name="410"></a><b>4.10. Packaging, Delivery &amp; Upgrade</b></p>
+      <p> <b>4.10.1 Packaging</b></p>
+      <p>This work does not have any impact in packaging.</p>
+      <p> <b>4.10.2 Delivery</b></p>
+      <p>This work will not have any impact on product installation</p>
+      <p> <b>4.10.3 Upgrade and Migration</b></p>
+      <p>This work will not have any impact on product upgrade and/or migration from prior releases.
+      <p> <a name="411"></a><b>4.11. Security Impact</b></p>
+      <p>This work does not interact with security-related APIs or interfaces.
+      It does not rely on any Java policy or platform user/permission.
+      The feature does not expose any new ports (quite the contrary!).</p>
+      <p> <a name="412"></a><b>4.12. Compatibility Impact</b></p>
+      <p>The changes described in this document will not change the default behaviour, and so will have no impact on backwards compatibility.</p>
+
+      <p> <a name="413"></a><b>4.13. Dependencies</b></p>
+      <p> <b>4.13.1 Internal Dependencies</b></p>
+      <p>The work described in this document is not dependent on any other Glassfish component.
+      However this work does not stand alone; changes to Glassfish are needed to allow the user
+      to configure what services and ports are required using the various properties defined in this document.
+      The changes to Glassfish are covered in a separate document.
+      Those changes will be dependent on the changes described here.</p>
+      <p> <b>4.13.2 External Dependencies</b></p>
+      <p>The work described in this document does not introduce any new dependencies on external components,
+      whether open source or not.
+      <p> <a name="414"></a><b>4.14. Testing Impact</b></p>
+      <p>Additional automated MQ system tests will be created to test the changes described in this document
+      and to confirm (using new or existing interfaces) some or all of the ports used by an embedded broker can be disabled if desired.</p>
+      <h3><a name="5"></a>5. Reference Documents</h3>
+      <p>None
+      </p>
+      <h3><a name="6"></a>6. Schedule</h3>
+      <p><b>6.1. Projected Availability</b></p>
+See <a href="https://glassfish.java.net/wiki-archive/3.1JMS.html#section-3.1JMS-MilestoneSchedule">Milestone schedule</a>.
+
+      <p>&nbsp;</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<link rel="stylesheet" media="all" type="text/css" href="style.css" />
+<title>Open MQ (4.2): Tuxedo XA Integration</title>
+<!-- hide the project info -->
+<style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+.style3 {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 12px;
+}
+</style>
+
+</head>
+
+<body>
+<table border="0" cellspacing="0" cellpadding="0" id="main2" width="100%">
+<tr valign="bottom" class="nav1">
+<td nowrap colspan="3"><!-- tab 4--></td>
+</tr>
+<form><tr class="sub1">
+<td nowrap><div align="center"><strong>&nbsp;Open Message Queue 4.2 --Tuxedo XA Integration</strong></div></td>
+<td align="right" nowrap>&nbsp;</td>
+</tr></form>
+<tr><td colspan="3" class="white"><div class="min1">&nbsp;</div></td></tr>
+</table>
+
+<p align="center"><em>(This is a new feature in Open MQ 4.2)</em><a href="http://mq.java.net/4.2.html"><br />
+Back to Open MQ 4.2 Index </a></p>
+<p>The Message Queue C-API has added X/Open distributed transaction (XA)   support so that&nbsp; Message Queue C client applications running in a X/Open DTP   system, for example Tuxedo,&nbsp; can use MQ as an XA-compliant resource manager.&nbsp;&nbsp; The   Message Queue C-API XA&nbsp; implementation is known to work with the Tuxedo transaction manager and has been tested on&nbsp; Solaris (SPARC) systems.</p>
+<p>Please see README in <a href="xa-example.zip">this.zip archive</a> for an MQ C-API Tuxedo example (this is also included in the examples with the download). <br />
+  <br />
+  The following are the currently supported xa_info name=value pairs</p>
+<table width="90%" border="1">
+  <tr>
+    <th scope="col">Name</th>
+    <th scope="col">Value</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td scope="col">address</td>
+    <td scope="col">host:port</td>
+    <td scope="col">The host:port the broker's portmapper   is running on&nbsp; (default: localhost:7676)</td>
+  </tr>
+  <tr>
+    <td scope="col">username</td>
+    <td scope="col">string</td>
+    <td scope="col">The username for the connection to   broker&nbsp; (default: guest)</td>
+  </tr>
+  <tr>
+    <td scope="col">password</td>
+    <td scope="col">string</td>
+    <td scope="col">The password for the username&nbsp;&nbsp;   (default: guest)</td>
+  </tr>
+  <tr>
+    <td scope="col">conntype</td>
+    <td scope="col">TCP or SSL</td>
+    <td scope="col">The connection type to the broker   (default: TCP) </td>
+  </tr>
+  <tr>
+    <td scope="col">trustedhost</td>
+    <td scope="col">true of false </td>
+    <td scope="col">Whether the broker host is trusted or   not (applicable only when conntype=SSL, default: true)</td>
+  </tr>
+  <tr>
+    <td scope="col">clientid</td>
+    <td scope="col">string</td>
+    <td scope="col">Required only for JMS durable   subscription application (default: no clientid)</td>
+  </tr>
+  <tr>
+    <td scope="col">reconnects</td>
+    <td scope="col">integer</td>
+    <td scope="col"> The number of reconnection  attempts to   broker (0 means no reconnect, default: 0)</td>
+  </tr>
+</table>
+<p><br />
+  For more information on XA resource manager, please see the XA Specification <br />
+  <a href="http://www.opengroup.org/onlinepubs/009680699/toc.pdf">http://www.opengroup.org/onlinepubs/009680699/toc.pdf</a> <br />
+  <br />
+  For more information on Tuxedo system, please see <br />
+  <a href="http://edocs.bea.com/tuxedo/tux100/index.html">http://edocs.bea.com/tuxedo/tux100/index.html</a> <br />
+  and download from <br />
+  <a href="http://commerce.bea.com/products/tuxedojolt/tuxedo_prod_fam.jsp">http://commerce.bea.com/products/tuxedojolt/tuxedo_prod_fam.jsp</a> <br />
+</p>
+<hr width="40%" size="4" />
+<h2 align="center">Tuxedo Example Readme </h2>
+Here is the readme from the example which you can download from this <a href="xa-example.zip">link</a>
+<pre class="style3">This directory contains examples of using MQ C-API XA feature
+   in Tuxedo applications with MQ as a X/Open XA-compliant resource 
+   manager (RM). </pre>
+<pre class="style3">The following are the public information for MQ C-API XA:</pre>
+<pre class="style3">. The name of the xa_switch_t:   sun_mq_xa_switch 
+   . The name of the RM:            SUN_MQ
+   . xa_open  string and format:    ';' separated name=value pairs
+   (see details in documentation)
+   . xa_close string and format:    none
+   . MQ C-API library to be linked: mqcrt (see README in parent directory)
+ </pre>
+<pre class="style3">----------------------------------------------------------------------
+   step 1: Install Tuxedo under $TUXDIR</pre>
+<pre class="style3">step 2: Setup environment</pre>
+<pre class="style3"> LD_LIBRARY_PATH        - include MQ C-API runtime library path 
+   TUXDIR                 - Tuxedo install root
+   PATH                   - include $TUXDIR/bin and compiler path
+   TUXCONFIG              - TUXCONFIG filename path
+   TLOGDEVICE             - Tuxedo transaction log filename path
+   MQ_HOME                - MQ install root
+   MQ_LOG_FILE            - MQ C-API runtime log file name
+   MQ_LOG_FILE_APPEND_PID - set this environment variable so that 
+   MQ C-API runtime log file name will be 
+   auto-appended Tuxedo server process id </pre>
+<pre class="style3">step 3: Build TMS </pre>
+<pre class="style3"> a. add an entry to the $TUXDIR/udataobj/RM file: </pre>
+<pre class="style3"> SUN_MQ:sun_mq_xa_switch:-lmqcrt
+     
+   b. build the TMS executable using buildtms</pre>
+<pre class="style3"> buildtm -o $TUDIR/bin/&lt;exe-name&gt; -r SUN_MQ</pre>
+<pre class="style3">step 4: Build server-side of application</pre>
+<pre class="style3"> for example on Solaris,</pre>
+<pre class="style3"> cc -I$MQ_HOME/include -I$TUXDIR/include -g -c jmsserver.c</pre>
+<pre class="style3"> buildserver -v -t -r SUN_MQ -s SENDMESSAGES,RECVMESSAGES -o jmsserver -f jmsserver.o -f -lmqcrt
+     
+   step 5: Build client-side of application</pre>
+<pre class="style3"> for example on Solaris,</pre>
+<pre class="style3"> cc -I$TUXDIR/include -c jmsclient_sender.c
+   buildclient -o jmsclient_sender -f jmsclient_sender.o
+ </pre>
+<pre class="style3"> cc -I$TUXDIR/include -c jmsclient_receiver.c
+   buildclient -o jmsclient_receiver -f jmsclient_receiver.o</pre>
+<pre class="style3">step 6: Configure Texudo servers</pre>
+<pre class="style3"> tmloadcf &lt;config-file&gt; 
+ </pre>
+<pre class="style3">step 7: Start MQ broker</pre>
+<pre class="style3"> imqbrokerd -tty</pre>
+<pre class="style3">step 8: Start Tuxedo servers</pre>
+<pre class="style3"> tmboot</pre>
+<pre class="style3">step 9: Run Tuxedo client-side application</pre>
+<pre class="style3"> jmsclient_sender</pre>
+<pre class="style3"> jmsclient_receiver</pre>
+<pre class="style3"> You can run imqcmd to confirm the messages are produced to or 
+   consumed from the destination after you have run jmsclient_sender
+   or jmsclient_receiver </pre>
+<pre class="style3"> imqcmd list dst -u admin 
+ </pre>
+<blockquote class="style3">&nbsp;</blockquote>
+<pre class="style3">&nbsp;</pre>
+</body>
+</html>

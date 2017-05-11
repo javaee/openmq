@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE>MQ 4.4: UMS Improvements</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.4  (Unix)">
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGEDBY" CONTENT="chiaming">
+	<META NAME="CHANGED" CONTENT="20090109;14523400">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<DL>
+	<DD STYLE="margin-left: 0in; text-align: left">
+	  <h2 align="center">New Work Analysis</h2>
+	</DD>
+</DL>
+<DL>
+  <dt>
+    <div align="center">Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. </div>
+  </dt>
+  <dt><B>Synopsis: <BR>
+    <BR>
+    </B>UMS
+    improvements for the crane release.<B><BR>
+    <BR>
+      Description:<BR>
+      </B><BR>
+          </dt>
+  <DD STYLE="margin-left: 0in; margin-bottom: 0.2in">
+    <SPAN STYLE="font-weight: medium">UMS will include the following
+      improvements for the crane release.  The designed usage of the
+      services introduced in this document is through a browser interface
+      for the crane release.  They are designed to be used by people, not
+      computer programs.  The are intended for information look up,
+    debugging, and trouble shooting purposes.  </SPAN><B>The output
+        format are classified as unstable and may be changed in the future
+        releases.</B><SPAN STYLE="font-weight: medium"><BR> <BR>1 </SPAN>Broker
+    monitoring service<SPAN STYLE="font-weight: medium">.</SPAN></DD>
+  <DD STYLE="margin-left: 0in; margin-bottom: 0.2in">
+    <A NAME="DDE_LINK1"></A>This feature provides broker monitoring
+    information through the UMS interface. An user may request broker
+    information by <SPAN STYLE="font-weight: medium">entering the
+      service URL into a browser's location bar</SPAN>.  Upon received a
+    monitoring service request, the monitoring service implementation
+    would respond to a request in the HTTP response message if a request
+    is accepted.<BR><BR><SPAN STYLE="font-weight: medium">The output of
+      the service is set in the HTTP response message body.  The output is
+      in xml format (classification: unstable, no schema binding) and
+      would be displayed in the browser's window.</SPAN><BR><BR>The
+    service name is defined as “getBrokerInfo” service. <BR><BR>The
+    service url is defined as follows (to be finalized in the functional
+    spec).<BR>http://&lt;host&gt;:&lt;port&gt;/&lt;ums_context&gt;/simple?service=getBrokerInfo&amp;cmd=getDestinations<BR><BR>For
+    example, the following is an example URL entered in the browser's
+    location
+    bar.<BR>http://localhost:8080/ums/simple?service=getBrokerInfo&amp;cmd=getDestinations<BR><BR>The
+    detailed broker monitoring service information is at the link
+    here:<BR><A HREF="http://jpgserv.red.iplanet.com/not/MQCrane/engineering/onepagers/ums/ums-monitoring.html">http://jpgserv.red.iplanet.com/not/MQCrane/engineering/onepagers/ums/ums-monitoring.html</A><BR><BR><BR>2.
+    UMS utility services. <BR><BR>The following UMS utility services
+    will be reviewed/updated and made public in the crane release. 
+    <BR><BR>2.1 ping service– ping broker through the UMS ping
+    service.<BR><BR>http://&lt;host&gt;:&lt;port&gt;/&lt;ums_context&gt;/simple?service=ping<BR><BR>For
+    example, the url (entered in a browser location bar) below would
+    invoke the UMS (deployed on niagra2) ping
+    service.<BR><A HREF="http://niagra2:8080/ums/simple?service=ping">http://niagra2:8080/ums/simple?service=ping</A><BR><BR>The
+    following output would be displayed in the browser window:<BR>Broker
+    is alive, round trip = 332 milli secs.<BR><BR>2.2 debug service –
+    turn UMS service debug logging on/off with an url entered in a
+    browser's location
+    bar.<BR><BR>http://&lt;host&gt;:&lt;port&gt;/&lt;ums_context&gt;/simple?service=debug&amp;debug=&lt;true|false&gt;<BR><BR>For
+    example:<BR><A HREF="http://niagra2:8080/ums/simple?service=debug&amp;debug=true">http://niagra2:8080/ums/simple?service=debug&amp;debug=true</A><BR><BR>The
+    following output would be displayed in the browser
+    window:<BR>service=debug, debug=true<BR><BR>2.3 ssend service–
+    send a simple text message with an url entered in a browser's
+    location
+    bar.<BR><BR>http://&lt;host&gt;:&lt;port&gt;/&lt;ums_context&gt;/simple?service=ssend&amp;destination=&lt;string&gt;&amp;text=&lt;string&gt;[&amp;domain=&lt;queue|topic&gt;]<BR><BR>For
+    example:<BR><A HREF="http://niagra2:8080/ums/simple?service=ssend&amp;destination=testq&amp;text=hello world">http://niagra2:8080/ums/simple?service=ssend&amp;destination=testq&amp;text=”HelloWorld”</A><A HREF="http://niagra2:8080/ums/simple?service=ssend&amp;destination=testq&amp;text=&quot;hello world&quot;"><BR></A><BR>The
+    above would send a text message with message body set to “hello
+    world” to the queue destination named testq.<BR>The following
+    output would be displayed in the browser window:<BR>Message sent:
+    &quot;hello world&quot;, destination = testq, domain=Queue<BR><BR>2.4
+    sreceive service– receive a simple text message with an url
+    entered in a browser's location
+    bar.<BR><BR>http://&lt;host&gt;:&lt;port&gt;/&lt;ums_context&gt;/simple?service=sreceive&amp;destination=&lt;string&gt;[&amp;domain=&lt;queue|topic&gt;]<BR><BR>For
+    example:<BR><A HREF="http://niagra2:8080/ums/simple?service=sreceive&amp;destination=testq">http://niagra2:8080/ums/simple?service=sreceive&amp;destination=testq</A><BR><BR>The
+    above would receive a message (if available) from the queue
+    destination named testq.<BR>The following output would be displayed
+    in the browser window if there is a “hello world” message in the
+    queue:<BR>&quot;hello world&quot;<BR><BR>2.5 getConfiguration
+    service. - get the UMS configuration data with an url entered in a
+    browser's location
+    bar.<BR><BR>http://&lt;host&gt;:&lt;port&gt;/&lt;ums_context&gt;/simple?service=getConfiguration<BR><BR>For
+    example:<BR><A HREF="http://niagra2:8080/ums/simple?service=getConfiguration">http://niagra2:8080/ums/simple?service=getConfiguration</A><BR><BR><BR>3.
+    UMS examples improvements and bug fixes.<BR><BR>
+    <BR>
+    <BR>
+    </DD>
+  <DT>
+    <B>Interfaces:</B></DT>
+  <DD STYLE="margin-left: 0in; margin-bottom: 0.2in">
+    <BR>The monitoring and utility services introduce new interfaces
+    with UMS and thus may need to be reviewed by ARC.<BR><BR><BR>
+    </DD>
+  <DT>
+    <B>Test Impact:</B></DT>
+  <DD STYLE="margin-left: 0in; margin-bottom: 0.2in">
+    <BR>All features mentioned in this one-pager can be tested manually
+    without new test case development.    </DD>
+  <DT>
+    <B>Doc Impact:</B></DT>
+  <DD STYLE="margin-left: 0in; margin-bottom: 0.2in">
+    <BR>Monitoring and utility services are required to be documented.</DD>
+  <DT>
+    <B>Support Impact:</B></DT>
+  <DD STYLE="margin-left: 0in; margin-bottom: 0.2in">
+    <BR>None.</DD>
+  <DT>
+    <B>Installation Impact:</B></DT>
+  <DD STYLE="margin-left: 0in; margin-bottom: 0.2in">
+    <BR>None.</DD>
+  <DT>
+    <B>Admin/Config Impact:</B></DT>
+  <DD STYLE="margin-left: 0in; margin-bottom: 0.2in">
+    <BR>None.</DD>
+  <DT>
+    <B>I18N/L10N Impact:</B></DT>
+  <DD STYLE="margin-left: 0in; margin-bottom: 0.2in">
+    <BR>None.</DD>
+  <DT>
+    <B>Security Impact:</B></DT>
+  <DD STYLE="margin-left: 0in; margin-bottom: 0.2in">
+    <BR>None.</DD>
+  <DT>
+    <B>Risks:</B></DT>
+  <DD STYLE="margin-left: 0in; margin-bottom: 0.2in">
+    <BR>Low risks.    </DD>
+  <DT>
+    <B>See Also:</B></DT>
+  <DD STYLE="margin-left: 0in; margin-bottom: 0.2in">
+    <BR><A HREF="http://jpgserv.red.iplanet.com/not/MQRobin/engineering/funcspecs/ums/ums_func_spec.html">http://jpgserv.red.iplanet.com/not/MQRobin/engineering/funcspecs/ums/ums_func_spec.html</A><BR>
+    <A HREF="http://jpgserv.red.iplanet.com/not/MQCrane/engineering/onepagers/ums/ums-monitoring.html">http://jpgserv.red.iplanet.com/not/MQCrane/engineering/onepagers/ums/ums-monitoring.html</A><BR><BR><BR>
+    </DD>
+  <DT>
+    <B>Author/Date:</B></DT>
+  <DD STYLE="margin-left: 0in; margin-bottom: 0.2in">
+    <BR>ISA Hashim<BR>Chiaming Yang<BR>Phuong Nguyen<BR>01/09/2009    </DD>
+</DL>
+<P>
+<I>Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. </I></P>
+<P><I>template version: @(#)onepager.txt 1.10 04/03/18</I></P>
+</BODY>
+</HTML>

@@ -1,0 +1,266 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>One Pager for Embedded brokers in conventional clusters </title>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+</head>
+<body style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
+<h2>One Pager: Embedded brokers in conventional clusters <br>
+</h2>
+(template version: 1.91)<br>
+<table border="1" cellpadding="2" width="756">
+  <tbody>
+    <tr>
+      <td>
+      <p><b>Table of Contents</b><br>
+      <a href="#1">1. Introduction</a><br>
+      </p>
+      <blockquote> <a href="#11">1.1 Project/Component Working Name</a><br>
+        <a href="#12">1.2 Name(s) and e-mail address of Document
+Author(s)/Supplier</a><br>
+        <a href="#13">1.3. Date of This Document</a><br>
+      </blockquote>
+      <a href="#2">2. Project Summary</a><br>
+      <blockquote> <a href="#21">2.1 Project Description</a><br>
+        <a href="#22">2.2 Risks and Assumptions</a><br>
+      </blockquote>
+      <a href="#3">3. Problem Summary</a><br>
+      <blockquote>
+        <a href="#31">3.1 Problem Area</a><br>
+        <a href="#32">3.2 Justification</a><br>
+      </blockquote>
+      <a href="#4">4. Technical Description</a><br>
+      <blockquote>
+        <p><a href="#41">4.1 Details</a><br>
+        <a href="#42">4.2 Bugs/RFE's</a><br>
+        <a href="#43">4.3 Scope</a><br>
+        <a href="#44">4.4 Out-of-scope</a><br>
+        <a href="#45">4.5 Interfaces</a><br>
+        <a href="#46">4.6 Documentation Impact</a><br>
+        <a href="#47">4.7 Configuration/administration Impact</a><br>
+        <a href="#48">4.8 High Availability Impact</a><br>
+        <a href="#49">4.9 Internationalization</a><br>
+        <a href="#410">4.10 Packaging</a><br>
+        <a href="#411">4.11 Security Impact</a><br>
+        <a href="#412">4.12 Compatibility</a><br>
+        <a href="#413">4.13 Dependencies</a><br>
+        <a href="#414">4.14 Testing Impact</a></p>
+      </blockquote>
+      <p><a href="#5">5. References</a><br>
+      <a href="#6">6. Schedule </a> <br>
+      </p>
+      <p><br>
+      </p>
+      <h3><a name="1"></a>1. Introduction<br>
+      </h3>
+      <p><a name="11"></a><b>1.1. Project/Component Working Name</b></p>
+      <p>Embedded brokers in conventional clusters<br>
+      </p>
+      <p><a name="12"></a><b>1.2. Name(s) and e-mail address of
+Document
+Author(s)/Supplier</b></p>
+      <p>Nigel Deakin<br>nigel.deakin@oracle.com
+      <p><a name="13"></a><b>1.3. Date of This Document</b></p>
+      <p>12 May 2010</p>
+      <h3><a name="2"></a>2. Project Summary</h3>
+      <p><br>
+      <a name="21"></a><b>2.1. Project Description</b></p>
+<p>In Glassfish 2.1.1, each Glassfish instance has associated with it a MQ broker 
+which is automatically started and stopped at the same time as the Glassfish instance. 
+The MQ broker can be configured to be "embedded" (running in the same JVM as Glassfish) 
+or "local" (running in a separate JVM from Glassfish).
+<p>
+In the Glassfish 2.1.1 developer profile, or Glassfish 3, which do not support clustering of any kind,
+the MQ broker is by default configured to be "embedded". If necessary, the broker can be configured to be "local" instead.
+<p>
+In the Glassfish 2.1.1 cluster profile, each Glassfish instance again has associated with it 
+a MQ broker which is automatically started and stopped at the same time as the Glassfish instance. 
+These MQ brokers are themselves clustered, in a MQ "conventional" cluster. 
+(Conventional clusters are described in the MQ 4.4 Technical Overview <a href="http://download.oracle.com/docs/cd/E19587-01/821-0028/index.html">here</a>.) 
+However these brokers must always be "local" (running in a separate JVM from Glassfish), and this is the default. 
+The use of "embedded" brokers (running in the same JVM as Glassfish) is not supported if the brokers are clustered.
+<p>
+Glassfish 3.1 will support clustering. 
+This one-pager describes some changes to MQ that will allow an embedded broker to be clustered in a conventional cluster. 
+This will allow Glassfish clusters to take advantage of the simpler architecture and improved performance of embedded brokers.</p>
+      <p><a name="22"></a><b>2.2. Risks and Assumptions</b></p>
+<p>No particular risks. 
+<p>When this one pager is reviewed, the following issues may be raised. These are all discussed later in this document, 
+but they may be the cause of debate and so it would be worth ensuring agreement on these issues before embarking on implementation.
+
+<ul>
+<li>Why do these changes not allow the use of direct mode connections to connect to a clustered embedded broker?
+<li>When the embedded broker encounters an unrecoverable failure, it is OK to shutdown the JVM. This means there is no need to support failover of applications.
+<li>The situation when the broker closes client connections when short of memory may be considered a problem for non-clustered brokers too.
+<li>The MQ broker's memory management system currently assumes that the broker is running in its own JVM rather than embedded in a Glassfish instance.
+It may be appropriate to enhance Glassfish to offer memory-management facilities for use by the embedded MQ broker, to allow it to manage memory correctly. 
+</ul>
+
+
+
+      <h3><a name="3"></a>3. Problem Summary</h3>
+      <p><a name="31"></a><b>3.1. Problem Area</b></p>
+      <p>// What problem or need does this project solve?</p>
+      <p><a name="32"></a><b>3.2. Justification</b></p>
+      <p>This feature has been requested by Glassfish 3.1 Project management.</p>
+      <h3><a name="4"></a>4. Technical Description</h3>
+      <p><p><b>Handling the case where the broker needs to shut down following an unrecoverable error</b>
+
+<p>
+There are a number of existing scenarios which require MQ code changes to cover the additional case where the embedded broker is clustered. 
+These are when the broker encounters an uncoverable error and (1) fails to start or (2) needs to shut down.
+<ol>
+<li>(Standalone MQ): If the broker is running in its own JVM the JVM can simply exit. 
+<li>(Non-clustered): If the broker is running in the same JVM as a Glassfish instance, and that instance is <i>not</i> clustered, then it is also acceptable for the JVM to simply exit.
+Without the broker, the instance cannot operate, so it is reasonable for a failure of the former to cause the failure of the latter.
+<li>(Conventional cluster): If the broker is running in the same JVM as a Glassfish instance, and that instance <i>is</i> clustered in a conventional cluster, then it is less appropriate for the JVM to simply exit.
+This is because even if the broker cannot operate, there will still be other brokers running, and applications running in the instance will be able to continue
+if they fail over to one of these brokers.
+</ol>
+
+<p>
+Code changes are needed to support the third case (Conventional cluster):
+<ul>
+<li>to make sure that in the event of an unrecoverable error the broker is shutdown without terminating the JVM, and
+<li>to make sure that the applications can be configured so that in this situation they will failover to another broker.
+</ul>
+
+<p>Note that when using a conventional cluster there is no use case which requires the in-process broker to be restarted rather than simply shut down.
+If such a case is found in the code it will be changed to simply shut down the embedded broker without terminating the JVM, and allow the client applications to failover to another broker.
+
+<p><b>Handling the case where the broker needs to close client connections to conserve memory</b>
+
+<p>In addition there are circumstances where a running broker encounters a low-memory condition and, to reduce memory usage, closes client connections. 
+The client will then attempt to reconnect, initially to the same broker and, if this is unsuccessful, to one of the other brokers in the cluster.
+
+<p>At present, clients connect to an in-process MQ broker using "direct mode" connections, which use direct Java calls rather than TCP sockets.
+Direct connections do not support reconnection and so a connection which is closed in this way will cause the in-process application to simply fail. 
+This is arguably acceptable in a non-clustered broker, but if the broker is clustered a higher level of service is appropriate, first to allow the client to 
+reconnect to the in-process broker or, if this refuses the reconnection, to another broker in the cluster.  
+
+<p>
+Therefore, code changes are needed to make sure that if the embedded broker closes the client connection due to an error, the client can reconnect to the same or another broker in the cluster.
+
+<p><b>Allowing an in-process client to reconnect if the embedded broker shuts down or closes the connection</b>
+
+<p>
+The two scenarios listed above explain why it is necessary to allow an in-process client to reconnect if the embedded broker shuts down or closes the connection.
+The existing direct mode client (RA-direct) does not have any support for reconnection. If the in-process broker fails, the behaviour of the direct mode client is undefined.
+<p>
+The simplest way to allow in-process clients to reconnect in this situation is to use TCP connections. These already support reconnection, both to
+the same in-process broker or to a broker running in some other JVM.
+<p>
+It is therefore proposed that if the embedded broker is clustered, direct mode connections will not be used, and TCP connections will be used instead.
+This will require some small resource adapter changes to enable this behaviour, and also to allow a list of possible brokers to be specified as well as just
+the embedded broker.
+<p>
+Note that the "new" direct mode, (API-direct), is not supported with the JMSRA resource adapter. 
+It is not currently supported with the JMSJCA or GenericJMSRA resource adapters either, though there are plans to allow this which are out of the scope of  this one-pager.
+Note, however, that API-direct does not support reconnection or failover either (not without extra work, anyway), 
+so any future support for API-direct will only apply if the embedded MQ broker is not clustered.
+</p>
+      <p> <a name="42"></a><b>4.2. Bug/RFE Number(s)</b></p>
+      <p>
+There are no bugs or RFEs which will be addressed by this proposed change.<br>
+      <p> <a name="43"></a><b>4.3. In Scope</b></p>
+      <p>This should be apparent from the description above.</p>
+      <p> <a name="44"></a><b>4.4. Out of Scope</b></p>
+<p>This one-pager covers the changes to MQ described in the description above.
+It does not include any changes needed to the Glassfish JMS module or any other Glassfish component
+to allow clusters of embedded brokers to be configured. That will be covered in a separate one-pager.</p>
+<p>
+This one-pager describes changes to allow MQ brokers embedded in Glassfish instances to be clustered in a conventional cluster.
+These changes will not allow MQ brokers embedded in Glassfish instances to be clustered in an 
+<a href="http://download.oracle.com/docs/cd/E19587-01/821-0028/ggsxf/index.html">enhanced cluster</a>.
+      <p> <a name="45"></a><b>4.5. Interfaces</b></p>
+
+      <p> <b>4.5.1 Public Interfaces</b></p>
+      <p><p>This work does not modify or introduce new public interfaces.</p>
+      <table border="1" width="80%">
+        <tbody>
+          <tr>
+            <td width="60%">Interface</td>
+            <td width="40%">Comments</td>
+          </tr>
+          <tr>
+            <td width="60%">&nbsp;</td>
+            <td width="40%">&nbsp;</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+      <b>4.5.2 Private interfaces</b></p>
+      <p><p>This work does not modify or introduce new private interfaces.</p>
+      <p> <b>4.5.3 Deprecated/Removed Interfaces</b></p>
+      <p><p>This work does not deprecate or remove any existing public interfaces.</p>
+
+      <p> <a name="46"></a><b>4.6. Doc Impact</b></p>
+      <p> This work does not require changes to the MQ documentation.
+	  <p>This work will require changes to the Glassfish documentation but this is beyond the scope of this one-pager
+      <p> <a name="47"></a><b>4.7. Admin/Config Impact</b></p>
+      <p>This work will have an impact on the administrative operation of creating a clustered Glassfish instance,
+since this will need to be configured by default to use a embedded MQ broker, configured to be part of a conventional cluster.
+However this is beyond the scope of this document and will be the subject of a separate one-pager.
+      <p> <a name="48"></a><b>4.8. HA Impact</b></p>
+      <p>The changes describe in this document are intended to improve conventional broker clustering, which is a HA feature. 
+      <p> <a name="49"></a><b>4.9. I18N/L10N Impact</b>inks</p>
+      <p>This proposal does not have any impact on internationalisation or localisation</p>
+      <p> <a name="410"></a><b>4.10. Packaging, Delivery &amp; Upgrade</b></p>
+      <p> <b>4.10.1 Packaging</b></p>
+      <p>This work will be delivered with MQ. No packaging changes are required.</p>
+      <p> <b>4.10.2 Delivery</b></p>
+      <p>This work has no impact on installation.</p>
+      <p> <b>4.10.3 Upgrade and Migration</b></p>
+      <p>The ability to upgrade a Glassfish 2.1.1 cluster to use Glassfish 3.1 is not specific to this proposal and is beyond the scope of this document.
+      If such an ability is provided then the work in this document does not impose any additional requirements;
+      Glassfish clusters will continue to support local brokers in 3.1 as they do in 2.1.1.
+      <p>It should be possible to convert a cluster using local brokers to use embedded brokers instead.
+      Providing this is out of scope of this document but should be tested.
+      </p>
+      <p> <a name="411"></a><b>4.11. Security Impact</b></p>
+      <p>This proposal has no impact on security.</p>
+      <p> <a name="412"></a><b>4.12. Compatibility Impact</b></p>
+      <p>This proposal does not change (or add) any interfaces. 
+      <p>Providing compatibility of Glassfish 3.1 with Glassfish 2.1.1 is not specific to this proposal and is beyond the scope of this document.
+      if this compatibility is provided then the work in this document does not impose any additional requirements;
+      Glassfish clusters will continue to support local brokers in 3.1 as they do in 2.1.1.
+      <p> // List any requirements on upgrade tool and migration tool.</p>
+      <p> <a name="413"></a><b>4.13. Dependencies</b></p>
+      <p> <b>4.13.1 Internal Dependencies</b></p>
+      <p>The work described in this document is not dependent on any other Glassfish component.
+      However this work does not stand alone; changes to Glassfish are needed to allow the user
+      to configure a Glassfish cluster to use embedded rather than local brokers.
+      The changes to Glassfish will be  covered in a separate document.
+      Those changes will be dependent on the changes described here.</p>
+      <p> <b>4.13.2 External Dependencies</b></p>
+      <p>The work described in this document does not introduce any new dependencies on external components,
+      whether open source or not.
+      <p> <a name="414"></a><b>4.14. Testing Impact</b></p>
+<p>Three levels of testing need to be performed:
+      <p>Developer-level system tests will be created as part of the work descrined in this one-pager.
+<p>This work will also need to be tested by <b>Glassfish QE</b> after Glassfish has been changed to incorporate the changes defined in this one-pager.
+That testing is beyond the scope of this one-pager, but should consist of running all tests from Glassfish 2.1.1 that currently use a cluster of local MQ brokers 
+with a cluster of embedded MQ brokers instead.
+
+<p>In addition, QA testing is needed to confirm that MQ and Glassfish behaves as required in various error conditions which cause the in-process broker to
+shut down or close client connections. These tests should be performed by the <b>MQ QE</b>	 team. 
+It may be necessary to wait until Glassfish has been changed to incorporate the changes defined in this one-pager
+before attempting to run such tests.
+      <h3><a name="5"></a>5. Reference Documents</h3>
+      <p>Not applicable.
+      </p>
+      <h3><a name="6"></a>6. Schedule</h3>
+      <p><b>6.1. Projected Availability</b></p>
+      
+<p>For the milestone schedule, see feature JMS-10 (MQ part) in the <a href="https://glassfish.java.net/wiki-archive/3.1JMS.html#section-3.1JMS-TaskList">task list</a>.      
+This shows handoff to QA expected in Glassfish 3.1 Milestone 3. This is an internal delivery only; 
+additional work is then needed in Glassfish before this can be made available to users, which needs to be delivered a later milestone.
+<p>THese changes are expected to be suitable for production when Glassfish 3.1 is suitable for production.
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

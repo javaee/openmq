@@ -1,0 +1,261 @@
+One pager template version: 1.91
+
+1. Introduction
+    1.1. Project/Component Working Name:
+
+    MQ Conventional Cluster Without Master Broker Using a Shared Database 
+
+    1.2. Name(s) and e-mail address of Document Author(s)/Supplier:
+
+    Amy Kang     (amyk@dev.java.net)
+    Nigel Deakin
+
+    1.3. Date of This Document:
+
+    05/03/2010
+
+2. Project Summary
+    2.1. Project Description:
+
+    In MQ conventional cluster, one of the brokers in the cluster is designated
+    as the master broker.  The master broker maintains configuration change 
+    records about changes in the persistent entities of durable subscriptions
+    and administratively created destinations in the cluster. 
+
+    This project is to provide a new MQ conventional cluster operation mode, 
+    in addition to the traditional conventional cluster with master broker,
+    that is a MQ conventional cluster without master broker by using a shared
+    database.  
+
+    2.2. Risks and Assumptions:
+
+    The general assumption is that the shared database is accessible to all
+    broker instances in the cluster and is running when 
+
+    1) A broker instance is starting up
+    2) A client application creates a durable subscription first time or
+       deletes a durable subscription through JMS API
+
+       Practically, a J2EE application that uses durable subscription would 
+       likely do #2) only at application deploy or undeploy time.
+
+    3) An administrator creates/updates/deletes a destination
+    4) An administrator destroys a durable subscrption
+
+
+3. Problem Summary
+    3.1. Problem Area:
+
+    Because the master broker in a MQ conventional cluster maintains
+    configuration change records,
+
+    (1). Each broker in the cluster, on startup, is required to sync-up with 
+         the master broker
+    (2). Adminmistratively create/update/delete a destination requires master
+         broker running
+    (3). Create/delete a durable subscription requires master broker running
+
+    In GlassFish LOCAL and EMBEDED JMS service modes, each GlassFish instance
+    in a GlassFish cluster is configured to have a LOCAL or EMBEDED broker 
+    and manages the lifecycle of the broker. These brokers form a MQ conventional
+    cluster with one of these brokers designated as the master broker.  Since 
+    GlassFish cluster is symmetrical from management point of view, having an
+    instance to be special, that is to associate with the master broker, makes
+    management of GlassFish instances inconvenient.
+
+    This project is to provide an option to run MQ conventional cluster without
+    master broker by using a shared database.  For applications that already 
+    use databases, this can simply mean an additional table, managed by MQ,
+    in the same database.  
+
+    3.2. Justification:
+    
+    1) Be able to use a MQ conventional cluster without the need to designate
+       a master broker in the cluster
+
+    2) Most of business applications would likely already use a database
+
+    3) The shared database is only used for change records of persist 
+       entities of durable subscriptions and administratively created
+       destinations.  Therefore typically this does not add high volume
+       data to the database nor impose high trafic to the database.
+
+    4) Here are some of the factors that affected alternative implementation choices,
+
+       a) GMS or Shoal or its replication module, either only about instances that are
+          running (versus configured) or does not have total order property, does not
+          tolerate arbitrary number of instance failures or network partition
+
+       b) Use DAS for the master broker, however DAS is not always running 
+
+       c) To dependent on GlassFish 3.1 configuration synchronization for
+          configured list of instances, however a GlassFish 3.1 instance can
+          start up without configuration synchronization if DAS is not running
+
+4. Technical Description:
+     4.1. Details:
+
+     imq.cluster.clusterid must set;
+
+     The shared database table name will be suffixed with the cluster id;
+
+     Each broker will write change record to the shared table for client change request;
+
+     Each broker will sync-up with the change records in the shared table on startup;
+
+     Change records stored in the shared table will be sequenced according to the time
+     of the insertion in the database, for example, by using auto-increment column;
+
+     For using the feature in GlassFish 3.1, JMSRA will be extended to pass the same
+     GlassFish clusters-wide unique cluster id and the same values of broker properties
+     for this feature (see 4.5.1) to each EMBEDED or LOCAL broker that will be running
+     in a GlassFish cluster.
+
+     4.2. Bug/RFE Number(s):
+
+     4.3. In Scope:
+
+     This one-pager describes changes in MQ only. 
+
+     This feature is applicable to all GlassFish JMS modes.
+
+     4.4. Out of Scope:
+
+     This one-pager does not cover the changes needed to Glassfish JMS module
+     to make use of this feature
+
+     4.5. Interfaces:
+
+        4.5.1.  Public Interfaces:
+        
+        New broker properties
+
+        imq.cluster.nomasterbroker=[true|false] default false
+        imq.cluster.sharecc.persist.jdbc.dbVendor
+        imq.cluster.sharecc.persist.jdbc.<dbVendor>.user
+        imq.cluster.sharecc.persist.jdbc.<dbVendor>.property.<propname>=<propval>
+        imq.cluster.sharecc.persist.jdbc.<dbVendor>.table.MQSHARECC45=<table-schema>
+
+        These broker properties, including imq.cluster.clusterid, must be set to 
+        same values in all broker instances in the conventional cluster
+
+        New imqdbmgr subcommand arguments 
+       
+        imqdbmgr create sharecc_tbl
+        imqdbmgr delete sharecc_tbl
+        imqdbmgr recreate sharecc_tbl
+        imqdbmgr backup sharecc_tbl
+        imqdbmgr restore sharecc_tbl
+
+        4.5.2.  Private Interfaces:
+
+        When running in a GlassFish cluster EMBEDED/LOCAL JMS mode, the same
+        clusters-wide unique cluster id and broker properties to configure this
+        feature must be passed to each broker instance via JMSRA from GlassFish.
+
+        4.5.3.  Deprecated/Removed Interfaces:
+
+        N/A
+
+     4.6. Doc Impact:
+
+     MQ Tech Overview and Admin Guide
+
+     4.7. Admin/Config Impact:
+
+     This feature adds new broker properties, new imqdbmgr subcommand arguments 
+
+     imqdbmgr create sharecc_tbl  
+     imqdbmgr delete sharecc_tbl 
+     imqdbmgr recreate sharecc_tbl  
+     imqdbmgr backup sharecc_tbl
+     imqdbmgr restore sharecc_tbl
+
+     4.8. HA Impact:
+
+     This feature applies only to MQ conventional cluster.
+
+     4.9. I18N/L10N Impact:
+
+     This feature will introduce new resource and log strings 
+
+     4.10. Packaging, Delivery & Upgrade:
+
+        4.10.1. Packaging
+
+        N/A
+
+        4.10.2. Delivery
+
+        N/A
+    
+        4.10.3. Upgrade and Migration:
+
+        By default, a previous release of GlassFish or MQ that ran a MQ
+        conventional cluster will continue to operate with master broker
+        (imq.cluster.nomasterbroker=false).
+
+        However it can be switched to run without master broker by following steps,
+
+        1). Shutdown all brokers in the existing cluster
+        2). Use previous conventional cluster with master broker configuration 
+        3). Backup the master broker's change records by starting up the master
+            broker with option -backup <backup-file>
+        4). Shutdown the master broker
+        5). Configure the cluster to use imq.cluster.nomastebroker=true mode
+        6). imqdbmgr recreate sharecc_tbl -Dimq.cluster.url=<cluster-config-file>
+        7). imqdbmgr restore sharecc_tbl -file <backup-file> -Dimq.cluster.url=<cluster-config-file>
+        8). Start brokers in the cluster
+
+        [6)-7) assumes using a cluster configuration file for cluster properties]
+    
+     4.11. Security Impact:
+     
+     This feature will access JDBC database server through JDBC API.
+
+     4.12. Compatibility Impact
+
+     A MQ broker configured to run in a conventional cluster without master
+     broker will be prevented from joining a cluster what has a master broker.
+
+     A conventional cluster that has a master broker can be switched to run
+     in no master broker mode (see 4.10.3) or vise-versa.
+
+     To change a MQ conventional cluster in no master broker mode to master broker mode:
+
+     1). Shutdown all brokers in the cluster 
+     2). imqdbmgr backup sharecc_tbl -file <backup-file> -Dimq.cluster.url=<cluster-config-file>
+     3). Configure the cluster to use imq.cluster.nomastebroker=false mode
+     4). Start the master broker with option -restore <backup-file>
+     5). Start other brokers in the cluster
+
+     [2) assumes using a cluster configuration file for cluster properties]
+ 
+     4.13. Dependencies:
+
+        4.13.1 Internal Dependencies
+
+        When this feature is used in GlassFish EMBEDED/LOCAL JMS mode,
+        it has dependency on Glassfish JMS module. 
+
+        4.13.2 External Dependencies
+
+        A transactional database that is accessible through a JDBC-compliant
+        driver and support auto-increment column, supports Oracle, MySQL, 
+        Derby(Network Server), DB2, PostgreSQL. 
+
+     4.14. Testing Impact
+
+     New tests need to be written and can be automated.
+     Existing tests can only be used to test this feature after
+     configuration and setup change.
+
+5. Reference Documents:
+
+6. Schedule:
+    6.1. Projected Availability:
+
+    Milestone 3: MQ broker side main functionality ready for MQ alone testing
+    Milestone 3: JMSRA changes done
+    Milestone 4: Feature complete
+

@@ -1,0 +1,143 @@
+One pager template version: 1.91
+
+1. Introduction
+    1.1. Project/Component Working Name:
+
+    MQ Consumer Notification
+
+    1.2. Name(s) and e-mail address of Document Author(s)/Supplier:
+
+    Amy Kang     (amyk@dev.java.net)
+
+    1.3. Date of This Document:
+
+    12/18/2009
+
+2. Project Summary
+    2.1. Project Description:
+
+    This feature allows a MQ client to know whether or not any consumer
+    exists on a destination and get notified when the existance of consumer
+    changes on the destination.  A MQ producer client can use this information
+    to decide to start or stop producing messages to a given destination.
+
+    2.2. Risks and Assumptions:
+
+3. Problem Summary
+    3.1. Problem Area:
+    3.2. Justification:
+
+    see 2.1
+
+4. Technical Description:
+     4.1. Details:
+
+     Add ConsumerEvent type to MQ client notification API
+
+     Add new methods to com.sun.messaging.jms.Connection
+
+     public void setConsumerEventListener(Destination, EventListener) throws JMSException;
+     public void removeConsumerEventListener(Destination) throws JMSException;
+
+     Add new request type to client<-->broker protocol REQUEST_INFO/INFO and a new property
+     to turn off the info request
+
+     CONSUMER_READY: send info if there is any consumer and its connection has been started
+                     on the specified destination
+
+     CONSUMER_NOT_READY: send info if there is no active consumer on the the specified
+                         destination
+
+     4.2. Bug/RFE Number(s):
+
+     N/A
+
+     4.3. In Scope:
+
+     This one-pager describes this feature as a MQ only feature.
+
+     4.4. Out of Scope:
+
+     This one-pager does not cover how GlassFish or RA can take advantage
+     of this feature.
+
+     4.5. Interfaces:
+
+        4.5.1.  Public Interfaces:
+        
+        Add com.sun.messaging.jms.notification.ConsumerEvent 
+
+        New methods to com.sun.messaging.jms.Connection:
+
+        public void setConsumerEventListener(Destination, EventListener) throws JMSException;
+        public void removeConsumerEventListener(Destination) throws JMSException;
+ 
+        4.5.2.  Private Interfaces:
+
+        Enhance existing Broker-Client protocols: REQUEST_INFO and INFO
+
+        4.5.3.  Deprecated/Removed Interfaces:
+
+        N/A
+
+     4.6. Doc Impact:
+
+     This feature enhances MQ client notification API and affects 
+     MQ Java Developer's Guide
+
+
+     4.7. Admin/Config Impact:
+
+     N/A
+
+     4.8. HA Impact:
+
+     N/A
+
+     4.9. I18N/L10N Impact:
+
+     This feature will introduce new resource and log strings 
+
+     4.10. Packaging, Delivery & Upgrade:
+
+        4.10.1. Packaging
+
+        N/A
+
+        4.10.2. Delivery
+
+        N/A
+    
+        4.10.3. Upgrade and Migration:
+
+        N/A
+    
+     4.11. Security Impact:
+     
+     N/A
+
+     4.12. Compatibility Impact
+
+     This feature does not affect the existing connection notification feature.
+ 
+     4.13. Dependencies:
+
+        4.13.1 Internal Dependencies
+
+        N/A
+
+        4.13.2 External Dependencies
+
+        N/A
+
+     4.14. Testing Impact
+
+     New tests need to be written and can be automated.
+
+5. Reference Documents:
+
+6. Schedule:
+    6.1. Projected Availability:
+
+    Milestone 1: feature complete 
+

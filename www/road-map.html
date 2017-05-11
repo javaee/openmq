@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Open MQ Roadmap</title>
+<link rel="stylesheet" media="all" type="text/css" href="style.css" />
+
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache" />
+<META HTTP-EQUIV="Expires" CONTENT="-1" />
+<meta name="description" content="A community sponsored, messaging middleware product that implements and extends the Java Message Service (JMS) standard."
+<!-- hide the project info -->
+<style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+</style>
+
+</head>
+
+<body>
+<h1>
+  <div id="section">Open MQ </div>
+  <div id="title">Roadmap</div>
+</h1>
+<h4><em>Disclaimer</em></h4>
+<p><em>As with any forward view, these plans are subject to change without any notice. We strive to keep the community informed of our progress and plans however things do change from time to time. We'll do our best to let you know as the future becomes ever more clear.</em> <em>You're always welcome to send an inquiry to <a href="mailto:users@mq.java.net">users@mq.java.net</a> if you want the very latest. </em></p>
+<h2>Open MQ 4.3</h2>
+<blockquote>
+  <p>This is the current stable release of Open MQ </p>
+  <ul>
+    <li>Universal Message Client for Java MQ</li>
+    <li>Better AIX support</li>
+    <li>Windows 2008</li>
+    <li>Oracle 11g</li>
+  </ul>
+  <p>This release was finalized in  December, 2008. It was included as the JMS provider in GlassFish v2.1.</p>
+  <p>For more details, downloads, and updates about this release, you can read about it at the <a href="4.3.html">Open MQ 4.3 description page</a>. </p>
+</blockquote>
+<h2>Open MQ 4.4</h2>
+<blockquote>
+  <p>This is the focus of our current development efforts. This release will be specifically aimed at changes required for supporting GlassFish v3. There are some changes in the plans to support the new lifecycle requirements of Java EE 6 (in development as of Sept. 2008). The features proposed for this release are</p>
+  <ul>
+    <li>JMS Bridge -- Connect to other Open MQ clusters, or other JMS products </li>
+    <li>STOMP -- use the Streaming Text Oriented Message Protocol in Open MQ</li>
+    <li>Embedding -- Use Open MQ as an embedded messaging provider in your own Java application</li>
+  </ul>
+  <p>We're also looking at things we can do to improve performance. Our slant is toward improvements when using Open MQ in GlassFish v3, but the nature of this work is often that performance improvements make all Open MQ use better.</p>
+  <p>One late addition to this project is the introduction of a Visual VM monitoring plug in for Open MQ. We're still working to improve this and it's not clear we can complete this on our current finalization schedule. </p>
+  <p>You can read about this as well as other changes in progress,  at the <a href="4.4.html">MQ 4.4 development page</a> </p>
+  <p>Check the <a href="https://glassfish.java.net/wiki-archive/PlanForGlassFishV3.html">GlassFish v3 planning page</a> for the most up to date timing details available. As of July., this is planned for late in the third quarter of 2009 (about September, 2009). </p>
+</blockquote>
+<h2>On the horizon </h2>
+<p>We are starting to put a plan together for the release following MQ 4.5. We're always interested to hear your opinion about what's important and what's not. If you have a suggestion, do post a note to <a href="mailto:users@mq.java.net">users@mq.java.net</a>.</p>
+<p>Some features that we think might make the cut for this release include:</p>
+<ul>
+  <li>Continued enhancements for integration with GlassFish 3
+    <ul>
+      <li>GlassFish Server Open Source Edition 3.1 Cluster support</li>
+      <li>Alignment with the <a href="https://jmsjca.java.net/">JMSJCA RA project</a> </li>
+    </ul>
+  </li>
+  <li>Finalization of the VisualVM plug in for Open MQ (if this doesn't finish up in MQ 4.4)</li>
+  <li>Message level journaling and replay</li>
+  <li>Enhancements for JMS Bridge -- Forwarding based on selectors, subscription routing</li>
+</ul>
+<p>We published some of what we were thinking about in our JavaOne Birds of a Feather (BOF) presentation. Here is a list, taken from that presentation (and extended a bit)</p>
+<p>We are looking at the following enhancements for subsequent releases</p>
+<ul>
+  <li>Adding more options for High Availability. Ideas that we have discussed include
+    <ul>
+      <li>Better integration with MySQL</li>
+      <li>Writing our own replication and reliability infrastructure</li>
+      <li>Integrating with the Shoal project for message broker node discovery, status monitoring, and maybe more.</li>
+    </ul>
+  </li>
+  <li>XML Interfaces
+    (This is introduced in in  MQ 4.3)
+    <ul>
+      <li>Integration with Google Web Toolkit (We opted not to go this route.) </li>
+      <li>XML (Rest style) interface for Broker to Broker communication (Internal Wire Protocol) </li>
+    </ul>
+  </li>
+  <li>Other APIs
+    <ul>
+      <li>PHP Integration (We'd like feedback about our Web Integration in 4.3)</li>
+      <li>.NET / MSMQ integration (ibid for php) </li>
+      <li>Spring (Some users already support success with Spring.) </li>
+    </ul>
+  </li>
+  <li>Journaling
+    <ul>
+      <li>To improve reliable write performance</li>
+      <li>To keep a transaction log, which may be replayed in case of failure</li>
+    </ul>
+  </li>
+  <li>Store and Forward Messaging (Wide Area Network of Clusters)</li>
+  <li>JMS Destination Synchronization  
+    <ul>
+      <li>3.3.1 JMS IQ Manager Delivery Modes and 8.3.3 Time Dependency Properties, in the <a href="http://dlc.sun.com/pdf/820-0948/820-0948.pdf">eGate Integrator, JMS Reference Guide</a> for a description of this feature. </li>
+    </ul>
+  </li>
+  <li>Message encryption on-disk </li>
+  <li>Better administration integration with GlassFish Server Open Source Edition 
+    (This is being considered for GlassFish v3, i.e. MQ 4.4 or later)
+    <ul>
+      <li>Revised and extended administration console </li>
+    </ul>
+  </li>
+  <li>Scalable in-memory destinations -- Allow messages to be spooled to disk, if memory limits are approached.  </li>
+  <li>Performance improvements for specific use cases</li>
+  <li>General performance improvements</li>
+  <li>JMS specification improvements (would likely be handled under the JMS or Java EE specification)   </li>
+</ul>
+<hr width="45%" size="5" />
+<h2>Older Releases</h2>
+<h3>Open MQ 4.2</h3>
+<blockquote>
+  <p> This is the current production release of MQ. We are currently working on this release -- it is available as a Beta release as of June, 2008. This release is planned for release in July, 2008. This release is available now from the <a href="downloads.html">Downloads page</a>. </p>
+  <p>Features added in this release included: </p>
+  <ul>
+    <li>Wildcard destinations</li>
+    <li>XML Schema Validation</li>
+    <li>Registration support</li>
+    <li>MySQL support</li>
+    <li>C-API for XA -- Tested with Tuxedo Transaction Manager</li>
+    <li>Performance improvements</li>
+  </ul>
+  <p>For more details on these features, as well as other updates, you can read the <a href="http://download.oracle.com/docs/cd/E19906-01/820-3701/index.html">release notes for MQ 4.2</a></p>
+</blockquote>
+<h3>Open MQ 4.1</h3>
+<blockquote>
+  <p>This release introduced the JDBC High Availability and Takeover feature. We also introduced the JMX interface in this release. This release is available now on the <a href="downloads.html">downloads page</a>.</p>
+</blockquote>
+<p>&nbsp; </p>
+<p>Is there a feature you want, but don't see here? Drop us a line (<a href="mailto: users@mq.java.net">users@mq.java.net</a>) and we'll add it to the list. If it gets too interactive, we'll move this over to the wiki. </p>
+</body>
+</html>

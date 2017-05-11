@@ -1,0 +1,772 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <title>Open MQ 4.6 (Preliminary)</title>
+
+  
+  
+  <link rel="stylesheet" media="all" type="text/css" href="style.css" />
+
+  
+  <meta http-equiv="Pragma" content="no-cache" />
+
+  
+  <meta http-equiv="Expires" content="-1" />
+
+<!-- hide the project info -->
+  
+  <style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+.style1 {
+	font-size: x-large;
+	font-weight: bold;
+}
+  </style>
+</head><body>
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>
+    <h2>Open MQ 4.6 (Preliminary) </h2>
+    </div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<h1>
+<div id="title">License </div>
+</h1>
+
+<thread> </thread>
+<table border="0" width="100%">
+
+  <tbody>
+    <tr>
+      <td bgcolor="#ffff99">
+      <p class="generic1"> Open MQ is dual licensed with CDDL or GPL v2
+with ClassPath Exception. <a href="LICENSE.txt">Click here to view the
+license</a>. In addition, Open MQ Binaries include Mozilla <a href="http://www.mozilla.org/projects/security/pki/nss/">Network
+Security Services</a> and <a href="http://www.mozilla.org/projects/nspr/">Network Security Portable
+Runtime</a>
+(NSS / NSPR) which are licensed under the LGPL. You may only use these
+products under the terms of these licenses. By downloading the source
+or binary archives from this site, you are agreeing to the terms of
+these licenses.</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p><a href="#download">Straight to the Downloads</a></p>
+
+<p>Open MQ will be delivered with GlassFish Enterprise Server 3.2. </p>
+
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>Project Overview </div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>Open MQ 4.6 is a minor feature update. This update will support the
+GlassFish 3.2 project. Key feature goals of that project include
+enabling deployment in various cloud based services. Two primary facts
+of cloud deployments to address are: Creation and operation from
+predefined system images and supporting the elastic nature of a cloud
+based service that can easily grow and shrink as the demand requires.<br />
+</p>
+
+<p>We will use this page to provide updates as well as highlights of
+the features and changes in store for MQ 4.6. If you have any comments
+or questions, please send e-mail to <a href="mailto:users@mq.java.net">users@mq.java.net</a>
+or <a href="mailto:users@glassfish.java.net">users</a><a href="mailto:users@glassfish.java.net">@glassfish.java.net</a>.</p>
+
+<p>Feature planning is still in progress. Check back often for updates.
+</p>
+
+<table style="width: 100%;" class="generic1" summary="This is a list of features that we plan to add to Open MQ 4.4. Please note: specifications are subject to change without notice." border="0">
+
+  <caption> <span class="style1">Open MQ 4.6 Features under
+consideration </span> </caption> <tbody>
+    <tr bgcolor="#cccccc">
+      <th scope="col" width="19%">Feature</th>
+      <th scope="col" width="44%">Description</th>
+      <th scope="col" width="9%">Current Status </th>
+      <th scope="col" width="10%">
+      <div align="center">Available?</div>
+      </th>
+      <th scope="col" width="6%">
+      <div align="center">One-Pager</div>
+      </th>
+      <th scope="col" width="12%">
+      <div align="center">Functional Spec. </div>
+      </th>
+    </tr>
+    <tr>
+      <td>
+      <div>Upgrade Bridges to use Grizzly 2.0</div>
+      </td>
+      <td>
+      <div>GlassFish 3.2 will use Grizzly 2.0. To avoid having multiple
+of Grizzly versions in the GlassFish bundle, we'll upgrade to the
+latest version of Grizzly too.<br />
+      </div>
+      </td>
+      <td>
+      <div>See <a href="http://java.net/jira/browse/MQ-89">JIRA MQ-89</a><br />
+      </div>
+      </td>
+      <td>
+      <div align="center"><br />
+      </div>
+      </td>
+      <td>
+      <div align="center"><a href="./4.5-content/jmsbridge-last-agent-opt.txt"> </a></div>
+      <a href="./4.5-content/jmsbridge-last-agent-opt.txt"><br />
+      </a></td>
+      <td>
+      
+<a href="4.4-content/jmsbridge-funcspec.html">      </a><a href="4.4-content/jmsbridge-funcspec.html"><br />
+      </a></td>
+    </tr>
+    <tr>
+      <td>
+      <div>Don't use IP address in conventional persistence store<br />
+      </div>
+      </td>
+      <td>
+      <div>As cloud and virtual services expand the volatility of the
+system's IP address increases. This update will remove use of IP
+address in any persistent storage or configuration data. This should
+help facility instance managers during instance creation and recreation
+with differing IP addresses. Exactly what Name to store is still TBD
+since some services seem to change both IP and Host-name.</div>
+      </td>
+      <td>
+      <div>See <a href="http://java.net/jira/browse/MQ-86">MQ-86 (scoped proposal for broker) </a> <br />
+      </div>
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>Provide elastic cluster support for conventional broker
+clusters<br />
+      </div>
+      </td>
+      <td>
+      <div>Support adding and removing cluster nodes as system demand
+requires. Key facet of this feature is the elimination of cluster nodes
+which will force the broker to migrate messages to another store owner.
+(Note, this is already supported when using Enhanced broker cluster
+configurations.)<br />
+      </div>
+      </td>
+      <td>
+      <div>See JIRA <a href="http://java.net/jira/browse/MQ-85">MQ-85</a><br />
+      </div>
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Add support for Berkeley DB<br />
+      </td>
+      <td>Provide conventional file-store support via Berkeley DB<br />
+      </td>
+      <td>See <a href="http://java.net/jira/browse/MQ-88">JIRA MQ-88</a><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Support dynamic client addressList<br />
+      </td>
+      <td>Client addressList must be dynamically updates as cluster
+members are added or removed.<br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Allow multiple threads to process ACK messages<br />
+      </td>
+      <td>Consider using
+ConnectionConsumer (Chapt. 8) API, instead of MessageConsumer to
+process MDB ACKs. Performance/Scalability improvements<br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Add c-client libraries for Windows 64 bit<br />
+      </td>
+      <td>Add 64 bit client libraries for c-API<br />
+      </td>
+      <td>Proposed<br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Fix more FindBug errors<br />
+      </td>
+      <td>Additional FindBugs issues will be addressed<br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Support for Amazon Elastic Block Storage (EBS)<br />
+      </td>
+      <td>Test and certify Amazon EBS as storage option for MQ
+File-Store<br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Support for Amazon Relational Database Service (RDS)<br />
+      </td>
+      <td>Test and certify Amazon RDS --
+(A flavor of MySQL). Conventional cluster support will be attempted.
+Enhanced cluster option is possible.<br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+      <td><br />
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br />
+
+<table style="width: 100%;" class="generic1" summary="This is a list of features that we plan to add to Open MQ 4.4. Please note: specifications are subject to change without notice." border="0" cellspacing="3">
+
+  <caption> <span class="style1">Some key bugs </span> </caption> <tbody>
+    <tr bgcolor="#cccccc">
+      <th style="text-align: center;" scope="col">Bug ID<br />
+      </th>
+      <th scope="col">Description</th>
+      <th scope="col">Bug/RFE </th>
+    </tr>
+    <tr>
+      <td style="text-align: center;"><br />
+      </td>
+      <td>
+      <div>Simplify setup when using Java DB from GlassFish<br />
+      </div>
+      </td>
+      <td>
+      <div>RFE<br />
+      </div>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center;"> <br />
+      </td>
+      <td>
+      <div>Simplify user repository setup when running MQ from
+GlassFish (EMBEDDED or LOCAL)<br />
+      </div>
+      </td>
+      <td>
+      <div>Proposed</div>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center;"> <br />
+      </td>
+      <td>
+      <div>Support adding and removing cluster nodes as system demand
+requires. Key facet of this feature is the elimination of cluster nodes
+which will force the broker to migrate messages to another store owner.</div>
+      </td>
+      <td>
+      <div>Proposed<br />
+      </div>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><a target="_blank" href="http://java.net/jira/browse/GLASSFISH-15424">GlassFish-15424</a><br />
+      </td>
+      <td style="vertical-align: top;">Fix java.io.EOFException
+warnings <br />
+      </td>
+      <td style="vertical-align: top;"><br />
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><a href="http://java.net/jira/browse/GLASSFISH-15558" target="_blank">GlassFish-15558</a><br />
+      </td>
+      <td style="vertical-align: top;">Errors caused by JMS session
+caching under heavy load<br />
+      </td>
+      <td style="vertical-align: top;"><br />
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><a href="http://java.net/jira/browse/GLASSFISH-15686" target="_blank">GlassFish-15686</a><br />
+      </td>
+      <td style="vertical-align: top;">Certain configuration settings
+can leave system in inconstant state<br />
+      </td>
+      <td style="vertical-align: top;"><br />
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><a href="http://java.net/jira/browse/GLASSFISH-15934" target="_blank">GlassFish-15934</a><br />
+      </td>
+      <td style="vertical-align: top;">Support for multi-home servers
+(e.g. with multiple network interfaces)<br />
+      </td>
+      <td style="vertical-align: top;"><br />
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br />
+</p>
+
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>Schedule</div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>This release will track the GlassFish Server, Open Source Edition
+3.2 project. </p>
+
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>
+    <div align="center">Open MQ 4.6 Milestones </div>
+    </div>
+    </td>
+    <td>
+    <div>
+    <div align="center">Date</div>
+    </div>
+    </td>
+    <td>
+    <div>
+    <div align="center">Description</div>
+    </div>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr>
+      <td>
+      <div>
+      <div align="center">Feature freeze <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-SunOS-20080707.zip">
+      </a></div>
+      <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-SunOS-20080707.zip">
+      </a></div>
+      </td>
+      <td>
+      <div>
+      <div align="center">TBD</div>
+      </div>
+      </td>
+      <td>
+      <div>All
+new features are integrated and available in a promoted build. The
+release is ready for testing. Community members are welcome to try any
+new feature as it is integrated. Feedback provides immeasurable benefit
+to the developers so please, don't hesitate to offer your experience
+feedback by sending an e-mail to <a href="mailto:users@mq.java.net">users@mq.java.net</a>.
+      </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>
+      <div align="center">Hard-code freeze <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-SunOS_X86-20080707.zip">
+      </a></div>
+      <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-SunOS_X86-20080707.zip">
+      </a></div>
+      </td>
+      <td>
+      <div>
+      <div align="center">TBD</div>
+      </div>
+      </td>
+      <td>
+      <div>All
+QE tests have been run once and required fixes have been integrated.
+All bugs which have been prioritized for this release are fixed. (After
+this milestone, only show-stopper problems are eligible for further
+integration). While we'll always accept feedback, your input into how
+well the features are working for you is most useful to us if you can
+provide it around the beginning of May. </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>
+      <div align="center">Finish</div>
+      </div>
+      </td>
+      <td>
+      <div>
+      <div align="center">Around Year-End, CY 2011 </div>
+      </div>
+      </td>
+      <td>
+      <div>All tests completed and passed. All integration requirements
+met. Product released for community use. </div>
+      </td>
+    </tr>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<h3>A note about the Issue Tracker Milestones</h3>
+
+<p>To better track GlassFish MQ progress against the GlassFish Server,
+Open Source Edition, we have created tracking milestone targets, which
+are intended to align with the master GlassFish project milestones. The
+target dates for the GlassFish project are shown here. We will continue
+to produce builds on a, roughly bi-weekly cadence. If we hold to our
+plans, this implies the following build-milestones</p>
+
+<table class="generic1" border="0" cellpadding="1" cellspacing="1" width="100%">
+
+  <tbody>
+    <tr bgcolor="#cccccc">
+      <th scope="col">
+      <div align="center">GlassFish Server, Open Source Edition
+Milestone </div>
+      </th>
+      <th scope="col">
+      <div align="center">GF Build Date</div>
+      </th>
+      <th scope="col">
+      <div align="center">GlassFish MQ Build </div>
+      </th>
+      <th scope="col">
+      <div align="center">MQ Build Date </div>
+      </th>
+      <th scope="col">
+      <div align="center">JIRA Target </div>
+      </th>
+    </tr>
+    <tr>
+      <td>
+      <div align="center">TBD</div>
+      </td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>
+      <div align="center">RC Builds </div>
+      </td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+
+<br />
+
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div><a name="download" id="download">Downloads</a></div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>Please note. We have simplified the downloads and now bundle the
+build instructions into the package archive that you download. </p>
+
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td colspan="3">
+    <div><a name="fileinstall" id="fileinstall">Open MQ 4.6 Latest
+Downloads <blink><em /></blink><em><em /></em></a></div>
+<em><em>    </em></em></td>
+  </tr>
+  </thead> <tbody>
+    <tr bgcolor="#cccccc">
+      <td>
+      <div>Operating System</div>
+      </td>
+      <td style="text-align: center;"> Installer Downloads </td>
+      <td style="text-align: center;"> Archive image (no installer) </td>
+    </tr>
+    <tr>
+      <td>
+      <div>Sun Solaris Sparc</div>
+      </td>
+      <td style="text-align: center;"><a href="http://download.java.net/mq/open-mq/4.6/latest/openmq4_6-installer-SunOS.zip">Solaris-SPARC-with-Installer</a></td>
+      <td style="text-align: center;"><a href="http://download.java.net/mq/open-mq/4.6/latest/openmq4_6-binary-SunOS.zip">Solaris-SPARC-zip</a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>Sun Solaris x86</div>
+      </td>
+      <td style="text-align: center;"><a href="http://download.java.net/mq/open-mq/4.6/latest/openmq4_6-installer-SunOS_X86.zip">Solaris-x86-with-Installer</a></td>
+      <td style="text-align: center;"><a href="http://download.java.net/mq/open-mq/4.6/latest/openmq4_6-binary-SunOS_X86.zip">Solaris-x86-zip</a></td>
+    </tr>
+    <tr>
+      <td>
+      <div>Linux</div>
+      </td>
+      <td style="text-align: center;"><a href="http://download.java.net/mq/open-mq/4.6/latest/openmq4_6-installer-Linux_X86.zip">Linux-with-Installer</a></td>
+      <td style="text-align: center;"><a href="http://download.java.net/mq/open-mq/4.6/latest/openmq4_6-binary-Linux_X86.zip">Linux-zip</a><br />
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>Microsoft Windows x86</div>
+      </td>
+      <td style="text-align: center;"><a href="http://download.java.net/mq/open-mq/4.6/latest/openmq4_6-installer-WINNT.zip">Windows-with-Installer</a>&nbsp;</td>
+      <td style="text-align: center;"><a href="http://download.java.net/mq/open-mq/4.6/latest/openmq4_6-binary-WINNT.zip">Windows-zip
+      </a><br />
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>IBM AIX</div>
+      </td>
+      <td style="text-align: center;"><a href="http://download.java.net/mq/open-mq/4.6/latest/openmq4_6-installer-AIX.zip">AIX-with-Installer</a></td>
+      <td style="text-align: center;"><a href="http://download.java.net/mq/open-mq/4.6/latest/openmq4_6-binary-AIX.zip">AIX-zip</a>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>
+      <div>Unix (e.g. Mac OSX)</div>
+      </td>
+      <td style="text-align: center;"><a href="http://download.java.net/mq/open-mq/4.6/latest/openmq4_6-installer-Unix.zip">Unix-with-Installer</a></td>
+      <td style="text-align: center;"><a href="http://download.java.net/mq/open-mq/4.6/latest/openmq4_6-binary-Unix.zip">Unix-zip
+      </a><br />
+      </td>
+    </tr>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<br />
+
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div><a name="source" id="source">Source-code Downloads 4.6</a></div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody>
+</table>
+
+<p>You can browse this archive is at this URL: <a href="http://java.net/projects/mq/sources/mq-hg/show">http://java.net/projects/mq/sources/mq-hg/show</a></p>
+
+<p>Instructions for performing builds via this archive are given on the
+<a href="repo-build.html">repo-build.html page</a>.</p>
+
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>JavaDoc</div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>4.6 JavaDoc is posted <a href="http://mq.java.net/nonav/javadoc/4.6/javadoc/index.html">here</a><br />
+ </p>
+
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td height="23">
+    <div>Maven</div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>Maven build snapshots are here: <a href="http://download.java.net/maven/2/">http://download.java.net/maven/2/
+</a>The MQ jars are available at <br />
+com/sun/messaging/mq/&lt;jarfilename&gt;/4.6-&lt;build no&gt;. These will
+evolve as 4.6 progresses. </p>
+
+<thread> </thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>Promoted Build History </div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td colspan="3">
+    <div><a href="http://download.java.net/mq/open-mq/4.6/b01/" name="version-history" id="version-history">Build History </a></div>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr>
+      <td>
+      <div><a href="http://download.java.net/mq/open-mq/4.6/b01/"> Build 1</a><br />
+      </div>
+      </td>
+      <td>
+      <div>First build.<br />
+</div>
+      </td>
+      <td>
+      <div>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.6/b01/changes.html">TBD</a></div>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p align="center">Feedback is always welcome -- e-mail to: <a href="mailto:users@mq.java.net">users@mq.java.net</a></p>
+
+<center>
+<script language="JavaScript">
+
+<!-- This script and many more are available free online at -->
+<!-- The JavaScript Source!! http://javascript.internet.com -->
+
+<!-- Begin
+var days = new Array(8);
+days[1] = "Sunday";
+days[2] = "Monday";
+days[3] = "Tuesday";
+days[4] = "Wednesday";
+days[5] = "Thursday";
+days[6] = "Friday";
+days[7] = "Saturday";
+var months = new Array(13);
+months[1] = "January";
+months[2] = "February";
+months[3] = "March";
+months[4] = "April";
+months[5] = "May";
+months[6] = "June";
+months[7] = "July";
+months[8] = "August";
+months[9] = "September";
+months[10] = "October";
+months[11] = "November";
+months[12] = "December";
+var dateObj = new Date(document.lastModified)
+var wday = days[dateObj.getDay() + 1]
+var lmonth = months[dateObj.getMonth() + 1]
+var date = dateObj.getDate()
+var fyear = dateObj.getYear()
+if (fyear < 2000) 
+fyear = fyear + 1900
+document.write("Last Updated " + wday + ", " + lmonth + " " + date + ", " + fyear)
+// End -->
+</script></center>
+
+</body></html>

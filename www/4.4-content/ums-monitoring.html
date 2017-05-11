@@ -1,0 +1,330 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>MQ 4.4: UMS Broker monitoring service</title>
+</head>
+<body>
+Author: Isa Hashim<br>
+Last Edited: 01/09/09<br>
+Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. <br>
+<br>
+<h2>UMS Broker Monitoring service</h2>
+The UMS Broker Monitoring service named 'getBrokerInfo' is a service
+which returns XML
+containing MQ Broker monitoring data. The content of this XML depends
+on the query string that is used. This document describes the XML that
+is returned by this service.<br>
+<br>
+A real sample of the XML can be seen <a href="getDestinations.xml">here</a>.<br>
+<br>
+<h2>XML returned</h2>
+The XML returned by the getBrokerInfo service will look like:<br>
+<br>
+<div style="margin-left: 40px;"><code>&lt;BrokerInfo&gt;<br>
+</code>
+<div style="margin-left: 40px;"><code>&lt;Header&gt;</code><br>
+<div style="margin-left: 40px;"><code></code><code>&lt;GeneratedDate&gt;<br>
+</code>
+<div style="margin-left: 40px;"><code>&lt;Milliseconds&gt;2347657265323342&lt;/Milliseconds&gt;</code><br>
+<code></code><code>&lt;DateString&gt;Monday, November 10, 2008&nbsp;
+4:25:24
+PM
+PST&lt;/DateString&gt;</code><br>
+<code></code></div>
+<code></code><code>&lt;/GeneratedDate&gt;<br>
+</code><code><br>
+&lt;RequestProperties cmd="getDestinations"/</code><code>&gt;<br>
+<br>
+</code><code>&lt;Broker&gt;<br>
+</code>
+<div style="margin-left: 40px;"><code></code><code>&lt;InstanceName&gt;imqbroker&lt;/</code><code>InstanceName</code><code>&gt;</code><code></code><br>
+<code></code><code>&lt;Port&gt;7676&lt;/Port&gt;</code><br>
+<code></code><code>&lt;Version&gt;4.4&lt;/Version&gt;<br>
+&lt;Host&gt;myHost&lt;/Host&gt;<br>
+&lt;VarHome&gt;/var/imq&lt;/VarHome&gt;<br>
+</code><code></code><code>...</code><br>
+<code></code></div>
+<code></code><code>&lt;/Broker&gt;</code><br>
+</div>
+<code></code><code>&lt;Header&gt;<br>
+</code><code><br>
+</code><code>&lt;Body&gt;<br>
+</code>
+<div style="margin-left: 40px;"><code>...<br>
+</code></div>
+<code></code><code>&lt;/Body&gt;</code><code><br>
+</code><code></code></div>
+<code>&lt;/BrokerInfo&gt;<br>
+</code></div>
+<br>
+2 basic parts of the XML are the Header and Body elements. The Header
+element is standard and should remain consistent with most requests
+except for GeneratedDate. The information returned in the Body element
+depends on the query string used.<br>
+<br>
+<h2>Header Element</h2>
+<table style="text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+  <caption>Header element<br>
+  </caption> <tbody>
+    <tr>
+      <th style="vertical-align: top;">XML Element<br>
+      </th>
+      <th style="vertical-align: top;">Description<br>
+      </th>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Header<br>
+      </td>
+      <td style="vertical-align: top;">Header element of&nbsp; UMS
+BrokerInfo reply XML<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">GeneratedDate<br>
+      </td>
+      <td style="vertical-align: top;">Date when this XML reply was
+generated.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Milliseconds<br>
+      </td>
+      <td style="vertical-align: top;">Milliseconds since Jan 1, 1970<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">DateString<br>
+      </td>
+      <td style="vertical-align: top;">Human readable date string.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">RequestProperties<br>
+      </td>
+      <td style="vertical-align: top;">Request properties as submitted
+via the query string. This is a list of key=value pairs.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Broker<br>
+      </td>
+      <td style="vertical-align: top;">High level details on the broker
+being queried.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<h2>Body Element</h2>
+The information returned in the Body element depends on the query
+string used, specifically, what is set for the 'cmd' request parameter.
+In MQ 4.4, the only supported value for 'cmd' is 'getDestinations'. An
+example query string:<br>
+<br>
+<div style="margin-left: 40px;"><samp>http://myhost:8080/imqums/simple?service=getBrokerInfo&amp;<span
+ style="font-weight: bold;">cmd=getDestinations</span></samp><br>
+</div>
+<br>
+The tables below lists the XML returned within the &lt;Body&gt; tags
+for
+a given query string.<br>
+<br>
+<table style="text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+  <caption>Destinations: Show all destinations and destination related
+data<br>
+  </caption> <tbody>
+    <tr>
+      <th style="vertical-align: top;">Query String<br>
+      </th>
+      <td style="vertical-align: top;">service=getBrokerInfo&amp;cmd=getDestinations<br>
+      <br>
+List all destinations and show their monitoring/runtime state.<br>
+      </td>
+    </tr>
+    <tr>
+      <th style="vertical-align: top;">XML returned<br>
+      </th>
+      <td style="vertical-align: top;"><code>&lt;Destinations&gt;<br>
+      </code>
+      <div style="margin-left: 40px;"><code>&lt;Destination&gt;</code><br>
+      <div style="margin-left: 40px;"><code>&lt;AvgNumActiveConsumers&gt;0&lt;/AvgNumActiveConsumers&gt;</code><br>
+      <code>&lt;AvgNumBackupConsumers&gt;0&lt;/AvgNumBackupConsumers&gt;</code><br>
+      <code>&lt;AvgNumConsumers&gt;0&lt;/AvgNumConsumers&gt;</code><br>
+      <code>&lt;AvgNumMsgs&gt;0&lt;/AvgNumMsgs&gt;</code><br>
+      <code>&lt;AvgTotalMsgBytes&gt;0&lt;/AvgTotalMsgBytes&gt;</code><br>
+      <code>&lt;ConnectionID&gt;0&lt;/ConnectionID&gt;</code><br>
+      <code>&lt;CreatedByAdmin&gt;false&lt;/CreatedByAdmin&gt;</code><br>
+      <code>&lt;DiskReserved&gt;0&lt;/DiskReserved&gt;</code><br>
+      <code>&lt;Name&gt;mq.sys.dmq&lt;/Name&gt;</code><br>
+      <code>...</code><br>
+      <code>&lt;Type&gt;q&lt;/Type&gt;<br>
+...<br>
+&lt;ConsumerIDs/&gt;<br>
+...<br>
+      </code> </div>
+      <code>&lt;/Destination&gt;</code><br>
+      <code></code></div>
+      <code><br>
+      </code>
+      <div style="margin-left: 40px;"><code>&lt;Destination&gt;</code><br>
+      </div>
+      <div style="margin-left: 80px;"><code>&lt;AvgNumActiveConsumers&gt;0&lt;/AvgNumActiveConsumers&gt;</code><br>
+      <code>&lt;AvgNumBackupConsumers&gt;0&lt;/AvgNumBackupConsumers&gt;</code><br>
+      <code>&lt;AvgNumConsumers&gt;0&lt;/AvgNumConsumers&gt;</code><br>
+      <code>&lt;AvgNumMsgs&gt;0&lt;/AvgNumMsgs&gt;</code><br>
+      <code>&lt;AvgTotalMsgBytes&gt;0&lt;/AvgTotalMsgBytes&gt;</code><br>
+      <code>&lt;ConnectionID&gt;0&lt;/ConnectionID&gt;</code><br>
+      <code>&lt;CreatedByAdmin&gt;false&lt;/CreatedByAdmin&gt;</code><br>
+      <code>&lt;DiskReserved&gt;0&lt;/DiskReserved&gt;</code><code></code><br>
+      <code>&lt;Name&gt;SimpleTopic&lt;/Name&gt;</code><br>
+      <code>...</code><br>
+      <code>&lt;Type&gt;t&lt;/Type&gt;<br>
+...<br>
+      </code><code>&lt;ConsumerIDs&gt;<br>
+      </code>
+      <div style="margin-left: 40px;"><code>&lt;ConsumerID&gt;</code><code>129230792242097664&lt;/ConsumerID&gt;</code><code></code><br>
+      <code>&lt;ConsumerID&gt;</code><code>129230792243460352&lt;/ConsumerID&gt;</code><br>
+      </div>
+      <code>&lt;/ConsumerIDs&gt;</code><br>
+      <code>...</code><br>
+      </div>
+      <div style="margin-left: 40px;"><code>&lt;/Destination&gt;<br>
+...<br>
+      <br>
+      </code></div>
+      <code>&lt;/Destinations&gt;</code> </td>
+    </tr>
+    <tr>
+      <th style="vertical-align: top;">Notes<br>
+      </th>
+      <td style="vertical-align: top;">Sample complete XML <a
+ href="getDestinations.xml">here</a>.<br>
+      <br>
+The child elements that are
+returned within the &lt;Destination&gt; elements come directly from the
+corresponding JMX MBeans (Destination Monitor MBean):<br>
+      <ul>
+        <li>Attributes - 1 to 1 mapping between MBean attribute name
+and XML element name e.g. CreatedByAdmin</li>
+        <li>Operations</li>
+        <ul>
+          <li>only operations that are 'readonly' are considered i.e.
+operations that do not have any impact on the destination which is true
+for the most part since we are dealing with Destination Monitor MBeans
+here.<br>
+          </li>
+          <li>only operations that do not require any parameters are
+considered</li>
+          <li>The XML element name is constructed by removing the
+prefix 'get' from the operation name e.g. Data returned from the
+getConsumerIDs operation will be listed under the ConsumerIDs XML
+element</li>
+          <li>If the data returned is an array, a sub element is
+created for each array element. The name used for this sub element is
+the singular of it's parent. For example, the ConsumerIDs XML element
+will contain an element named ConsumerID for each consumer of this
+destination.<br>
+          </li>
+        </ul>
+      </ul>
+Issues:<br>
+      <ul>
+        <li>Instead of the above, should we separate/encapsulate the
+information within &lt;Destination&gt; with &lt;Attributes&gt; and
+&lt;Operations&gt; to distinguish what comes from attributes vs
+operations ?<br>
+        </li>
+      </ul>
+      <code></code><code> </code></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<table style="text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+  <caption>Destinations: Show all destinations, specify destination
+data to return<br>
+  </caption> <tbody>
+    <tr>
+      <th style="vertical-align: top;">Query String<br>
+      </th>
+      <td style="vertical-align: top;">service=getBrokerInfo&amp;cmd=getDestinations&amp;dest-elements=Name,Type,NumMsgs<br>
+      <br>
+Listing of destinations, only return specified elements.<br>
+      </td>
+    </tr>
+    <tr>
+      <th style="vertical-align: top;">XML returned<br>
+      </th>
+      <td style="vertical-align: top;"><code>&lt;Destinations&gt;<br>
+      </code> <code></code>
+      <div style="margin-left: 40px;"><code>&lt;Destination&gt;</code><code></code><br>
+      <div style="margin-left: 40px;"> <code>&lt;Name&gt;mq.sys.dmq&lt;/Name&gt;</code></div>
+      <div style="margin-left: 40px;"><code>&lt;NumMsgs&gt;300&lt;/NumMsgs&gt;</code></div>
+      <div style="margin-left: 40px;"> <code>&lt;Type&gt;q&lt;/Type&gt;</code></div>
+      <div style="margin-left: 40px;"> </div>
+      <code>&lt;/Destination&gt;</code><br>
+      <code></code><br>
+      <code>&lt;Destination&gt;</code><code></code><br>
+      <div style="margin-left: 40px;"> <code>&lt;Name&gt;SimpleTopic&lt;/Name&gt;</code></div>
+      <div style="margin-left: 40px;"><code>&lt;NumMsgs&gt;300&lt;/NumMsgs&gt;</code><code></code></div>
+      <div style="margin-left: 40px;"> <code>&lt;Type&gt;t&lt;/Type&gt;</code></div>
+      <div style="margin-left: 40px;"> </div>
+      <code>&lt;/Destination&gt;</code><code></code><br>
+      <code>...</code><br>
+      <code></code></div>
+      <code></code><code>&lt;/Destinations&gt;</code><code></code> </td>
+    </tr>
+    <tr>
+      <th style="vertical-align: top;">Notes<br>
+      </th>
+      <td style="vertical-align: top;"><code></code><code> </code>Sample
+complete XML <a href="getDestinations_elements_spec.xml">here</a>.<br>
+      <br>
+The
+values listed in 'dest-elements' are comma separated and designate the
+XML elements that are to be&nbsp; returned. This applies to data that
+comes from MBean operations as well. For example, one could do:<br>
+      <br>
+service=getBrokerInfo&amp;cmd=getDestinations&amp;dest-elements=Name,Type,NumMsgs,ConsumerIDs<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<h2>Future Improvements</h2>
+<ul>
+  <li>More resource types. In future releases of MQ, this service can
+be extended to support other types of
+resources in the broker eg Consumers, Producers, Connections, which
+means we could in some future release of MQ, support the following:<br>
+    <br>
+    <div style="margin-left: 40px;"><samp>http://myhost:8080/imqums/simple?service=getBrokerInfo&amp;cmd=getDestinations,getConsumers,getConnections<br>
+(this is not implemented in MQ 4.4, possibly in a future release)</samp><br>
+    </div>
+    <br>
+When we do this, the XML may be augmented with more data within the
+Body tags e.g. &lt;Consumers&gt;, &lt;Connections&gt; elements.
+Possible resource types to support:<br>
+    <ul>
+      <li>Services</li>
+      <li>Connections</li>
+      <li>Consumers</li>
+      <li>Producers</li>
+      <li>Transactions<br>
+      </li>
+    </ul>
+  </li>
+  <li>Filtering. have some way of saying 'only return destinations
+where NumConsumers=0 and Type=q'<br>
+  </li>
+</ul>
+<br>
+Copyright 2009, Sun Microsystems, Inc. All rights reserved. Features and specifications subject to change without notice. <br>
+</body>
+</html>

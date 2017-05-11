@@ -1,0 +1,162 @@
+One pager template version: 1.91
+
+1. Introduction
+    1.1. Project/Component Working Name:
+
+    Last Agent Optimization for JMS Bridge Transacted Link
+
+    1.2. Name(s) and e-mail address of Document Author(s)/Supplier:
+
+    Amy Kang     (amyk@dev.java.net)
+
+    1.3. Date of This Document:
+
+    12/08/2009 
+
+2. Project Summary
+    2.1. Project Description:
+
+    The JMS Bridge transacted link uses XA transaction to ensure
+    once-only-once message transfer quality.
+
+    Last agent optimization is a common technique used as an option to optimize
+    2-phase commit protocol when there are more than 1 participants in a XA
+    transaction and when performance requirement outweighs potential transaction
+    inconsistency due to weakened 2-phase commit protocol by the optimization.
+
+    Since last agent optimization uses 1-phase commit for the last participant
+    in the XA transaction,  it can also to be used as a workaround when a
+    JMS provider at one end of the JMS bridge has no XA support.
+
+    The last agent optimization itself can be enhanced to remove the potential
+    transaction inconsistency by inserting an artificial transaction work to 
+    the last agent's transaction to be used to learn the commit out come
+    by the transaction coordinator during recovery.
+
+    2.2. Risks and Assumptions:
+
+    The assumption is that the non-XA JMS provider is JMS 1.1 compliant,
+    in particular JMS local transaction semantic is guaranteed 
+    
+3. Problem Summary
+   3.1. Problem Area:
+   3.2. Justification:
+
+   see 2.1
+
+4. Technical Description:
+     4.1. Details:
+
+     Either the target or the source (not both) in a JMS bridge transacted link
+     can be specified with an attribute
+
+     last-agent-optimization=true
+
+     and attribute last-agent-destination-ref must be specified for the source
+     or target to be used by the JMS bridge transaction coordinator to send
+     an arbitration message in the same JMS transaction to the source or target
+     non-XA JMS provider.  During recovery, the JMS bridge's transaction coordinator
+     will use the existance of this arbitration message in the source or target
+     non-XA JMS provider to determine the transaction decision, should the XA JMS
+     provider returns indoubt transaction state during recovery for the transaction.
+
+     The arbitration message for a transaction will be cleaned up perodically once
+     the XA JMS provider confirms its transaction commit
+
+     The arbitration message will be a javax.jms.Message type with following
+     message String property:
+
+     JMS_SUN_JMSBRIDGE_LAST_AGENT_GXID
+
+     When the decision for a indoubt (PREPARED) transaction in the XA JMS provider
+     can't be determined during recovery, the indoubt transaction will stay unchanged
+     by JMS bridge transaction coordinator, which can be resolved either at next
+     recovery time if possible or manually via administration of the corresponding
+     JMS provider.
+
+     4.2. Bug/RFE Number(s):
+
+     4.3. In Scope:
+
+     4.4. Out of Scope:
+
+     A JMS bridge with link(s) that has last-agent-optimization="true" is not allowed
+     in a HA (enhanced cluster) broker
+
+     4.5. Interfaces:
+
+        4.5.1.  Public Interfaces:
+
+        New JMS Bridge dtd source and target optional attributes
+        last-agent-optimization=true
+        last-agent-destination-ref 
+
+        New MQ JMS provider specific javax.jms.Message property
+        JMS_SUN_JMSBRIDGE_LAST_AGENT_GXID  (String)
+
+        4.5.2.  Private Interfaces:
+        None
+
+        4.5.3.  Deprecated/Removed Interfaces:
+
+        None
+
+     4.6. Doc Impact:
+
+     MQ Admin Guide
+
+     4.7. Admin/Config Impact:
+
+     This feature adds new broker properties, startup option, new imqdbmgr sub-command
+
+     4.8. HA Impact:
+
+     A JMS bridge with link(s) that has last-agent-optimization="true" is not allowed
+     in a HA (enhanced cluster) broker
+
+     4.9. I18N/L10N Impact:
+
+     This feature will introduce new resource and log strings 
+
+     4.10. Packaging, Delivery & Upgrade:
+
+        4.10.1. Packaging
+
+        N/A
+
+        4.10.2. Delivery
+
+        N/A
+    
+        4.10.3. Upgrade and Migration:
+
+        N/A 
+
+     4.11. Security Impact:
+     
+     N/A
+
+     4.12. Compatibility Impact
+
+     None 
+
+     4.13. Dependencies:
+
+        4.13.1 Internal Dependencies
+        None
+
+        4.13.2 External Dependencies
+
+        JMS 1.1 compliant foreign provider
+
+     4.14. Testing Impact
+
+     New tests need to be written and can be automated.
+
+5. Reference Documents:
+
+6. Schedule:
+    6.1. Projected Availability:
+
+    Milestone 5: feature complete
+

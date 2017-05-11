@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Untitled Document</title>
+</head>
+
+<body>
+<h2><a name="section-DirectModeExample-HowToCreateAndConnectToAnEmbeddedBroker" id="section-DirectModeExample-HowToCreateAndConnectToAnEmbeddedBroker">How to create and connect to an embedded broker </a></h2>
+<p>A new feature in Open Message Queue 4.4 is the ability to start and  connect to an embedded broker. This is a broker running in the same JVM  as some other application. </p>
+<p>This feature has been available for some time in the GlassFish Server, Open Source Edition application server, which allows a broker to be started in the same JVM  as the application server instance. However it is now available for use  in any Java application. </p>
+<p>In general, the &quot;embedded&quot; broker instance that is started behaves exactly the same as an ordinary broker instance. </p>
+<h3><a name="section-DirectModeExample-HowToStartAnEmbeddedBroker" id="section-DirectModeExample-HowToStartAnEmbeddedBroker">How to start an embedded broker</a></h3>
+<p>The following code sample shows how to create and start an embedded broker. </p>
+<blockquote>
+  <p><code>  import com.sun.messaging.jmq.jmsclient.runtime.BrokerInstance;  <br>  
+    import com.sun.messaging.jmq.jmsclient.runtime.ClientRuntime;<br>  
+    import com.sun.messaging.jmq.jmsservice.BrokerEvent;<br>  
+    import com.sun.messaging.jmq.jmsservice.BrokerEventListener;<br>  
+    <br>  
+    // obtain the ClientRuntime singleton object<br>  
+    ClientRuntime clientRuntime = ClientRuntime.getRuntime();<br>  
+    <br>  
+    // create the embedded broker instance<br>  
+    BrokerInstance brokerInstance = clientRuntime.createBrokerInstance();<br>	
+    <br>  
+    // convert the specified broker arguments into Properties<br>  
+    // this is a utility function: it doesn't change the broker<br>  
+    Properties props = brokerInstance.parseArgs(args);<br>  
+    <br>	
+    // initialise the broker instance   <br>  
+    // using the specified properties<br>  
+    // and a BrokerEventListener<br>  
+    BrokerEventListener listener = new ExampleBrokerEventListener();<br>  
+    brokerInstance.init(props, listener);<br>  
+    <br>	
+    // now start the embedded broker<br>	 
+    brokerInstance.start();  </code>  </p>
+</blockquote>
+<h3><a name="section-DirectModeExample-ArgumentsThatNeedToBeSpecifiedWhenStartingAnEmbeddedBroker" id="section-DirectModeExample-ArgumentsThatNeedToBeSpecifiedWhenStartingAnEmbeddedBroker">Arguments that need to be specified when starting an embedded broker</a></h3>
+<p>You need to pass into <code>BrokerInstance.parseArgs()</code> the same broker arguments as when starting an ordinary standalone broker. </p>
+<p>In particular, unless you run this in the same directory as the <code>imqbrokerd</code> command you may need to specify the <code>-imqhome</code> and <code>-varhome</code> arguments. </p>
+<blockquote>
+  <p><code>-imqhome</code> specifies the MQ installation directory<br />
+  <code>-varhome</code> specifies the directory in which MQ temporary or dynamically created configuration and data files are stored. </p>
+</blockquote>
+<p>Other arguments you may also wish to specify: </p>
+<blockquote>
+  <p><code>-name</code> specifies the broker name<br />
+  <code>-port</code> specifies the port on which the broker will be listening for connections (for out-of-VM clients) </p>
+</blockquote>
+<p>For example: </p>
+<blockquote>
+  <p><code>-imqhome C:\Sun\glassfish\imq  -varhome C:\Sun\glassfish\imq\var  -name embeddedExample -port 4545 </code></p>
+</blockquote>
+<h3><a name="section-DirectModeExample-HowToSpecifyABrokerEventListener" id="section-DirectModeExample-HowToSpecifyABrokerEventListener">How to specify a BrokerEventListener</a></h3>
+<p>When you call <code>BrokerInstance.init()</code> to initalise the embedded broker you need to supply a <code>BrokerEventListener</code>. This is an instance of a class that implements the <code>BrokerEventListener</code> interface. This implements two methods: </p>
+<blockquote> <code>public void brokerEvent(BrokerEvent brokerEvent){  <br/>
+</code><code>} </code></blockquote>
+<p>This is called when the broker starts and stops. It doesn't need to do anything: you can implement an empty method. </p>
+<blockquote> 
+  <p><code>public boolean exitRequested(BrokerEvent event, Throwable thr){</code><code> <br />
+    &nbsp;&nbsp;return true;  <br />
+    } </code> </p>
+</blockquote>
+<p>This is called when a fatal error has been encountered and the  broker is seeking permission to terminate. This method should normally  return true. If false is returned then the broker shutdown will not  take place but the broker may then cease to respond correctly. </p>
+<h3><a name="section-DirectModeExample-HowToShutDownAnEmbeddedBroker" id="section-DirectModeExample-HowToShutDownAnEmbeddedBroker">How to shut down an embedded broker</a></h3>
+<blockquote>
+  <p><code>// stop the embedded broker		  <br />
+    &nbsp;&nbsp;  brokerInstance.stop();<br />  		  
+    // shutdown the embedded broker			  <br />
+    &nbsp;&nbsp; brokerInstance.shutdown();  </code></p>
+</blockquote>
+<h3><a name="section-DirectModeExample-HowToCreateADirectConnectionToAnEmbeddedBroker" id="section-DirectModeExample-HowToCreateADirectConnectionToAnEmbeddedBroker">How to create a direct connection to an embedded broker</a></h3>
+<p>Once the embedded broker is running you can create direct  connections to it from threads running in the same JVM as required.  Direct connections are used in exactly the same way as ordinary  connections except that they use a direct in-memory transport rather  than TCP: </p>
+<blockquote>
+  <p><code>com.sun.messaging.ConnectionFactory cf = new com.sun.messaging.ConnectionFactory();<br>
+    cf.setProperty(ConnectionConfiguration.imqAddressList, &quot;mq://localhost/direct&quot;);  <br>
+    Connection connection = cf.createConnection();  </code>  </p>
+</blockquote>
+<p>Threads running in the same JVM as the embedded broker can also  create ordinary TCP connections (as described in the following  sections). However direct connections give faster performance. </p>
+<h3><a name="section-DirectModeExample-HowToCreateAnOrdinaryTCPConnectionToAnEmbeddedBroker" id="section-DirectModeExample-HowToCreateAnOrdinaryTCPConnectionToAnEmbeddedBroker">How to create an ordinary TCP connection to an embedded broker</a></h3>
+<p>Clients running in other JVMs can connect to the broker in exactly  the same way as they connect to any other broker, by specifying the  appropriate URL including the hostname and port. They do not need to be  aware that the broker being connected to is an &quot;embedded&quot; broker. </p>
+<blockquote>
+  <p><code>com.sun.messaging.ConnectionFactory cf = new com.sun.messaging.ConnectionFactory();  <br>
+    cf.setProperty(ConnectionConfiguration.imqAddressList, &quot;mq://localhost:7676&quot;);  <br>
+    Connection connection = cf.createConnection();  </code>  </p>
+</blockquote>
+<h3><a name="section-DirectModeExample-CompleteExample" id="section-DirectModeExample-CompleteExample">Complete example</a></h3>
+<p>We've written this into an example which you can download,  <a href="EmbeddedBrokerExample.java">here<img src="../images/download.gif" alt="Download" width="40" height="40" /></a>. This example shows how to: </p>
+<ul>
+  <li> start an embedded broker </li>
+  <li> create a direct connection to it which is used to send and receive a message, and </li>
+  <li> shut down the embedded broker </li>
+</ul>
+<p>It also shows how to implement a BrokerEventListener. </p>
+<p>When running this example you need to specify the same arguments as are needed for running a normal broker. For example: </p>
+<blockquote>
+  <p><code>-imqhome C:\Sun\glassfish\imq  -varhome C:\Sun\glassfish\imq\var  -name embeddedExample -port 4545 </code>  </p>
+</blockquote>
+
+<hr align="center" />
+<p align="center"><em>Copyright 2009, Sun Microsystems Inc., All Rights Reserved </em></p>
+</body>
+</html>

@@ -1,0 +1,561 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+
+
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" /><title>Open MQ 4.5.1</title>
+  
+
+  
+  
+  <link rel="stylesheet" media="all" type="text/css" href="style.css" />
+
+  
+  <meta http-equiv="Pragma" content="no-cache" />
+
+  
+  <meta http-equiv="Expires" content="-1" /><!-- hide the project info -->
+
+
+  
+  <style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+.style1 {
+	font-size: x-large;
+	font-weight: bold;
+}
+  </style>
+  <meta content="Open MQ 4.5.1 update release" name="description" /></head><body>
+<thread>
+</thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>Open MQ 4.5.1 (Complete) </div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<h1>
+<div id="section">Downloads</div>
+<div id="title">License </div>
+</h1>
+
+<thread> </thread>
+<table border="0" width="100%">
+
+  <tbody>
+    <tr>
+      <td bgcolor="#ffff99">
+      <p class="generic1"> Open MQ is dual licensed with either CDDL or
+GPL v2 with ClassPath Exception. <a href="LICENSE.txt">Click here to
+view the license</a>. In addition, Open MQ Binaries include Mozilla <a href="http://www.mozilla.org/projects/security/pki/nss/">Network
+Security Services</a> and <a href="http://www.mozilla.org/projects/nspr/">Network Security Portable
+Runtime</a> (NSS / NSPR) which are licensed under the LGPL. You may
+only use these products under the terms of these licenses. By
+downloading the source or binary archives from this site, you are
+agreeing to the terms of these licenses.</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p><a href="#download">Straight to the Downloads</a></p>
+
+<p>MQ 4.5.1 is now complete. Final download bits are below. This is a
+minor bug-fix only update to MQ 4.5. You will find complete details
+about new features in MQ 4.5, <a href="4.5.html">here</a>. If you find any problems with these
+builds, please use <a href="http://java.net/jira/browse/MQ">Jira</a>,
+or send an e-mail to <a href="mailto:users@mq.java.net">users@mq.java.net</a>.
+As a reminder, the license for NSS/NSPR
+is now LGPL.</p>
+
+<thread>
+</thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>Project Overview </div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>Open MQ 4.5.1 will contain bug-fixes only.While we do our best to
+keep this page accurate, there are occasionally mistakes. Please let us
+know if you find anything missing, or incorrect. Definitions and
+planning for MQ 4.6 should be forthcoming soon. </p>
+
+<p>This page is a reasonable description of the projects and features
+that we added in MQ 4.5.1. If you have any comments or questions,
+please send e-mail to <a href="mailto:users@mq.java.net">users@mq.java.net</a>
+or <a href="mailto:users@glassfish.java.net">users</a><a href="mailto:users@glassfish.java.net">@glassfish.java.net</a>. </p>
+
+<table class="generic1" summary="This is a list of new features and other changes in Open MQ 4.5." border="0" width="100%">
+
+  <caption> <span class="style1">New features and other changes in
+Open MQ 4.5.1 </span> </caption> <tbody>
+    <tr bgcolor="#cccccc">
+      <th scope="col" width="19%">Feature</th>
+      <th scope="col" width="44%">Description</th>
+      <th scope="col" width="6%">
+      <div align="center">One-Pager</div>
+      </th>
+    </tr>
+    <tr>
+      <td>Java 7<br />
+      </td>
+      <td style="text-align: center;">This release was tested (and commercial version) supported with Java 7<br />
+      </td>
+      <td><br />
+      </td>
+    </tr>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </tbody>
+</table><br />This is a Jira query that yields bugs fixed in MQ 4.5.1 updae -- <a href="http://java.net/jira/secure/IssueNavigator.jspa?reset=true&amp;jqlQuery=project+%3D+MQ+AND+fixVersion+%3D+%224.5.1_b03%22+AND+status+%3D+Resolved">Click Here for JIRA Query</a><br />
+<p>Community updates</p>
+
+<ul>
+
+  <li>Build scripts are now included with source archive. See <a href="#source">below</a> for details about building with the Mercurial
+archive. </li>
+</ul>
+
+<thread>
+</thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>Schedule</div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>This release will track the GlassFish Server, Open Source Edition
+3.1 project. GlassFish Server, Open Source Edition 3.1 is described
+further, <a href="https://glassfish.java.net/wiki-archive/GlassFishv3.1.html">here</a>.
+The GlassFish subproject page which provides additional context for the
+GlassFish features is available <a href="https://glassfish.java.net/wiki-archive/3.1JMS.html">here</a>. The
+proposed master schedule for GlassFish 3.1 is <a href="https://glassfish.java.net/wiki-archive/GlassFishV3Schedule.html#section-GlassFishV3Schedule-section-GlassFishV3Schedule-GlassFishServerOpenSourceEdition3.1">here</a>.
+</p>
+
+<thread>
+</thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>
+    <div align="center">Open MQ 4.5.1 Milestones </div>
+    </div>
+    </td>
+    <td>
+    <div>
+    <div align="center">Date</div>
+    </div>
+    </td>
+    <td>
+    <div>
+    <div align="center">Description</div>
+    </div>
+    </td>
+  </tr>
+  </thead> <tbody>
+    
+    
+    <tr>
+      <td>
+      <div>
+      <div align="center">Finish</div>
+      </div>
+      </td>
+      <td>
+      <div>
+      <div align="center">July 28, 2011<br />
+ </div>
+      </div>
+      </td>
+      <td>
+      <div>This release coincides with GlassFish 3.1.1. We anticipate
+delivering this around the time Java 7, and NetBeans 7.1 arrive. See
+the <a href="http://glassfish.java.net">GlassFish project</a> for more up to date projections.<br />
+ </div>
+      </td>
+    </tr>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<thread>
+</thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div><a name="download" id="download">Downloads</a></div>
+    <a name="download" id="download"> </a></td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p><br />
+</p>
+
+<thread>
+</thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td colspan="3">
+    <div><a name="fileinstall" id="fileinstall">Open MQ 4.5.1 Binary
+Downloads <blink><em /></blink><em><em><em /></em></em></a></div>
+<em><em><em><em><em>    <a name="fileinstall" id="fileinstall"><em> </em></a></em></em></em></em></em></td>
+  </tr>
+  </thead> <tbody>
+    <tr bgcolor="#cccccc">
+      <td>
+      <div>Operating System</div>
+      </td>
+      <td>
+      <div>
+      <div align="center">image with installer </div>
+      </div>
+      </td>
+      <td>
+      <div>
+      <div align="center">file image (no installer) </div>
+      </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>Sun Solaris Sparc</div>
+      </td>
+      <td>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/latest/openmq4_5_1-installer-SunOS.zip">image
+with installer</a> </div>
+      </td>
+      <td>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/latest/openmq4_5_1-binary-SunOS.zip">zip
+archive, no installer</a></div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>Sun Solaris x86</div>
+      </td>
+      <td>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/latest/openmq4_5_1-installer-SunOS_X86.zip">image
+with installer </a></div>
+      </td>
+      <td>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/latest/openmq4_5_1-binary-SunOS_X86.zip">zip
+archive, no installer</a></div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>Linux</div>
+      </td>
+      <td>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/latest/openmq4_5_1-installer-Linux_X86.zip">image
+with installer</a> </div>
+      </td>
+      <td>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/latest/openmq4_5_1-binary-Linux_X86.zip">zip
+archive, no installer</a></div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>Microsoft Windows x86</div>
+      </td>
+      <td>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/latest/openmq4_5_1-installer-WINNT.zip">image
+with installer</a> </div>
+      </td>
+      <td>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/latest/openmq4_5_1-binary-WINNT.zip">zip
+archive, no installer</a> </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>IBM AIX</div>
+      </td>
+      <td>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/latest/openmq4_5_1-installer-AIX.zip">image
+with installer</a> </div>
+      </td>
+      <td>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/latest/openmq4_5_1-binary-AIX.zip">zip
+archive, no installer</a></div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>Unix (e.g. Mac OSX)</div>
+      </td>
+      <td>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/latest/openmq4_5_1-installer-Unix.zip">image
+with installer </a></div>
+      </td>
+      <td>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/latest/openmq4_5_1-binary-Unix.zip">zip
+archive, no installer</a></div>
+      </td>
+    </tr>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<br />
+
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td colspan="3">
+    <div><a name="source" id="source">Source-code Downloads 4.5.1</a></div>
+    <a name="source" id="source"> </a></td>
+  </tr>
+  </thead> <tbody>
+    <tr>
+      <td colspan="2">
+      <div>Open Message Queue 4.5.1 Source Code Archive </div>
+      </td>
+      <td>
+      <div>
+      <div align="center"><a href="http://java.net/projects/mq/sources/mq-hg/show">Repository</a><br />
+ </div>
+      </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>Build files (For <a href="http://netbeans.org">NetBeans</a>)</div>
+      </td>
+      <td>
+      <div> <a href="http://download.java.net/mq/open-mq/4.4u1/b7-final/CompilingAndRunningInNetBeans.txt">
+      </a></div>
+      <a href="http://download.java.net/mq/open-mq/4.4u1/b7-final/CompilingAndRunningInNetBeans.txt">
+      <br />
+      </a></td>
+      <td>See the source code archive </td>
+    </tr>
+    <tr>
+      <td>
+      <div>Build files (For Ant)</div>
+      </td>
+      <td colspan="2">See the source code archive </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Please note: At the conclusion of MQ 4.5, we posted the source
+archive in a Mercurial archive at java.net. This archive is now
+available for community users. You can browse this archive is at this
+URL: <a href="http://java.net/projects/mq/sources/mq-hg/show">http://java.net/projects/mq/sources/mq-hg/show</a></p>
+
+<p>Instructions for performing builds via this archive are given on the
+<a href="repo-build.html">repo-build.html page</a>.</p>
+
+
+<thread>
+</thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>JavaDoc</div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p><a href="javadoc/4.5/javadoc/overview-summary.html">4.5 JavaDoc</a> (This isn't planned for update in 4.5.1) </p>
+
+<thread>
+</thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td height="23">
+    <div>Maven</div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p>Maven build snapshots are also available. The MQ jars are available at <br />http://download.java.net/maven/2/com/sun/messaging/mq/imq/4.5.1-bXX. These will
+evolve as 4.5.1 progresses. </p>
+
+<thread>
+</thread>
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td>
+    <div>Promoted Build History </div>
+    </td>
+  </tr>
+  </thead> <tbody>
+  </tbody> <tbody>
+  </tbody>
+</table>
+
+<p><br />
+ </p>
+
+<table class="generic1" border="0" cellpadding="0" cellspacing="0" width="95%">
+
+  <thead> <tr>
+    <td colspan="3">
+    <div><a name="version-history" id="version-history">Build History </a></div>
+    <a name="version-history" id="version-history"> </a></td>
+  </tr>
+  </thead> <tbody>
+    <tr>
+<td>
+      <div>
+      <div align="left"><a href="http://download.java.net/mq/open-mq/4.5.1/b03-final">4.5.1 b3-final</a><a href="http://download.java.net/mq/open-mq/4.5.1/b03-final"><br />
+      </a></div>
+      </div>
+      </td><td>
+      <div>Bug fixes<br />
+      </div>
+      </td><td>
+      <div>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/b03-final/changes.html">Change
+Log </a></div>
+      </div>
+      </td></tr>
+    <tr>
+<td>
+      <div>
+      <div align="left"><a href="http://download.java.net/mq/open-mq/4.5.1/b03">4.5.1 b3</a><a href="http://download.java.net/mq/open-mq/4.5.1-b03">
+      </a></div>
+      </div>
+      </td><td>
+      <div>Bug fixes<br />
+      </div>
+      </td><td>
+      <div>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/b03/changes.html">Change
+Log </a></div>
+</div>
+      </td></tr>
+<tr>
+      <td>
+      <div>
+      <div align="left"><a href="http://download.java.net/mq/open-mq/4.5.1/b02">4.5.1 b2<br />
+      </a></div>
+      </div>
+      </td>
+      <td>
+      <div>Bug fixes<br />
+      </div>
+      </td>
+      <td>
+      <div>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/b02/changes.html">Change
+Log </a></div>
+      </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      <div>
+      <div align="left"><a href="http://download.java.net/mq/open-mq/4.5.1/b01/">4.5.1 b1<br />
+      </a></div>
+      </div>
+      </td>
+      <td>
+      <div>First build for Open MQ 4.5.1 community update<br />
+      </div>
+      </td>
+      <td>
+      <div>
+      <div align="center"><a href="http://download.java.net/mq/open-mq/4.5.1/b01/changes.html">Change
+Log </a></div>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p align="center">Feedback is always welcome -- e-mail to: <a href="mailto:users@mq.java.net">users@mq.java.net</a></p>
+
+<center>
+<script language="JavaScript">
+
+<!-- This script and many more are available free online at -->
+<!-- The JavaScript Source!! http://javascript.internet.com -->
+
+<!-- Begin
+var days = new Array(8);
+days[1] = "Sunday";
+days[2] = "Monday";
+days[3] = "Tuesday";
+days[4] = "Wednesday";
+days[5] = "Thursday";
+days[6] = "Friday";
+days[7] = "Saturday";
+var months = new Array(13);
+months[1] = "January";
+months[2] = "February";
+months[3] = "March";
+months[4] = "April";
+months[5] = "May";
+months[6] = "June";
+months[7] = "July";
+months[8] = "August";
+months[9] = "September";
+months[10] = "October";
+months[11] = "November";
+months[12] = "December";
+var dateObj = new Date(document.lastModified)
+var wday = days[dateObj.getDay() + 1]
+var lmonth = months[dateObj.getMonth() + 1]
+var date = dateObj.getDate()
+var fyear = dateObj.getYear()
+if (fyear < 2000) 
+fyear = fyear + 1900
+document.write("Last Updated " + wday + ", " + lmonth + " " + date + ", " + fyear)
+// End -->
+</script></center>
+
+</body></html>

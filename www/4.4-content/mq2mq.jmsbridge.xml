@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jmsbridge SYSTEM "sun_jmsbridge_1_0.dtd">
+<!--
+   Copyright  2000-2008 Sun Microsystems, Inc.  All rights reserved.
+   Use is subject to license terms.
+-->
+<jmsbridge name="mq2mqbridge">
+  <link name="link1">
+    <source connection-factory-ref="CF1" destination-ref="myqueue1">
+    </source>
+    <target connection-factory-ref="CF2" destination-ref="myqueue2">
+    </target>
+  </link>
+  <connection-factory ref-name="CF1" /> 
+
+  <connection-factory ref-name="CF2" lookup-name="cn=XCF7678">
+    <property name="java.naming.factory.initial"
+              value="com.sun.jndi.fscontext.RefFSContextFactory"/>
+    <property name="java.naming.provider.url" value="file:///tmp/mq/"/>
+  </connection-factory>
+
+  <connection-factory ref-name="dmq"/>
+
+  <destination ref-name="myqueue1" name="myqueue1" type="queue">
+  </destination>
+  <destination ref-name="myqueue2" name="myqueue2" type="queue">
+  </destination>
+</jmsbridge>
+

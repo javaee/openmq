@@ -1,21 +1,11 @@
-The JavaMail API provides a platform-independent and
-protocol-independent framework to build mail and messaging
-applications.
-The JavaMail API is available as an optional package for use with the
-[Java SE platform](http://www.oracle.com/technetwork/java/javase/index.html)
-and is also included in the
-[Java EE platform](http://www.oracle.com/technetwork/java/javaee/index.html).
+Open Message Queue (Open MQ) is a complete message-oriented middleware platform.
+It offers high quality, enterprise ready messaging and is open source with a community of developers and users. 
 
 # Table of Contents
 * [Latest News](#Latest_News)
-* [Download Open Message Queue](#Download_OpenMQ)
+* [Downloads](#Download_OpenMQ)
+* [Quick start guide](www/overview.html)
 * [API Documentation](#API_Documentation)
-* [Samples](#Samples)
-* [Help](#Help)
-* [Bugs](#Bugs)
-* [Development Releases](#Development_Releases)
-* [JavaMail for Android](#JavaMail_for_Android)
-* [Project Documentation](#Project_Documentation)
 
 # <a name="Latest_News"></a>Latest News
 

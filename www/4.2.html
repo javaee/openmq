@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<link rel="stylesheet" media="all" type="text/css" href="style.css" />
+<title>Open MQ (4.2): Overview</title>
+<!-- hide the project info -->
+<style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+</style>
+
+</head>
+
+<body>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Open MQ 4.2 Project Information </div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p>The Open MQ 4.2 release is now final! We'd love to hear you feedback with this release, good or bad. If you encounter any issues, drop us a line. </p>
+<p>Here's the place where we are describing what we're up to with the next release of Open MQ. You might want to book-mark our <a href="http://blogs.sun.com/openmessagequeue/">Linda Schneider</a> and <a href="http://blogs.sun.com/tharakan/">George Tharakan's</a> blogs, as there will be updates and conversation about the features, priorities etc. over there as well. </p>
+<p><a href="#Downloads">Download's are down below. </a></p>
+<h3>Content</h3>
+<p>The following features are added to this release. See the <a href="http://download.oracle.com/docs/cd/E19906-01/index.html">Java MQ 4.2 product documentation</a> for complete descriptions and usage updates. </p>
+<ol>
+  <li><strong>Improvements in performance</strong> -- We continue to analyze and estimate performance in various use-case scenarios. We are working to improve JMS performance and obtain improved performance in both Horizontal (more output from single servers) and Vertical (more output from clusters of servers) scaling dimensions. The gains we're looking at for this release are probably only modest, but the will be measurable. These changes will be rolled out over the course of this development cycle and they start in Build 2. </li>
+  <li><strong>Wildcard Topics </strong> -- this feature allows you to reference a collection of Destination Topics by using under-specified destination names. This feature was first released in promoted build 4. Preliminary description is available on <a href="wildcard-topics.html">this page</a>. </li>
+  <li><strong>Support for XA Transactions using Tuxedo</strong> --  This feature allows integration with XA and Tuxedo. This is implemented using the C-API and we extend this API by implementing the XA interfaces required by the X-Open XA Specification. This feature is introduced in build 2 and is available for you to test and trial. We welcome your feedback. You can read more about the API on <a href="tux-xa.html">this page</a></li>
+  <li><strong>Schema validation for XML payloads -- </strong> This often requested feature allows the administrator a way to validate payloads before they are placed into a destination. This feature should simplify the down-stream error checking requirements, though it's not suitable for all possible message types. This is available starting in Build 12. You can read the preliminary instructions <a href="xml-validation.html">on this page</a>. </li>
+  <li><strong>MySQL Support</strong> -- With this release, we add support for MySQL. We've tested both <a href="http://dev.mysql.com/downloads/mysql/5.0.html">MySQL Community</a> edition, and <a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster Edition</a>. With Cluster Edition, you can deploy a fully distributed and replicated JMS solution. When this release ships, we'll also be providing commercial support for these products in combination. Be sure to have a look at the enhancement <a href="http://bugs.sun.com/view_bug.do?bug_id=6713071">CR 6713071</a> that describes how we've simplified property setup for  MySQL. You should use MySQL Cluster Edition 6.x. For vanilla JDBC use, version 5.x should work fine. More configuration details maybe found in the <a href="https://glassfish.java.net/wiki-archive/OpenMQJDBCQuestions.html">FAQ</a>. </li>
+  <li><strong>Product Registration</strong> -- We will now have  product registration, via the GUI installer. This runs when you install from any of the GUI install archives (first released in Build 8). There is a command-line invocation that allows registration without installation. That is documented <a href="registration.html">here</a>.</li>
+</ol>
+<h3>Timing / Status </h3>
+<p>This release was finalized on July 28, 2008. We'd like to think the community for their feedback and assistance developing this release. </p>
+<p> Please feel free to drop us a line if you have any feedback on the new features that are included in this release. </p>
+<h3>Feedback</h3>
+<p>Feel free to send us e-mail at <a href="mailto:users@mq.java.net">users@mq.java.net</a>. </p>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div><a name="Downloads" id="Downloads"></a>Downloads</div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<h2>Open Message Queue 4.2  Binary Distributions </h2>
+<p>These builds are now final. If you are interested in a commercial licensed version, you can access it from the Sun Download Center, Here. Older stable releases are posted on the <a href="downloads.html">Downloads Page</a>. </p>
+<p>Open Message Queue is available for Solaris Sparc, Solaris x86, Linux, and Windows. Use the table to select the version you desire. </p>
+<p>These community versions are available under dual license, allowing you to choose between  open source licenses <a href="http://www.sun.com/cddl/">CDDL</a> or GPL v2 with ClassPath exception. <a href="LICENSE.txt">Click here to view the license</a>. In addition, this project uses Mozilla <a href="http://www.mozilla.org/projects/security/pki/nss/">Network Security Services</a> and <a href="http://www.mozilla.org/projects/nspr/">Network Security Portable Runtime</a> (NSS / NSPR) which are licensed under the <a href="http://www.mozilla.org/MPL/MPL-1.1.html">Mozilla Public License</a>. You may only use these products under the terms of these licenses. By downloading the source or binary archives from this site, you are agreeing to the terms of these licenses. </p>
+<p>If you are interested in the commercially licensed version of Sun Java System Message Queue 4.2, you may obtain it from the Sun Download Center at this <a href="https://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_SMI-Site/en_US/-/USD/ViewProductDetail-Start?ProductRef=JavaSystem-MsgQ-4.2-OTH-G-F@CDS-CDS_SMI">link</a>. </p>
+<table border="0" cellspacing="0" cellpadding="0" width="95%" class="generic1">
+  <thead>
+    <tr>
+      <td><div> Open MQ 4.2 GUI Install Downloads <blink><em>These were released July 28, 2008 </em></blink></div></td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div> Solaris Sparc <a href="http://download.java.net/mq/open-mq/4.3/b07-fcs/openmq4_3-installer-Linux_X86.zip">Link</a> </div></td>
+    </tr>
+    <tr>
+      <td><div>Solaris x86 <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-SunOS_X86-20080707.zip">Link</a> </div></td>
+    </tr>
+    <tr>
+      <td><div>Linux <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-Linux_X86-20080707.zip">Link</a> (RPM Support Required)</div></td>
+    </tr>
+    <tr>
+      <td><div>Windows <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-WINNT_20080707.zip">Link</a> </div></td>
+    </tr>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p>&nbsp;</p>
+<table border="0" cellspacing="0" cellpadding="0" width="95%" class="generic1">
+  <thead>
+    <tr>
+      <td><div><a name="fileinstall" id="fileinstall"></a>Open MQ 4.2 Binary Downloads (Compressed Archive) <blink><em>These were released July 28, 2008 </em></blink></div></td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div>Solaris Sparc <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-binary-SunOS-20080707.jar">link</a></div></td>
+    </tr>
+    <tr>
+      <td><div>Solaris x86 <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-binary-SunOS_X86-20080707.jar">link</a></div></td>
+    </tr>
+    <tr>
+      <td><div>Linux <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-binary-Linux_X86-20080707.jar">link</a></div></td>
+    </tr>
+    <tr>
+      <td><div>Windows x86 <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-binary-WINNT-20080707.jar">link</a></div></td>
+    </tr>
+    <tr>
+      <td><div>Unix (e.g. AIX, Mac OSX) <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-binary-Unix-20080707.jar">link</a></div></td>
+    </tr>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p>See <a href="http://mq.java.net/downloads.html#fileinstall">these instructions</a> for installing these file-based bundles </p>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div><a name="source" id="source"></a>Open MQ 4.2 Source-code Downloads</div></td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div>
+        <p>Current source bundle archive <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-source-20080707.jar">Link</a>. <blink></blink> <br />
+          <a href="http://download.java.net/mq/open-mq/4.2/fcs/Compiling and Running OpenMQ 4.2 in NetBeans.txt">Build instructions</a> for Netbeans. <a href="http://download.java.net/mq/open-mq/4.2/fcs/version.properties">Version.properties</a> for your Netbeans build. </p>
+        </div></td>
+    </tr>
+  </tbody>
+</table>
+<h2>Documentation</h2>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>
+        <a name="source" id="source"></a>Open MQ 4.2 Revised Documentation</div></td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div><a href="http://download.oracle.com/docs/cd/E19906-01/index.html">Sun Java System Message Queue Document Collection for version 4.2. 
+        </a></div></td>
+    </tr>
+  </tbody>
+</table>
+<h2>Version History</h2>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td colspan="2"><div><a name="version-history" id="version-history"></a>Version History </div></td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div><a href="http://download.java.net/mq/open-mq/4.2/b17/">Build 17</a> </div></td>
+      <td><div>Bug fixes. See Changes <a href="http://download.java.net/mq/open-mq/4.2/b17/build-17-changes.html">here</a>. </div></td>
+    </tr>
+    <tr>
+      <td><div><a href="http://download.java.net/mq/open-mq/4.2/b16/">Build 16</a> </div></td>
+      <td><div>Bug Fixes, MySQL property simplification. See changes <a href="http://download.java.net/mq/open-mq/4.2/b16/build-16-changes.html">here</a>. </div></td>
+    </tr>
+    <tr>
+      <td><div><a href="http://download.java.net/mq/open-mq/4.2/b15/">Build 15</a> </div></td>
+      <td><div>Bug Fixes, updated localization strings.</div></td>
+    </tr>
+    <tr>
+      <td><div><a href="http://download.java.net/mq/open-mq/4.2/b14/">Build 14</a> </div></td>
+      <td><div>Bug Fixes</div></td>
+    </tr>
+    <tr>
+      <td><div>Build 13 </div></td>
+      <td><div>Bug Fixes, Localization Updates </div></td>
+    </tr>
+    <tr>
+      <td><div>Build 12  </div></td>
+      <td><div>Finalized XML Schema Validation</div></td>
+    </tr>
+    <tr>
+      <td><div>Build 11 </div></td>
+      <td><div>Added XSD Validation. General fixes. </div></td>
+    </tr>
+    <tr>
+      <td><div>Build 10 </div></td>
+      <td><div>Added Administration and JMX commands for Wildcard Topics </div></td>
+    </tr>
+    <tr>
+      <td><div>Build 8 </div></td>
+      <td><div>Added GUI install with registration </div></td>
+    </tr>
+    <tr>
+      <td><div>Build 4 </div></td>
+      <td><div>Added support for Wildcard topics </div></td>
+    </tr>
+    <tr>
+      <td><div>Build 3</div></td>
+      <td><div>Minor update from build 2</div></td>
+    </tr>
+    <tr>
+      <td><div>Build 2 </div></td>
+      <td><div>First promoted build. Adds performance updates (minor) and XA support in the C-API -- tested for use with Tuxedo Transaction Manager </div></td>
+    </tr>
+  </tbody>
+</table>
+<p>&nbsp; </p>
+<p>We'll add more of these from time to time. Check back when you have time.  </p>
+</body>
+</html>

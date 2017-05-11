@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link rel="stylesheet" media="all" type="text/css" href="style.css" />
+<title>Open MQ (4.2): Registration</title>
+<!-- hide the project info -->
+<style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+</style>
+
+</head>
+
+
+<body>
+
+<table border="0" cellspacing="0" cellpadding="0" id="main2" width="100%">
+  <tr valign="bottom" class="nav1">
+    <td nowrap="nowrap" colspan="3"><!-- tab 4--></td>
+  </tr>
+  <form>
+    <tr class="sub1">
+      <td nowrap="nowrap"><div align="center"><strong>&nbsp;Open Message Queue 4.2 -- New Registration Features </strong></div></td>
+      <td align="right" nowrap="nowrap">&nbsp;</td>
+    </tr>
+  </form>
+  <tr>
+    <td colspan="3" class="white"><div class="min1">&nbsp;</div></td>
+  </tr>
+</table>
+<p align="center"><em>(Note: This is a new feature in Open MQ 4.2) </em> <br />
+  <a href="http://mq.java.net/4.2.html">Back to Open MQ 4.2 Index </a></p>
+<p>If the user registers the product when they perform the installation, this command is not required. However, if they choose not to register at installation time, but want to register later, this provides that, without requiring a re-install. </p>
+<h3>New installer 'register  only' mode</h3>
+<p>If the user decides to skip registration, he or she can perform  registration after installation by running the installer in a 'register  only' mode. In this mode, the installer will display only the screens  related to registration. A requirement here is that MQ 4.2 needs to be  already installed - since registration will require the local service  tag registry. <br />
+  <br />
+  The MQ 4.2 'register only' mode is activated by running the installer  with a new '-r' option. Relevant usage help output  in bold below.<br>
+</p>
+<pre>
+# installer -h<br />  Usage: installer [OPTION]<br />  <br />  Options:<br />  &nbsp; -a &lt;file&gt;<br />  &nbsp; Specify an answer file to be used by installer in non  interactive mode.<br />  <br />  &nbsp; -h<br />  &nbsp; Show usage help<br />  <br />  &nbsp; -s<br />  &nbsp; Silent mode. No output will be displayed.<br />  <br />  &nbsp; -t<br />  &nbsp; Select Text mode instead of GUI mode.<br />  <br />  &nbsp; -n &lt;file&gt;<br />  &nbsp; Dry run mode. Does not install anything. Your install responses  are saved to<br />  &nbsp; &lt;file&gt; and can be used with -a to replicate this install.<br />  <br />  &nbsp; -r<br />  &nbsp; Register product. Does not  install anything. Runs the installer's product <br />  &nbsp; registration screens.<br />  <br />  &nbsp; Exit status<br />  &nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp; Success<br />  &nbsp; &gt;0&nbsp;&nbsp;&nbsp; An error occurred</pre>
+</body>
+</html>

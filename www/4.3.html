@@ -1,0 +1,375 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Open MQ 4.3</title>
+<link rel="stylesheet" media="all" type="text/css" href="style.css" />
+
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache" />
+<META HTTP-EQUIV="Expires" CONTENT="-1" />
+<!-- hide the project info -->
+<style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+</style>
+</head>
+
+<body>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Open MQ 4.3 Release Information </div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p><a href="#download">Straight to the Downloads </a>MQ 4.3 was finalized on Dec. 15, 2008 </p>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Project Overview </div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p>Open MQ 4.3 was a short-cycle release with a few minor new features and bug fixes. We were pleased to finalized this release on-time, December 15, 2008. This release will be delivered as part of GlassFish 2.1. </p>
+<p>New Features included with MQ 4.3 include</p>
+<ul>
+  <li><strong>Universal Message Service</strong> (UMS) -- Message Queue  4.3 introduces a new universal messaging service (UMS)  and messaging API that provides access toMessage Queue from any  http-enabled device. As a result, almost any application can  communicate with any other application and benefit from the reliability  and guaranteed delivery of JMS messaging. In addition, the UMS provides  enhanced scalability for JMS messaging, allowing the number of  messaging clients to reach internet-scale proportions.<br />
+    The simple, language-independent, protocol-based UMS API supports both  web-based and non-web-based applications, and can be used with both scripting and  programming languages. 
+The API is offered in two styles: a simple messaging API that uses a  Representational State 
+Transfer (REST)-style protocol, and an XML messaging API that embeds  the protocol in a 
+SOAP message header. In both cases, however, the API requires only a  single http request to 
+send or receive a message.<br />
+<a href="http://mq.java.net/4.3-content/ums/umsMain.html">Here  is more detail about UMS</a>. </li>
+  <li><strong>Support for AIX</strong> -- We have delivered a new  download package for AIX that will also include support for the Message  Queue C-API. Support for AIX will include the following:
+    <ul>
+      <li>AIX v 6.1 or higher <br />
+        (Earlier versions of AIX are supported via the Unix/Java Only bundle, Also, note that GlassFish provides a separate certification for MQ and includes support for versions of AIX 5.) </li>
+      <li>DB2 support on AIX only</li>
+      <li>IBM XL C/C++ Compiler V9.0</li>
+      <li>JDK 1.5 or better</li>
+    </ul>
+  </li>
+  <li><strong>New Open MQ Installer -- </strong>Message Queue 4.3  introduces a new installer for Zip-based distributions (including .jar  files), as opposed to native package distributions. The installer is  used to install .jar distributions on the Open MQ web site as well as  the new Message Queue .zip distributions for the AIX platform.<br />
+    The  new installer will extract the Message Queue .jar files to any  directory for  which you have write access (you will not need root privileges) and  will also enable you to register your Open MQ installation with Sun  Connection. To minimize the size of the download bundle, the Java  Runtime will no longer be included (most sites will already have it).  The current native package installer bundle, which will continue to be  used with the commercial release of Sun Java System Message Queue, will  no longer be available from the Open MQ site.
+    <ul>
+      <li>To use these new install bundles, simply download the .zip  package, unzip it; and run the Install script.</li>
+    <li>To run the Install script, you must explicitly reference a  JRE. You can use the new -j option:<br />
+      installer -j <em>JDK/JRE-path</em><br />
+      where <em>JDK/JRE-path</em> is the path of the specified JDK or JRE</li>
+    </ul>
+  </li>
+  <li><strong>Additional platform support</strong>-- The following  updated platforms will be certified for Open MQ 4.3:
+    <ul>
+      <li>Oracle 11g</li>
+      <li>Windows Vista</li>
+      <li>Windows Server 2008</li>
+    </ul>
+  </li>
+</ul>
+<p>In addition to these updates which will become part of the commercial product, we are also adding some new community examples. These examples are being provided to better give examples of using Open MQ with other community projects. The projects we are currently considering include:</p>
+<ul>
+  <li><a href="http://hermesjms.com">HermesJMS</a> integration -- HermesJMS is a useful administration tool that many of our community customers have asked if was supported. We put together <a href="https://glassfish.java.net/wiki-archive/OpenMQHermesJMSQuestions.html">a Wiki page</a> that explains the details for setting up Hermes JMS. We are continuing to work with the HermesJMS project and, we may have a Hermes plugin soon. That wasn't ready when we finalized the MQ 4.3 release, please stay tuned for further updates. Hermes is available at <a href="http://hermesjms.com/confluence/display/HJMS/Home">hermesjms.com</a>. As of this writing, HermesJMS is licensed under the Apache 2.0 license. </li>
+  <li> <a href="http://stomp.codehaus.org">STOMP</a> (Streaming Text Orientated Messaging Protocol). STOMP provides generic access to many scripting and programming languages. In addition, STOMP can be used as an adapter between JMS Message Providers. STOMP is available by separate download  from <a href="http://stomp.codehaus.org">stomp.codehaus.org</a>. As of this writing, STOMP is licensed under the Apache 2.0 license. 
+    <ul>
+      <li><a href="stomp-readme.html">Click here to read an example</a> that shows how  to use STOMP Connect with Open MQ <br />
+      </li>
+    </ul>
+  </li>
+</ul>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Schedule</div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p>This release was finalized, Dec. 15, 2008. </p>
+<p>The master schedule for this release will be driven by the GlassFish 2.1 schedule. Our high-level milestone targets were:</p>
+<table border="0" cellspacing="0" cellpadding="0" width="95%" class="generic1">
+  <thead>
+    <tr>
+      <td><div> 
+        <div align="center">Open MQ 4.3 Milestones </div>
+      </div></td>
+      <td><div>
+        <div align="center">Date</div>
+      </div></td>
+      <td><div>
+        <div align="center">Description</div>
+      </div>	  </td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div> 
+        <div align="center">Feature freeze <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-SunOS-20080707.zip"></a> </div>
+      </div></td>
+      <td><div>
+        <div align="center">Mid. Sept. </div>
+      </div></td>
+      <td><div>All new features are integrated and available in a promoted build. The release is ready for testing. Community members are welcome to trial any new feature as it is integrated. Feedback provides immeasurable benefit to the developers so please, don't hesitate to offer your experience feedback by sending an e-mail to <a href="mailto:users@mq.java.net">users@mq.java.net</a>. </div></td>
+    </tr>
+    <tr>
+      <td><div>
+        <div align="center">Hard-code freeze <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-SunOS_X86-20080707.zip"></a> </div>
+      </div></td>
+      <td><div>
+        <div align="center">Mid Oct. </div>
+      </div></td>
+      <td><div>All QE tests have been run once and required fixes have been integrated. All bugs which have been prioritized for this release are fixed. (After this milestone, only show-stopper problems are eligible for further integration). While we'll always accept feedback, your input into how well the features are working for you is most useful to us if you can provide it around the beginning of October. </div></td>
+    </tr>
+    <tr>
+      <td><div>
+        <div align="center">Finish</div>
+      </div></td>
+      <td><div>
+        <div align="center">Mid. Dec. </div>
+      </div></td>
+      <td><div>Stable bits are promoted and available for download. Release is now ready for production deployments. </div></td>
+    </tr>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<br />
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div><a name="download" id="download"></a>Downloads</div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p><a href="http://download.oracle.com/docs/cd/E19340-01/820-6360/index.html">Release Notes</a><br />
+   Java System Message Queue install guide is available at the Sun Documents Server, <a href="http://download.oracle.com/docs/cd/E19340-01/820-6361/index.html">here</a>. <br />
+Java System Message Queue, 4.3 documentation collection  is available <a href="http://download.oracle.com/docs/cd/E19340-01/index.html">here</a>. </p>
+<table border="0" cellspacing="0" cellpadding="0" width="95%" class="generic1">
+  <thead>
+    <tr>
+      <td colspan="3"><div><a name="fileinstall" id="fileinstall"></a>Open MQ 4.3 Binary Downloads (Compressed Archive) This is the final release.<blink><em></em></blink></div></td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div>Operating System</a></div></td>
+      <td><div>
+        <div align="center">Installer Archive </div>
+      </div></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td><div>Sun Solaris Sparc</div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b07-fcs/openmq4_3-installer-SunOS.zip">.zip</a></div></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td><div>Sun Solaris x86</div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b07-fcs/openmq4_3-installer-SunOS_X86.zip">.zip</a></div></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td><div>Linux</div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b07-fcs/openmq4_3-installer-Linux_X86.zip">.zip</a></div></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td><div>Microsoft Windows x86</div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b07-fcs/openmq4_3-installer-WINNT.zip">.zip</a></div></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td><div>IBM AIX</div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b07-fcs/openmq4_3-installer-AIX.zip">.zip</a></div></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td><div>Unix (e.g. Mac OSX)</div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b07-fcs/openmq4_3-installer-Unix.zip">.zip</a></div></td>
+      <td>&nbsp;</td>
+    </tr>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<br />
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div><a name="source" id="source"></a>Source-code Downloads</div></td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div>Open Message Queue 4.3 <a href="http://download.java.net/mq/open-mq/4.3/b07-fcs/openmq4_3-source.zip">Source Code Archive</a> </div></td>
+    </tr>
+    <tr>
+      <td><div>Build files (For <a href="http://netbeans.org">NetBeans</a>) <a href="http://download.java.net/mq/open-mq/4.3/b07-fcs/Compiling and Running OpenMQ 4.3 in NetBeans.txt">Build Instructions </a>, <a href="http://download.java.net/mq/open-mq/4.3/b07-fcs/version.properties">Version.Properties</a></div></td>
+    </tr>
+  </tbody>
+</table>
+<br />
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Promoted Build History </div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<br />
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td colspan="3"><div><a name="version-history" id="version-history"></a>Build History </div></td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b07-fcs">Final</a></div>
+      </div></td>
+      <td><div>Final release MQ 4.3  . <a href="https://glassfish.java.net/downloads/v2.1-b47.html"></a></div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b07-fcs/changes.html">Change Log</a> Summary </div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b07">Build 7 </a></div>
+      </div></td>
+      <td><div>RC 1 . <a href="https://glassfish.java.net/downloads/v2.1-b47.html"></a></div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b07/changes.html">Change Log</a> </div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b06">Build 6 </a></div>
+      </div></td>
+      <td><div>File / package reorganization for IPS. UMS Debugging. <a href="https://glassfish.java.net/downloads/v2.1-b47.html"></a></div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b06/changes.html">Change Log</a> </div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b05">Build 5 </a></div>
+      </div></td>
+      <td><div>More Bug fixes <a href="https://glassfish.java.net/downloads/v2.1-b47.html"></a></div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b05/changes.html">Change Log</a> </div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b04">Build 4</a><a href="http://download.java.net/mq/open-mq/4.3/b3"></a></div>
+      </div></td>
+      <td><div>Feature Freeze Build -- Added UMS, Added compressed archive installers <a href="https://glassfish.java.net/downloads/v2.1-b47.html"></a><a href="https://glassfish.java.net/downloads/v2.1-b47.html"></a></div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b04/changes.html">Change Log</a> </div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b03">Build 3 </a></div>
+      </div></td>
+      <td><div>Bug Fixes <a href="https://glassfish.java.net/downloads/v2.1-b47.html"></a></div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b03/changes.html">Change Log</a> </div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b02/">Build 2 </a></div>
+      </div></td>
+      <td><div>Added STOMP example <a href="https://glassfish.java.net/downloads/v2.1-b47.html"></a></div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b02/changes.html">Change Log</a> </div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+        <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b01/">Build 1</a></div>
+      </div></td>
+      <td><div>First build. Delivered to GlassFish <a href="https://glassfish.java.net/downloads/v2.1-b47.html">build 47</a></div></td>
+      <td><div>
+        <div align="center"><a href="http://download.java.net/mq/open-mq/4.3/b01/changes.html">Change Log</a> </div>
+      </div></td>
+    </tr>
+  </tbody>
+</table>
+
+<p align="center">Feedback is always welcome -- e-mail to: <a href="mailto:users@mq.java.net">users@mq.java.net</a></p>
+
+<CENTER>
+<SCRIPT LANGUAGE="JavaScript">
+
+<!-- This script and many more are available free online at -->
+<!-- The JavaScript Source!! http://javascript.internet.com -->
+
+<!-- Begin
+var days = new Array(8);
+days[1] = "Sunday";
+days[2] = "Monday";
+days[3] = "Tuesday";
+days[4] = "Wednesday";
+days[5] = "Thursday";
+days[6] = "Friday";
+days[7] = "Saturday";
+var months = new Array(13);
+months[1] = "January";
+months[2] = "February";
+months[3] = "March";
+months[4] = "April";
+months[5] = "May";
+months[6] = "June";
+months[7] = "July";
+months[8] = "August";
+months[9] = "September";
+months[10] = "October";
+months[11] = "November";
+months[12] = "December";
+var dateObj = new Date(document.lastModified)
+var wday = days[dateObj.getDay() + 1]
+var lmonth = months[dateObj.getMonth() + 1]
+var date = dateObj.getDate()
+var fyear = dateObj.getYear()
+if (fyear < 2000) 
+fyear = fyear + 1900
+document.write("Last Updated " + wday + ", " + lmonth + " " + date + ", " + fyear)
+// End -->
+</SCRIPT>
+</CENTER>
+</body>
+
+
+</html>

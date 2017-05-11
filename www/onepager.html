@@ -1,0 +1,167 @@
+<html>
+<TITLE>
+New Work Analysis
+</TITLE>
+<BODY>
+<CENTER>
+			<h5><em>Copyright Sun Microsystems, Inc. All Rights Reserved </em></h5>
+</CENTER>
+<H2>
+<CENTER> 
+			<p>New Work Analysis
+            </p>
+</CENTER>
+</H2>
+
+<DL>
+<P><DT><b>Synopsis: </b><DD>
+	[One sentence synopsis of the work to be performed]
+
+<P><DT><b>Quick Questions:</b><DD>
+<UL><LI>Difficulity: [Easy|Medium|Hard]</LI>
+    </UL>
+
+<P><DT><b>Description:</b><DD>
+	[A longer description of the work to be implemented.  Give details]
+
+<P><DT><b>Requestor:</b><DD>
+	[Is there a customer or someone internal to Sun requesting
+	 this feature?  If so, identify the group(s).]
+
+<P><DT><b>Non-feature:</b><DD>
+	[A description of aspects of the work that will *not* be implemented]
+
+<P><DT><b>Dependencies:</b><DD>
+	[List all (technology) dependencies this work has.  What impact will
+	 it have on other groups?]
+
+<P><DT><b>Competitive Analysis:</b><DD>
+	[Which competitors have this feature?  How is this feature the
+	same and how is this feature different from what our competitors
+	offer?]
+
+<P><DT><b>Phases:</b><DD>
+	[Can this work be broken into phases that are implemented at
+	 different times?  What would each phase include?  The phase can
+	 be across a single product release or multiple product releases.]
+
+<P><DT><b>Direction of Implementation:</b><DD>
+	[How will the implementation be done?  Will we buy/license other
+	 technology?  From whom?  Can the implementation of a phase be 
+	 shared by multiple developers?]
+
+<P><DT><b>Cost:</b><DD>
+	[How many engineering man/weeks will the implementation take? 
+	 Be sure to consider the time to do the implementation, write
+	 test cases and provide doc and support input for this work.
+	 Please list the cost to implement the feature separate from 
+	 the cost to write the tests.  Since those items can be done 
+	 by different people the cost estimates need to be broken 
+	 down separately.  When you develop the cost estimate use a 
+	 loaded cost.  That means if you say one week and you start on 
+	 Monday you should be finished on Friday.  In other words that 
+	 one week includes the time you may spend reading mail, 
+	 eating lunch, attending meetings.  Don't factor in vacations
+	 or holidays.
+<pre>
+
+	 e.g:
+
+	 Phase 1: 
+
+	    Broker		: 3 weeks
+	    Broker Test	Dev	: 1 week
+	    Client		: 1 week
+	    Client Test	Dev	: 0
+	    Admin		: 2 days
+	    Admin Test Dev	: 1 day
+            Doc			: 1 week
+            Support Training	: 3 days
+
+	 Phase 2: 
+
+	    Broker		: 1 week
+	    Broker Test		: 1 week
+            Doc			: 3 days
+            Support Training	: 3 days
+</pre>
+         ]
+
+<P><DT><b>Interfaces:</b><DD>
+	[Will this work need to be reviewed by the ARC?  Does it introduce
+	 new interfaces (GUI, config, API, etc), modify or delete existing 
+	 interfaces?]
+
+<P><DT><b>Test Impact:</b><DD>
+	[How hard will it be to test this work?  Can it be completely
+	 tested through automated tests or will manual tests be required 
+	 as well?  If both what percent are manual?]
+
+<P><DT><b>Doc Impact:</b><DD>
+	[Is the item an addition/expansion of an existing feature (or command 
+	 set) or is it a new feature?
+	 Does it affect the Admin GUI?
+	 In your opinion how many pages of doc are required to adequately 
+	 cover this feature?
+	 Is it principally a feature for development or administration? C dev? 
+	 Java dev?
+	 Does it introduce new concepts? Which?
+	 If the feature is a new feature, should it be documented in a 
+	 separate doc or as part of our existing doc set?
+	 Any additional questions/issues you can think of?]
+
+<P><DT><b>Support Impact:</b><DD>
+	[How will this work impact the supportability of the product?
+	 Will the product be easier to support or more difficult to support
+	 after this work is completed?  For example Certificate management
+	 create a lot of support issues in JWS.  Will it be necessary to
+	 provide additional support training if this work is completed?]
+
+<P><DT><b>Installation Impact:</b><DD>
+	[Will this work effect installation?  How?]
+
+<P><DT><b>Admin/Config Impact:</b><DD>
+	[How will this work impact the administration and configuration
+	 of the product? The cost estimate above should include this cost
+	 or reference another one pager.
+	 Include a one line description summary of possible admin tool
+	 impact e.g.
+ 	    imqobjmgr: new admin obj attrs
+ 	    imqobjmgr: new admin obj
+ 	    imqobjmgr: enhancements
+ 	    imqcmd: new attributes for existing subcommands
+ 	    imqcmd: new subcommand
+ 	    imqcmd: enhancements
+ 	    imqusermgr: enhancements
+ 	    new admin tool
+	]
+
+<P><DT><b>I18N/L10N Impact:</b><DD>
+	[Does this work need to be internationalized?  Beyond string
+	 localization are there other I18N/L10N issues?]  
+
+<P><DT><b>Security Impact:</b><DD>
+        [If the new feature interacts directly with any security-related
+         APIs or interfaces, make a note here. If the new feature expects
+         to have any Java policy or platform user/permissions implications,
+         note them here. If the feature exposes any new ports, listeners,
+         or any similar communication points which may have security
+         implications, note these here.]
+
+<P><DT><b>Risks:</b><DD>
+	[What are the risks?  E.g. Difficult to do correctly.  Highly 
+	 dependent on 3rd party.  Not easy to test. etc.
+
+<P><DT><b>See Also:</b><DD>
+	[List any references that may be valuable to the reader. These could
+	 be URLs to specifications, references to other New Work Analysis,
+	 etc.]
+
+<P><DT><b>Author/Date:</b>
+<DD>
+	[A Developer 01/24/2009]
+</DL>
+<P>
+<i>template version: @(#)onepager.txt	1.10 04/03/18</i>
+</BODY>
+</HTML>

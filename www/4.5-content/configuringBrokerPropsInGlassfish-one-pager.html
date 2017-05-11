@@ -1,0 +1,335 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>One Pager for JMSRA changes to allow arbitrary broker properties to be configured</title>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+</head>
+<body style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
+<h2>One Pager: JMSRA Changes to allow arbitrary broker properties to be configured<br>
+</h2>
+(template version: 1.91)<br>
+<table border="1" cellpadding="2" width="756">
+  <tbody>
+    <tr>
+      <td>
+      <p><b>Table of Contents</b><br>
+      <a href="#1">1. Introduction</a><br>
+      </p>
+      <blockquote> <a href="#11">1.1 Project/Component Working Name</a><br>
+        <a href="#12">1.2 Name(s) and e-mail address of Document
+Author(s)/Supplier</a><br>
+        <a href="#13">1.3. Date of This Document</a><br>
+      </blockquote>
+      <a href="#2">2. Project Summary</a><br>
+      <blockquote> <a href="#21">2.1 Project Description</a><br>
+        <a href="#22">2.2 Risks and Assumptions</a><br>
+      </blockquote>
+      <a href="#3">3. Problem Summary</a><br>
+      <blockquote>
+        <a href="#31">3.1 Problem Area</a><br>
+        <a href="#32">3.2 Justification</a><br>
+      </blockquote>
+      <a href="#4">4. Technical Description</a><br>
+      <blockquote>
+        <p><a href="#41">4.1 Details</a><br>
+        <a href="#42">4.2 Bugs/RFE's</a><br>
+        <a href="#43">4.3 Scope</a><br>
+        <a href="#44">4.4 Out-of-scope</a><br>
+        <a href="#45">4.5 Interfaces</a><br>
+        <a href="#46">4.6 Documentation Impact</a><br>
+        <a href="#47">4.7 Configuration/administration Impact</a><br>
+        <a href="#48">4.8 High Availability Impact</a><br>
+        <a href="#49">4.9 Internationalization</a><br>
+        <a href="#410">4.10 Packaging</a><br>
+        <a href="#411">4.11 Security Impact</a><br>
+        <a href="#412">4.12 Compatibility</a><br>
+        <a href="#413">4.13 Dependencies</a><br>
+        <a href="#414">4.14 Testing Impact</a></p>
+      </blockquote>
+      <p><a href="#5">5. References</a><br>
+      <a href="#6">6. Schedule </a> <br>
+      </p>
+      <p><br>
+      </p>
+      <h3><a name="1"></a>1. Introduction<br>
+      </h3>
+      <p><a name="11"></a><b>1.1. Project/Component Working Name</b></p>
+      <p>JMSRA changes to allow arbitrary broker properties (including passwords) to be configured<br>
+      </p>
+      <p><a name="12"></a><b>1.2. Name(s) and e-mail address of
+Document
+Author(s)/Supplier</b></p>
+      <p>Nigel Deakin<br>
+nigel.deakin@oracle.com</p>
+      <p><a name="13"></a><b>1.3. Date of This Document</b></p>
+      <p>First version: 15 June 2010<br>
+      6 July 2010: Updated</p>
+      9 July 2010: Updated</p>
+	  </p>
+      <h3><a name="2"></a>2. Project Summary</h3>
+      <p><br>
+      <a name="21"></a><b>2.1. Project Description</b></p>
+      <p>This project relates to the use of JMSRA (the MQ resource adapter used by default by Glassfish)
+      to "manage" a local or embedded MQ broker.
+      Although JMSRA provider several methods to configure various aspects of the broker there is no general mechanism
+      by which arbitrary broker properties can be explicitly configured. 
+      This project proposes to add a new method <tt>setBrokerProps()</tt> to the JMSRA classes 
+      <tt>com.sun.messaging.jms.blc.LifecycleManagedBroker</tt> and <tt>com.sun.messaging.jms.ra.ResourceAdapter</tt> to 
+      allow this.
+      <p>
+      This new method may be used to pass any property to the managed broker, including those used to define passwords.
+      So long as the property name ends in "password" they will be handled securely.
+      <p>
+      JMSRA currently provides methods to allow
+      a HADB database to be configured for use by the broker for message storage.
+      These are <tt>setDBProps()</tt> and <tt>setDSProps</tt>. 
+      These methods are inadequate for Glassfish 3.1 which needs to allow other databases such as MySQL to be used.
+      This project proposes that support for these other databases be provided by the new method <tt>setBrokerProps()</tt> mentioned above.
+      The existing methods <tt>setDBProps()</tt> and <tt>setDSProps</tt> will be deprecated. 
+      <p><a name="22"></a><b>2.2. Risks and Assumptions</b></p>
+      <p>This change is low risk and makes no particular assumptions.</p>
+      <h3><a name="3"></a>3. Problem Summary</h3>
+      <p><a name="31"></a><b>3.1. Problem Area</b></p>
+      <p>
+      The MQ 4.4 Administration Guide <a href="http://download.oracle.com/docs/cd/E19587-01/821-0027/index.html">describes</a>
+      how broker properties may be configured. There are two recommended ways to do this:
+      <ul>
+      <li>Manually edit the broker's instance configuration file
+      (<tt>config.properties</tt>) for each individual broker instance.  This file is created when the broker is first started.
+      This method can be used both for standalone brokers and when the broker is managed by Glassfish.
+      
+      </li>
+      <li>Append <tt>-Dpropertyname=propertyvalue</tt> to the <tt>imqbrokerd</tt> command line when starting the broker.
+      When the broker is managed by Glassfish, the <tt>imqbrokerd</tt> command is not invoked directly.
+      However command-line properties can be configured in Glassfish by setting the <tt>&lt;jms-service&gt;</tt> attribute <tt>start-args</tt>.
+      This can be configured using Glassfish tools using <tt>asadmin set</tt> as described here.      </li>
+      </ul>
+      <p>In addition
+      <ul>
+      <li>
+      The MQ command utility <tt>imqcmd</tt> can be used to set a broker property of a running broker.
+      </li>
+      </ul>
+      <p>
+      However all three approaches have a number of disadvantages:
+      <ul>
+      <li>
+      It is inconvenient, and possibly confusing, for users that <tt>config.properties</tt>, and the directory structure under which it resides,
+      do not exist until the broker is first started. 
+      The default version of this file  contains a long comment listing many of the possible properties. 
+      Although it is possible for the user to create these manually the 
+      user has to work out for themselves what directories they need to create and to create both these and the <tt>config.properties</tt>
+      file manually. The user then needs to use a text editor to define broker properties in java properties format.
+      <p>Although this is certainly possible, it is not particularly user-friendly. In particular,  it is inconsistent with the way that other information
+      about the broker is configured, in the Glassfish admin tool or using <tt>asadmin</tt>. It also means that setting the broker configuration
+      cannor be scripted.
+      <p>It is also unclear what will happen if the user configures properties which are also defined by Glassfish. Which wins?
+      </li>
+      <li>
+      Configuring broker arguments by setting the <tt>&lt;jms-service&gt;</tt> attribute <tt>start-args</tt> is a useful alternative,
+      which can be configured before the broker is first started and which provides access by Glassfish tools. 
+      <p>However this is simply a single long string, which is difficult to manipulate if many properties need to be set.
+      <tt>asadmin</tt> can't be used to set individual properties: the whole list must be set every time.
+        <p>It is also unclear what will happen if the user configures properties which are also defined by Glassfish. Which wins?
+      </li>
+      <li>Finally, although the use of <tt>imqcmd</tt> allows broker properties to be individually configured, this is not a standard Glassfish tool
+      and so its use is inconsistent the way in which other aspects of Glassfish is configured. In addition, this command cannot be used
+      to configure a broker which is not running. 
+      </ul>
+      
+      
+      </p>
+      <p><a name="32"></a><b>3.2. Justification</b></p>
+      <p>This project is needed because:
+      <ul>
+      <li>We have received repeated requests for the ability to configure arbitrary broker properties on a managed broker</li>
+      <li>It supports the general product goal of incorporating MQ into Glassfish so that it be administeded using the same tools.</li>
+      </ul>
+      <h3><a name="4"></a>4. Technical Description</h3>
+      <p><a name="41"></a><b>4.1. Details</b></p>
+ This project proposes to add a new method <tt>setBrokerProps()</tt> to the JMSRA classes 
+      <tt>com.sun.messaging.jms.blc.LifecycleManagedBroker</tt> and <tt>com.sun.messaging.jms.ra.ResourceAdapter</tt> to 
+      allow arbitrary broker propetties to be confgured on a local or embedded broker.
+For more information see <a href="#45">interfaces</a> below.
+<p>
+If the broker is embedded in the same JVM as Glassfish then these properties will be supplied to it using a normal Java method call.
+If the broker is "local", running in a separate JVM, then these properties will be supplied to it by writing to standard input. 
+The use of standard input as a way of passing property values to a local broker was introduced in MQ 4.4U2 as a way of passing passwords
+securely. This will now be used to pass all properties defined using <tt>setBrokerProps()</tt>, including those that define passwords.
+
+<p><b>Order of precedence when setting a property in multiple places</b></p>
+<p>
+Following this change, the properties of a managed broker can be defined in four main ways. 
+<ul>
+<li>
+Some broker properties are configured directly by JMSRA, usually on the basis of information configured using setter methods 
+on <tt>com.sun.messaging.jms.blc.LifecycleManagedBroker</tt> and <tt>com.sun.messaging.jms.ra.ResourceAdapter</tt>. 
+</li>
+<li>
+Any broker property can be configured using the new method  <tt>setBrokerProps()</tt>.
+</li>
+<li>
+The existing method <tt>setBrokerArgs(String args)</tt> can be used to specify broker command-line arguments, which can include system property settings
+of the form <tt>-Dname=value</tt>. In Glassfish the value used is a combination of arguments determined automatically by Glassfish and an optional string configured by the user.
+</li>
+<li>
+From the file <tt>config.properties</tt> in the broker's <tt>props</tt> directory.
+</li>
+</ul>
+<p>As a general rule, the above list denotes the order of precedence when a particular property is defined more than once. That is, a property value 
+defined using a method lower down in the list is overridden by a property value defined by a method above it in the list. The position of <tt>setBrokerArgs</tt>
+in this list is significant because it potentially offers a means by which Glassfish users can override properties "hardwired" by Glassfish which could not previously be overridden.
+(Note that any changes to Glassfish are beyond the scope of this one-pager).
+<p>
+<p><b>Logging changes</b></p>
+<p>
+Currently, when any broker is started, the list of command-line arguments that were supplied is logged in the broker log. 
+This is also the case then the broker is a managed broker, where the arguments were supplied by Glassfish using the resource adapter's
+<tt>setBrokerArgs</tt> method, and which the user may not be otherwise aware of. This is the case for both a LOCAL broker and an EMBEDDED broker,
+even though in the latter case there is no actual command line. Here's an example:<br>
+<br>
+<tt>
+[09/Jul/2010:11:43:55 BST] Arguments: -port 7686 -name TestManagedBrokerPasswordHandling -imqhome C:\mq\MQ4.5\binary\win32\opt [etc]
+</tt>
+<p>
+An additional line of logging will be provided to log any properties defined using <tt>setBrokerProps()</tt>. For example:<br>
+<br>
+<tt>
+[09/Jul/2010:11:43:55 BST] JMSRA BrokerProps: imq.service.activate=jmsdirect, imq.imqcmd.password=*****, imq.cluster.nowaitForMasterBroker=true
+</tt>
+<p>Note that passwords are shown as <tt>*****</tt>. 
+<p>In accordance with the order of precedence for property configuration described above, if a given property is shown in both the "Arguments" and "BrokerProps" log entries, the value shown in ""BrokerProps" will be used.
+
+
+  <p> <a name="42"></a><b>4.2. Bug/RFE Number(s)</b></p>
+      <p>
+N/A
+
+      <p> <a name="43"></a><b>4.3. In Scope</b></p>
+      <p>This project covers changes to JMSRA, the MQ resource adapter. It also covers changes to the MQ broker if any are needed.</p>
+      <p> <a name="44"></a><b>4.4. Out of Scope</b></p>
+      <p>This project does not include the necessary changes to Glassfish to allow users to make use of this new feature.</p>
+      <p> <a name="45"></a><b>4.5. Interfaces</b></p>
+      <p>
+
+      <p> <b>4.5.1 Public Interfaces</b></p>
+      <p>The following new method will be added to <tt>com.sun.messaging.jms.ra.ResourceAdapter</tt>.
+      The same method will also be added to <tt>com.sun.messaging.jms.blc.LifecycleManagedBroker</tt> in order
+      to allow the future separation of broker lifecycle management functionality from the resource adapter.</p>
+      <table border="1" width="80%">
+        <tbody>
+          <tr>
+            <td width="60%"><tt>setBrokerProps(Properties props)</td>
+            <td width="40%">Specifies a set of properties which will be passed to the managed broker.<br><br>
+            Any broker property can be specified using this method, though properties that are configured using other resource adapter methods,
+            including those passed using <tt>setBrokerArgs()</tt> or the deprecated methods <tt>setDSProps()</tt> and <tt>setDBProps()</tt> will not be overridden.<br><br>
+            This method can be used to pass database passwords to the managed broker. Properties of the form <tt>*.password</tt> will be intercepted
+            and passed securely to the managed broker.</td>
+        </td>
+          </tr>
+          <tr>
+            <td width="60%"><tt>getBrokerProps()</td>
+            <td width="40%">Returns the <tt>Properties</tt> object passed in a previous call to </tt>setBrokerProps()</tt></td>
+          </tr>          
+        </tbody>
+      </table>
+      <p><br>
+      <b>4.5.2 Private interfaces</b></p>
+      <p>None<br>
+      <p> <b>4.5.3 Deprecated/Removed Interfaces</b></p>
+      <p>The following existing methods on <tt>com.sun.messaging.jms.ra.ResourceAdapter</tt> and
+      <tt>com.sun.messaging.jms.blc.LifecycleManagedBroker</tt> will be deprecated by this project.
+      </p>
+      <table border="1" width="80%">
+        <tbody>
+          <tr>
+            <td width="40%"><tt>setDSProps(properties props)</tt></td>
+            <td width="60%">This method is deprecated because it required users to set special JMSRA-specific properties which
+            would then be converted to broker properties. It also required <tt>setDSProps()</tt> to be used for some properties
+            and <tt>setDBProps()</tt> to be used for other properties, which was confusing.
+            <br><br>Prior to MQ 4.5, only HADB-specific properties were supported,
+            though recent changes to MQ 4.5 to allow the full range of passwords to be passed securely to a managed MQ broker 
+            described in this <a href="http://mq.java.net/4.5-content/6897519OnePager.html">one-pager</a>)
+            extended this to support MySQL. After further review it has been decided that hardwiring the support for various
+            databases in JMSRA was insufficiently generic and made it difficult for Glassfish tobe generic.
+            <br><br> 
+            Instead of this method, the method <tt>setBrokerProps()</tt> should be used to set the various database-specific broker properties
+            directly.</tt></td>
+          </tr>
+          <tr>
+            <td width="40%"><tt>getDBProps()</tt></td>
+            <td width="60%">This method is deprecated because the corresponding setter method is deprecated.</td>
+          </tr>          
+          <tr>
+            <td width="40%"><tt>setDSProps(properties props)</tt></td>
+            <td width="60%">Same reasons as for <tt>setDSProps()</tt> above.</td>
+          </tr>
+          <tr>
+            <td width="40%"><tt>getDSProps()</tt></td>
+            <td width="60%">This method is deprecated because the corresponding setter method is deprecated.</td>
+          </tr>           
+          <tr>
+            <td width="40%"><tt>setDBType()</tt></td>
+            <td width="60%">Same reasons as for <tt>setDSProps()</tt> above.<br><br>
+            Instead of this method, the method <tt>setBrokerProps()</tt> should be used to set the broker properties
+            <tt>imq.persist.store</tt> and  <tt>imq.persist.jdbc.dbVendor</tt> directly.</td>
+          </tr>
+          <tr>
+            <td width="40%"><tt>getDBType()</tt></td>
+            <td width="60%">This method is deprecated because the corresponding setter method is deprecated.</td>
+          </tr>          
+        </tbody>
+      </table>
+      <p> <a name="46"></a><b>4.6. Doc Impact</b></p>
+      <p>In the MQ administration guide, the table of ResourceAdapter properties will need to be updated.</p>
+      <p> <a name="47"></a><b>4.7. Admin/Config Impact</b></p>
+      <p>Although the purpose of this project is to make it easier for Glassfish users to configure a managed broker,
+      the change to Glassfish are out of scope and are not described here.</p>
+      <p> <a name="48"></a><b>4.8. HA Impact</b></p>
+      <p>This project has no specific impact on HA</p>
+      <p> <a name="49"></a><b>4.9. I18N/L10N Impact</b>inks</p>
+      <p>This project has no internationalisation or localisation impact.</p>
+      <p> <a name="410"></a><b>4.10. Packaging, Delivery &amp; Upgrade</b></p>
+      <p> <b>4.10.1 Packaging</b></p>
+      <p>This project has no impact on packaging.</p>
+      <p> <b>4.10.2 Delivery</b></p>
+      <p>This project has no impact on product installation</p>
+      <p> <b>4.10.3 Upgrade and Migration</b></p>
+      <p>This project has no impact on product upgrade and/or migration from prior releases?  
+      <p> <a name="411"></a><b>4.11. Security Impact</b></p>
+      <p>This project has no security implications with the following exception.
+      <p>
+      This new method can be used to pass any property to the managed broker, including those used to define passwords.
+      This is because properties defined using this method will not be passed on the command line or using a password file.
+      If the broker is embedded in the same JVM as Glassfish then these properties will be supplied to it using a normal Java method call.
+      If the broker is "local", running in a separate JVM, then these properties will be supplied to it by writing to standard input.
+      <p>Note, however, that all property names and values will be written to the broker logfile at broker startup, except for
+      properties whose names end with "password", where the value will be logged as "*****". This is in  accordance with the MQ convention that 
+      the names of broker properties used to define passwords end with "password".
+      <p>Note that the method <tt>setAdminPassword(String password)</tt> can continue to be used to specify the password <tt>imq.imqcmd.password</tt>,
+      though <tt>setBrokerProps</tt> may be used instead if desired. In both cases the password is transmitted securely to the managed broker.
+      A password set using <tt>setAdminPassword(String password)</tt> overrides a value of <tt>imq.imqcmd.password</tt> set using <tt>setBrokerProps</tt>.
+      <p> <a name="412"></a><b>4.12. Compatibility Impact</b></p>
+      <p>This project has no impact on compatibility. </p>
+      <p> <a name="413"></a><b>4.13. Dependencies</b></p>
+      <p> <b>4.13.1 Internal Dependencies</b></p>
+      <p>This project has no internal dependencies on other software.
+      Note, however, that changes are needed to Glassfish before the changes defined in this project can be made available to Glassfish users.
+      Those changes are out of scope of this one-pager.</p>
+      <p>This project has no external dependencies on other software.</p>
+      <p> <a name="414"></a><b>4.14. Testing Impact</b></p>
+      <p>This work will be tested using automatic MQ regression tests.</p>
+      <h3><a name="5"></a>5. Reference Documents</h3>
+      <p>N/A
+      </p>
+      <h3><a name="6"></a>6. Schedule</h3>
+      <p><b>6.1. Projected Availability</b></p>
+      <p>It is currently planned that this change will be released in MQ 4.5 Milestone 3.
+      <p>&nbsp;</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

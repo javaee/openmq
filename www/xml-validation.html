@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Open MQ 4.2: XML Schema Validation</title>
+<link rel="stylesheet" media="all" type="text/css" href="style.css" />
+<title>Open MQ (4.2): Schema Validation</title>
+<!-- hide the project info -->
+<style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+.style3 {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 12px;
+}
+</style>
+
+</head>
+
+<body>
+
+<table border="0" cellspacing="0" cellpadding="0" id="main2" width="100%">
+<tr valign="bottom" class="nav1">
+<td nowrap colspan="3"><!-- tab 4--></td>
+</tr>
+<form><tr class="sub1">
+<td nowrap><div align="center"><strong>&nbsp;Open Message Queue 4.2 -- Schema Validation of XML Payload Messages </strong></div></td>
+<td align="right" nowrap>&nbsp;</td>
+</tr></form>
+<tr><td colspan="3" class="white"><div class="min1">&nbsp;</div></td></tr>
+</table>
+
+<p align="center"><em>(Note: This is a new feature in Open MQ 4.2) </em> <br />
+<a href="http://mq.java.net/4.2.html">Back to Open MQ 4.2 Index </a></p>
+This feature enables validation of the content of a text (not object)  XML message against an XML schema at the point the message is sent to  the broker. The location of the XML schema (XSD) is specified as a  property of a Message Queue destination. If no XSD location is  specified, the DTD declaration within the XML document is used to  perform DTD validation. (XSD validation, which includes data type and  value range validation, is more rigorous than DTD validation.)<br />
+<br />
+Client applications using this new feature should upgrade Java SE  version to JRE 1.5 or above.<br />
+<br />
+To enable XML schema validation, imqcmd should be used to set the new  properties on physical destinations described in the  Administration Support section below.<br />
+<br />
+When XML validation is enabled, the Message Queue client runtime  will attempt to validate an XML message against the specified XSDs (or  against the DTD, if no XSD is specified) before sending it to the  broker. If the specified schema cannot be located or the message cannot  be validated, the message is not sent, and a JMSException is thrown.<br />
+<br />
+XSDs might change as a result of changing application requirements. If  an XSD is changed, all client applications producing XML messages based  on the changed XSD should be restarted.<br />
+<br />
+<h2>Administration Support</h2>
+The changes for administration support includes updates to imqcmd and  MQ's JMX API.<br />
+<h3>imqcmd changes</h3>
+The following table lists new properties for physical destinations that  can be set via 'imqcmd'.<br />
+<br />
+<table border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr valign="top">
+      <th> <p>Property</p></th>
+      <th> <p>Value</p></th>
+      <th> <p>Description</p></th>
+    </tr>
+    <tr valign="top">
+      <td><p>validateXMLSchemaEnabled</p></td>
+      <td><p>true or false<br />
+        Default is false.</p></td>
+      <td><p>If set to true, this destination has XML schema validation  enabled. If set to false or not set, this destination does not have XML  schema validation enabled. <br />
+              <br />
+        This can be set at create ('imqcmd create dst') or update ('imqcmd  update dst') time.</p></td>
+    </tr>
+    <tr valign="top">
+      <td><p>XMLSchemaURIList</p></td>
+      <td><p>Space separated list of&nbsp; schema URIs.<br />
+              <br />
+        Default is null (ie no value).</p></td>
+      <td><p>Space separated list of schema URIs to use if XML schema  validation is enabled for this destination.<br />
+              <br />
+        If this property is not set or null and XML schema validation is  enabled, the XML is validated via a DTD specified in the XML document.<br />
+        <br />
+        This can be set at create ('imqcmd create dst') or update ('imqcmd  update dst') time. <br />
+        <br />
+        Double quotes should be used if multiple values are specified here.<br />
+        <br />
+        Example values:</p>
+          <ol>
+            <li>
+              <p><a href="http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsd">http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsd</a> </p>
+            </li>
+            <li>
+              <p><a href="http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsdhttp://test.com/xmlschema/example/newLoanApplication.xsd">&quot;http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsd  http://test.com/xmlschema/example/newLoanApplication.xsd&quot;</a> </p>
+            </li>
+          </ol>
+        <p><br />
+          Note the space in between the 2 URIs in example (2) above.<br />
+        </p></td>
+    </tr>
+  </tbody>
+</table>
+<br />
+<strong>Note:</strong><br />
+The above properties can be set at destination create or update time.  It should be pointed out that changing the values of these properties  when the destination is active or is not empty could potentially cause  problems. The ideal time to modify these properties would be when there  are no consumers or producers and when the destination is empty.  However, during development this may be necessary. Also, if the URI  points to a machine that is inaccessible, it might be necessary to  modify/update the URI while message processing on the destination is  still active. MQ will not attempt to prevent these attributes from  being updated at any time. However, a warning will be printed when  imqcmd is run to update these properties:
+<blockquote>Warning:<br />
+  Updating the destination attributes  'validateXMLSchemaEnabled' and 'XMLSchemaURIList'<br />
+  when  there is activity in the destination (when it has consumers and  producers) and<br />
+  when the destination already contains  messages may cause some undesirable results.</blockquote>
+The output of 'imqcmd query dst' has also been updated to reflect the  values of these 2 new properties:<br />
+<br />
+Example usage:<br />
+<dl>
+  <dd>
+    <table border="1" cellpadding="2" cellspacing="2">
+      <caption>
+        Updating destination using imqcmd<br />
+      </caption>
+      <tbody>
+        <tr>
+          <td valign="top"><pre>
+% imqcmd update dst -t q -n TestQueue
+&nbsp; -o validateXMLSchemaEnabled=true
+&nbsp; -o  XMLSchemaURIList=<a href="http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsd">http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsd</a>
+             
+Updating the Queue destination that has the name:
+             
+TestQueue
+             
+with the following updated attributes:
+             
+XMLSchemaURIList&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsd">http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsd</a>
+validateXMLSchemaEnabled&nbsp;&nbsp;&nbsp; true
+             
+On the broker specified by:
+             
+-------------------------
+Host&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Primary Port
+-------------------------
+localhost&nbsp;&nbsp;&nbsp; 7676
+             
+Warning:
+Updating the destination attributes  'validateXMLSchemaEnabled' and 'XMLSchemaURIList'
+when there is activity in the destination (when it has  consumers and producers) and
+when the destination already contains messages may cause  some undesirable results.
+             
+Are you sure you want to update this destination?  (y/n)[n]y
+             
+Successfully updated the destination.</pre></td>
+        </tr>
+      </tbody>
+    </table>
+  </dd>
+</dl>
+<dl>
+  <dd>
+    <table border="1" cellpadding="2" cellspacing="2">
+      <caption>
+        Querying destination using imqcmd<br />
+      </caption>
+      <tbody>
+        <tr>
+          <td valign="top"><p><br />
+            % imqcmd query dst -t q -n TestQueue<br />
+            <br />
+            Querying the destination where:<br />
+            <br />
+            ------------------------------------<br />
+            Destination Name&nbsp;&nbsp;&nbsp; Destination Type<br />
+            ------------------------------------<br />
+            TestQueue&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Queue<br />
+            <br />
+            On the broker specified by:<br />
+            <br />
+            -------------------------<br />
+            Host&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Primary Port<br />
+            -------------------------<br />
+            localhost&nbsp;&nbsp;&nbsp; 7676<br />
+            <br />
+            Destination Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TestQueue<br />
+            Destination Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Queue<br />
+            Destination State&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RUNNING<br />
+            Created Administratively&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br />
+            Current Number of Messages&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br />
+            &nbsp;&nbsp;&nbsp; Actual&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1<br />
+            &nbsp;&nbsp;&nbsp; Held in Transaction&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0<br />
+            Current Message Bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br />
+            &nbsp;&nbsp;&nbsp; Actual&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 372<br />
+            &nbsp;&nbsp;&nbsp; Held in Transaction&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0<br />
+            Current Number of Producers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0<br />
+            Current Number of Active Consumers&nbsp;&nbsp;&nbsp; 0<br />
+            Current Number of Backup Consumers&nbsp;&nbsp;&nbsp; 0<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br />
+            Max Number of Messages&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 100000<br />
+            Max Total Message Bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 10737418240<br />
+            Max Bytes per Message&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 10485760<br />
+            Max Number of Producers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 100<br />
+            Max Number of Active Consumers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unlimited (-1)<br />
+            Max Number of Backup Consumers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br />
+            Limit Behavior&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; REJECT_NEWEST<br />
+            Consumer Flow Limit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1000<br />
+            Is Local Destination&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false<br />
+            Local Delivery is Preferred&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false<br />
+            Use Dead Message Queue&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; true<br />
+            <strong>XML schema validation enabled&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; true</strong><br />
+            <strong>XML schema URI List&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsd">http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsd</a></strong><br />
+            <br />
+            Successfully queried the destination.</p></td>
+        </tr>
+      </tbody>
+    </table>
+  </dd>
+  <dd><br />
+  </dd>
+</dl>
+<h3>JMX API<br />
+</h3>
+2 MBeans are updated:<br />
+<ul>
+  <li>Destination Config MBean</li>
+  <li>Destination Manager Config MBean<br />
+  </li>
+</ul>
+<strong>Destination Config MBean</strong>
+<dl>
+  <dd>
+    <table border="1" cellpadding="2" cellspacing="2">
+      <caption>
+        Destination Config - New Attributes<br />
+      </caption>
+      <tbody>
+        <tr>
+          <th> <p>Name</p></th>
+          <th> <p>Set/Get</p></th>
+          <th> <p>Type</p></th>
+          <th> <p>Description</p></th>
+        </tr>
+        <tr>
+          <td><p>ValidateXMLSchemaEnabled</p></td>
+          <td><p>S,G</p></td>
+          <td><p>Boolean</p></td>
+          <td><p>If set to true, this destination has XML schema validation  enabled. If set to false, this destination does not have XML schema  validation enabled.<br />
+                  <br />
+            Default is false.</p></td>
+        </tr>
+        <tr>
+          <td><p>XMLSchemaURIList</p></td>
+          <td><p>S,G</p></td>
+          <td><p>String</p></td>
+          <td><p>Space separated list of schema URIs to use if XML schema  validation is enabled for this destination.<br />
+                  <br />
+            If this property is not set or null and XML schema validation is  enabled, the XML is validated via a DTD specified in the XML document.<br />
+            <br />
+            Example values:</p>
+              <ol>
+                <li>
+                  <p><a href="http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsd">&quot;http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsd&quot;</a> </p>
+                </li>
+                <li>
+                  <p><a href="http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsdhttp://test.com/xmlschema/example/newLoanApplication.xsd">&quot;http://foobar/EmployeeInvoice.EmployeeInvoiceInvoiced.xsd  http://test.com/xmlschema/example/newLoanApplication.xsd&quot;</a> </p>
+                </li>
+              </ol>
+            <p><br />
+              Note the space in between the 2 URIs in example (2) above.<br />
+              <br />
+              Default is null (no value).</p></td>
+        </tr>
+      </tbody>
+    </table>
+  </dd>
+</dl>
+<br />
+<strong>Destination Manager Config MBean</strong><br />
+<br />
+No new changes here other than a mention that the new Destination  Attributes (ValidateXMLSchemaEnabled and XMLSchemaURIList) can be used  as part of destination creation (via the create() operation). These new  attributes are introduced as new literals of the existing class  com.sun.messaging.jms.management.server.DestinationAttributes:<br />
+<ul>
+  <li>DestinationAttributes.VALIDATE_XML_SCHEMA_ENABLED</li>
+  <li>DestinationAttributes.XML_SCHEMA_URI_LIST</li>
+</ul>
+<hr />
+<p>Please send feedback to: <a href="mailto:users@mq.java.net">users@mq.java.net</a> </p>
+</body>
+</html>

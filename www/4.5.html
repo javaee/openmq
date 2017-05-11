@@ -1,0 +1,789 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Open MQ 4.5</title>
+<link rel="stylesheet" media="all" type="text/css" href="style.css" />
+
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache" />
+<META HTTP-EQUIV="Expires" CONTENT="-1" />
+<!-- hide the project info -->
+<style type="text/css">
+#projecthome .axial { display: none; }
+#apphead h1 { display: none; }
+#longdescription { border: none; }
+#longdescription h2 { display: none; }
+#customcontent h2 { display: block; }
+#bodycol .tasknav { display: none; }
+.style1 {
+	font-size: x-large;
+	font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Open MQ 4.5 (Final) </div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<h1>
+  <div id="section">Downloads</div>
+  <div id="title">License </div>
+</h1>
+<table width="100%" border="0">
+  <thread>
+    <tr>
+      <td bgcolor="#FFFF99"><p class="generic1"> Open MQ is dual licensed with either CDDL or GPL v2 with ClassPath Exception. <a href="LICENSE.txt">Click here to view the license</a>. In addition, Open MQ Binaries include Mozilla <a href="http://www.mozilla.org/projects/security/pki/nss/">Network Security Services</a> and <a href="http://www.mozilla.org/projects/nspr/">Network Security Portable Runtime</a> (NSS / NSPR) which are licensed under the LGPL. You may only use these products under the terms of these licenses. By downloading the source or binary archives from this site, you are agreeing to the terms of these licenses.</p></td>
+    </tr>
+  </thread>
+</table>
+<p><a href="#download">Straight to the Downloads</a></p>
+<p>Open MQ 4.5 is now complete. If you find any problems with this build, please use <a href="http://java.net/jira/browse/MQ">Jira</a>, or send an e-mail to <a href="mailto:users@mq.java.net">users@mq.java.net</a>. One of the last things we did in this release cycle was to add a Mercurial repository at Java.net! See the <a href="#source">Source section below</a>. Also, we have changed the license for NSS/NSPR. This is now licensed under LGPL.</p>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Project Overview </div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p>Open MQ 4.5 is a minor feature update, continuing along the improvement path that we've followed for the past several releases. While we do our best to keep this page accurate, there are occasionally mistakes. Please let us know if you find anything missing, or incorrect. Definitions and planning for MQ 4.6 should be forthcoming soon. </p>
+<p>This page is a reasonable description of the projects and features that we added in MQ 4.5. If you have any comments or questions, please send e-mail to <a href="mailto:users@mq.java.net">users@mq.java.net</a> or <a href="mailto:users@glassfish.java.net">users</a><a href="mailto:users@glassfish.java.net">@glassfish.java.net</a>. </p>
+
+<table width="100%" border="0" class="generic1" summary="This is a list of new features and other changes in Open MQ 4.5.">
+  <caption>
+  <span class="style1">New features and other changes in Open MQ 4.5 </span>
+  </caption>
+  <tr bgcolor="#CCCCCC">
+    <th width="19%" scope="col">Feature</th>
+    <th width="44%" scope="col">Description</th>
+    <th width="6%" scope="col"><div align="center">One-Pager</div></th>
+  </tr>
+
+  <tr>
+    <td>Consumer Notifications </td>
+    <td>Provides notifications about consumer status, based on destinations </td>
+    <td><a href="./4.5-content/consumer-notification.txt">one-pager</a></td>
+  </tr>
+
+
+  <tr>
+    <td>Improved support for &quot;Temporary Failure&quot; response in MySQL Cluster / NDB </td>
+    <td>NDB data-engines can sometimes return a &quot;temporary&quot; failure. In many cases, the operation can be retried and, may succeed. Node fail over is one example of this type of response. </td>
+    <td><a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6890337">RFE 6890337</a> </td>
+  </tr>
+  <tr>
+    <td>JDBC DB Connection Improvements </td>
+    <td>Connection Validation. Timeout idle connections </td>
+    <td><a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6831996">6831996</a> <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6943001">6943001</a></td>
+  </tr>
+  <tr>
+    <td>Support pooling of JDBC PooledConnection</td>
+    <td>&nbsp;</td>
+    <td><a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6831953">6831953</a></td>
+  </tr>
+
+  <tr>
+    <td>Improve password management between GlassFish and MQ </td>
+    <td><p>Fix a problem in MQ described in CR 6897519 </p>    </td>
+    <td><a href="./4.5-content/6897519OnePager.html">one-pager</a></td>
+  </tr>
+  <tr>
+    <td>Support conventional broker clusters when run as an Embedded Broker in the GlassFish VM </td>
+    <td>Prior to this release, Embedded brokers only support singleton brokers. This enhancement will provide support for conventional clusters when run as an embedded broker in GlassFish. See <a href="http://java.net/jira/browse/MQ-53">IT 53</a>. </td>
+    <td><a href="./4.5-content/embeddedBrokersInConventionalClusters-one-pager.html">one-pager</a></td>
+  </tr>
+  <tr>
+    <td>Alternate solution for durable subscription management across conventional broker cluster </td>
+    <td>Develop an alternate implementation for keeping track of durable subscriptions in broker cluster. This is in addition to the current Master Broker solution.  See <a href="http://java.net/jira/browse/MQ-54">IT 54</a></td>
+    <td><a href="./4.5-content/cluster-nomaster-db.txt">one-pager</a></td>
+  </tr>
+  <tr>
+    <td>Improve Conventional Cluster With Master Broker in GlassFish</td>
+    <td>Provide a startup synchronization period during which cluster restricted operations will wait for master broker to startup and sync complete, before throwing JMS exception. adds new property: imq.cluster.nowaitForMasterBrokerTimeoutInSeconds. <a href="http://java.net/jira/browse/MQ-52">See IT 52</a> </td>
+    <td><a href="./4.5-content/cluster-improvemaster.txt">one-pager</a></td>
+  </tr>
+  <tr>
+    <td>Dynamic Master Broker Change </td>
+    <td>Allows master broker to be changed, dynamically. </td>
+    <td><a href="./4.5-content/dynamic-change-mastebroker.txt">one-pager Also </a><a href="http://java.net/jira/browse/MQ-65">MQ IT 65</a></td>
+  </tr>
+  <tr>
+    <td>Dynamic Sync. broker list in conventional cluster config. </td>
+    <td>Dynamic Sync. broker list in conventional cluster config. in GlassFish cluster. <a href="http://java.net/jira/browse/MQ-63">See IT 63 </a></td>
+    <td><a href="./4.5-content/sync-brokerlist-in-glassfish.txt">one-pager</a></td>
+  </tr>
+
+  <tr>
+    <td 1>64 bit c-api build, Linux </td>
+    <td>Deliver binaries for 64 bit c-api integration,  Linux. </td>
+    <td><p><a href="http://bugs.sun.com/search.do?process=1&amp;category=jmq&amp;sortBy=date&amp;submit=Keyword&amp;keyword=6714189">RFE (Linux)</a> <a href="http://bugs.sun.com/search.do?process=1&amp;category=jmq&amp;sortBy=date&amp;submit=Keyword&amp;keyword=6834189"></a></p>    </td>
+  </tr>
+
+  <tr>
+    <td>Add support for literal IPv6 addresses </td>
+    <td>&nbsp;</td>
+    <td><a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6937110">CR 6937110</a> </td>
+  </tr>
+</table>
+
+<table width="100%" border="0" class="generic1" 
+	summary="This is a list of features that we planned to add to Open MQ 4.5 but which did not make it into the final release.">
+  <caption>
+  <span class="style1">New features and other changes which were proposed but not implemented </span>
+  </caption>
+  <tr bgcolor="#CCCCCC">
+    <th width="19%" scope="col">Feature</th>
+    <th width="44%" scope="col">Description</th>
+    <th width="6%" scope="col"><div align="center">One-Pager</div></th>
+  </tr>
+  <tr>
+    <td>JMS Bridge Enhancements </td>
+    <td><p>Considering the following:</p>
+      <ul>
+        <li>Last agent optimization for single-phase commit between providers (<a href="http://java.net/jira/browse/MQ-57">see IT 57</a>); </li>
+        <li>remote destination subscriptions to filter messages delivered between destinations;</li>
+        <li>Provide improved fail over support for bridge connections and HA deployments</li>
+    </ul></td>
+    <td><div align="center"><a href="./4.5-content/jmsbridge-last-agent-opt.txt">Last Agent Optimization One-pager</a> </div></td>
+  </tr>  
+  <tr>
+    <td>Scalable destinations </td>
+    <td> Provide destinations that can grow without bounds </td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>JMSJCA</td>
+    <td>Switch to JMSJCA as the primary Resource Adapter for GlassFish Server, Open Source Edition </td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>RA</td>
+    <td>Refactor lifecycle management in MQRA </td>
+    <td><a href="./4.5-content/mqLifecycleAPI-one-pager.html">one-pager</a></td>
+  </tr>
+  <tr>
+    <td>Enhance VisualVM Plugin </td>
+    <td>Enhance the existing unsupported VisualVM plugin (<a href="4.4-content/visual-vm-plugin.html">overview</a>) 
+    to improve the display of cluster information, to allow navigation between host, connection, destination, producer and consumer,
+    to allow destination browsing, to offer charting, and to add various miscellaneous improvements. <a href="http://java.net/jira/browse/MQ-55">See IT 55</a> </td>
+    <td><a href="./4.5-content/mq-visualvm-plugin-one-pager.html">one-pager</a></td>
+  </tr>
+
+  <tr>
+    <td>Integration to NDB Cluster via Cluster/J connector </td>
+    <td>Create a new data-engine connection in MQ to directly call the NDB data engine -- reduce or eliminate the SQL Node requirement. Unwind the schemas for performance. </td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>Provide default JAAS LoginModules</td>
+    <td><a href="http://java.net/jira/browse/MQ-58">See IT 58</a> </td>
+    <td><a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6903030">RFE 6903030</a> </td>
+  </tr>
+  <tr>
+    <td>Disable port-mapper (For use with Embedded deployment) </td>
+    <td>&nbsp;</td>
+    <td><a href="./4.5-content/disablingPorts-one-pager.html">one-pager</a></td>
+  </tr>
+  <tr>
+  <td 1>64 bit c-api build, Windows </td>
+    <td>Deliver binaries for 64 bit c-api integration, Windows. </td>
+    <td><p><a href="http://bugs.sun.com/search.do?process=1&amp;category=jmq&amp;sortBy=date&amp;submit=Keyword&amp;keyword=6714189"></a> <a href="http://bugs.sun.com/search.do?process=1&amp;category=jmq&amp;sortBy=date&amp;submit=Keyword&amp;keyword=6834189">RFE (Win) </a></p></td>
+  </tr>
+</table>
+
+<p>Community updates</p>
+<ul>
+  <li>Build scripts are now included with source archive. See <a href="#source">below</a> for details about building with the Mercurial arvhice. </li>
+</ul>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Schedule</div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p>This release will track the GlassFish Server, Open Source Edition 3.1 project. GlassFish Server, Open Source Edition 3.1 is described further, <a href="https://glassfish.java.net/wiki-archive/GlassFishv3.1.html">here</a>. The GlassFish subproject page which provides additional context for the GlassFish features is available <a href="https://glassfish.java.net/wiki-archive/3.1JMS.html">here</a>. The proposed master schedule for GlassFish 3.1 is <a href="https://glassfish.java.net/wiki-archive/GlassFishV3Schedule.html#section-GlassFishV3Schedule-section-GlassFishV3Schedule-GlassFishServerOpenSourceEdition3.1">here</a>. </p>
+<table border="0" cellspacing="0" cellpadding="0" width="95%" class="generic1">
+  <thead>
+    <tr>
+      <td><div> 
+        <div align="center">Open MQ 4.5 Milestones </div>
+      </div></td>
+      <td><div>
+        <div align="center">Date</div>
+      </div></td>
+      <td><div>
+        <div align="center">Description</div>
+      </div>	  </td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div> 
+        <div align="center">Feature freeze <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-SunOS-20080707.zip"></a> </div>
+      </div></td>
+      <td><div> 
+        <div align="center">Early Sep., 2010</div> 
+      </div>
+      </td>
+      <td><div>All new features are integrated and available in a promoted build. The release is ready for testing. Community members are welcome to try any new feature as it is integrated. Feedback provides immeasurable benefit to the developers so please, don't hesitate to offer your experience feedback by sending an e-mail to <a href="mailto:users@mq.java.net">users@mq.java.net</a>. </div></td>
+    </tr>
+    <tr>
+      <td><div>
+        <div align="center">Hard-code freeze <a href="http://download.java.net/mq/open-mq/4.2/fcs/mq4_2-installer-SunOS_X86-20080707.zip"></a> </div>
+      </div></td>
+      <td><div>
+        <div align="center">Mid. Dec., 2010 </div>
+      </div></td>
+      <td><div>All QE tests have been run once and required fixes have been integrated. All bugs which have been prioritized for this release are fixed. (After this milestone, only show-stopper problems are eligible for further integration). While we'll always accept feedback, your input into how well the features are working for you is most useful to us if you can provide it around the beginning of May. </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="center">Finish</div>
+      </div></td>
+      <td><div>
+          <div align="center">First quarter, 2011  </div>
+      </div></td>
+      <td><div>GlassFish was completed Feb. 28, 2011. Open MQ bits were delayed a bit due to some internal configuration / staging issues (finally got it out on Mar. 8). </div></td>
+    </tr>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p>&nbsp;</p>
+<h3>A note about the Issue Tracker Milestones</h3>
+<p>To better track GlassFish MQ progress against the GlassFish Server, Open Source Edition, we have created tracking milestone targets, which are intended to align with the master GlassFish project milestones. The target dates for the GlassFish project are shown here. We will continue to produce builds on a, roughly bi-weekly cadence. If we hold to our plans, this implies the following build-milestones</p>
+<table width="100%" border="0" cellpadding="1" cellspacing="1" class="generic1">
+  <tr bgcolor="#CCCCCC">
+    <th scope="col"><div align="center">GlassFish Server, Open Source Edition Milestone </div></th>
+    <th scope="col"><div align="center">GF Build Date</div></th>
+    <th scope="col"><div align="center">GlassFish MQ Build </div></th>
+    <th scope="col"><div align="center">MQ Build Date </div></th>
+    <th scope="col"><div align="center">Jira Target </div></th>
+  </tr>
+  <tr>
+    <td><div align="center">M1</div></td>
+    <td><div align="center">May 24 </div></td>
+    <td> <div align="center">B08 </div></td>
+    <td><div align="center">May 19 </div></td>
+    <td><div align="center">4.5_m1</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">M2</div></td>
+    <td><div align="center">June 21 </div></td>
+    <td><div align="center">B10</div></td>
+    <td><div align="center">June 16 </div></td>
+    <td><div align="center">4.5_m2</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">M3</div></td>
+    <td><div align="center">July 19 </div></td>
+    <td><div align="center">B12</div></td>
+    <td><div align="center">July 14 </div></td>
+    <td><div align="center">4.5_m3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">M4</div></td>
+    <td><p align="center">Aug. 16 </p>    </td>
+    <td><div align="center">B14</div></td>
+    <td><div align="center">Aug. 11 </div></td>
+    <td><div align="center">4.5_m4</div></td>
+  </tr>
+  <tr>
+    <td><p align="center">M5</p>    </td>
+    <td><div align="center">Sep. 13 </div></td>
+    <td><div align="center">B16</div></td>
+    <td><div align="center">Sep. 8 </div></td>
+    <td><div align="center">4.5_m5_scf (Soft code-freeze) </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">M6</div></td>
+    <td><div align="center">Oct. 26 </div></td>
+    <td><div align="center">B19</div></td>
+    <td><div align="center">Oct. 21 </div></td>
+    <td><div align="center">4.5_m6_hcf (hard code-freeze) </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">M7</div></td>
+    <td><div align="center">Dec. 14, 2010 </div></td>
+    <td><div align="center">B22</div></td>
+    <td><div align="center">Nov. 11 </div></td>
+    <td><div align="center">4.5_m7 </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">M8</div></td>
+    <td><div align="center">Jan. 2011  </div></td>
+    <td><div align="center">B23</div></td>
+    <td><div align="center">Dec. 19  </div></td>
+    <td><div align="center">4.5_m8 </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">RC Builds </div></td>
+    <td><div align="center">Jan-Feb 2011 </div></td>
+    <td><div align="center">As needed </div></td>
+    <td><div align="center">As Needed </div></td>
+    <td><div align="center">4.5_rc </div></td>
+  </tr>
+</table>
+<br />
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div><a name="download" id="download"></a>Downloads</div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p>Please note. We have simplified the downloads and now bundle the build instructions into the package archive that you download. </p>
+<table border="0" cellspacing="0" cellpadding="0" width="95%" class="generic1">
+  <thead>
+    <tr>
+      <td colspan="3"><div><a name="fileinstall" id="fileinstall"></a>Open MQ 4.5 Binary Downloads - Final build <blink><em></em></blink></div></td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr bgcolor="#CCCCCC">
+      <td><div>Operating System</a></div></td>
+      <td><div>
+        <div align="center">image with installer </div>
+      </div></td>
+      <td><div>
+        <div align="center">file image (no installer) </div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>Sun Solaris Sparc</div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/openmq4_5-installer-SunOS.zip">image with installer</a> </div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/openmq4_5-binary-SunOS.zip">zip archive, no installer</a></div></td>
+    </tr>
+    <tr>
+      <td><div>Sun Solaris x86</div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/openmq4_5-installer-SunOS_X86.zip">image with installer </a></div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/openmq4_5-binary-SunOS_X86.zip">zip archive, no installer</a></div></td>
+    </tr>
+    <tr>
+      <td><div>Linux</div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/openmq4_5-installer-Linux_X86.zip">image with installer</a> </div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/openmq4_5-binary-Linux_X86.zip">zip archive, no installer</a></div></td>
+    </tr>
+    <tr>
+      <td><div>Microsoft Windows x86</div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/openmq4_5-installer-WINNT.zip">image with installer</a> </div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/openmq4_5-binary-WINNT.zip">zip archive, no installer</a>  </div></td>
+    </tr>
+    <tr>
+      <td><div>IBM AIX</div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/openmq4_5-installer-AIX.zip">image with installer</a> </div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/openmq4_5-binary-AIX.zip">zip archive, no installer</a></div></td>
+    </tr>
+    <tr>
+      <td><div>Unix (e.g. Mac OSX)</div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/openmq4_5-installer-Unix.zip">image with installer </a></div></td>
+      <td><div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/openmq4_5-binary-Unix.zip">zip archive, no installer</a></div></td>
+    </tr>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<br />
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td colspan="3"><div><a name="source" id="source"></a>Source-code Downloads 4.5</div></td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="2"><div>Open Message Queue 4.5 Source Code Archive </div></td>
+      <td><div>
+        <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/openmq4_5-source.zip">Source Code Archive</a> (See Note) </div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>Build files (For <a href="http://netbeans.org">NetBeans</a>)</div></td>
+      <td><div>
+        <div align="center"><a href="http://download.java.net/mq/open-mq/4.4u1/b7-final/CompilingAndRunningInNetBeans.txt"></a></div>
+      </div></td>
+      <td>See the source code archive </td>
+    </tr>
+    <tr>
+      <td><div>Build files (For Ant)</div></td>
+      <td colspan="2">See the source code archive </td>
+    </tr>
+  </tbody>
+</table>
+<p>Please note: At the conclusion of MQ 4.5, we posted the source archive in a Mercurial archive at java.net. This archive is now available for community users. You can browse this archive is at this URL: <a href="http://java.net/projects/mq/sources/mq-hg/show">http://java.net/projects/mq/sources/mq-hg/show</a></p>
+<p>Instructions for performing builds via this archive are given on the <a href="repo-build.html">repo-build.html page</a>.</p>
+<p>Future releases will NOT have source repository archives, included with the downloads. (We're guessing most of you are happy with this!) </p>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>JavaDoc</div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p><a href="javadoc/4.5/javadoc/overview-summary.html">4.5 JavaDoc</a> </p>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td height="23"><div>Maven</div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p>Maven build snapshots are here: <a href="http://download.java.net/maven/2/">http://download.java.net/maven/2/ </a>The MQ jars are available at <br />
+com/sun/messaging/mq/&lt;jarfilename&gt;/4.5-SNAPSHOT. These will evolve as 4.5 progresses. </p>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td><div>Promoted Build History </div></td>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <thread></thread>
+  <tbody>
+  </tbody>
+</table>
+<p>Please note, soon, the preliminary builds will be removed from our download server. We hope you can migrate your systems to build 29 FCS soon. </p>
+<table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
+  <thead>
+    <tr>
+      <td colspan="3"><div><a name="version-history" id="version-history"></a>Build History </div></td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/">4.5 Build 29-FCS</a></div>
+      </div></td>
+      <td><div>Final release Open MQ 4.5 </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29-fcs/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b29/">4.5 Build 29 </a></div>
+      </div></td>
+      <td><div>RC Fixes Integrated into GF 3.1 RC3</div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b29/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b28/">4.5 Build 28 </a></div>
+      </div></td>
+      <td><div>RC Fixes Integrated into GF 3.1 RC2 </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b28/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b27/">4.5 Build 27 </a></div>
+      </div></td>
+      <td><div>RC Fixes Integrated into GF 3.1 RC1 </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b27/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b26/">4.5 Build 26 </a></div>
+      </div></td>
+      <td><div>RC Fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b26/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b25/">4.5 Build 25 </a></div>
+      </div></td>
+      <td><div>RC Fixes  </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b25/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b24/">4.5 Build 24 </a></div>
+      </div></td>
+      <td><div>RC Fixes  </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b24/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b23/">4.5 Build 23 </a></div>
+      </div></td>
+      <td><div>Hard code freeze build for MQ 4.5. Delivered to GlassFish build  33 </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b23/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b22/">4.5 Build 22 </a></div>
+      </div></td>
+      <td><div>Bug fixes -- GlassFish 3.1 Milestone 7(GF build 32) </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b22/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b21/">4.5 Build 21 </a></div>
+      </div></td>
+      <td><div>Bug fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b21/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b20/">4.5 Build 20 </a></div>
+      </div></td>
+      <td><div>Bug fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b20/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b19/">4.5 Build 19 </a></div>
+      </div></td>
+      <td><div>Milestone 6 build for GlassFish 3.1 project </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b19/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b18/">4.5 Build 18 </a></div>
+      </div></td>
+      <td><div>Bug Fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b18/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b17/">4.5 Build 17 </a></div>
+      </div></td>
+      <td><div>Bug Fixes  </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b17/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b16/">4.5 Build 16 </a></div>
+      </div></td>
+      <td><div>Functional Complete Milestone build. Staged for GlassFish Milestone 5 promotion </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b16/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b15/">4.5 Build 15</a></div>
+      </div></td>
+      <td><div>Bug fixes</div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b15/">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b14/">4.5 Build 14 </a></div>
+      </div></td>
+      <td><div>Added dynamic change, master broker </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b14/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b13/">4.5 Build 13 </a></div>
+      </div></td>
+      <td><div>Bug Fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b13/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b12/">4.5 Build 12 </a></div>
+      </div></td>
+      <td><div>Bug Fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b12/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b11/">4.5 Build 11 </a></div>
+      </div></td>
+      <td><div>Bug Fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b12/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b10/">4.5 Build 10 </a></div>
+      </div></td>
+      <td><div>Bug Fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b10/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b09/">4.5 Build 9 </a></div>
+      </div></td>
+      <td><div>Bug Fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b09/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b08/">4.5 Build 8 </a></div>
+      </div></td>
+      <td><div>Bug Fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b08/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b07/">4.5 Build 7 </a></div>
+      </div></td>
+      <td><div>Bug Fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b07/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b06/">4.5 Build 6 </a></div>
+      </div></td>
+      <td><div>Bug Fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b06/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b05/">4.5 Build 5 </a></div>
+      </div></td>
+      <td><div>Bug Fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b05/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b04/">4.5 Build 4 </a></div>
+      </div></td>
+      <td><div>Bug Fixes </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b04/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+    <tr>
+      <td><div>
+          <div align="left"><a href="http://download.java.net/mq/open-mq/4.5/b03/">4.5 Build 3</a></div>
+      </div></td>
+      <td><div>First build is build 3. </div></td>
+      <td><div>
+          <div align="center"><a href="http://download.java.net/mq/open-mq/4.5/b03/changes.html">Change Log </a></div>
+      </div></td>
+    </tr>
+  </tbody>
+</table>
+
+<p align="center">Feedback is always welcome -- e-mail to: <a href="mailto:users@mq.java.net">users@mq.java.net</a></p>
+
+<CENTER>
+<SCRIPT LANGUAGE="JavaScript">
+
+<!-- This script and many more are available free online at -->
+<!-- The JavaScript Source!! http://javascript.internet.com -->
+
+<!-- Begin
+var days = new Array(8);
+days[1] = "Sunday";
+days[2] = "Monday";
+days[3] = "Tuesday";
+days[4] = "Wednesday";
+days[5] = "Thursday";
+days[6] = "Friday";
+days[7] = "Saturday";
+var months = new Array(13);
+months[1] = "January";
+months[2] = "February";
+months[3] = "March";
+months[4] = "April";
+months[5] = "May";
+months[6] = "June";
+months[7] = "July";
+months[8] = "August";
+months[9] = "September";
+months[10] = "October";
+months[11] = "November";
+months[12] = "December";
+var dateObj = new Date(document.lastModified)
+var wday = days[dateObj.getDay() + 1]
+var lmonth = months[dateObj.getMonth() + 1]
+var date = dateObj.getDate()
+var fyear = dateObj.getYear()
+if (fyear < 2000) 
+fyear = fyear + 1900
+document.write("Last Updated " + wday + ", " + lmonth + " " + date + ", " + fyear)
+// End -->
+</SCRIPT>
+</CENTER>
+</body>
+
+
+</html>

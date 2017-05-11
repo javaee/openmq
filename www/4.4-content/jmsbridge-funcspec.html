@@ -1,0 +1,2225 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<TITLE>MQ 4.4: JMQ Bridge and WebSphere MQ Integration Functional Specification</TITLE>
+</HEAD>
+<BODY> 
+<H2 ALIGN=CENTER>Functional Specification</H2>
+
+<DL>
+
+<DT><B>1.0 Author/Date:<BR><BR></B><DT>
+    <DD>Amy Kang  12/15/2008 Initial Draft and Updates</DD>
+    <DD>Isa & Amy 01/16/2009 updated imqbridgemgr syntax & use cases</DD><br>
+
+<DT><B>2.0 Synopsis:<BR><BR></B></DT>
+    <DD><b>JMS Bridge and WebSphere MQ Integration</b></DD> 
+<HR>
+</DL>
+
+<a href="#overview">4.1 Overview</a><br>
+<a href="#features">4.2 MQ JMS Bridge Features</a><br>
+<a href="#non-feature">5.0 Non-feature</a><br>
+<a href="#depends">6.0 Dependencies</a><br>
+<a href="#interface">7.0 Interfaces</a><br>
+<a href="#config">9.0 Configuration/Administration</a><br>
+<a href="#security">12.0 Security</a></br>
+<a href="#install">14.0 Installation/packaging</a></br>
+<a href="#usecases">15.0 Use Cases</a>
+
+<DL>
+
+<DT><B>3.0 PRD Requirement#:</B></DT>
+This feature has been required by previous PRD and requested from
+mq-interest and OpenMQ user  alias  as well as from  MQ forum.
+
+<p>
+<DT><B>4.0 Description:<BR><BR></B></DT>
+<a href="#components">MQ JMS Bridge Components</a><br>
+<a href="#conn">MQ JMS Bridge Connection Management</a><br>
+<a href="#tm">MQ JMS Bridge Built-in XA Transaction Coordinator</a><br>
+<a href="#inhacluster">JMS Bridge Running a HA Cluster</a><br>
+<a href="#bridgestate">MQ JMS Bridge States and State Transitions</a><br>
+<a href="#linkstate">MQ JMS Bridge Link States and State Transitions</a><br>
+<a href="#startstop">MQ JMS Bridge Start and Stop</a><br>
+<a href="#sequence">MQ JMS Bridge Message Transfer</a><br>
+<a href="#dmq">MQ JMS Bridge DMQ</a><br>
+<a href="#link">MQ JMS Bridge Link</a><br>
+<a href="#msgtransformer">MQ JMS Bridge Message Transformer</a><br>
+<a href="#replyto">JMSReplyTo</a><br>
+<a href="#dtd">MQ JMS Bridge DTD</a><br>
+<p>
+
+    <DD>
+    <DL>
+  
+<a NAME="overview"></a>
+    <DT><b>Overview</b></DT>
+        <br>
+        A JMS bridge maps destination(s) in MQ to destination(s) in a forein JMS provider, 
+        like WebSphere MQ, or in another MQ instance or cluster.  The main usage of a JMS
+        bridge can be:<p>
+        <ul>
+        <li>Connecting MQ to WebSphere MQ or other foreign JMS providers 
+        <li>Bridging geographically dispersed MQ clusters or broker instances over low bandwidth network 
+        <li>Bridging a MQ HA-cluster to a MQ non-HA cluster or a standalone MQ broker 
+        <li>Can be used by MQ as a way of achieving remote destination store & forwarding 
+        </ul>
+        <P>
+        <DD><IMG SRC="./usagesamples.gif"></IMG></DD>
+        <P>
+<a name="features"></a>
+         A MQ JMS bridge runs embeded inside a MQ broker by using the 
+         <a href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/bridgeservice/javadoc/index.html">MQ Pluggable Bridge Service Framework</a>. 
+         <ul>
+		 <li>Multiple JMS bridges (each can have 0 or more links) can be enabled and run at in parallel in a MQ broker instance. 
+         <li>A link in a MQ JMS bridge can be configured to run in either non-transacted mode or XA transacted mode.<br>
+		 <li>MQ JMS bridge implements built-in XA transaction coordinator which facilitates XA transaction
+         completion and recovery; 
+         <li>MQ JMS bridge provides pluggable interface to allow an external JTA transaction manager to be used to drive XA transactions<br>
+             [not officially supported]
+         <li>A link target in a MQ JMS bridge can can be configured in disconnected mode <br>
+             so that only when a message comes from the source will a connection to the target be made.  
+         <li>MQ JMS bridge implements connection pooling as well as shared connection.  
+         <li>MQ JMS bridge handles connection exceptions and auto-reconnect
+         <li>Undeliverable indoubt messages are sent to the bridge's DMQ(s). <br>
+             A MQ JMS bridge has a built-in DMQ as well as 0 or more additional DMQs that can be configured.
+         <li>The MQ JMS bridge implements transaction log to facilitate XA recovery for the built-in XA transaction coordinator<br>
+             [supports both file and jdbc-based transaction log]
+         </ul>
+    </DL>
+    <p>
+    <DL>
+<a NAME="components"></a>
+    <DT><b>MQ JMS Bridge Components</b></DT>
+    <p>
+    <ul>
+    <li><b>jmsbridge</b><br>
+        A jmsbridge is composed by 0 or more links and 1 or more of DMQs
+     <li><b>link</b><br>
+     A link specifies a mapping of a destination in one JMS provider to a 
+     destination in another, or the same, JMS provider.  A link is uni-directional.
+     A link has a source and a target. A link can be disabled or enabled. A enabled
+     link can be started, paused, resumed, stopped.
+     <li><b>source</b><br>
+     A source is one end of  a link that specifies the source JMS provider and the source destination.
+     Messages received by the jmsbridge from the source are forwarded to the target of the link. 
+     A source has a destination and a connection factory.
+     <li><b>target</b><br>
+     A target is the other end of the link that specifies the target JMS provider and the target destination.
+     A target has a destination and connection factory.  A target can optionally specify a message transformer
+     to transform a JMS message from the source to a new JMS message.
+     <li><b>dmq</b><br>
+     A dmq, Dead Message Queue, specifies a JMS provider and a JMS destination where undeliverable
+     indoubt messages can be sent to.  It has a destination and a connection factory. 
+     <li><b>connection factory</b><br> 
+     A connection factory is used to create connections to a JMS provider. Connection factories must 
+     be a JMS 1.1 either javax.jms.ConnectionFactory or javax.jms.XAConnectionFactory type.
+     <li><b>destination</b><br> 
+     A destination represents a JMS provider-specific address where messages can be sent to or received from. 
+     </ul>
+     <p>
+     Links and DMQs in a jmsbridge is configured by a XML document file which is validated against the <a href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/bridgeservice/jmsbridge/sun_jmsbridge_1_0.dtd.html">MQ JMS Bridge XML Document DTD</a>.
+     The following is an example of MQ JMS bridge for bridging MQ and Web Sphere MQ.
+     <DD><IMG SRC="./jmsbridge.gif"></iMG></DD>
+    </DL>
+	 <p>
+    <DL>
+<a NAME="conn"></a>
+    <DT><b>MQ JMS Bridge Connection Management</b></DT>
+<p>
+   The JMS bridge uses connection factories to create connections to the underlining JMS providers.   A source in a link needs a connection
+to the source JMS provider in order to receive messages from it for transfering to the target in the link.  A target in a link needs a
+connection to the target JMS provider in order to send the message that received from the source. Connection factories 
+are created from JNDI lookup except default connection factories which create connections to the MQ broker that the JMS bridge is running in.<P>
+   There are 3 types of connections in a MQ JMS bridge,<p>
+   <a href="#pooled">Pooled Connection</a><br>
+   <a href="#shared">Shared Connection</a><br>
+   <a href="#dedicated">Dedicated Connection</a><br>
+   <DD> 
+   <DL>
+   <a name="pooled"></a>
+   <DT><b>Pooled Connection</b></DT>
+   MQ JMS bridge implements connection pooling for,
+   <ul>
+   <li>connection reuse<br>
+       Physical connections to JMS providers can be expensive to create and destroy. 
+   <li>idle connection timeout 
+   </ul>
+   <p>
+   Connection pools are partitioned per connection factory object and are created automatically on demand.<p>
+   A practical example of using pooled connection is a jmsbridge that has many links to a target JMS provider and 
+   each link has relatively low message flow rate.  To avoid too many simutaneous connections to the target JMS provider,
+   the target in each link can be configured to have <a href="#targetattrs">stay-connected</a> false.  When a message comes
+   in from the source of the link, the link gets a pooled connection from the MQ JMS Bridge's <a href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/bridgeservice/javadoc/com/sun/messaging/bridge/service/jms/package-frame.html">pooled connection factory</a> and use it to send
+   the message to the target and then returns the pooled connection back to the pool.  A connection factory can be configured
+   with <a href="#cfattrs">idle-timeout-in-seconds</a> to be used when the connection factory is used for pooled connections.
+   <p>
+   Pooled connection will be used for a target in a link or for a dmq if
+   <ul>
+   <li>The connection factory has no JMS client identifier configured
+   <li>The target or dmq stay-connected attribute is set to false 
+   </ul>
+   <p>
+   <a name="shared"></a>
+   <DT><b>Shared Connection</b></DT>
+   A shared connection will be used by targets in multiple links or dmqs concurrently if they are configured to use
+   the same connection factory and the connection factory has JMS client identifier configured.
+   <p>
+   <a name="dedicated"></a>
+   <DT><b>Dedicated Connection</b></DT>
+   Dedicated connection is dedicated to a source or a target or a dmq. A source connection in a link is always 
+   dedicated.  A target in a link will use dedicated connection if the target has attribute <a href="#targetattrs">stay-connected</a> set 
+   to true or has attribute <a href="#targetattrs">clientid</a> set.
+   </DD>
+   </DL>
+   </DL>
+<p>
+    <DL>
+<a NAME="tm"></a>
+    <DT><b>MQ JMS Bridge Built-in XA Transaction Coordinator</b></DT>
+    <P>
+    A link in a JMS bridge can be configured to be <a href="#linkattrs">transacted</a> or non-transacted.
+    When a link is transacted, message transfer from the source to the target is done in a XA distributed transaction. <P>
+
+    MQ JMS bridge implements a <a href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/bridgeservice/javadoc/tx/">built-in XA transaction coordinator</a>.  The built-in XA transaction coordinator
+    uses JTA standard interfaces to coordinate XA transaction completion between the source XA resoure manager
+    and the target XA resource manager in each link and does XA recovery for XA resources in a JMS bridge.
+    Each JMS bridge has its own built-in XA transaction coordinator instance.  
+    <P>
+    <DD>
+    <DL>
+    <DT><b>XA Recovery and RM Registration</b></DT>
+    <p>
+    <ul>
+    <li>Coordinator Transaction Log <p>
+	MQ JMS Bridge built-in XA transaction coordinator uses transaction log to facilitate 
+    XA recovery and implements both file-based and jdbc-based transaction log,  and uses  
+    the same persist type (file or jdbc) as the in-process MQ broker uses.  When file-based, 
+    transaction log for a JMS bridge is created as<p> 
+    &lt;broker-instance&gt;/bridges/&lt;bridge-name&gt;/txlog.&lt;bridge-name&gt;
+    <p> 
+    <li>RM Registration<p>
+    At start of a MQ JMS bridge, all RMs of the JMS bridge are registered with its built-in XA coordinator instance.
+    The built-in XA coordinator uses RM registration for two purposes:
+    <ul>
+    <li>part of branch XID generation
+    <li>identify a RM during recovery
+    </ul>
+    <p>
+    A RM is registered for each XA connection-factory that has attribute <a href="#cfattrs">multi-rm</a> false
+    using the connection-factory element's ref-name as RM name combined with its XAResource class name (obtained 
+    at runtime).  Therefore the ref-name for a XA connection-factory element in a jmsbridge XML document file should
+    not be changed if recovery is expected between restarts. <p>
+
+	A XA connection-factory that potentially creates 
+    connections to more than one RM (ie. XAResoure.isSame() false among them) at runtime should have its attribute 
+	<a href="#cfattrs">multi-rm</a> set to true<p>
+
+    Each RM that will participate in the message-transfer XA transactions in a JMS bridge 
+    must have a corresponding XA connection-factory element whose attribute <a href="#cfattrs">multi-rm</a> is false in the JMS bridge's XML document.
+    </ul>
+    <DT><b>JDBC-based Transaction Log</b></DT>
+    <p>
+    When a broker that the JMS bridge embeded in is using JDBC store,  the JMS bridge's built-in XA transaction coordinator will store its transaction log in the same database as the broker's JDBC store uses.  Please see <a href="./dbschema.html">JMS Bridge Table Schema</a> for additional information.
+    <p>
+    A JMS bridge can run in a HA-broker.  When running in a HA-broker, all JMS bridges configured for brokers in the HA-cluster must have unique bridge names. In 4.4 when the broker that a JMS bridge is embeded in is taken over by another broker, the JMS bridge can be restarted when the failed broker restarts.  Automatic failover of a JMS bridge to the taken over broker will be supported in future release.
+   <p>
+<P>
+</DD>
+</DL>
+</DL>
+<a name="inhacluster"></a>
+<DL>
+    <DT><b>JMS Bridge Running in a HA Cluster</b></DT>
+    <br>
+    All JMS bridges configured for a broker that will be running in a HA cluster must have 
+    cluster-wide unqiue names.  A JMS bridge is owned by only 1 broker<p>
+    <DD>
+     
+    <b>imq.bridge.enabled</b> must have the same value in all brokers in a HA-cluster.  Therefore
+    it should be placed in the centralized cluster properties file pointed by imq.cluster.url
+    <p>
+    Each JMS bridge must have the same bridge configuration, for examples, <p> 
+    <b>imq.bridge.</b><i>&lt;bridge-name&gt;</i>.<b>type</b><br>
+    <b>imq.bridge.</b><i>&lt;bridge-name&gt;</i>.<b>xmlurl</b><br>
+    <P>
+    must be same for all brokers in the HA-cluster for a specific <i>bridge-name</i>. Therefore 
+    they should be placed in the centralized cluster properties file.
+    <p>
+    For a HA-broker, <b>imq.bridge.activelist</b> is used to specify a JMS bridge's initial broker ownership (versus ownership after takeover).
+    <p>
+    JMS bridge names specified in <b>imq.bridge.activelist</b> and JMS bridge names owned by this
+    broker in the HA store JMS bridge names table will sync-up during the bridge service manager initialization as part 
+    of broker startup, specifically, JMS bridge names that are in <b>imq.bridge.activelist</b> 
+    but not owned by this broker in HA store will attempt to be added into the HA store and if another broker owns the
+    JMS bridge name, it will be removed from <b>imq.bridge.activelist</b>; JMS bridge names that are
+    owned by this broker in the HA store but not in <b>imq.bridge.activelist</b> will be added to <b>imq.bridge.activelist</b>
+    <p>
+
+    <b>imqdbmgr</b><p>
+    HA cluster backup/restore that is provided by <b>imqdbmgr backup</b> and <b>imqdbmgr restore</b> will also backup and restore the JMS bridge related 
+    tables (JMS bridge names table, and JMS bridge transaction coordinators transaction log records)<p>
+    <p>
+    <b>imqdbmgr remove jmsbridge -n</b> &lt;bridge-name&gt; is added to allow to remove a JMS bridge that is owned by this broker
+    from its HA store. To run this command, first shutdown the broker with -nofailover using imqcmd if the broker is running.
+</DD>
+</DL>
+<a name="bridgestate"></a>
+<DL>
+    <DT><b>JMS Bridge States and State Transition</b></DT>
+    <br>
+    A configured JMS bridge is started either at broker startup or on demand by <a href="#bridgemgr">imqbridgemgr</a>.
+    A configured JMS bridge can be started, stopped, paused or resumed by imqbridgemgr and is automatically stopped when broker shuts down.
+        <DD>
+
+<TABLE WIDTH=1045 BORDER=1 CELLPADDING=4 CELLSPACING=3>
+<CAPTION>JMS Bridge States and State Transitions</CAPTION>
+    <COL WIDTH=76>
+    <COL WIDTH=68>
+    <COL WIDTH=60>
+    <COL WIDTH=71>
+    <THEAD>
+        <TR VALIGN=TOP>
+            <TH WIDTH=76>
+                <P><BR>
+                </P>
+            </TH>
+            <TH WIDTH=71>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">STOPPED<BR></FONT></P>
+                <P><FONT SIZE=2>s1</FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">STARTED<BR></FONT></P>
+                <P><FONT SIZE=2>s2</FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">PAUSED<BR></FONT></P>
+                <P><FONT SIZE=2>s3</FONT></P>
+            </TH>
+        </TR>
+        </THEAD>
+        <TBODY>
+          <TR VALIGN=TOP>
+            <TH WIDTH=76>
+                <P ALIGN=LEFT><FONT SIZE=2 STYLE="font-size: 9pt">start</FONT></P>
+            </TH>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>s2</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>[no-op]</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>s2</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TH WIDTH=76>
+                <P ALIGN=LEFT><FONT SIZE=2 STYLE="font-size: 9pt">pause</FONT></P>
+            </TH>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>[error]</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>s3</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>[no-op]</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TH WIDTH=76>
+                <P ALIGN=LEFT><FONT SIZE=2 STYLE="font-size: 9pt">resume</FONT></P>
+            </TH>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>[error]</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>[no-op]</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>s2</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TH WIDTH=76>
+                <P ALIGN=LEFT><FONT SIZE=2 STYLE="font-size: 9pt">stop</FONT></P>
+            </TH>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>[no-op]</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>s1</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>s1</P>
+            </TD>
+         </TR>
+    </TBODY>
+</TABLE>
+<p>
+
+The <b>Bridge Service Manager</b>, part of the <a href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/bridgeservice/javadoc/">Pluggable Bridge Service Framework</a>, in the broker manages
+all bridges running in the broker instance.  It provides management functionalities,
+pause/resume, stop/start a bridge. <a href="#bridgemgr">imqbridgemgr</a>
+is a  Java utility program that provides a command line interface for the Bridge Service Manager.
+<p>
+<DD><IMG SRC="./bridgemanager.gif"></DD>
+</DD>
+</DL>
+<p>
+<a name="linkstate"></a>
+<DL>
+    <DT><b>JMS Bridge Link States and State Transition</b></DT>
+    <br>
+        <DD>
+
+<TABLE WIDTH=1045 BORDER=1 CELLPADDING=4 CELLSPACING=3>
+<CAPTION>Link States and State Transitions</CAPTION>
+    <COL WIDTH=76>
+    <COL WIDTH=75>
+    <COL WIDTH=68>
+    <COL WIDTH=60>
+    <COL WIDTH=71>
+    <THEAD>
+        <TR VALIGN=TOP>
+            <TH WIDTH=76>
+                <P><BR>
+                </P>
+            </TH>
+            <TH WIDTH=68>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">UNINITIALIZED<BR></FONT></P>
+                <P><FONT SIZE=2>s0</FONT></P>
+            </TH>
+            <TH WIDTH=71>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">STOPPED<BR></FONT></P>
+                <P><FONT SIZE=2>s1</FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">STARTING<BR></FONT></P>
+                <P><FONT SIZE=2>s2</FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">STARTED<BR></FONT></P>
+                <P><FONT SIZE=2>s3</FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">PAUSING<BR></FONT></P>
+                <P><FONT SIZE=2>s4</FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">PAUSED<BR></FONT></P>
+                <P><FONT SIZE=2>s5</FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">STOPPING<BR></FONT></P>
+                <P><FONT SIZE=2>s6</FONT></P>
+            </TH>
+        </TR>
+        </THEAD>
+        <TBODY>
+          <TR VALIGN=TOP>
+            <TH WIDTH=76>
+                <P ALIGN=LEFT><FONT SIZE=2 STYLE="font-size: 9pt">start</FONT></P>
+            </TH>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>--&gt;s1--&gt;s2--&gt;s3</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>--&gt;s2--&gt;s3</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>[no-op]</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>[no-op]</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>--&gt;s5--&gt;s2--&gt;s3</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>--&gt;s2--&gt;s3</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>--&gt;s1--&gt;s2--&gt;s3</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TH WIDTH=76>
+                <P ALIGN=LEFT><FONT SIZE=2 STYLE="font-size: 9pt">pause</FONT></P>
+            </TH>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>[error]</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>[error]</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>--&gt;s3--&gt;s4--&gt;s5</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>--&gt;s4--&gt;s5</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>[no-op]</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>[no-op]</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>[error]</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TH WIDTH=76>
+                <P ALIGN=LEFT><FONT SIZE=2 STYLE="font-size: 9pt">resume</FONT></P>
+            </TH>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>[error]</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>[error]</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>[no-op]</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>[no-op]</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>--&gt;s5--&gt;s2--&gt;s3</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>--&gt;s2--&gt;s3</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>[error]</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TH WIDTH=76>
+                <P ALIGN=LEFT><FONT SIZE=2 STYLE="font-size: 9pt">stop</FONT></P>
+            </TH>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>[error]</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>[no-op]</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>--&gt;s3--&gt;s6--&gt;s1</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>--&gt;s6--&gt;s1</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>--&gt;s5--&gt;s6--&gt;s1</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>--&gt;s6--&gt;s1</P>
+            </TD>
+            <TD WIDTH=71>
+                <P ALIGN=CENTER>[no-op]</P>
+            </TD>
+         </TR>
+    </TBODY>
+</TABLE>
+<p>
+
+</DD>
+</DL>
+     <p>
+<a name="startstop"></a>
+<DL>
+    <DT><b>JMS Bridge Start and Stop</b></DT>
+<p>
+When a JMS bridge is started either on broker startup or on demand by <a href="#bridgemgr">imqbridgemgr</a>,
+<ol>
+<li>It parses and validates the bridge configuration XML document file configured for the JMS bridge
+<li>All dmqs and all links are initialized and consistency checked
+<li>If any transacted link is enabled,<br>
+<ol>
+ <li>The built-in XA transaction coordinator is initialized
+  <li>The JMS bridge registers resource managers for all potential XA connection factories
+  <li>The built-in XA transaction coordinator does XA recovery for the available resource managers
+</ol>
+<li>Connection pools and shared connections are created on demand 
+<li>All dmqs are ready 
+<li>All links are started
+</ol>
+<p>
+ 
+When a JMS bridge is stopped either due to the broker shuts down or on demand by <a href="#bridgemgr">imqbridgemgr</a>, first all links are closed 
+(source is closed first) and then wait all pooled connections returned to their respective pools, all references to shared
+connections returned, connection pools and shared connections are closed which causes all physical connections
+to JMS providers to close.
+<p>
+</DL>
+     <DL>
+<a name="sequence"></a> 
+    <DT><b>JMS Bridge Message Transfer</b></DT>
+     <p>
+      The MQ JMS bridge receives messages in the order sent by the source JMS provider and transfers the 
+      messages in the same order to the target JMS provider.
+	  
+     <DD>
+     Non-transacted JMS messsage transfer uses JMS CLIENT_ACKNOWLEDGE on the source side,<p>
+     <ol>
+     <li> A link receives a JMS message from its source; 
+     <li>Check the JMSExpiration header to see if the received message has expired<br>
+         If yes, log a message and send to DMQ(s), then no further action for the message 
+     <li>If the message's JMSReplyto header presents, and if the target's retain-replyto attribute is false<br>
+         set message's JMSReplyTo header null
+     <li>If the target attribute message-transformer-class set<br>
+         The message is passed to the class that extends the <a href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/bridgeservice/javadoc/com/sun/messaging/bridge/service/MessageTransformer.html">MQ Bridge MessageTransfer</a> class. 
+     <li>The message is sent to the target with calculated timeToLive based on the JMSExpiration header
+          and current GMT, and with the same JMSDeliveryMode and JMSPriority as in the original message. 
+     <li>The source message is acknowledged
+     </ol>
+     <P>
+     XA-transacted JMS messsage transfer follows similar sequence except it uses JTA interfaces
+     to coordinate the source and target resource managers to transfer each message in a XA distributed transaction.
+    <p>
+     The quality of message transfer under failures for non-transacted link is <b>at-least-once</b> and for transacted link is <b>once-only-once</b>. 
+    <p>
+    </DD>
+    </DL>
+     <p>
+    <DL>
+<a name="dmq"></a>
+    <DT><b>MQ JMS Bridge DMQ</b></DT>
+    <p>
+    <a href="#dmqprops">MQ JMS Bridge DMQ Message Properties</a><br>
+    <a href="#dmqattrs">The jmsbridge dmq Attributes</a><br>
+    <p>
+     A jmsbridge always has a built-in dmq,  and can have 0 or more additional dmq configured.
+	 The builtin dmq is a designated Queue in the broker that the jmsbridge is running in. 
+     A non-builtin dmq in a jmsbridge can be configured to have any JMS destination to any supported JMS provider.
+     An undeliverable indoubt message is sent to the built-in
+     dmq first, if that fails, it tries the other dmq(s) in the order it appears in the jmsbridge configuration XML document file
+     until a send is successful or the dmq list exhausted.  A delivery to a dmq fails if send-attempts exhausted<p>
+
+     Before an undeliverable indoubt message is sent to a dmq, it's first logged, then the following <a href="#dmqprops">MQ JMS Bridge DMQ Message Properties</a> are set to a newly created DMQ ObjectMessage. Then if the message-transformer-class is specified for the dmq, the original message is passed to the MessageTransformer.transform(), then the returned message object is set to the body of the DMQ ObjectMessage; if no message-transformer-class is specified for the dmq, the original message is set to the body of the DMQ ObjectMessage; if that fails (e.g. message is unserializable), the original message's toString() is set to the body of the DMQ ObjectMessage. The DMQ ObjectMessage is then sent to the dmq with the time-to-live-in-millis as specified for the dmq, the same JMSDeliveryMode and the same JMSPriority as in the original message.<p>
+
+	 If the original message is not serializable, message-transform-class should be specified for the dmq to transform the message to
+     a serilizable object, otherwise only the original message's headers and properties are transferred to the dmq message.  
+	 When an undeliverable indoubt message is unable to be sent to any dmq, details (properties, headers) about the original
+     message will be logged along with the <a href="#dmqprops">MQ JMS Bridge DMQ Message Properties</a>.
+     <p>
+
+When a dmq is configured to use MQ, the MQ administrator can optionally configure the destination of the dmq so that the messages sent to the destination will be automatically transferred to the MQ broker's DMQ by setting the destination attributes
+<p>
+useDMQ=true<br> 
+limitBehavior=REMOVE_OLDEST<br>
+maxNumMsgs=0 <br>
+	 <p>
+
+In a MQ JMS bridge XML configuration document, the dmq element can have a number of <a href="#dmqattrs">dmq attributes</a>
+specified. To configure the built-in dmq, use dmq name "built-in-dmq".  These attributes for the built-in dmq are ignored: 
+enabled, connection-factory-ref, destination-ref, stay-connected.
+<p>
+<a name="todmq"></a>
+A message is sent to DMQ on the following message transfer failures:
+<TABLE WIDTH=1045 BORDER=1 CELLPADDING=4 CELLSPACING=3>
+    <COL WIDTH=76>
+    <COL WIDTH=76>
+    <COL WIDTH=30>
+    <THEAD>
+        <TR VALIGN=TOP>
+            <TH WIDTH=68>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Transacted Link<BR></FONT></P>
+            </TH>
+            <TH WIDTH=71>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Non-Transacted Link<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Comments<BR></FONT></P>
+            </TH>
+         </TR>
+       </THEAD>
+       <TBODY>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>message expired</P>
+            </TD>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>message expired</P>
+            </TD>
+            <TD WIDTH=30>
+                <P ALIGN=LEFT>The message expired before sending to the target</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>N/A</P>
+            </TD>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>send failure</P>
+            </TD>
+            <TD WIDTH=30>
+                <P ALIGN=LEFT>For transacted link, the transaction will be rolled back</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>N/A</P>
+            </TD>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>ack failure</P>
+            </TD>
+            <TD WIDTH=30>
+                <P ALIGN=LEFT>The message acknowledgement to source is failed after sent to target</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>message transformer failure</P>
+            </TD>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>message transformer failure</P>
+            </TD>
+            <TD WIDTH=30>
+                <P ALIGN=LEFT>MessageTransforer.transform(message) is failed when message-transfer-class is configured for the target.  The non-transformed original message will be sent to the target</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>commit failure</P>
+            </TD>
+            <TD WIDTH=75>
+                <P ALIGN=CENTER>N/A</P>
+            </TD>
+            <TD WIDTH=30>
+                <P ALIGN=LEFT></P>
+            </TD>
+         </TR>
+         </TBODY>
+</TABLE>
+<p>
+<p>
+<a name="dmqprops"></a>
+<TABLE WIDTH=1045 BORDER=1 CELLPADDING=4 CELLSPACING=3>
+<CAPTION><b>MQ JMS Bridge DMQ Message Properties</b></CAPTION>
+    <COL WIDTH=76>
+    <COL WIDTH=75>
+    <COL WIDTH=68>
+    <THEAD>
+        <TR VALIGN=TOP>
+            <TH WIDTH=68>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Property Name<BR></FONT></P>
+            </TH>
+            <TH WIDTH=71>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Type<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Comments<BR></FONT></P>
+            </TH>
+         </TR>
+       </THEAD>
+       <TBODY>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>JMS_SUN_JMSBRIDGE_SOURCE_MESSAGEID</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>String</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>orginal message's getJMSMessageID(), null if not available</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>JMS_SUN_JMSBRIDGE_SOURCE_TIMESTAMP</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>long</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>original message's getJMSTimestamp()</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>JMS_SUN_JMSBRIDGE_SOURCE_CORRELATIONID</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>String</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>original message's getJMSCorrelationID()</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>JMS_SUN_JMSBRIDGE_SOURCE_JMSTYPE</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>String</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>original message's getJMSType()</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>JMS_SUN_JMSBRIDGE_SOURCE_DESTINATION</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>String</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>The original message's source destination name</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>JMS_SUN_JMSBRIDGE_TARGET_DESTINATION</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>String</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>The name of the target destination where the original message was intended to send to </P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>JMS_SUN_JMSBRIDGE_SOURCE_PROVIDER</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>String</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>The ConnectionMetaData.getJMSProviderName of the connection the original message was received on, if not available, the source connection factory's getClass().getName() </P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>JMS_SUN_JMSBRIDGE_TARGET_PROVIDER</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>String</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>The ConnectionMetaData.getJMSProviderName of the connection the original message was intended to send on, if not available, the target connection factory's getClass().getName() </P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>JMS_SUN_JMSBRIDGE_DMQ_REASON</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>String</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>one of MESSAGE_EXPIRED, SEND_FAILURE, ACK_FAILURE, MESSAGE_TRANSFORM_FAILURE, COMMIT_FAILURE</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>JMS_SUN_JMSBRIDGE_DMQ_EXCEPTION</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>String</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>The Exception.getMessage() if exception occurred or detailed comments on the failure; null if none</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>JMS_SUN_JMSBRIDGE_DMQ_TIMESTAMP</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>String</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>The timestamp when the JMS bridge sends the message to the DMQ</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>JMS_SUN_JMSBRIDGE_DMQ_BODY_TRUNCATED</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>String</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>If unable to set the original message or the transformed (if the dmq's message-transform-class set) message to the body of the dmq ObjectMessage. In that case the message's toString() is set to the body of the dmq ObjectMessage</P>
+            </TD>
+         </TR>
+         <TBODY>
+</TABLE>
+<p>
+<a name="dmqattrs"></a>
+<TABLE WIDTH=1045 BORDER=1 CELLPADDING=4 CELLSPACING=3>
+<CAPTION><b>The jmsbridge dmq Attributes</b></CAPTION>
+    <COL WIDTH=76>
+    <COL WIDTH=75>
+    <COL WIDTH=68>
+    <THEAD>
+        <TR VALIGN=TOP>
+            <TH WIDTH=68>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Attribute Name<BR></FONT></P>
+            </TH>
+            <TH WIDTH=71>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Type<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Default<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Comments<BR></FONT></P>
+            </TH>
+         </TR>
+       </THEAD>
+       <TBODY>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>name</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>no default</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>unique identifier for this dmq</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>enabled</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>"true" or "false"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>"true"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>whether this dmq is enabled</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>connection-factory-ref</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>no default</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>a reference to a non-XA connection-factory element</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>destination-ref</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>no default</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>a reference to a destination element</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>stay-connected</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>"true" or "false"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>"true"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>if true,  the dmq producer connection will stay connected and be dedicated</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>client-id</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>not default</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>JMS client identifier for the dmq producer connection. If set, the connection will be dedicated</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>time-to-live-in-millis</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>integer</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>"0"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>Time-to-live in milliseconds (0 means forever) for messages going to this dmq </P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>send-attempts</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>integer</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>"3"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>The number of attempts in sending an undeliverable indoubt message to a dmq</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>send-attempt-interval-in-seconds</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>integer</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>"5"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>how long to wait before next retry in sending an undeliverable indoubt to dmq </P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>message-transformer-class</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>not set</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>A fully qualified class name that extends the <a href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/bridgeservice/javadoc/com/sun/messaging/bridge/service/MessageTransformer.html">MQ Bridge MessageTransformer</a> class.  When it's set, user can optionally specify any number of properties to be used by the MessageTransformer subclass throgh the property element in the dmq element; see <a href="#msgtransformer">MQ JMS Bridge Message Transformer</a></P>
+            </TD>
+         </TR>
+        </TBODY>
+       </TABLE>
+
+    </DL> 
+<p>
+<DL>
+<a name="link"></a>
+    <DT><b>MQ JMS Bridge Link</b></DT>
+<p>
+<a href="#linkattrs">link Attributes</a><br>
+<a href="#sourceattrs">source Attributes</a><br>
+<a href="#targetattrs">target Attributes</a><br>
+<a href="#cfattrs">connection-factory Attributes</a><br>
+<a href="#destattrs">destination Attributes</a><br>
+   <p>
+   <DL>
+   The following attributes can be specified for a jmsbridge link element.
+<p>
+<a name="linkattrs"></a>
+<TABLE WIDTH=1045 BORDER=1 CELLPADDING=4 CELLSPACING=3>
+<CAPTION><b>The jmsbridge link Attributes</b></CAPTION>
+    <COL WIDTH=76>
+    <COL WIDTH=75>
+    <COL WIDTH=68>
+    <THEAD>
+        <TR VALIGN=TOP>
+            <TH WIDTH=68>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Attribute Name<BR></FONT></P>
+            </TH>
+            <TH WIDTH=71>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Type<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Default<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Comments<BR></FONT></P>
+            </TH>
+         </TR>
+       </THEAD>
+       <TBODY>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>name</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>no default</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>unique identifier for this link</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>enabled</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>"true" or "false"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>"true"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>if false, the link will not be started</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>transacted</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>"true" or "false"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>"true"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>If true, each message transfer from source to target will be done in a XA distributed transaction and the source and target connection-factory-ref must reference to a javax.jms.XAConnectionFactory object; <P>
+if false, CLIENT_ACKNOWLEDGE mode will be used on the source and the source and target connection-factory-ref must reference to a javax.jms.ConnectionFactory object</P>
+            </TD>
+         </TR>
+         </TBODY>
+        </TABLE>
+
+<a name="sourceattrs"></a>
+   <p>
+<p>
+   The following attributes can be specified for the source in a jmsbridge link element.
+<p>
+<TABLE WIDTH=1045 BORDER=1 CELLPADDING=4 CELLSPACING=3>
+<CAPTION><b>The jmsbridge source Attributes</b></CAPTION>
+    <COL WIDTH=76>
+    <COL WIDTH=75>
+    <COL WIDTH=68>
+    <THEAD>
+        <TR VALIGN=TOP>
+            <TH WIDTH=68>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Attribute Name<BR></FONT></P>
+            </TH>
+            <TH WIDTH=71>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Type<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Default<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Comments<BR></FONT></P>
+            </TH>
+         </TR>
+       </THEAD>
+       <TBODY>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>connection-factory-ref</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>no default</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>reference to a connection-factory element</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>destination-ref</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>no default</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>reference to a destination element</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>selector</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>not set</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>a JMS selector for the message consumer</p> 
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>durable-sub</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>not set</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>a JMS durable subscription name, ignored if destination-ref does not reference a javax.jms.Topic object</p> 
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>clientid</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>not set</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>a JMS client identifier for message consumer connection</p> 
+            </TD>
+         </TR>
+         </TBODY>
+        </TABLE>
+<p>
+<a name="targetattrs"></a>
+   <p>
+<p>
+   The following attributes can be specified for the target in a jmsbridge link element.
+<p>
+<TABLE WIDTH=1045 BORDER=1 CELLPADDING=4 CELLSPACING=3>
+<CAPTION><b>The jmsbridge target Attributes</b></CAPTION>
+    <COL WIDTH=76>
+    <COL WIDTH=75>
+    <COL WIDTH=68>
+    <THEAD>
+        <TR VALIGN=TOP>
+            <TH WIDTH=68>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Attribute Name<BR></FONT></P>
+            </TH>
+            <TH WIDTH=71>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Type<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Default<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Comments<BR></FONT></P>
+            </TH>
+         </TR>
+       </THEAD>
+       <TBODY>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>connection-factory-ref</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>no default</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>reference to a connection-factory element</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>destination-ref</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>no default</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>reference to a destination element</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>stay-connected</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>"true" or "false"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>"true"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>if true, the message producer connection will stay connected, and be dedicated </p> 
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>stay-connected</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>"true" or "false"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>"true"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>if true, the message producer connection will stay connected, and be dedicated </p> 
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>clientid</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>not set</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>a JMS client identifier for message producer connection; if set, use dedicated connection</p> 
+            </TD>
+          </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>retain-replyto</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>"true" or "false"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>"true" if MQ to MQ<br> "false" otherwise</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>whether retain JMSReplyTo header of source message, see <a href="#replyto">JMSReplyTo</a></p> 
+            </TD>
+          </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>message-transformer-class</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>not set</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>
+                <P ALIGN=LEFT>A fully qualified class name that extends the <a href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/bridgeservice/javadoc/com/sun/messaging/bridge/service/MessageTransformer.html">MQ Bridge MessageTransformer</a> class.  When it's set, user can optionally specify any number of properties to be used by the MessageTransfer subclass throgh the property element in the target element; see <a href="#msgtransformer">MQ JMS Bridge Message Transformer</a></P>
+            </TD>
+          </TR>
+        </TBODY>
+        </TBODY>
+        </TABLE>
+		<p>
+<a name="cfattrs"></a>
+The following attributes can be specified for a jmsbridge connection-factory element.
+<p>
+<TABLE WIDTH=1045 BORDER=1 CELLPADDING=4 CELLSPACING=3>
+<CAPTION><b>The jmsbridge connection-factory Attributes</b></CAPTION>
+    <COL WIDTH=76>
+    <COL WIDTH=75>
+    <COL WIDTH=68>
+    <THEAD>
+        <TR VALIGN=TOP>
+            <TH WIDTH=68>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Attribute Name<BR></FONT></P>
+            </TH>
+            <TH WIDTH=71>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Type<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Default<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Comments<BR></FONT></P>
+            </TH>
+         </TR>
+       </THEAD>
+       <TBODY>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>ref-name</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>no default</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>reference name for this connection-factory element</P>
+            </TD>
+           </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>multi-rm</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>"true" or "false"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>false</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>ignored if javax.jms.ConnectionFactory type <p>
+				set to true if this connection factory will potentially create XA connections to more than one XA resource managers (ie. XAResource.isSame() false among them) and add separate connection-factory for each those resource managers so that each of them will be registered separately to XA transaction coordiator</P>
+            </TD>
+           </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>lookup-name</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>not set</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>JNDI lookup name. If specified, the JNDI environment properties must specified in the property elements of this connection-factory, and the object returned by the lookup must be either javax.jms.ConnectionFactory or javax.jms.XAConnectionFactory type; 
+if not specified, a default connection factory to the MQ broker with the properties in the property elements will be created.</P>
+            </TD>
+           </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>connect-attempts</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>integer</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>-1</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>The number of attempts for connecting, -1 means retry forever</P>
+            </TD>
+           </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>connect-attempt-interval-in-seconds</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>integer</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>5</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>how long to wait before each connect attempt</P>
+            </TD>
+           </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>idle-timeout-in-seconds</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>integer</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>1800</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>Close a connection if it is idle for more than this long. 0 means no idle timeout. This attribute will be ignored for a source and ignored if stay-connected is true for a target or a dmq</P>
+            </TD>
+           </TR>
+           </TBODY>
+           </TABLE>
+<p>
+<a name="destattrs"></a>
+The following attributes can be specified for a jmsbridge destination element.
+<p>
+<TABLE WIDTH=1045 BORDER=1 CELLPADDING=4 CELLSPACING=3>
+<CAPTION><b>The jmsbridge destination Attributes</b></CAPTION>
+    <COL WIDTH=76>
+    <COL WIDTH=75>
+    <COL WIDTH=68>
+    <THEAD>
+        <TR VALIGN=TOP>
+            <TH WIDTH=68>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Attribute Name<BR></FONT></P>
+            </TH>
+            <TH WIDTH=71>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Type<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Default<BR></FONT></P>
+            </TH>
+            <TH WIDTH=70>
+                <P STYLE="margin-bottom: 0in"><FONT SIZE=1 STYLE="font-size: 8pt">Comments<BR></FONT></P>
+            </TH>
+         </TR>
+       </THEAD>
+       <TBODY>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>ref-name</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>no default</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>reference name for this destination element</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>name</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>not set</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>The JMS destination name for this destination. ignored if lookup-name is specified </P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>type</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>"queue" or "topic"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>"queue"</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>JMS destination type. ignored if lookup-name is specified</P>
+            </TD>
+         </TR>
+          <TR VALIGN=TOP>
+            <TD WIDTH=75>
+                <P ALIGN=LEFT>lookup-name</P>
+            </TD>
+            <TD WIDTH=68>
+                <P ALIGN=CENTER>string</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=CENTER>not set</P>
+            </TD>
+            <TD WIDTH=60>
+                <P ALIGN=LEFT>JNDI lookup name for the destination.  If specified, the JNDI environment properties must specified in the
+property elements of the this destination element</P>
+            </TD>
+         </TR>
+         </TBODY>
+        </TABLE>
+</DL>
+</DL>
+    <DL>
+<a name="msgtransformer"></a>
+    <DT><b>MQ JMS Bridge MessageTransformer</b></DT>
+<p>
+    A dmq or a target in a link can optionally specify a message-transformer-class attribute which 
+is a fully qualified class name that extends the <a href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/bridgeservice/javadoc/com/sun/messaging/bridge/service/MessageTransformer.html">MQ Bridge MessageTransformer</a> class, and can optionally specify any number of properties to be used by the MessageTransformer subclass throgh the property element in a dmq or target element.  The properties will be passed to the MessageTransform.transform() method by the MQ JMS bridge runtime.  For JMS bridge, the formal type parameters for a subclass of MessageTransformer must be javax.jms.Message type. <P>
+
+The MessageTranformer.transform() method will be called, for a target after processing retain-replyto attribute on the original message,  and for both target and dmq before sending the message.
+<p>
+</DL>
+    <DL>
+<a name="replyto"></a>
+    <DT><b>JMSReplyTo</b></DT>
+<p>
+The JMS message's JMSReplyTo header value is provider dependent.  The MQ JMS bridge does not support 
+automatic JMSReplyTo destination mapping.  By default,  if the original message that is received from
+a source has JMSReplyTo header set, the MQ JMS bridge will set it to null before passing the message 
+to any message-tranformer-class or sending to a target JMS provider.  The JMSReplyTo header handling 
+can be customerized by a message-transformer-class with target attribute retain-replyto set to true
+ so that the JMSReplyTo header will be retained when the message is passed to the MessageTransformer.transform()
+ method.<p>
+
+If there is no message-transformer-class specified for a target or if specified message-tranfomer-class does
+not handle JMSReplyTo header, setting retain-replyto to true can potentially cause ClassCastException when
+the message is sent to a target JMS provider that is different from the message's source.<p>
+
+If both target and source has the same JMS provider, in order for the message recipient client of a target 
+JMS provider instance to send a reply message back to the JMSReplyTo destination in the source provider 
+instance over the JMS bridge, the JMSReplyTo destination must exist in the target JMS provider instance 
+(or can be auto-created) and a jmsbridge link must set up in the jmsbridge XML document to link the 
+JMSReplyTo destination in the target provider instance to the one in the source provider instance.
+<p>
+</DL>
+    <DL>
+<a name="dtd"></a>
+    <DT><b>MQ JMS Bridge DTD</b></DT>
+	<p>
+    The configuration of a MQ JMS bridge is specified by a XML document that is validated against
+    the MQ JMS bridge DTD (Document Type Definition) unpon read by a JMS bridge that is running
+    in a MQ broker instance.<p>
+    The MQ JMS bridge DTD file is named <a href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/bridgeservice/jmsbridge/sun_jmsbridge_1_0.dtd.html">sun_jmsbridge_1_0.dtd</a> and specifies the syntax of a MQ
+    JMS bridge configuration XML document.  
+ </DL>
+
+<a NAME="non-feature"></a>
+<DT><B>5.0 Non-feature:<BR></B></DT>
+<ul>
+<li>Bridging 2 foreign JMS providers are not supported. <br>
+<li>Bridging non-JMS providers are not supported.<br>
+<li>JMS 1.0.2 providers are not supported<br>
+Connection factories must be JMS 1.1 either javax.jms.ConnectionFactory or javax.jms.XAConnectionFactory type
+</ul>  
+<p>
+MQ JMS bridge runs in HA-mode (be able to failover to the takeover broker) when running in a HA-clustered broker will be added in future release.
+<p>
+<a NAME="depends"></a>
+<DT><B>6.0 Dependencies:<BR></B></DT>
+<ul>
+<li>JMS 1.1<br>
+<li>Foreign JMS provider, such as IBM Web Sphere MQ<br>
+    <ul>
+    <li>must be JMS 1.1 compliant<br>
+    <li>must support JNDI administrative objects<br>
+    <li>Connection factory must be either javax.jms.ConnectionFactory or javax.jms.XAConnectionFactory type<br>
+    <li>To use transacted link, must support the XA interfaces as a resource manager<br>
+    </ul>
+<li>JNDI and JNDI service provider(s) for lookup foreign JMS provider's or MQ's administrative objects
+<li>JTA intefaces for transacted links<br>
+</ul>
+<p>
+<a NAME="interface"></a>
+<DT><B>7.0 Interfaces:<BR></B></DT>
+<p> <center> Exported Interfaces</center>
+<p>
+<DL>
+    <DT>
+    <TABLE WIDTH=1288 BORDER=1 CELLPADDING=2 CELLSPACING=3>
+        <COL WIDTH=250>
+        <COL WIDTH=243>
+        <COL WIDTH=768>
+        <TR>
+            <TH WIDTH=250>
+                <P><A NAME="bgie34"></A><A NAME="bgie35"></A>Interface</P>
+            </TH>
+            <TH WIDTH=243>
+                <P><A NAME="bgie36"></A>Classification</P>
+            </TH>
+            <TH WIDTH=768>
+                <P><A NAME="bgie37"></A><A NAME="bgie38"></A>Comments/Specification</P>
+            </TH>
+        </TR>
+        <TR>
+            <TD WIDTH=250>
+                <P>sun_jmsbridge_1_0.dtd</P>
+            </TD>
+            <TD WIDTH=243>
+                <P>Evolving</P>
+            </TD>
+            <TD WIDTH=768>
+                <P>The <a href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/bridgeservice/jmsbridge/sun_jmsbridge_1_0.dtd.html">MQ JMS bridge configuration xml document file DTD</a></P>
+            </TD>
+        </TR>
+        <TR>
+            <TD WIDTH=250>
+                <P>imqbridgemgr</P>
+            </TD>
+            <TD WIDTH=243>
+                <P>Evolving</P>
+            </TD>
+            <TD WIDTH=768>
+                <P><a href="#bridgemr">The bridge service manager administration command line utility</a></P>
+            </TD>
+        </TR>
+        <TR>
+            <TD WIDTH=250>
+                <P>MQ bridge service configuration<br>
+                   MQ JMS bridge service configuration</A></P>
+            </TD>
+            <TD WIDTH=243>
+                <P>Evolving</P>
+            </TD>
+            <TD WIDTH=768>
+                <P><A HREF="#config">broker properties for MQ bridge service and jms bridge service</a></P>
+            </TD>
+        </TR>
+        <TR>
+            <TD WIDTH=250>
+                <P>com.sun.messaging.bridge.service.MessageTransformer</A></P>
+            </TD>
+            <TD WIDTH=243>
+                <P>Evolving</P>
+            </TD>
+            <TD WIDTH=768>
+                <P>The abstract class <a href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/bridgeservice/javadoc/com/sun/messaging/bridge/service/MessageTransformer.html">MessageTransformer</a> that can be subclassed by MQ JMS bridge users to be used by MQ JMS bridge runtime to transform messages</P>
+            </TD>
+        </TR>
+    </TABLE>
+    </DT><DD></DD>
+    </DL>
+<P ALIGN=CENTER STYLE="margin-bottom: 0.2in">
+Imported Interfaces</P>
+<DL>
+    <DT>
+    <TABLE WIDTH=1293 BORDER=1 CELLPADDING=2 CELLSPACING=3>
+        <COL WIDTH=379>
+        <COL WIDTH=320>
+        <COL WIDTH=568>
+        <TR>
+            <TH WIDTH=379>
+                <P>Interface</P>
+            </TH>
+            <TH WIDTH=320>
+                <P>Classification</P>
+            </TH>
+            <TH WIDTH=568>
+                <P>Comments/Specification</P>
+            </TH>
+        </TR>
+        <TR>
+            <TD WIDTH=379>
+                <P>JMS 1.1</P>
+            </TD>
+            <TD WIDTH=320>
+                <P>Standard</P>
+            </TD>
+            <TD WIDTH=568>
+            <p><a href="http://java.sun.com/javaee/5/docs/api/javax/jms/package-frame.html">javax.jms</a></P>
+            </TD>
+        </TR>
+        <TR>
+            <TD WIDTH=379>
+                <P>JTA 1.1</P>
+            </TD>
+            <TD WIDTH=320>
+                <P>Standard</P>
+            </TD>
+            <TD WIDTH=568>
+                <P><a href="http://java.sun.com/javaee/5/docs/api/javax/transaction/package-frame.html">javax.transaction</a>
+                   <br>
+                   <a href="http://java.sun.com/javaee/5/docs/api/javax/transaction/xa/package-frame.html">javax.transaction.xa</a>
+                </p>
+            </TD>
+        </TR>
+    </TABLE>
+   </DT>
+   <DD></DD>
+   </DL>
+
+<p>
+<DT><B>8.0 Performance:<BR><BR></B></DT>
+The MQ JMS bridge runs embeded in MQ broker which benefits performance.<p>
+The MQ JMS bridge implements connection pooling so that connections can be obtained
+from available connections of the same connectin factory instead of always create new.<p>
+
+The MQ JMS bridge is highly scalable. Multiple jmsbridge can run parallel
+in the same broker instance and each jmsbridge can have muliple links 
+which only limited by the broker configured resources.
+<p>
+<a NAME="config"></a>
+<DT><B>9.0 Configuration/Administration:<br></B></DT>
+<p>
+<a href="#configs">MQ Bridge Service Manager Configuration</a><br>
+<a href="#jmsconfig">MQ JMS Bridge Service Configuration</a><br>
+<a href="#bridgemgr">imqbridgemgr</a><br>
+<a name="configs"></a>
+<DD>
+<DL>
+<p>
+<DT><b>Broker Properties for MQ Bridge Service Manager</b></DT>
+<TABLE WIDTH=1045 BORDER=1 CELLPADDING=4 CELLSPACING=3>
+    <COL WIDTH=76>
+    <COL WIDTH=75>
+    <COL WIDTH=68>
+    <TR>
+            <TH WIDTH=250> <P>Name</P></TH>
+            <TH WIDTH=243> <P>Default</P></TH>
+            <TH WIDTH=768>Description</P></TH>
+    </TR>
+    <TR>
+            <TD WIDTH=250> <P>imq.bridge.enabled</P></TD>
+            <TD WIDTH=243> <P>false</P></TD>
+            <TD WIDTH=768>Set true to enable broker to run embeded bridge service(s).  When the broker is in HA-mode, this property is added to the match properties of the HA cluster</P></TD>
+    </TR>
+    <TR>
+            <TD WIDTH=250> <P>imq.bridge.activelist</P></TD>
+            <TD WIDTH=243> <P>not set</P></TD>
+            <TD WIDTH=768>A list of comma separated bridge names that will be loaded on broker startup. All bridge names, regardless type,  that are configured for a broker must be unique</P></TD>
+    </TR>
+    <TR>
+            <TD WIDTH=250> <P>imq.bridge.admin.user</P></TD>
+            <TD WIDTH=243> <P>not set</P></TD>
+            <TD WIDTH=768>A MQ broker administrative user to be used by the bridge service manager and the JMS bridges to create ADMIN connections to the broker and to access the JMS bridge's built-in DMQ Queue destinantion <b>imq.bridge.jms.dmq</b></P></TD>
+    </TR>
+    <TR>
+            <TD WIDTH=250> <P>imq.bridge.admin.password</P></TD>
+            <TD WIDTH=243> <P>not set</P></TD>
+            <TD WIDTH=768>The password for the imq.bridge.admin.user. It's recommended to specify this property in a passfile through the "-passfile" option of imqbrokerd </P></TD>
+    </TR>
+</TABLE>
+<br>
+<p>
+<a NAME="jmsconfig"></a>
+<DT><b>Broker Properties for JMS Bridge Service</b></DT>
+<TABLE WIDTH=1045 BORDER=1 CELLPADDING=4 CELLSPACING=3>
+    <COL WIDTH=76>
+    <COL WIDTH=75>
+    <COL WIDTH=68>
+    <TR>
+            <TH WIDTH=250> <P>Name</P></TH>
+            <TH WIDTH=243> <P>Default</P></TH>
+            <TH WIDTH=768>Description</P></TH>
+    </TR>
+    <TR>
+            <TD WIDTH=250> <P>imq.bridge.<i>&lt;name&gt;</i>.type</P></TD>
+            <TD WIDTH=243> <P>not set</P></TD>
+            <TD WIDTH=768><p>Specifies the type (case insensitive) of the JMS bridge whos name is <i>&lt;name&gt;</i>. For JMS bridge, the type is jms or JMS</P></TD>
+    </TR>
+    <TR>
+            <TD WIDTH=250> <P>imq.bridge.<i>&lt;name&gt;</i>.xmlurl</P></TD>
+            <TD WIDTH=243> <P>not set</P></TD>
+            <TD WIDTH=768><p>Specifies a URL that points to the jmsbridge, whos name is <i>&lt;name&gt;</i>, XML configuration document file.</P></TD>
+    </TR>
+    <TR>
+            <TD WIDTH=250> <P>imq.bridge.<i>&lt;name&gt;</i>.autostart</P></TD>
+            <TD WIDTH=243> <P>true</P></TD>
+            <TD WIDTH=768><p>Specifies whether this bridge, whos name is <i>&lt;name&gt;</i>, should be auto-started on broker startup.</P></TD>
+    </TR>
+    <TR>
+            <TD WIDTH=250> <P>imq.bridge.tm.class <b>(private)</b></P></TD>
+            <TD WIDTH=243> <P>com.sun.messaging.bridge.jms.tx.TransactionManagerImpl</P></TD>
+            <TD WIDTH=768><p>Specifies the fully qualified class name that implements the MQ JMS bridge <a href="http://jpgserv.red.iplanet.com/MQRobin/engineering/onepagers/bridgeservice/javadoc/com/sun/messaging/bridge/service/jms/tx/TransactionManagerAdapter.html">TransactionManagerAdapter</a> interface</P></TD>
+    </TR>
+    <TR>
+            <TD WIDTH=250> <P>imq.bridge.tm.props<br></P>
+                           <P>imq.bridge.&lt;name&gt;.tm.props<br></P>
+			</TD>
+            <TD WIDTH=243>not set</TD>
+            <TD WIDTH=768><p>Specifies a list of key=value separated by "," for the configured transaction manager (imq.bridge.tm.class). <p>If the same key specified in both properties, the value specified in imq.bridge.&lt;name&gt;.tm.props takes precedence.<p> For the MQ JMS bridge built-in transaction coordinator, the following property names are supported when the imq.persist.store=file:<br>
+             txlogSize<br> txlogSync<br> txlogMmap<br>
+			</P></TD>
+    </TR>
+</TABLE>
+<p>
+<a NAME="bridgemgr"></a>
+<DT><b>imqbridgemgr</b></DT>
+[Isa, Amy]
+<p>
+imqbrokermgr is the command line interface for the MQ Bridge Service Manager. 
+It has consistent syntax as imqcmd.
+<P>
+imqbridgemgr &lt;subcommand&gt; &lt;argument&gt; [&lt;options&gt;] <br>
+imqbridgemgr -h<br>
+imqbridgemgr -H<br>
+imqbridgemgr -v<br>
+imqbridgemgr -version<br>
+<p>
+The valid "subcommand" are <b>start</b>, <b>stop</b>, <b>resume</b>, <b>pause</b>, <b>list</b><p>
+The valid "argument" are <b>bridge</b>, <b>link</b><p>
+The valid "options" are:<p>
+<pre>
+    <b>-b</b>                     : Specify the broker host and port (host:port).\n\
+    <b>-bn</b>                    : Specify the bridge name.\n\
+    <b>-f</b>                     : Perform action without user confirmation.\n\
+    <b>-h</b>, <b>-help</b>       : Display usage help.\n\
+    <b>-H</b>, <b>-Help</b>       : Display usage help, attribute list, and examples.\n\
+    <b>-javahome</b>              : Specify an alternate Java 2 compatible runtime to use.\n\
+                                    Default is to use the bundled runtime.\n\
+    <b>-ln</b>                    : Specify the link name.\n\
+    <b>-passfile</b>              : Specify a file containing the administrator password.\n\
+    <b>-rtm</b>                   : Specify the receive timeout in seconds. Default is 10.\n\
+    <b>-rtr</b>                   : Specify the number of retries. Default is 5.\n\
+    <b>-s</b>                     : Silent mode. No output will be displayed.\n\
+    <b>-secure</b>                : Use the SSL/TLS based admin service on the broker\n\
+                                    (it needs to be enabled first).\n\
+    <b>-t</b>                     : Specify the bridge type.\n\
+    <b>-u</b>                     : Specify the administrator username.\n\
+    <b>-v</b>, <b>-version</b>    : Display version info.\n
+</pre>
+Please note that some bridge types (eg. stomp) does not support <b>link</b> argument. 
+<p>
+Please see some examples in <a href="#bridgemgrusecase">imqbridgemgr Use Cases</a>
+<p>
+</DL>
+</DD>
+<a NAME="diag"></a>
+<DT><B>10.0 Instrumentation/Diagnostics:<BR><BR></B></DT>
+    imqbridgemgr provides "list" subcommand to show JMS brigde state and its links and link states.
+    <p>
+    The MQ JMS bridge implementation uses Java logging which can be configured by Java system property <i><b>java.util.logging.config.file</b></i>
+    <p>
+    JMX interfaces will be added for the MQ Bridge Service Manager and JMS bridges in future release.
+<p>
+<a NAME="interop"></a>
+<DT><B>11.0 Compatibility/Interoperability/Migration:<BR><BR></B></DT>
+MQ JMS Bridge interoperates with JMS 1.1 conformant JMS providers.  see <a href="#depends">Dependencies</a>
+<p>
+MQ JMS bridge uses JTA standard interfaces to coordinate XA transactions between source and 
+target resource managers for a transacted link.  An external JTA transaction manager can be
+used instead of the built-in XA transaction coordinator, although this is not officially supported.
+ 
+<p>
+<a NAME="security"></a>
+<DT><B>12.0 Security:<BR><BR></B></DT>
+It's recommended to access control the MQ JMS Bridge's built-in DMQ destination <b>imq.bridge.jms.dmq</b> to only MQ broker administrators.
+<p>
+
+The security on connections to a JMS provider lies in the configuration that is set in each connection factory administrative object.  Therefore administrators using MQ JMS bridge should configure sufficient security in the connection factory administrative objects that to be used by the jmsbridge, and configure sufficient security in the property element of the jmsbridge connection-factory element for lookup those objects<p> 
+<p> 
+<DT><B>13.0 Standards Conformance:<BR><BR></B></DT>
+JMS 1.1<br>
+JTA 1.1<br>
+JSE 5.0 or later<br>
+<p>
+<a name="install"></a>
+<DT><B>14.0 Installation/packaging:</B></DT>
+<ul>
+<li>The MQ JMS bridge implementation classes will be <b>imqjmsbridge.jar</b> to be instanlled under lib/<br>
+<li>The JTA interface classes <b>jta.jar</b> is a dependency of imqjmsbridge.jar and to be installed under lib/<br>
+<li>The <b>fscontext.jar</b>, currently already installed with MQ,  can be a dependency of imqjmsbridge.jar if 
+the jmsbridge is configured lookup administrative objects through the JNDI File System Service Provider.
+<li> sun_jmsbridge_1_0.dtd to be installed under lib/ or lib/dtd/
+</ul>
+<P>
+<a NAME="usecases"></a>
+<DT><B>15.0 Use Cases:<BR></B></DT>
+<a href="#mq2series">Bridging MQ and WebSphere MQ</a><br>
+<a href="#mq2mq">Bridging MQ and MQ</a><br>
+<a href="#bridgemgrusecase">imqbridgemgr</a>
+<p>
+<DL>
+<a name="mq2series"></a>
+<DT><b>Bridging MQ and WebSphere MQ using transacted link</b><DT>
+
+<ol>
+<li>Set up and start WebSphere MQ queue manager by following WebSphere MQ instructions  
+<li>Create administrative objects with lookup name "ivtXACF" for XAConnectionFactory,
+"ivtQ" for the Queue destination object 
+<li>Create a JMS bridge xml document file, for example<br> 
+    <a href="./mq2series.jmsbridge.xml">mq2series.jmsbridge.html</a>
+<br>the example JMS bridge is named "mq2seriesbridge"<p>
+
+<li>Set following broker properties<br>
+imq.bridge.enabled=true<br>
+imq.bridge.activelist=mq2seriesbridge<br>
+imq.bridge.mq2seriesbridge.type=jms<br>
+imq.bridge.mq2seriesbridge.xmlurl=&lt;url points to the example mq2series.jmsbridge.xml file&gt; <br>
+imq.bridge.admin.password=admin<br>
+imq.bridge.admin.user=admin<br>
+<p>
+<li>Start the broker 
+<li>Send a message to Queue destination "mqq" in the MQ broker
+<li>run "imqcmd list dst" to the MQ broker to confirm the message is gone in Queue "mqq" 
+<li>You can confirm the message has been transfered to WebSphere MQ's destination configured
+in the mq2series.jmsbridge.xml by running the reverse JMS bridge of the above example,
+<br>
+<a href="./series2mq.jmsbridge.xml">series2mq.jmsbridge.html</a>
+<br>following the above steps only this time, the JMS bridge is named "series2mqbridge". 
+When finished, you should see the message back to MQ broker's Queue "mqq"
+</ol>
+<p>
+<a name="mq2mq"></a>
+<DT><b>Bridging MQ and MQ using transacted link</b><DT>
+<ol>
+<li>Start brokerb on port 7678
+<li>Create MQ XAConnectionFactory administrative object with lookup name cn=XCF7678
+    and imqAddressList set to &lt;host-name&gt;:7678
+<li>Create JMS bridge xml document file, as<br>
+    <a href="./mq2mq.jmsbridge.xml">mq2mq.jmsbridge.xml</a>
+<br>the example JMS bridge is named "mq2mqbridge"
+<li>Set following broker properties to brokera
+imq.bridge.enabled=true<br>
+imq.bridge.activelist=mq2mqbridge<br>
+imq.bridge.mq2mqbridge.type=jms<br>
+imq.bridge.mq2mqbridge.xmlurl=&lt;url points to the example mq2mq.jmsbridge.xml file&gt; <br>
+imq.bridge.admin.password=admin<br>
+imq.bridge.admin.user=admin<br>
+<p>
+<li>Start brokera
+<li>Send a message to Queue myqueue1 in brokera
+<li>run imqcmd list dst in brokera and brokerb<br>
+You should see the message has transfered from brokera myqueue1 to brokerb's myqueue2
+</ol>
+<P>
+<a name="bridgemgrusecase"></a>
+<DT><b>imqbridgemgr</b><DT>
+<p>
+The following examples assume the broker is running on localhost:9555
+and there is a configured JMS bridge named "mqtomqbridge". 
+<p>
+<ol>
+<li><b>To list all bridges</b> on the broker<br>
+imqbridgemgr list bridge -b :9555
+<pre>
+Listing all bridges on the broker specified by:
+
+-------------------------
+Host         Primary Port
+-------------------------
+localhost    9555
+
+----------------------------------------
+Bridge Name      Bridge Type     Bridge State
+----------------------------------------
+mqtomqbridge    JMS           STOPPED
+
+Successfully listed the bridge(s).
+</pre>
+<li><b>To list all bridges of a type</b> JMS on the broker<br>
+imqbridgemgr list bridge -t JMS -b :9555
+<pre>
+Listing all bridges where:
+
+------------
+Bridge Type
+------------
+JMS
+
+On the broker specified by:
+
+-------------------------
+Host         Primary Port
+-------------------------
+localhost    9555
+
+----------------------------------------
+Bridge Name      Bridge Type     Bridge State
+----------------------------------------
+mqtomqbridge    JMS           STOPPED
+
+Successfully listed the bridge(s).
+</pre>
+<li><b>To list a bridge</b> named "mqtomqbridge" on the broker<br>
+imqbridgemgr list bridge -bn mqtomqbridge -b :9555
+<pre>
+Listing the bridge where:
+
+------------
+Bridge Name
+------------
+mqtomqbridge
+
+On the broker specified by:
+
+-------------------------
+Host         Primary Port
+-------------------------
+localhost    9555
+
+---------------------------------------------------
+Bridge Name     Bridge Type    Bridge State    # Links
+---------------------------------------------------
+mqtomqbridge    JMS            STOPPED         1
+
+--------------------------------------------------------------------------------------
+Link Name    Link State    Source                 Target                 Transacted
+--------------------------------------------------------------------------------------
+9555to9666   STOPPED      CF9555::queue:myqueue1   CF9666::queue:myqueue3   true
+9555to9777   STOPPED      CF9555::queue:myqueue2   CF9777::queue:myqueue4   true
+
+Successfully listed the bridge.
+</pre>
+<li><b>To list a link</b> named "9555to9666" in the bridge named "mqtomqbridge"<br>
+imqbridgemgr list link -bn mqtomqbridge -ln 9555to9666 -b :9555
+<pre>
+Listing the link where:
+
+--------------------------
+Bridge Name     Link Name
+--------------------------
+mqtomqbridge    9555to9666
+
+On the broker specified by:
+
+-------------------------
+Host         Primary Port
+-------------------------
+localhost    9555
+
+---------------------------------------------------
+Bridge Name     Bridge Type    Bridge State    # Links
+---------------------------------------------------
+mqtomqbridge   JMS          STOPPED      1
+
+--------------------------------------------------------------------------------------
+Link Name    Link State    Source                 Target                 Transacted
+--------------------------------------------------------------------------------------
+9555to9666   STOPPED      CF9555::queue:myqueue1   CF9666::queue:myqueue2   true
+
+Successfully listed the link.
+</pre>
+<li><b>To start a bridge</b> named "mqtomqbridge"<br>
+imqbridgemgr start bridge -bn mqtomqbridge -b :9555
+<pre>
+Starting the bridge where:
+
+------------
+Bridge Name
+------------
+mqtomqbridge
+
+On the broker specified by:
+
+-------------------------
+Host         Primary Port
+-------------------------
+localhost    9555
+
+Are you sure you want to start this bridge ? (y/n)[n] y
+
+Successfully started the bridge.
+<pre>
+<li>It's an error <b>to start a link</b> when its bridge is in STOPPED state<br>
+imqbridgemgr start link -bn mqtomqbridge -ln 9555to9666 -b :9555
+<pre>
+Starting the link where:
+
+--------------------------
+Bridge Name     Link Name
+--------------------------
+mqtomqbridge    9555to9666
+
+On the broker specified by:
+
+-------------------------
+Host         Primary Port
+-------------------------
+localhost    9555
+
+Are you sure you want to start this link ? (y/n)[n] y
+
+Error while performing this operation on the broker.
+Link operation can only be operated when the bridge is in STARTED state
+
+Starting the link failed.
+</pre>
+</DL>
+<p>
+<DT><B>16.0 Other:</B></DT>
+[List other useful information about this feature here. If this
+feature impacts another part of the product make a note of it here.]
+<p>
+<DT><B>17.0 Documentation:</B></DT>
+<br>
+The following documentation will be impacted:
+<p>
+<dd>
+<TABLE BORDER=1 CELLPADDING=2 CELLSPACING=2>
+        <TR>
+            <TH>
+                <P><A NAME="bgie88"></A><A NAME="bgie89"></A>Book</P>
+            </TH>
+            <TH>
+                <P><A NAME="bgie90"></A><A NAME="bgie91"></A>Comments</P>
+            </TH>
+        </TR>
+        <TR>
+            <TD>
+                <P><A NAME="bgie92"></A>Technical Overview</P>
+            </TD>
+            <TD>
+                <P><A NAME="bgie93"></A><A NAME="bgie94"></A>&nbsp;</P>
+            </TD>
+        </TR>
+        <TR>
+            <TD>
+                <P><A NAME="bgie95"></A>Administrator Guide and new Book</P>
+            </TD>
+            <TD>
+                <P><A NAME="bgie96"></A><A NAME="bgie97"></A>How to enable broker bridge service, configure jmsbridge, use imqbridgemgr, link to examples of jmsbridge XML and README</P>
+            </TD>
+        </TR>
+        <TR>
+            <TD>
+                <P><A NAME="bgie104"></A>Installation Guide</P>
+            </TD>
+            <TD>
+                <P>&nbsp;</P>
+            </TD>
+        </TR>
+    </TABLE>
+</dd>
+<p>
+
+<DT><B>18.0 Open Issues:</B></DT>
+[List open issues]
+<p>
+<DT><B>19.0 Version History<BR><BR></B></DT>
+    <DD>
+    <TABLE WIDTH=503 BORDER=1 CELLPADDING=2 CELLSPACING=3>
+        <COL WIDTH=92>
+        <COL WIDTH=103>
+        <COL WIDTH=282>
+        <TR>
+            <TH WIDTH=92>
+                <P><A NAME="bgie114"></A><A NAME="bgie115"></A>Date</P>
+            </TH>
+            <TH WIDTH=103>
+                <P><A NAME="bgie116"></A>Version</P>
+            </TH>
+            <TH WIDTH=282>
+                <P><A NAME="bgie117"></A><A NAME="bgie118"></A>Change</P>
+            </TH>
+        </TR>
+        <TR>
+            <TD WIDTH=92>
+                <P><A NAME="bgie119"></A>01/16/2009</P>
+            </TD>
+            <TD WIDTH=103>
+                <P><A NAME="bgie120"></A>1.0</P>
+            </TD>
+            <TD WIDTH=282>
+                <P>updated imqbridgemgr syntax & use cases</P>
+            </TD>
+        </TR>
+        <TR>
+            <TD WIDTH=92>
+                <P><A NAME="bgie119"></A>12/14/2008</P>
+            </TD>
+            <TD WIDTH=103>
+                <P><A NAME="bgie120"></A>0.91</P>
+            </TD>
+            <TD WIDTH=282>
+                <P>added JDBC table schema</P>
+            </TD>
+        </TR>
+        <TR>
+            <TD WIDTH=92>
+                <P><A NAME="bgie119"></A>12/15/2008</P>
+            </TD>
+            <TD WIDTH=103>
+                <P><A NAME="bgie120"></A>0.9</P>
+            </TD>
+            <TD WIDTH=282>
+                <P>first draft</P>
+            </TD>
+        </TR>
+    </TABLE>
+    </TABLE>
+    </DD>
+
+
+</DL>
+<H5><I>Sun Proprietary/Confidential: Internal Use Only </I>
+</H5>
+<H5><I>(FS Version 1.1) </I>
+</H5>
+<P STYLE="margin-bottom: 0.2in"><BR><BR>
+</P>
+</body>
+</html>

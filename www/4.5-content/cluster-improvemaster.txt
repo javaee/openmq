@@ -1,0 +1,173 @@
+One pager template version: 1.91
+
+1. Introduction
+    1.1. Project/Component Working Name:
+
+    Improve Conventional Cluster With Master Broker in GlassFish
+
+    1.2. Name(s) and e-mail address of Document Author(s)/Supplier:
+
+    Amy Kang      (amyk@dev.java.net)
+    Nigel Deakin 
+
+    1.3. Date of This Document:
+
+    05/03/2010
+
+2. Project Summary
+    2.1. Project Description:
+
+    In GlassFish 3.1 LOCAL and EMBEDED JMS service modes, a MQ conventional
+    cluster can be operated in two modes - with master broker and without 
+    master broker.
+
+    The "with master broker" mode is how MQ conventional cluster traditionally 
+    operates.  This work is to improve the integration of MQ conventional cluster
+    with master broker in GlassFish cluster environment.
+
+    2.2. Risks and Assumptions:
+
+    The assumption is that the master broker will start up and sync-up with master
+    broker will be done within the specified timeout.
+
+3. Problem Summary
+    3.1. Problem Area:
+    3.2. Justification:
+
+    In GlassFish 2.2.x LOCAL JMS service mode, each Glassfish instance in a cluster
+    is configured to have a LOCAL broker in a MQ conventional cluster.  One of these
+    brokers is designated as the master broker for the MQ conentional cluster.
+
+    The master broker in MQ conventional cluster maintains configuration change
+    records about changes in the persistent entities of durable subscriptions and
+    administratively created destinations in the cluster.  Under normal operation
+    of conventional cluster,   
+
+    a. Each broker in the cluster is required to sync-up with the master broker
+       on startup 
+    b. Adminmistratively create/update/delete a destination requires master 
+       broker running
+    c. create/delete a durable subscription requires master broker running
+    
+    When a MQ conventional cluster is operated under GlassFish 2.2.x cluster
+    environment, the above #a requirement is relaxed (through the use of the
+    private broker property imq.cluster.nowaitForMasterBroker=true) and the
+    broker will operate in restricted JMS service mode until the broker sync-up
+    with the master broker.  This has eased the startup/shutdown of GlassFish 
+    instances in a cluster. However in GlassFish 2.2.x, when a broker is started
+    up in JMS restricted mode, any JMS operation that is restricted before the 
+    broker sync-up with master broker will throw JMS exception right way which
+    has imposed issue on deployment of JMS application that uses any restricted
+    JMS service if the GlassFish instance that associated with the MQ master 
+    broker starts late.
+
+4. Technical Description:
+     4.1. Details:
+      
+     In GlassFish 3.1, a JMS client request that is a JMS restricted operation,
+     will wait a configurable time for the master broker to startup and for the
+     broker to sync-up with the master broker.  The following new broker property
+
+     imq.cluster.nowaitForMasterBrokerTimeoutInSeconds  
+     (default 90sec, 0 means no wait, -1 means wait forever)
+
+     can be passed to a broker instance from GlassFish JMS module when running MQ
+     conventional cluster with master broker in GlassFish EMBEDED and LOCAL JMS mode.
+
+     This property specifies the number of seconds to wait for master broker starting
+     up and for this broker to sync-up with the master broker when a JMS client requests
+     an operation that is restricted before sync-up with master broker is done.  After
+     timeout, the JMS operation will throw JMS exception. 
+
+     This property will be ignored by a broker that has no master broker configured
+     or in effect.
+
+     JMSRA will be extended (if necessary) to allow this broker property to be passed
+     to a broker instance when running MQ conventional cluster with master broker in
+     GlassFish EMBEDED and LOCAL JMS mode. 
+    
+     4.2. Bug/RFE Number(s):
+
+     4.3. In Scope:
+
+     This one-pager describes changes in MQ only.
+
+     This feature is only applicable to GlassFish LOCAL and EMBEDED JMS mode
+
+     4.4. Out of Scope:
+
+     This one-pager does not cover GlassFish JMS module to change, if necessary,
+     the default value of the new broker property 
+
+     4.5. Interfaces:
+
+        4.5.1.  Public Interfaces:
+
+        None for MQ
+
+        4.5.2.  Private Interfaces:
+
+        New private broker property
+        imq.cluster.nowaitForMasterBrokerTimeoutInSeconds
+
+        4.5.3.  Deprecated/Removed Interfaces:
+
+        N/A
+
+     4.6. Doc Impact:
+
+     N/A
+
+     4.7. Admin/Config Impact:
+
+     No 
+     
+     4.8. HA Impact:
+
+     N/A
+
+     4.9. I18N/L10N Impact:
+
+     This feature will add new resource and log strings.
+
+     4.10. Packaging, Delivery & Upgrade:
+
+     N/A
+
+     4.11. Security Impact:
+
+     N/A
+
+     4.12. Compatibility Impact
+
+     This feature is not available to clients that use MQ client runtime
+     versions < 4.5 where the behavior in this context is not changed when
+     talking to a 4.5 broker.
+     
+     4.13. Dependencies:
+    
+        4.13.1 Internal Dependencies
+
+        GlassFish JMS module may want to change the default value of the
+        new broker property if necessary.
+
+        To minimize the chance of having to wait for the master broker, 
+        when starting up a GlassFish cluster in JMS EMBEDED and LOCAL mode,
+        JMS module should always start the GlassFish instance that
+        is associated with the designated master broker first.
+
+        4.13.2 External Dependencies
+
+        NO
+
+     4.14. Testing Impact
+
+     New tests need to be written and can be automated
+
+5. Reference Documents:
+
+6. Schedule:
+    6.1. Projected Availability:
+
+    Milestone 2 MQ broker side feature complete 
+
