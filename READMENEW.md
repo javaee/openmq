@@ -80,7 +80,13 @@ Select the version you desire from the tables below.
 | :---         | :---      | 
 | git status   | git status     |
 | git diff     | git diff       | 
-
+| Operating System | file image (no installer) | 
+| Sun Solaris Sparc | Oracle Solaris Sparc zip archive | 
+| Sun Solaris x86 | Oracle Solaris x86 zip archive | 
+| Linux | Linux x86 zip archive | 
+| Microsoft Windows x86 | Microsoft Windows x86 zip archive | 
+| IBM AIX | IBM AIX zip archive | 
+| Unix (e.g. Mac OSX) | Generic Unix zip archive |
 
  
 Open MQ 5.0 Latest Developer Release, Binary Downloads
