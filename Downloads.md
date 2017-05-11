@@ -79,4 +79,4 @@ Open MQ 4.5 community documentation collection is contained within the GlassFish
 
 ### Legacy versions
 
-Older versions of GlassFish Message Queue are available [here](https://mq.java.net/downloads/legacy-downloads.html)
+Older versions of GlassFish Message Queue are available [here](www/legacy-downloads.html)
