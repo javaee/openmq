@@ -77,10 +77,10 @@ Select the version you desire from the tables below.
 | Unix (e.g. Mac OSX) | Generic Unix zip archive |
 
 
-| Left-aligned | Center-aligned | Right-aligned |
-| :---         |     :---:      |          ---: |
-| git status   | git status     | git status    |
-| git diff     | git diff       | git diff      |
+| Left-aligned | Left-aligned | 
+| :---         | :---      | 
+| git status   | git status     |
+| git diff     | git diff       | 
 
 
  
