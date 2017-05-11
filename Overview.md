@@ -76,12 +76,3 @@ A more complete feature list is available <a href="www/features.html">here</a>.
     </tr>
   </tbody>
 </table>
-<p>&nbsp;
-</div></td>
-</tr>
-<tr class="white"><td><div class="min1">&nbsp;</div></td></tr>
-</table>
-</div>
-</div>
-</div>
-
