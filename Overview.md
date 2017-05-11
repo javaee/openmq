@@ -1,6 +1,6 @@
 # Open Message Queue -- Quick Start
 
-**This page gives a brief overview of the main features of Open MQ**
+_This page gives a brief overview of the main features of Open MQ_
 
 Open MQ implements a reliable messaging mechanism to allow your applications to integrate together without relying on synchronous communications, and providing buffering between the message producers and message consumers. Open MQ provides a unified building block that enables asychronous, loosely coupled integration and provides a common framework for administration, control, and monitoring. 
 
@@ -15,8 +15,6 @@ Open Message Queue is a full featured Message Oriented Middleware (MOM),  messag
 
 A more complete feature list is available <a href="www/features.html">here</a>. 
 
-<p>&nbsp;
-<hr width="40%" size="5" noshade="noshade" />
 <h2>Why use a message queue?</h2>
 <p>Message oriented integration has some advantages over direct integration between applications. Primarily, this allows the messaging infrastructure to operate as a buffer between your major system components. Additionally, messaging can provide a mechanism through which you can communicate with a disparate collection of system components, without necessarily knowing the details of those components. Since there's an integral buffer between the connected applications, each of these systems can operate at their own pace while the messaging infrastructure can absorb messages at the production rate, while they can be consumed at whatever rate the consumer is able to work through these messages.
 <p>Messaging is fundamentally different from an API call because your applications cannot know when the application at the other end of the communications link is going to receive the message and perform whatever actions are implied by that message. It is inherently asynchronous. Applications which require tight coupling may not be the best choice for a MOM intermediary. All actions between your systems are abstracted to a collection of messages which are exchanged via the JMS server, operating as an intermediary between your application end-points. Just because an application is asynchronous, does not mean that it cannot have high-throughput. In fact, many applications have been implemented which perform at very high message exchange rates. 
