@@ -52,8 +52,8 @@ A more complete feature list is available <a href="www/features.html">here</a>.
 <p>Open Message Queue is integrated into several community and commercial class products. It is the Java EE Java Message Service (JMS) provider for Project GlassFish, and it is the reference implementation JMS Provider for Java Platform, Enterprise Edition.
 <p>If you are interested in using a supported version of Open Message Queue, you should look over at the <a href="http://www.oracle.com/technetwork/middleware/glassfish/overview/index.html">Oracle GlassFish Server product pages</a>. Trial versions are available for download and service contracts are available from Sun Microsystems. Please remember, features in the commercial class products may vary from Open MQ. 
 
-* <a href="https://glassfish.java.net/">GlassFish Community</a>
-* <a href="https://open-esb.java.net/">Project Open Enterprise Service Bus </a>
+* [GlassFish Community](https://javaee.github.io/glassfish/)
+* [Project Open Enterprise Service Bus](https://open-esb.java.net)
 
 <table border="0" cellspacing="0" cellpadding="0" width="95%" class="generic1">
   <tbody>
