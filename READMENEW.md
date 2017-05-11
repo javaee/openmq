@@ -49,6 +49,8 @@ By downloading the source or binary archives from this site, you are agreeing to
 
 ## Downloads
 
+| Open MQ 5.1 Latest Developer Release, Binary Downloads |
+| See the Open MQ 5.1 page for additional details on this product version |
 |Item|Description|
 |:---|:----------|
 |[javax.mail.jar](https://github.com/javaee/javamail/releases/download/JAVAMAIL-1_5_6/javax.mail.jar)|The JavaMail reference implementation, including the SMTP, IMAP, and POP3 protocol providers|
