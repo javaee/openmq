@@ -69,7 +69,6 @@ Open MQ 4.5 and earlier support JMS 1.1. This version of MQ is included with Gla
 
 _See the Open MQ 4.5 page for additional details on this release_
 
-
 | :--- | :--- | :--- |
 | **Operating System**   | **installer image** | **file image (no installer)** |
 | :--- | :--- | :--- |
@@ -91,16 +90,5 @@ Installer guide for stand-alone MQ will no longer be updated.
 We will provide the Open MQ community updates and errata changes, using the Open MQ Wiki, here.
 
 Open MQ 4.5 community documentation collection is contained within the GlassFish Server 3.1 Documentation Collection. 
-
-# <a name="API_Documentation"></a>API Documentation
-
-For JMS 1.1 version of MQ, please use the [Open MQ 4.5.2 JavaDocs](https://javaee.github.io/openmq/www/javadoc/4.5/javadoc/index.html).
-
-For the latest JMS 2.0, please use the [Open MQ 5.0 JavaDocs](https://javaee.github.io/openmq/www/javadoc/5.0/javadoc/index.html). 
-
-# <a name="Bugs"></a>Bugs
-
-Bugs and in Open MQ are tracked in the
-[GitHub Open MQ project issue tracker](https://github.com/javaee/openmq/issues).
 
 
