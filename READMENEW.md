@@ -8,9 +8,7 @@ It offers high quality, enterprise ready messaging and is open source with a com
 
 Please see the [license](LICENSE) and the [terms of use for contributors](CONTRIBUTING).
 
-# Table of Contents
-* [Downloads](#Download_OpenMQ)
-* [Quick start guide](www/overview.html)
+To get started, read the  [Quick start guide](www/overview.html).
 
 # <a name="Download_OpenMQ"></a>Download Open Message Queue
 
