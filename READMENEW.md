@@ -52,12 +52,12 @@ By downloading the source or binary archives from this site, you are agreeing to
 Open Message Queue is available for Solaris Sparc, Solaris x86, AIX, Linux, and Windows. 
 Select the version you desire from the tables below.
 
-###Open MQ 5.1 Latest Developer Release, Binary Downloads 
+### Open MQ 5.1 Latest Developer Release, Binary Downloads 
 
 _See the Open MQ 5.1 page for additional details on this product version_
 
 | :---         | :---      | 
-| Operating System   | file image (no installer)     |
+| *Operating System*   | *file image (no installer) * |
 | :---         | :---      | 
 | Sun Solaris Sparc | Oracle Solaris Sparc zip archive | 
 | Sun Solaris x86 | Oracle Solaris x86 zip archive | 
