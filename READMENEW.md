@@ -101,46 +101,13 @@ Open MQ 4.5 community documentation collection is contained within the GlassFish
 
 # <a name="API_Documentation"></a>API Documentation
 
-The JavaMail API is defined through the Java Community Process as
-[JSR 919](http://jcp.org/en/jsr/detail?id=919).
+For JMS 1.1 version of MQ, please use the [Open MQ 4.5.2 JavaDocs](https://javaee.github.io/openmq/www/javadoc/4.5/javadoc/index.html).
 
-The JavaMail API documentation is available [here](docs/api/) and the
-JavaMail specification is available [here](docs/JavaMail-1.5.pdf).
-
-The following documents summarize the API changes in each release of
-the JavaMail API specification:
-
--   [JavaMail 1.5](docs/JavaMail-1.5-changes.txt)
--   [JavaMail 1.4](docs/JavaMail-1.4-changes.txt)
--   [JavaMail 1.3](docs/JavaMail-1.3-changes.txt)
--   [JavaMail 1.2](docs/JavaMail-1.2-changes.txt)
--   [JavaMail 1.1](docs/JavaMail-1.1-changes.txt)
-
-# <a name="Samples"></a>Samples
-
-Some sample programs showing how to use the JavaMail APIs are available
-[here](https://github.com/javaee/javamail/releases/download/JAVAMAIL-1_5_6/javamail-samples.zip).
-
-# <a name="Help"></a>Help
-
-Please read the
-[JavaMail FAQ](FAQ.html)!
-Read it again. Tell everyone you know to read it. Thank you!
-
-You can search for and post questions to the
-[JavaMail OTN forum](https://forums.oracle.com/forums/forum.jspa?forumID=975).
-You can also subscribe to the
-[mailing list](https://javaee.groups.io/g/javamail).
-
-Or, post a question on [Stack Overflow](http://stackoverflow.com/) using the
-[javamail](http://stackoverflow.com/questions/tagged/javamail) tag.
-
-Finally, you can send mail directly to the JavaMail team at
-<javamail_ww@oracle.com>.
+For the latest JMS 2.0, please use the [Open MQ 5.0 JavaDocs](https://javaee.github.io/openmq/www/javadoc/5.0/javadoc/index.html). 
 
 # <a name="Bugs"></a>Bugs
 
-JavaMail bugs are tracked in the
-[GitHub JavaMail project issue tracker](https://github.com/javaee/javamail/issues).
+Bugs and in Open MQ are tracked in the
+[GitHub Open MQ project issue tracker](https://github.com/javaee/openmq/issues).
 
 
