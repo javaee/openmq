@@ -49,6 +49,12 @@ By downloading the source or binary archives from this site, you are agreeing to
 
 ## Downloads
 
+First Header | Second Header
+------------ | -------------
+Content from cell 1 | Content from cell 2
+Content in the first column | Content in the second column
+
+
 Open Message Queue is available for Solaris Sparc, Solaris x86, AIX, Linux, and Windows. 
 Select the version you desire from the tables below.
 
