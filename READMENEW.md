@@ -8,7 +8,7 @@ It offers high quality, enterprise ready messaging and is open source with a com
 
 Please see the [license](LICENSE) and the [terms of use for contributors](CONTRIBUTING).
 
-To find our more about Open MQ, read the  [Quick start guide](www/overview.html) and visit the [Downloads page](Downloads.md).
+To find our more about Open MQ, read the  [Quick start guide](Overview.md) and visit the [Downloads page](Downloads.md).
 
 
 
