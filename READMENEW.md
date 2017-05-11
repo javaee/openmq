@@ -52,12 +52,12 @@ By downloading the source or binary archives from this site, you are agreeing to
 Open Message Queue is available for Solaris Sparc, Solaris x86, AIX, Linux, and Windows. 
 Select the version you desire from the tables below.
 
-### Open MQ 5.1 Latest Developer Release, Binary Downloads 
+#### Open MQ 5.1 Latest Developer Release, Binary Downloads 
 
 _See the Open MQ 5.1 page for additional details on this product version_
 
 | :---         | :---      | 
-| *Operating System*   | *file image (no installer) * |
+| **Operating System**   | **file image (no installer) ** |
 | :---         | :---      | 
 | Sun Solaris Sparc | Oracle Solaris Sparc zip archive | 
 | Sun Solaris x86 | Oracle Solaris x86 zip archive | 
@@ -66,43 +66,32 @@ _See the Open MQ 5.1 page for additional details on this product version_
 | IBM AIX | IBM AIX zip archive | 
 | Unix (e.g. Mac OSX) | Generic Unix zip archive |
 
-Open MQ 5.0 Latest Developer Release, Binary Downloads
-See the Open MQ 5.0 page for additional details on this product version
-Operating System
-	  	
-file image (no installer)
-Sun Solaris Sparc
-	  	
-Oracle Solaris Sparc zip archive
-Sun Solaris x86
-	  	
-Oracle Solaris x86 zip archive
-Linux
-	  	
-Linux x86 zip archive
-Microsoft Windows x86
-	  	
-Microsoft Windows x86 zip archive
-IBM AIX
-	  	
-IBM AIX zip archive
-Unix (e.g. Mac OSX)
-	  	
-Generic Unix zip archive
+#### Open MQ 5.0 Latest Developer Release, Binary Downloads
+
+_See the Open MQ 5.0 page for additional details on this product version_ 
+
+| :---         | :---      | 
+| **Operating System**   | **file image (no installer) ** |
+| :---         | :---      | 
+| Sun Solaris Sparc | Oracle Solaris Sparc zip archive |
+| Sun Solaris x86 | Oracle Solaris x86 zip archive |
+| Linux | Linux x86 zip archive |
+| Microsoft Windows x86 | Microsoft Windows x86 zip archive |
+| IBM AIX | IBM AIX zip archive |
+| Unix (e.g. Mac OSX) | Generic Unix zip archive |
 
 Open MQ 4.5 and earlier support JMS 1.1. This version of MQ is included with GlassFish Enterprise Server, 3.1.
-Open MQ 4.5 Latest Stable (4.5.2) Binary Downloads
-See the Open MQ 4.5 page for additional details on this release
-Operating System
-	
-installer image
-	
-file image (no installer)
-Sun Solaris Sparc
-	
-image with installer
-	
-zip archive, no installer
+
+#### Open MQ 4.5 Latest Stable (4.5.2) Binary Downloads
+
+_See the Open MQ 4.5 page for additional details on this release_
+
+
+| :--- | :--- | :--- |
+| **Operating System**   | **installer image** | **file image (no installer) ** |
+| :--- | :--- | :--- |
+| Sun Solaris Sparc | image with installer | zip archive, no installer
+
 Sun Solaris x86
 	
 image with installer
