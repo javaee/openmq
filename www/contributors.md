@@ -54,8 +54,7 @@
     <td><p>Do you have a success story that you'd like to share with the community? Are you using Open MQ in your community or private project?
     If you wish to share your story, please don't hesitate to contact us. You can send e-mail to the 
     user alias <a href="mailto:users@mq.java.net">users@mq.java.net</a> or you can e-mail us directly at 
-    <a href="mailto:users-owner@mq.java.net">users-owner@mq.java.net </a></td>
-  </tr>
+    <a href="mailto:users-owner@mq.java.net">users-owner@mq.java.net </a>
   <tr>
     <td><p><a href="community.html#contrib">Make a contribution</a> 
     <td><p>We welcome contributions, but at this time we are not able to take direct contributions to the source code via our on-line repository. 

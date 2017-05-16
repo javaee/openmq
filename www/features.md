@@ -1,37 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>Open MQ: Feature Matrix</title>
-<link rel="stylesheet" media="all" type="text/css" href="style.css" />
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>About Open MQ</title>
-<!-- hide the project info -->
-<style type="text/css">
-#projecthome .axial { display: none; }
-#apphead h1 { display: none; }
-#longdescription { border: none; }
-#longdescription h2 { display: none; }
-#customcontent h2 { display: block; }
-#bodycol .tasknav { display: none; }
-</style>
+# Open Message Queue Feature Matrix
 
-</head>
-
-<body>
-
-<table border="0" cellspacing="0" cellpadding="0" id="main2" width="100%">
-<tr valign="bottom" class="nav1">
-<td nowrap colspan="3"><!-- tab 4--></td>
-</tr>
-<form><tr class="sub1">
-<td nowrap>&nbsp;Open Message Queue Feature Matrix</td>
-<td align="right" nowrap>&nbsp;</td>
-</tr></form>
-<tr><td colspan="3" class="white"><div class="min1">&nbsp;</div></td></tr>
-</table>
-
-<p>&nbsp;</p>
 <table width="95%" border="0" cellpadding="0" cellspacing="0" class="generic1">
   <thead>
     <tr valign="middle">
