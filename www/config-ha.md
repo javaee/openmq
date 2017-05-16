@@ -6,11 +6,11 @@
 The first timea broker instance is run, a config.properties file is automatically created. 
 You can edit this instance configuration file to configure the HA cluster configuration properties.
 
-`$TOP/mq/bin/imqbrokerd -tty`
+    $TOP/mq/bin/imqbrokerd -tty
 	
-* Shutdown the broker<BR><BR>Ctrl-C in the terminal window in which you ran the imqbrokerd command
+* Shutdown the broker by pressing Ctrl-C in the terminal window in which you ran the `imqbrokerd` command
 
-* Edit the config.properties file to configure HA cluster configuration properties:
+* Edit the `config.properties` file to configure HA cluster configuration properties:
 
 <TABLE WIDTH=766 BORDER=1 CELLPADDING=4 CELLSPACING=3 STYLE="page-break-inside: avoid">
 		<COL WIDTH=380>
@@ -80,90 +80,92 @@ You can edit this instance configuration file to configure the HA cluster config
 
 Additional configuration properties for HADB database:
 
-	<TABLE WIDTH=766 BORDER=1 CELLPADDING=4 CELLSPACING=3 STYLE="page-break-inside: avoid">
-		<COL WIDTH=380>
-		<COL WIDTH=359>
-		<THEAD>
-			<TR VALIGN=TOP>
-				<TH WIDTH=380>
-					<P>Property Name</P>
-				</TH>
-				<TH WIDTH=359>
-					<P>Description</P>
-				</TH>
-			</TR>
-		</THEAD>
-		<TBODY>
-			<TR VALIGN=TOP>
-				<TD WIDTH=380>
-					<P><B>imq.persist.jdbc.hadb.user</B></P>
-				</TD>
-				<TD WIDTH=359>
-					<P>Specifies user's account name</P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=380>
-					<P><B>imq.persist.jdbc.hadb.password</B></P>
-				</TD>
-				<TD WIDTH=359>
-					<P><FONT SIZE=3>Specifies user's password</FONT></P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=380>
-					<P><B>imq.persist.jdbc.hadb.property.serverList</B></P>
-				</TD>
-				<TD WIDTH=359>
-					<P><FONT SIZE=3>Specifies the JDBC URL of the HADB. Use the
-					command &quot;hadbm get JdbcUrl&quot;; remove the <I>jdbc:sun:hadb
-					</I>prefix and use the <I>host:port,host:port...</I> as the
-					value for the serverList property.</FONT></P>
-				</TD>
-			</TR>
-		</TBODY>
-	</TABLE>
-	<P><BR><BR>Additional configuration properties for MySQL database:</P>
-	<TABLE WIDTH=766 BORDER=1 CELLPADDING=4 CELLSPACING=3 STYLE="page-break-inside: avoid">
-		<COL WIDTH=380>
-		<COL WIDTH=359>
-		<THEAD>
-			<TR VALIGN=TOP>
-				<TH WIDTH=380>
-					<P>Property Name</P>
-				</TH>
-				<TH WIDTH=359>
-					<P>Description</P>
-				</TH>
-			</TR>
-		</THEAD>
-		<TBODY>
-			<TR VALIGN=TOP>
-				<TD WIDTH=380>
-					<P><B>imq.persist.jdbc.mysql.user</B></P>
-				</TD>
-				<TD WIDTH=359>
-					<P>Specifies user's account name</P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=380>
-					<P><B>imq.persist.jdbc.mysql.password</B></P>
-				</TD>
-				<TD WIDTH=359>
-					<P><FONT SIZE=3>Specifies user's password</FONT></P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=380>
-					<P><B>imq.persist.jdbc.mysql.property.url</B></P>
-				</TD>
-				<TD WIDTH=359>
-					<P><FONT SIZE=3>Specifies the JDBC URL to open the database</FONT></P>
-				</TD>
-			</TR>
-		</TBODY>
-	</TABLE>
+<TABLE WIDTH=766 BORDER=1 CELLPADDING=4 CELLSPACING=3 STYLE="page-break-inside: avoid">
+	<COL WIDTH=380>
+	<COL WIDTH=359>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=380>
+				<P>Property Name</P>
+			</TH>
+			<TH WIDTH=359>
+				<P>Description</P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=380>
+				<P><B>imq.persist.jdbc.hadb.user</B></P>
+			</TD>
+			<TD WIDTH=359>
+				<P>Specifies user's account name</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=380>
+				<P><B>imq.persist.jdbc.hadb.password</B></P>
+			</TD>
+			<TD WIDTH=359>
+				<P><FONT SIZE=3>Specifies user's password</FONT></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=380>
+				<P><B>imq.persist.jdbc.hadb.property.serverList</B></P>
+			</TD>
+			<TD WIDTH=359>
+				<P><FONT SIZE=3>Specifies the JDBC URL of the HADB. Use the
+				command &quot;hadbm get JdbcUrl&quot;; remove the <I>jdbc:sun:hadb
+				</I>prefix and use the <I>host:port,host:port...</I> as the
+				value for the serverList property.</FONT></P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+	
+## Additional configuration properties for MySQL database:
+
+<TABLE WIDTH=766 BORDER=1 CELLPADDING=4 CELLSPACING=3 STYLE="page-break-inside: avoid">
+	<COL WIDTH=380>
+	<COL WIDTH=359>
+	<THEAD>
+		<TR VALIGN=TOP>
+			<TH WIDTH=380>
+				<P>Property Name</P>
+			</TH>
+			<TH WIDTH=359>
+				<P>Description</P>
+			</TH>
+		</TR>
+	</THEAD>
+	<TBODY>
+		<TR VALIGN=TOP>
+			<TD WIDTH=380>
+				<P><B>imq.persist.jdbc.mysql.user</B></P>
+			</TD>
+			<TD WIDTH=359>
+				<P>Specifies user's account name</P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=380>
+				<P><B>imq.persist.jdbc.mysql.password</B></P>
+			</TD>
+			<TD WIDTH=359>
+				<P><FONT SIZE=3>Specifies user's password</FONT></P>
+			</TD>
+		</TR>
+		<TR VALIGN=TOP>
+			<TD WIDTH=380>
+				<P><B>imq.persist.jdbc.mysql.property.url</B></P>
+			</TD>
+			<TD WIDTH=359>
+				<P><FONT SIZE=3>Specifies the JDBC URL to open the database</FONT></P>
+			</TD>
+		</TR>
+	</TBODY>
+</TABLE>
 
 * Copy your JDBC driver jar file to the following path:
 ` $TOP/mq/lib/ext/`
