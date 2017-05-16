@@ -2,81 +2,29 @@
 
 * Install Open Message Queue 4.1 on each of the machine that you want to setup as part of the Message Queue HA Cluster
 
-* Use the imqbrokerd command to start a broker. 
-The first timea broker instance is run, a config.properties file is automatically created. 
+* Use the `imqbrokerd` command to start a broker. 
+The first time a broker instance is run, a config.properties file is automatically created. 
 You can edit this instance configuration file to configure the HA cluster configuration properties.
 
-    $TOP/mq/bin/imqbrokerd -tty
+    `$TOP/mq/bin/imqbrokerd -tty`
 	
 * Shutdown the broker by pressing Ctrl-C in the terminal window in which you ran the `imqbrokerd` command
 
 * Edit the `config.properties` file to configure HA cluster configuration properties:
 
-<TABLE WIDTH=766 BORDER=1 CELLPADDING=4 CELLSPACING=3 STYLE="page-break-inside: avoid">
-		<COL WIDTH=380>
-		<COL WIDTH=359>
-		<THEAD>
-			<TR VALIGN=TOP>
-				<TH WIDTH=380>
-					<P>Property Name</P>
-				</TH>
-				<TH WIDTH=359>
-					<P>Description</P>
-				</TH>
-			</TR>
-		</THEAD>
-		<TBODY>
-			<TR VALIGN=TOP>
-				<TD WIDTH=380>
-					<P><B>imq.cluster.ha</B></P>
-				</TD>
-				<TD WIDTH=359>
-					<P><FONT SIZE=3>High Availability mode must be turned
-					on<BR><BR><B><I>imq.cluster.ha=true</I></B></FONT></P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=380>
-					<P><B>imq.cluster.clusterid</B></P>
-				</TD>
-				<TD WIDTH=359>
-					<P><FONT SIZE=3>Cluster name which is the <SPAN STYLE="font-weight: medium"><I>ID</I></SPAN>
-					associated with all brokers in the HA cluster; this id must be
-					set the same on all brokers in the HA cluster</FONT></P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=380>
-					<P><B>imq.brokerid</B></P>
-				</TD>
-				<TD WIDTH=359>
-					<P><FONT SIZE=3>Broker's unique ID; this ID must be unique to
-					this broker in the HA cluster</FONT></P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=380>
-					<P><B>imq.persist.store</B></P>
-				</TD>
-				<TD WIDTH=359>
-					<P>Specifies type of  persistence store; only JDBC-based data
-					store is supported<BR><BR><B><I>imq.persist.store=jdbc</I></B></P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=380>
-					<P><B>imq.persist.jdbc.dbVendor</B></P>
-				</TD>
-				<TD WIDTH=359>
-					<P>Database vendor (hadb, mysql);<BR><BR>hadb &ndash; Sun Java
-					System High Availability Database<BR>mysql &ndash; MySQL 4.1
-					Database<BR><BR>Example: <B><I>imq.persist.jdbc.dbVendor=hadb</I></B><BR><BR>Note:
-					Select HADB if you're currently using Sun Java Enterprise System
-					and already have HADB installed.</P>
-				</TD>
-			</TR>
-		</TBODY>
-	</TABLE>
+| :---         | :---      | 
+| **Property name**   | **Description** |
+| :---         | :---      |
+| `imq.cluster.ha` | High Availability mode must be turned on `imq.cluster.ha=true` | 
+| `imq.cluster.clusterid` | Cluster name which is the ID associated with all brokers in the HA cluster; this id must be set the same on all brokers in the HA cluster
+| `imq.brokerid` | Broker's unique ID; this ID must be unique to this broker in the HA cluster | 
+| `imq.persist.store` | Specifies type of  persistence store; only JDBC-based data store is supported
+`imq.persist.store=jdbc`|
+| `imq.persist.jdbc.dbVendor` | Database vendor (hadb, mysql)
+hadb - Sun Java System High Availability Database
+mysql - MySQL 4.1 Database
+Example: `imq.persist.jdbc.dbVendor=hadb`
+Note: Select HADB if you're currently using Sun Java Enterprise System and already have HADB installed. |
 
 Additional configuration properties for HADB database:
 
