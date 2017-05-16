@@ -65,21 +65,6 @@ _See the Open MQ 4.5 page for additional details on this release_
 | IBM AIX | [image with installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-installer-AIX.zip) | [zip archive, no installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-binary-AIX.zip) |
 | Unix (e.g. Mac OSX) | [image with installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-installer-Unix.zip) | [zip archive, no installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-binary-Unix.zip) |
 
-Beginning with Open MQ 4.4u2, Oracle no longer offers Open MQ as an independent product. 
-
-Open MQ will continue to provide builds and separate release packages as they are contributing to the GlassFish Server project. 
-
-Support contracts continue to be offered as part of GlassFish Enterprise Server 
-and customers may use GlassFish MQ as a component of the Java EE server. 
-
-Existing MQ customers should discuss the appropriate options, with their support sales representative. 
-
-JMS Development will continue as a component of GlassFish Server Open Source Edition 
-and as a component to Oracle GlassFish Enterprise Server. 
-
-The Installer guide for stand-alone MQ will no longer be updated. 
-We will provide the Open MQ community with updates and errata changes.
-
 ### Older versions
 
 Legacy versions of Open Message Queue are available on the [Open Message Queue Legacy Downloads](www/downloads/legacy-downloads.html) page.
