@@ -1,4 +1,4 @@
-# Starting and Configuring Open Message Queue 4.1 HA Cluster
+# Starting and Configuring an Open Message Queue 4.1 HA Cluster
 
 * Install Open Message Queue 4.1 on each of the machine that you want to setup as part of the Message Queue HA Cluster
 
