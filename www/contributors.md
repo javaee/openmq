@@ -17,8 +17,7 @@
     <td><p>Browse and post questions in the <br> 
     <a href="https://forums.oracle.com/forums/forum.jspa?forumID=974&start=0">OTN JMS Forum </a>
     <td><p>The <a href="https://forums.oracle.com/forums/forum.jspa?forumID=974&start=0">OTN JMS Forum </a> is for general questions about JMS.
-    (Questions specific to a particular product are best addressed to more specific forums.)</td>
-  </tr>
+    (Questions specific to a particular product are best addressed to more specific forums.)
   <tr>
     <td><p><a href="https://java.net/jira/browse/MQ">Report a bug </a>
     <td><p>We use JIRA for tracking any problems with the Open Message Queue project. 
@@ -41,7 +40,7 @@
     <p>Finally, if you're just interested in occasional announcements, subscribe to the announcement alias 
     <a href="mailto:announce@mq.java.net">announce@mq.java.net </a></p>
   <tr>
-    <td><p>Add to the <a href="https://wikis.oracle.com/display/GlassFish/OpenMessageQueue">wiki</a> </td>
+    <td><p>Add to the <a href="https://wikis.oracle.com/display/GlassFish/OpenMessageQueue">wiki</a> 
     <td><p>If you want to add to the material at the <a href="https://wikis.oracle.com/display/GlassFish/OpenMessageQueue">Open MQ Wiki</a>
     you will need a GlassFish project wiki ID. 
     See the instructions at the <a href="http://wiki.glassfish.java.net/Login.jsp">Login page</a> under the &quot;Register New User&quot; tab. 
@@ -65,7 +64,4 @@
       <p>Before  submitting anything, please contact us first via the developer alias
       <a href="mailto:dev@mq.java.net">dev@mq.java.net</a> so that we can give you further details about how to go about this.  
       If you are interested in this, we suggest you review the <a href="https://glassfish.java.net/public/devindex.html">contributor details</a> 
-      (see the section about code and samples) in the GlassFish project for more details. </p></td>
-  </tr></tbody>
-</table>
-
+      (see the section about code and samples) in the GlassFish project for more details. </p>
