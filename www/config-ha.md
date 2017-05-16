@@ -1,16 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML>
-<HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
-	<TITLE></TITLE>
-	<META NAME="GENERATOR" CONTENT="StarOffice 8  (Solaris Sparc)">
-	<META NAME="CREATED" CONTENT="20061114;13484800">
-	<META NAME="CHANGED" CONTENT="20061115;12491000">
-</HEAD>
-<BODY LANG="en-US" DIR="LTR">
-<P STYLE="margin-top: 0.17in; page-break-after: avoid"><FONT FACE="Albany, sans-serif"><FONT SIZE=4>Starting
-and Configuring Open Message Queue  4.1 HA Cluster</FONT></FONT></P>
-<OL>
+# Starting and Configuring Open Message Queue  4.1 HA Cluster
+
 	<LI>
 	  <P>Install Open Message Queue 4.1 on each of the machine that you want to setup
 	as part of the Message Queue HA Cluster</P>
@@ -190,9 +179,4 @@ and Configuring Open Message Queue  4.1 HA Cluster</FONT></FONT></P>
 	step 1). When brokers are started they will automatically register
 	themselves into the HA cluster.</P>
 </OL>
-<P><BR><BR>
-</P>
-<P><BR><BR>
-</P>
-</BODY>
-</HTML>
+
