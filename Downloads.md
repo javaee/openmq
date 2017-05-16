@@ -51,20 +51,6 @@ _See the Open MQ 5.0 page for additional details on this product version_
 
 Open MQ 4.5 and earlier support JMS 1.1. This version of MQ is included with GlassFish Enterprise Server, 3.1.
 
-### Open MQ 5.0 Documentation
-
-Open Message Queue 5.0 documentation is available as part of the [GlassFish Server Documentation](https://javaee.github.io/glassfish/documentation):
-
-| :--- | :--- | 
-| **Manual** | **pdf** |
-| :--- | :--- | 
-| Technical Overview | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) |
-| Release Notes | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-relnotes.pdf) |
-| Developer's Guide for Java Clients | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-java.pdf) |
-| Developer's Guide for JMX Clients | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-jmx.pdf) |
-| Developer's Guide for C Clients | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-c.pdf) |
-| Administration Guide | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-admin-guide.pdf)  |
-
 ### Open MQ 4.5 Latest Stable (4.5.2) Binary Downloads
 
 _See the Open MQ 4.5 page for additional details on this release_
@@ -93,20 +79,6 @@ and as a component to Oracle GlassFish Enterprise Server.
 
 The Installer guide for stand-alone MQ will no longer be updated. 
 We will provide the Open MQ community with updates and errata changes.
-
-### Open MQ 4.5 Documentation
-
-Open Message Queue 4.5 documentation is available as part of the [Oracle GlassFish Server 3.1.2 Online Documentation Library](http://docs.oracle.com/cd/E26576_01/index.htm).
-
-| :--- | :--- | :--- |  
-| **Manual** | **pdf** | **browse** |
-| :--- | :--- | :--- |  
-| Technical Overview | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24949/toc.htm) |
-| Release Notes | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24948.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24948/toc.htm) |
-| Developer's Guide for Java Clients | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24945.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24945/toc.htm) |
-| Developer's Guide for JMX Clients | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24946.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24946/toc.htm) |
-| Developer's Guide for C Clients | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24944.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24944/toc.htm) |
-| Administration Guide | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24943.pdf)  | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24943/toc.htm) |
 
 ### Older versions
 
