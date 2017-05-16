@@ -91,7 +91,7 @@ Existing MQ customers should discuss the appropriate options, with their support
 JMS Development will continue as a component of GlassFish Server Open Source Edition 
 and as a component to Oracle GlassFish Enterprise Server. 
 
-Installer guide for stand-alone MQ will no longer be updated. 
+The Installer guide for stand-alone MQ will no longer be updated. 
 We will provide the Open MQ community with updates and errata changes.
 
 ### Open MQ 4.5 Documentation
@@ -101,12 +101,12 @@ Open Message Queue 4.5 documentation is available as part of the [Oracle GlassFi
 | :--- | :--- | :--- |  
 | **Manual** | **pdf** | **browse** |
 | :--- | :--- | :--- |  
-| Technical Overview | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) | (browse)[http://docs.oracle.com/cd/E26576_01/doc.312/e24949/toc.htm] |
-| Release Notes | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) | (browse)[http://docs.oracle.com/cd/E26576_01/doc.312/e24948/toc.htm] |
-| Developer's Guide for Java Clients | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) | (browse)[http://docs.oracle.com/cd/E26576_01/doc.312/e24945/toc.htm] |
-| Developer's Guide for JMX Clients | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) | (browse)[http://docs.oracle.com/cd/E26576_01/doc.312/e24946/toc.htm] |
-| Developer's Guide for C Clients | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24944.pdf) | (browse)[http://docs.oracle.com/cd/E26576_01/doc.312/e24944/toc.htm] |
-| Administration Guide | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24943.pdf)  | (browse)[http://docs.oracle.com/cd/E26576_01/doc.312/e24943/toc.htm] |
+| Technical Overview | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24949/toc.htm) |
+| Release Notes | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24948/toc.htm) |
+| Developer's Guide for Java Clients | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24945/toc.htm) |
+| Developer's Guide for JMX Clients | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24946/toc.htm) |
+| Developer's Guide for C Clients | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24944.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24944/toc.htm) |
+| Administration Guide | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24943.pdf)  | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24943/toc.htm) |
 
 ### Older versions
 
