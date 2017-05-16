@@ -16,11 +16,13 @@ You can edit this instance configuration file to configure the HA cluster config
 | **Property name**   | **Description** |
 | :---         | :---      |
 | `imq.cluster.ha` | High Availability mode must be turned on `imq.cluster.ha=true` | 
-
 | `imq.cluster.clusterid` | Cluster name which is the ID associated with all brokers in the HA cluster; this id must be set the same on all brokers in the HA cluster
 | `imq.brokerid` | Broker's unique ID; this ID must be unique to this broker in the HA cluster | 
-| `imq.persist.store` | Specifies type of  persistence store; only JDBC-based data store is supported
-`imq.persist.store=jdbc`|
+| `imq.persist.store` | Specifies type of  persistence store; only JDBC-based data store is supported `imq.persist.store=jdbc`|
+
+| :---         | :---      | 
+| **Property name**   | **Description** |
+| :---         | :---      |
 | `imq.persist.jdbc.dbVendor` | Database vendor (hadb, mysql)
 hadb - Sun Java System High Availability Database
 mysql - MySQL 4.1 Database
