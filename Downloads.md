@@ -51,6 +51,18 @@ _See the Open MQ 5.0 page for additional details on this product version_
 
 Open MQ 4.5 and earlier support JMS 1.1. This version of MQ is included with GlassFish Enterprise Server, 3.1.
 
+### Open MQ 5.1 Documentation
+
+Open Message Queue 5.1 documentation is available as part of the [GlassFish Server Documentation](https://javaee.github.io/glassfish/documentation).
+
+| :---         |  
+| [Technical Overview](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) |
+| [Release Notes](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) |
+| [Developer's Guide for Java Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-java.pdf) |
+| [Developer's Guide for JMX Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-jmx.pdf) |
+| [Developer's Guide for JMX Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-c.pdf) |
+| [Administration Guide](https://javaee.github.io/glassfish/doc/4.0/mq-admin-guide.pdf) |
+
 ### Open MQ 4.5 Latest Stable (4.5.2) Binary Downloads
 
 _See the Open MQ 4.5 page for additional details on this release_
@@ -73,10 +85,11 @@ Existing MQ customers should discuss the appropriate options, with their support
 JMS Development will continue as a component of GlassFish Server Open Source Edition 
 and as a component to Oracle GlassFish Enterprise Server. 
 Installer guide for stand-alone MQ will no longer be updated. 
-We will provide the Open MQ community updates and errata changes.
+We will provide the Open MQ community with updates and errata changes.
 
-Open MQ 4.5 community documentation collection is contained within the GlassFish Server 3.1 Documentation Collection. 
+### Older versions
 
-### Legacy versions
+Legacy versions of Open Message Queue are available [here](www/downloads/legacy-downloads.html).
 
-Older versions of GlassFish Message Queue are available [here](www/downloads/legacy-downloads.html).
+### Source code
+
