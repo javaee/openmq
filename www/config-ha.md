@@ -8,9 +8,9 @@ You can edit this instance configuration file to configure the HA cluster config
 
     `$TOP/mq/bin/imqbrokerd -tty`
 	
-* Shutdown the broker by pressing Ctrl-C in the terminal window in which you ran the `imqbrokerd` command
+1. Shutdown the broker by pressing Ctrl-C in the terminal window in which you ran the `imqbrokerd` command
 
-* Edit the `config.properties` file to configure HA cluster configuration properties:
+2. Edit the `config.properties` file to configure HA cluster configuration properties:
 
 | :---         | :---      | 
 | **Property name**   | **Description** |
@@ -28,6 +28,7 @@ Additional configuration properties for HADB database:
 | :---         | :---      |
 | `imq.persist.jdbc.hadb.user` | Specifies user's account name |
 | `imq.persist.jdbc.hadb.password` | Specifies user's password |
+| ` imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. |
 | ` imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. Use the command `hadbm get JdbcUrl`, remove the `jdbc:sun:hadb` prefix and use the `host:port,host:port...` as the	value for the serverList property. |
 	
 ## Additional configuration properties for MySQL database:
@@ -42,10 +43,7 @@ Additional configuration properties for HADB database:
 * Copy your JDBC driver jar file to the following path:
     `$TOP/mq/lib/ext/`
 
-* Repeat steps 2-5 for each broker instance in the HA cluster.
-Ensure that the cluster ID is the same for all brokers in the HA
-cluster and the broker ID is unique for each broker in the HA
-cluster.
+3. Repeat steps 2-5 for each broker instance in the HA cluster. Ensure that the cluster ID is the same for all brokers in the HA cluster and the broker ID is unique for each broker in the HA cluster.
 
 * Use the `imqdbmgr` command to create the database schema.
     `$TOP/mq/bin/imqdbmgr create tbl
