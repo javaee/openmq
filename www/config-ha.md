@@ -10,9 +10,10 @@ You can edit this instance configuration file to configure the HA cluster config
 	
 3\. Shutdown the broker by pressing Ctrl-C in the terminal window in which you ran the `imqbrokerd` command
 
-4\. Edit the `config.properties` file to configure HA cluster configuration properties:
+4\. Edit the file `config.properties` file to configure HA cluster configuration properties:
 
 | :---         | :---      | 
+| **HA cluster configuration properties** |
 | **Property name**   | **Description** |
 | :---         | :---      |
 | `imq.cluster.ha` | High Availability mode must be turned on `imq.cluster.ha=true` | 
@@ -21,9 +22,8 @@ You can edit this instance configuration file to configure the HA cluster config
 | `imq.persist.store` | Specifies type of  persistence store; only JDBC-based data store is supported `imq.persist.store=jdbc`|
 | `imq.persist.jdbc.dbVendor` | Database vendor. Set to `hadb` (Sun Java System High Availability Database) or `mysql` (MySQL 4.1 Database). Note: Select `hadb` if you're currently using Sun Java Enterprise System and already have HADB installed. | 
 
-Additional configuration properties for HADB database:
-
 | :---         | :---      | 
+| **Additional configuration properties for HADB database** |
 | **Property name**   | **Description** |
 | :---         | :---      |
 | `imq.persist.jdbc.hadb.user` | Specifies user's account name |
@@ -31,10 +31,8 @@ Additional configuration properties for HADB database:
 | ` imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. |
 | ` imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. Use the command `hadbm get JdbcUrl`, remove the `jdbc:sun:hadb` prefix and use the `host:port,host:port...` as the	value for the serverList property. |
 	
-## Additional configuration properties for MySQL database:
-
 | :---         | :---      | 
-| Additional configuration properties for MySQL database |
+| **Additional configuration properties for MySQL database** |
 | **Property name**   | **Description** |
 | :---         | :---      |
 | `imq.persist.jdbc.mysql.user` | Specifies user's account name |
