@@ -1,4 +1,4 @@
-# Starting and Configuring Open Message Queue  4.1 HA Cluster
+# Starting and Configuring Open Message Queue 4.1 HA Cluster
 
 	<LI>
 	  <P>Install Open Message Queue 4.1 on each of the machine that you want to setup
