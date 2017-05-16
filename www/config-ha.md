@@ -23,16 +23,16 @@ You can edit this instance configuration file to configure the HA cluster config
 | `imq.persist.jdbc.dbVendor` | Database vendor. Set to `hadb` (Sun Java System High Availability Database) or `mysql` (MySQL 4.1 Database). Select `hadb` if you're currently using Sun Java Enterprise System and already have HADB installed. | 
 
 | :---         | :---      | 
-| **Additional configuration properties for HADB database** |
+| **Additional configuration properties for HADB** |
 | **Property name**   | **Description** |
 | :---         | :---      |
 | `imq.persist.jdbc.hadb.user` | Specifies user's account name |
 | `imq.persist.jdbc.hadb.password` | Specifies user's password |
-| ` imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. |
+| ` imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. Use the command `hadbm get JdbcUrl` |
 | ` imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. Use the command `hadbm get JdbcUrl`, remove the `jdbc:sun:hadb` prefix and use the `host:port,host:port...` as the	value for the serverList property. |
 	
 | :---         | :---      | 
-| **Additional configuration properties for MySQL database** |
+| **Additional configuration properties for MySQL** |
 | **Property name**   | **Description** |
 | :---         | :---      |
 | `imq.persist.jdbc.mysql.user` | Specifies user's account name |
