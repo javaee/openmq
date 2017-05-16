@@ -28,8 +28,8 @@ You can then edit this file to configure the HA cluster configuration properties
 | :---         | :---      |
 | `imq.persist.jdbc.hadb.user` | Specifies user's account name |
 | `imq.persist.jdbc.hadb.password` | Specifies user's password |
-| ` imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. Use the command `hadbm get JdbcUrl` |
-| ` imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. Use the command `hadbm get JdbcUrl`, remove the `jdbc:sun:hadb` prefix and use the `host:port,host:port...` as the	value for the serverList property. |
+| `imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. Use the command `hadbm get JdbcUrl` |
+| `imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. Use the command `hadbm get JdbcUrl`, remove the `jdbc:sun:hadb` prefix and use the `host:port,host:port...` as the	value for the serverList property. |
 	
 | :---         | :---      | 
 | **Additional configuration properties for MySQL** |
