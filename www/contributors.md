@@ -7,13 +7,13 @@
     <td colspan="2" scope="col"><div align="center"><strong>How you can participate </strong></div></td>
   </tr> </thead>
   <tbody> <tr>
-    <td><p><a href="http://java.net/projects/mq/watch">Join the Open MQ project</a></td>
+    <td><p><a href="http://java.net/projects/mq/watch">Join the Open MQ project</a>
     <td><p>If you <a href="http://java.net/projects/mq/watch">join the Open MQ project</a>
     this will add the project to your personal <a href="https://java.net/mypage">My Page</a>.
     You'll need to <a href="https://java.net/people/new">sign up for java.net</a> first.
     Read more about project membership <a href="community.html">here</a>. 
     <p>Joining this project will allow you to <a href="https://java.net/projects/mq/lists">join the mailing lists</a>.
-    </td>
+    
   </tr>
   <tr>
     <td><p>Browse and post questions in the <br> 
