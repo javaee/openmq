@@ -19,7 +19,7 @@ You can edit this instance configuration file to configure the HA cluster config
 | `imq.cluster.clusterid` | Cluster name which is the ID associated with all brokers in the HA cluster; this id must be set the same on all brokers in the HA cluster
 | `imq.brokerid` | Broker's unique ID; this ID must be unique to this broker in the HA cluster | 
 | `imq.persist.store` | Specifies type of  persistence store; only JDBC-based data store is supported `imq.persist.store=jdbc`|
-| `imq.persist.jdbc.dbVendor` | Database vendor (hadb, mysql) hadb - Sun Java System High Availability Database mysql - MySQL 4.1 Database Example: `imq.persist.jdbc.dbVendor=hadb` Note: Select HADB if you're currently using Sun Java Enterprise System and already have HADB installed. | 
+| `imq.persist.jdbc.dbVendor` | Database vendor. Set to `hadb` (Sun Java System High Availability Database) or `mysql` (MySQL 4.1 Database). Note: Select `hadb` if you're currently using Sun Java Enterprise System and already have HADB installed. | 
 
 Additional configuration properties for HADB database:
 
@@ -28,53 +28,19 @@ Additional configuration properties for HADB database:
 | :---         | :---      |
 | `imq.persist.jdbc.hadb.user` | Specifies user's account name |
 | `imq.persist.jdbc.hadb.password` | Specifies user's password |
-| ` imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. Use the command `hadbm get JdbcUrl`, remove the `jdbc:sun:hadb` prefix and use the `host:port,host:port...` as the	value for the serverList property.|
+| ` imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. Use the command `hadbm get JdbcUrl`, remove the `jdbc:sun:hadb` prefix and use the `host:port,host:port...` as the	value for the serverList property. |
 	
 ## Additional configuration properties for MySQL database:
 
-<TABLE WIDTH=766 BORDER=1 CELLPADDING=4 CELLSPACING=3 STYLE="page-break-inside: avoid">
-	<COL WIDTH=380>
-	<COL WIDTH=359>
-	<THEAD>
-		<TR VALIGN=TOP>
-			<TH WIDTH=380>
-				<P>Property Name</P>
-			</TH>
-			<TH WIDTH=359>
-				<P>Description</P>
-			</TH>
-		</TR>
-	</THEAD>
-	<TBODY>
-		<TR VALIGN=TOP>
-			<TD WIDTH=380>
-				<P><B>imq.persist.jdbc.mysql.user</B></P>
-			</TD>
-			<TD WIDTH=359>
-				<P>Specifies user's account name</P>
-			</TD>
-		</TR>
-		<TR VALIGN=TOP>
-			<TD WIDTH=380>
-				<P><B>imq.persist.jdbc.mysql.password</B></P>
-			</TD>
-			<TD WIDTH=359>
-				<P><FONT SIZE=3>Specifies user's password</FONT></P>
-			</TD>
-		</TR>
-		<TR VALIGN=TOP>
-			<TD WIDTH=380>
-				<P><B>imq.persist.jdbc.mysql.property.url</B></P>
-			</TD>
-			<TD WIDTH=359>
-				<P><FONT SIZE=3>Specifies the JDBC URL to open the database</FONT></P>
-			</TD>
-		</TR>
-	</TBODY>
-</TABLE>
+| :---         | :---      | 
+| **Property name**   | **Description** |
+| :---         | :---      |
+| `imq.persist.jdbc.mysql.user` | Specifies user's account name |
+| `imq.persist.jdbc.mysql.password` | Specifies user's password | 
+| `imq.persist.jdbc.mysql.property.url` | Specifies the JDBC URL to open the database | 
 
 * Copy your JDBC driver jar file to the following path:
-` $TOP/mq/lib/ext/`
+    `$TOP/mq/lib/ext/`
 
 * Repeat steps 2-5 for each broker instance in the HA cluster.
 Ensure that the cluster ID is the same for all brokers in the HA
@@ -82,16 +48,10 @@ cluster and the broker ID is unique for each broker in the HA
 cluster.
 
 * Use the `imqdbmgr` command to create the database schema.
-`$TOP/mq/bin/imqdbmgr create tbl
+    `$TOP/mq/bin/imqdbmgr create tbl
 
-* Note: You'll
-	only need to run this command once with any of the machine that is
-	part of the HA cluster because all brokers in an HA cluster shared
-	the same persistent store.
+* Note: You'll only need to run this command once with any of the machine that is part of the HA cluster because all brokers in an HA cluster shared the same persistent store.
 
-* Starting the brokers in the HA cluster<BR><BR>For each broker
-in the HA cluster, use the imqbrokerd command to start a broker (see
-step 1). When brokers are started they will automatically register
-themselves into the HA cluster.
+* Starting the brokers in the HA cluster<BR><BR>For each broker in the HA cluster, use the imqbrokerd command to start a broker (see step 1). When brokers are started they will automatically register themselves into the HA cluster.
 
 
