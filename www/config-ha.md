@@ -23,49 +23,12 @@ You can edit this instance configuration file to configure the HA cluster config
 
 Additional configuration properties for HADB database:
 
-<TABLE WIDTH=766 BORDER=1 CELLPADDING=4 CELLSPACING=3 STYLE="page-break-inside: avoid">
-	<COL WIDTH=380>
-	<COL WIDTH=359>
-	<THEAD>
-		<TR VALIGN=TOP>
-			<TH WIDTH=380>
-				<P>Property Name</P>
-			</TH>
-			<TH WIDTH=359>
-				<P>Description</P>
-			</TH>
-		</TR>
-	</THEAD>
-	<TBODY>
-		<TR VALIGN=TOP>
-			<TD WIDTH=380>
-				<P><B>imq.persist.jdbc.hadb.user</B></P>
-			</TD>
-			<TD WIDTH=359>
-				<P>Specifies user's account name</P>
-			</TD>
-		</TR>
-		<TR VALIGN=TOP>
-			<TD WIDTH=380>
-				<P><B>imq.persist.jdbc.hadb.password</B></P>
-			</TD>
-			<TD WIDTH=359>
-				<P><FONT SIZE=3>Specifies user's password</FONT></P>
-			</TD>
-		</TR>
-		<TR VALIGN=TOP>
-			<TD WIDTH=380>
-				<P><B>imq.persist.jdbc.hadb.property.serverList</B></P>
-			</TD>
-			<TD WIDTH=359>
-				<P><FONT SIZE=3>Specifies the JDBC URL of the HADB. Use the
-				command &quot;hadbm get JdbcUrl&quot;; remove the <I>jdbc:sun:hadb
-				</I>prefix and use the <I>host:port,host:port...</I> as the
-				value for the serverList property.</FONT></P>
-			</TD>
-		</TR>
-	</TBODY>
-</TABLE>
+| :---         | :---      | 
+| **Property name**   | **Description** |
+| :---         | :---      |
+| `imq.persist.jdbc.hadb.user` | Specifies user's account name |
+| `imq.persist.jdbc.hadb.password` | Specifies user's password |
+| ` imq.persist.jdbc.hadb.property.serverList` | Specifies the JDBC URL of the HADB. Use the command `hadbm get JdbcUrl`, remove the `jdbc:sun:hadb` prefix and use the `host:port,host:port...` as the	value for the serverList property.|
 	
 ## Additional configuration properties for MySQL database:
 
