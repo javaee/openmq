@@ -34,6 +34,7 @@ Additional configuration properties for HADB database:
 ## Additional configuration properties for MySQL database:
 
 | :---         | :---      | 
+| Additional configuration properties for MySQL database |
 | **Property name**   | **Description** |
 | :---         | :---      |
 | `imq.persist.jdbc.mysql.user` | Specifies user's account name |
