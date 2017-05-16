@@ -4,8 +4,9 @@
 
 Open Message Queue 5.0 documentation is available as part of the [GlassFish Server Documentation](https://javaee.github.io/glassfish/documentation).
 
-| :--- | :--- | 
-| :--- | :--- | 
+| :--- | :--- | :--- |  
+| **Manual** | | |
+| :--- | :--- | :--- |  
 | Javadocs (including JMS 2.0) | | [browse](https://javaee.github.io/openmq/www/javadoc/5.0/javadoc/index.html) |
 | Technical Overview | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) |
 | Release Notes | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-relnotes.pdf) |
