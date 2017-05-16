@@ -55,6 +55,8 @@ Open MQ 4.5 and earlier support JMS 1.1. This version of MQ is included with Gla
 
 Open Message Queue 5.1 documentation is available as part of the [GlassFish Server Documentation](https://javaee.github.io/glassfish/documentation).
 
+| :---         | :---      | 
+| **Manual**   | **pdf** |
 | :---  | :--- | 
 | [Technical Overview](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) (pdf)| [Technical Overview](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) |
 | [Release Notes](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) (pdf)| [Release Notes](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) |
