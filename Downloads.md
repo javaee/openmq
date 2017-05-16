@@ -56,12 +56,12 @@ Open MQ 4.5 and earlier support JMS 1.1. This version of MQ is included with Gla
 Open Message Queue 5.1 documentation is available as part of the [GlassFish Server Documentation](https://javaee.github.io/glassfish/documentation).
 
 | :---         |  
-| [Technical Overview](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) |
-| [Release Notes](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) |
-| [Developer's Guide for Java Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-java.pdf) |
-| [Developer's Guide for JMX Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-jmx.pdf) |
-| [Developer's Guide for JMX Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-c.pdf) |
-| [Administration Guide](https://javaee.github.io/glassfish/doc/4.0/mq-admin-guide.pdf) |
+| [Technical Overview](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) (pdf)|
+| [Release Notes](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) (pdf)|
+| [Developer's Guide for Java Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-java.pdf) (pdf)|
+| [Developer's Guide for JMX Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-jmx.pdf) (pdf)|
+| [Developer's Guide for C Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-c.pdf) (pdf)|
+| [Administration Guide](https://javaee.github.io/glassfish/doc/4.0/mq-admin-guide.pdf) (pdf)|
 
 ### Open MQ 4.5 Latest Stable (4.5.2) Binary Downloads
 
@@ -87,9 +87,18 @@ and as a component to Oracle GlassFish Enterprise Server.
 Installer guide for stand-alone MQ will no longer be updated. 
 We will provide the Open MQ community with updates and errata changes.
 
+### Open MQ 4.5 Documentation
+
+Open Message Queue 4.5 documentation is available as part of the [Oracle GlassFish Server 3.1.2 Online Documentation Library](https://javaee.github.io/glassfish/documentation).
+
+| :---         |  
+| [Technical Overview](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) (pdf)|
+| [Release Notes](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) |
+| [Developer's Guide for Java Clients](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) |
+| [Developer's Guide for JMX Clients](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) |
+| [Developer's Guide for C Clients](http://docs.oracle.com/cd/E26576_01/doc.312/e24944.pdf) |
+| [Administration Guide](http://docs.oracle.com/cd/E26576_01/doc.312/e24943.pdf) |
+
 ### Older versions
 
-Legacy versions of Open Message Queue are available [here](www/downloads/legacy-downloads.html).
-
-### Source code
-
+Legacy versions of Open Message Queue are available on the [Open Message Queue Legacy Downloads](www/downloads/legacy-downloads.html) page.
