@@ -30,4 +30,4 @@ Open Message Queue 4.5 documentation is available as part of the [Oracle GlassFi
 
 ### Older versions
 
-Documentation for legacy versions of Open Message Queue is available via the [Open Message Queue Legacy Downloads](www/downloads/legacy-downloads.html) page.
+Documentation for older versions of Open Message Queue is available via the [Open Message Queue Legacy Downloads](www/downloads/legacy-downloads.html) page.
