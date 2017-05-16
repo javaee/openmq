@@ -20,7 +20,7 @@ You can edit this instance configuration file to configure the HA cluster config
 | `imq.cluster.clusterid` | Cluster name which is the ID associated with all brokers in the HA cluster; this id must be set the same on all brokers in the HA cluster
 | `imq.brokerid` | Broker's unique ID; this ID must be unique to this broker in the HA cluster | 
 | `imq.persist.store` | Specifies type of  persistence store; only JDBC-based data store is supported `imq.persist.store=jdbc`|
-| `imq.persist.jdbc.dbVendor` | Database vendor. Set to `hadb` (Sun Java System High Availability Database) or `mysql` (MySQL 4.1 Database). Note: Select `hadb` if you're currently using Sun Java Enterprise System and already have HADB installed. | 
+| `imq.persist.jdbc.dbVendor` | Database vendor. Set to `hadb` (Sun Java System High Availability Database) or `mysql` (MySQL 4.1 Database). Select `hadb` if you're currently using Sun Java Enterprise System and already have HADB installed. | 
 
 | :---         | :---      | 
 | **Additional configuration properties for HADB database** |
@@ -39,16 +39,16 @@ You can edit this instance configuration file to configure the HA cluster config
 | `imq.persist.jdbc.mysql.password` | Specifies user's password | 
 | `imq.persist.jdbc.mysql.property.url` | Specifies the JDBC URL to open the database | 
 
-\5. Copy your JDBC driver jar file to the following path:
+5\. Copy your JDBC driver jar file to the following path:
     `$TOP/mq/lib/ext/`
 
-\6. Repeat steps 2-5 for each broker instance in the HA cluster. Ensure that the cluster ID is the same for all brokers in the HA cluster and the broker ID is unique for each broker in the HA cluster.
+6\. Repeat steps 2-5 for each broker instance in the HA cluster. Ensure that the cluster ID is the same for all brokers in the HA cluster and the broker ID is unique for each broker in the HA cluster.
 
-\7, Use the `imqdbmgr` command to create the database schema.
+7\. Use the `imqdbmgr` command to create the database schema.
     `$TOP/mq/bin/imqdbmgr create tbl
 
-\8. Note: You'll only need to run this command once with any of the machine that is part of the HA cluster because all brokers in an HA cluster shared the same persistent store.
+8\. Note: You'll only need to run this command once with any of the machine that is part of the HA cluster because all brokers in an HA cluster shared the same persistent store.
 
-\9. Starting the brokers in the HA cluster<BR><BR>For each broker in the HA cluster, use the imqbrokerd command to start a broker (see step 1). When brokers are started they will automatically register themselves into the HA cluster.
+9\. Starting the brokers in the HA cluster<BR><BR>For each broker in the HA cluster, use the imqbrokerd command to start a broker (see step 1). When brokers are started they will automatically register themselves into the HA cluster.
 
 
