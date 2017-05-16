@@ -7,7 +7,7 @@ Open Message Queue 5.0 documentation is available as part of the [GlassFish Serv
 | :--- | :--- | 
 | **Manual** | |
 | :--- | :--- | 
-| Javadocs (JMS 2.0) | | [browse](https://javaee.github.io/openmq/www/javadoc/5.0/javadoc/index.html) |
+| Javadocs (including JMS 2.0) | | [browse](https://javaee.github.io/openmq/www/javadoc/5.0/javadoc/index.html) |
 | Technical Overview | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) |
 | Release Notes | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-relnotes.pdf) |
 | Developer's Guide for Java Clients | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-java.pdf) |
@@ -22,7 +22,7 @@ Open Message Queue 4.5 documentation is available as part of the [Oracle GlassFi
 | :--- | :--- | :--- |  
 | **Manual** | | |
 | :--- | :--- | :--- |  
-| Javadocs (JMS 1.1) | | [browse](https://javaee.github.io/openmq/www/javadoc/5.0/javadoc/index.html) |
+| Javadocs (including JMS 1.1) | | [browse](https://javaee.github.io/openmq/www/javadoc/5.0/javadoc/index.html) |
 | Technical Overview | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24949/toc.htm) |
 | Release Notes | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24948.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24948/toc.htm) |
 | Developer's Guide for Java Clients | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24945.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24945/toc.htm) |
