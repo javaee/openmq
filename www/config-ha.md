@@ -1,16 +1,16 @@
 # Starting and Configuring an Open Message Queue 4.1 HA Cluster
 
-\1. Install Open Message Queue 4.1 on each of the machine that you want to setup as part of the Message Queue HA Cluster
+1\. Install Open Message Queue 4.1 on each of the machine that you want to setup as part of the Message Queue HA Cluster
 
-\2. Use the `imqbrokerd` command to start a broker. 
+2\. Use the `imqbrokerd` command to start a broker. 
 The first time a broker instance is run, a config.properties file is automatically created. 
 You can edit this instance configuration file to configure the HA cluster configuration properties.
 
     `$TOP/mq/bin/imqbrokerd -tty`
 	
-\3. Shutdown the broker by pressing Ctrl-C in the terminal window in which you ran the `imqbrokerd` command
+3\. Shutdown the broker by pressing Ctrl-C in the terminal window in which you ran the `imqbrokerd` command
 
-\4. Edit the `config.properties` file to configure HA cluster configuration properties:
+4\. Edit the `config.properties` file to configure HA cluster configuration properties:
 
 | :---         | :---      | 
 | **Property name**   | **Description** |
