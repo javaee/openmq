@@ -23,7 +23,7 @@ Open Message Queue 4.5 documentation is available as part of the [Oracle GlassFi
 | :--- | :--- | :--- |  
 | **Manual** | | |
 | :--- | :--- | :--- |  
-| Javadocs (including JMS 1.1) | | [browse](https://javaee.github.io/openmq/www/javadoc/5.0/javadoc/index.html) |
+| Javadocsxx (including JMS 1.1) | | [browse](https://javaee.github.io/openmq/www/javadoc/5.0/javadoc/index.html) |
 | :--- | :--- | :--- |  
 | Technical Overview | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24949.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24949/toc.htm) |
 | Release Notes | [pdf](http://docs.oracle.com/cd/E26576_01/doc.312/e24948.pdf) | [browse](http://docs.oracle.com/cd/E26576_01/doc.312/e24948/toc.htm) |
