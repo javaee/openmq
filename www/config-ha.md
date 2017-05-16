@@ -1,16 +1,16 @@
 # Starting and Configuring an Open Message Queue 4.1 HA Cluster
 
-* Install Open Message Queue 4.1 on each of the machine that you want to setup as part of the Message Queue HA Cluster
+\1. Install Open Message Queue 4.1 on each of the machine that you want to setup as part of the Message Queue HA Cluster
 
-* Use the `imqbrokerd` command to start a broker. 
+\2. Use the `imqbrokerd` command to start a broker. 
 The first time a broker instance is run, a config.properties file is automatically created. 
 You can edit this instance configuration file to configure the HA cluster configuration properties.
 
     `$TOP/mq/bin/imqbrokerd -tty`
 	
-1. Shutdown the broker by pressing Ctrl-C in the terminal window in which you ran the `imqbrokerd` command
+\3. Shutdown the broker by pressing Ctrl-C in the terminal window in which you ran the `imqbrokerd` command
 
-2. Edit the `config.properties` file to configure HA cluster configuration properties:
+\4. Edit the `config.properties` file to configure HA cluster configuration properties:
 
 | :---         | :---      | 
 | **Property name**   | **Description** |
@@ -41,16 +41,16 @@ Additional configuration properties for HADB database:
 | `imq.persist.jdbc.mysql.password` | Specifies user's password | 
 | `imq.persist.jdbc.mysql.property.url` | Specifies the JDBC URL to open the database | 
 
-* Copy your JDBC driver jar file to the following path:
+\5. Copy your JDBC driver jar file to the following path:
     `$TOP/mq/lib/ext/`
 
-3. Repeat steps 2-5 for each broker instance in the HA cluster. Ensure that the cluster ID is the same for all brokers in the HA cluster and the broker ID is unique for each broker in the HA cluster.
+\6. Repeat steps 2-5 for each broker instance in the HA cluster. Ensure that the cluster ID is the same for all brokers in the HA cluster and the broker ID is unique for each broker in the HA cluster.
 
-* Use the `imqdbmgr` command to create the database schema.
+\7, Use the `imqdbmgr` command to create the database schema.
     `$TOP/mq/bin/imqdbmgr create tbl
 
-* Note: You'll only need to run this command once with any of the machine that is part of the HA cluster because all brokers in an HA cluster shared the same persistent store.
+\8. Note: You'll only need to run this command once with any of the machine that is part of the HA cluster because all brokers in an HA cluster shared the same persistent store.
 
-* Starting the brokers in the HA cluster<BR><BR>For each broker in the HA cluster, use the imqbrokerd command to start a broker (see step 1). When brokers are started they will automatically register themselves into the HA cluster.
+\9. Starting the brokers in the HA cluster<BR><BR>For each broker in the HA cluster, use the imqbrokerd command to start a broker (see step 1). When brokers are started they will automatically register themselves into the HA cluster.
 
 
