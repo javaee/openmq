@@ -24,7 +24,7 @@ You can edit this instance configuration file to configure the HA cluster config
 hadb - Sun Java System High Availability Database
 mysql - MySQL 4.1 Database
 Example: `imq.persist.jdbc.dbVendor=hadb`
-Note: Select HADB if you're currently using Sun Java Enterprise System and already have HADB installed. |
+Note: Select HADB if you're currently using Sun Java Enterprise System and already have HADB installed. | 
 
 Additional configuration properties for HADB database:
 
