@@ -1,36 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<link rel="stylesheet" media="all" type="text/css" href="style.css" />
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>About Open MQ</title>
-<!-- hide the project info -->
-<style type="text/css">
-#projecthome .axial { display: none; }
-#apphead h1 { display: none; }
-#longdescription { border: none; }
-#longdescription h2 { display: none; }
-#customcontent h2 { display: block; }
-#bodycol .tasknav { display: none; }
-</style>
+# Quick Introduction to Open Message Queue
 
-</head>
-
-<body>
-<table border="0" cellspacing="0" cellpadding="0" id="main2" width="100%">
-  <tr valign="bottom" class="nav1">
-    <td nowrap="nowrap" colspan="3"><!-- tab 4--></td>
-  </tr>
-  <form>
-    <tr class="sub1">
-      <td nowrap="nowrap"><strong>&nbsp;<a name="orientation" id="orientation"></a>Quick Introduction to Open Message Queue </strong></td>
-      <td align="right" nowrap="nowrap">&nbsp;</td>
-    </tr>
-  </form>
-  <tr>
-    <td colspan="3" class="white"><div class="min1">&nbsp;</div></td>
-  </tr>
-</table>
 <p>Open message queue is an enterprise quality, production ready, scalable messaging server. It provides a complete Java Message Service (JMS) implementation for message oriented system integration. In addition, Open MQ provides the additional enterprise features that are necessary for enterprise deployments, large and small. It gets its roots from Java Message Queue and provides all the features, functions and capabilities of the currently available licensed product: Java System Message Queue.</p>
 Here are some pointers that might help you get the most of your visit here:
 <ul>
@@ -45,16 +14,8 @@ Here are some pointers that might help you get the most of your visit here:
   <li>Who's using Open MQ? <a href="customers.html">Have a look here.</a> </li>
   <li>What are we thinking about for the next release? Here's a <a href="road-map.html">road-map page</a>. </li>
 </ul>
-<table border="0" cellspacing="0" cellpadding="0" id="main2" width="100%">
-<tr valign="bottom" class="nav1">
-<td nowrap colspan="3"><!-- tab 4--></td>
-</tr>
-<form><tr class="sub1">
-<td nowrap><strong>Want to get more? </strong></td>
-<td align="right" nowrap>&nbsp;</td>
-</tr></form>
-<tr><td colspan="3" class="white"><div class="min1">&nbsp;</div></td></tr>
-</table>
+
+## Want to get more?
 
 <p>We have many ways for you to get more information about Open Message Queue and many ways to try  it out. Open Message Queue is community version of the commercial product, Sun Java System Message Queue. So, the resources available for that product enable you to get up to speed with the community version quickly. </p>
 <p>If you've downloaded the product, or are thinking about it, you might want to browse over to the evolving -- <a href="prog-tips.html">Programming Tips section of our site</a>. This is continually being updated with new scenarios and links so you might want to bookmark that page for future reference. </p>
