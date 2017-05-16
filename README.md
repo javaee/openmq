@@ -6,7 +6,4 @@ enterprise-ready messaging
 
 Open Message Queue is open source, with a community of developers and users. Please see the [license](LICENSE) and the [terms of use for contributors](CONTRIBUTING).
 
-To find our more about Open Message Queue, read the  [Quick start guide](Overview.md) and visit the [Downloads page](Downloads.md).
-
-
-
+To find out more about Open Message Queue, read the  [Quick start guide](Overview.md) and visit the [Downloads page](Downloads.md).
