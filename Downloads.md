@@ -55,13 +55,13 @@ Open MQ 4.5 and earlier support JMS 1.1. This version of MQ is included with Gla
 
 Open Message Queue 5.1 documentation is available as part of the [GlassFish Server Documentation](https://javaee.github.io/glassfish/documentation).
 
-| :---         |  
-| [Technical Overview](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) (pdf)|
-| [Release Notes](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) (pdf)|
-| [Developer's Guide for Java Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-java.pdf) (pdf)|
-| [Developer's Guide for JMX Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-jmx.pdf) (pdf)|
-| [Developer's Guide for C Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-c.pdf) (pdf)|
-| [Administration Guide](https://javaee.github.io/glassfish/doc/4.0/mq-admin-guide.pdf) (pdf)|
+| :---  | :--- | 
+| [Technical Overview](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) (pdf)| [Technical Overview](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) |
+| [Release Notes](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) (pdf)| [Release Notes](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) |
+| [Developer's Guide for Java Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-java.pdf) (pdf)| [Developer's Guide for Java Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-java.pdf) |
+| [Developer's Guide for JMX Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-jmx.pdf) (pdf)| [Developer's Guide for JMX Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-jmx.pdf) |
+| [Developer's Guide for C Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-c.pdf) (pdf)| [Developer's Guide for C Clients](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-c.pdf) |
+| [Administration Guide](https://javaee.github.io/glassfish/doc/4.0/mq-admin-guide.pdf) (pdf)| [Administration Guide](https://javaee.github.io/glassfish/doc/4.0/mq-admin-guide.pdf)  |
 
 ### Open MQ 4.5 Latest Stable (4.5.2) Binary Downloads
 
