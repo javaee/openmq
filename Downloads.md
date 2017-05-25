@@ -65,6 +65,10 @@ _See the Open MQ 4.5 page for additional details on this release_
 | IBM AIX | [image with installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-installer-AIX.zip) | [zip archive, no installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-binary-AIX.zip) |
 | Unix (e.g. Mac OSX) | [image with installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-installer-Unix.zip) | [zip archive, no installer](http://download.java.net/mq/open-mq/4.5.2/latest/openmq4_5_2-binary-Unix.zip) |
 
+### JMS 2.0 Reference Implementations
+
+[Open MQ Reference Implementations downloads](/openmq/www/downloads/ri/)
+
 ### Older versions
 
 Older versions of Open Message Queue are available on the [Open Message Queue Legacy Downloads](www/downloads/legacy-downloads.html) page.

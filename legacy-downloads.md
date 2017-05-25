@@ -1,7 +1,7 @@
 # Legacy downloads
 
-This page provides download links to legacy editions of GlassFish Message Queue. 
-If you want the most up to date downloads, jump to the (main downloads page)[https://javaee.github.io/openmq/Downloads.html].
+This page provides download links to legacy editions of Open Message Queue. 
+If you want the most up to date downloads, jump to the [main downloads page](/openmq/Downloads.html).
 
 ## License
 
