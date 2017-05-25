@@ -71,4 +71,4 @@ _See the Open MQ 4.5 page for additional details on this release_
 
 ### Older versions
 
-Older versions of Open Message Queue are available on the [Open Message Queue Legacy Downloads](www/downloads/legacy-downloads.html) page.
+Older versions of Open Message Queue are available on the [Open Message Queue Legacy Downloads](/openmq/legacy-downloads) page.
