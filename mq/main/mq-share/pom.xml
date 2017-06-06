@@ -41,13 +41,14 @@
 
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
        <groupId>org.glassfish.mq</groupId>
        <artifactId>mq</artifactId>
-       <version>5.1.1-b02</version>
+       <version>5.1.1-SNAPSHOT</version>
        <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -75,32 +76,34 @@
 		  <phase>process-sources</phase>
 		  <configuration>
                       <tasks>
-			<tstamp />
-			<delete file="${project.build.outputDirectory}/com/sun/messaging/jmq/version.properties" />
-			<copy file="src/main/java/com/sun/messaging/jmq/version.template" tofile="${project.build.outputDirectory}/com/sun/messaging/jmq/version.properties">
+			<tstamp/>
+			<delete file="${project.build.outputDirectory}/com/sun/messaging/jmq/version.properties"/>
+			<copy file="src/main/java/com/sun/messaging/jmq/version.template"
+                            tofile="${project.build.outputDirectory}/com/sun/messaging/jmq/version.properties">
                            <filterset>
-                              <filter token="FULL_NAME" value="${full.name}" />
-                              <filter token="BUILD_NUMBER" value="${build.number}" />
-                              <filter token="BUILD_LETTER" value="${build.letter}" />
-                              <filter token="MAJOR_VERSION" value="${major.version}" />
-                              <filter token="MINOR_VERSION" value="${minor.version}" />
-                              <filter token="MICRO_VERSION" value="${micro.version}" />
+                              <filter token="FULL_NAME" value="${full.name}"/>
+                              <filter token="BUILD_NUMBER" value="${build.number}"/>
+                              <filter token="BUILD_LETTER" value="${build.letter}"/>
+                              <filter token="MAJOR_VERSION" value="${major.version}"/>
+                              <filter token="MINOR_VERSION" value="${minor.version}"/>
+                              <filter token="MICRO_VERSION" value="${micro.version}"/>
                               <filter token="PRODUCT_VERSION" value="${major.version}.${minor.version}.${micro.version}" />
-                              <filter token="JMS_VERSION" value="${javax-jms.version}" />
-                              <filter token="PRODUCT_NAME" value="${product.name}" />
-                              <filter token="PRODUCT_ABBREVNAME" value="${product.abbrevname}" />
-                              <filter token="DATE" value="${TODAY} ${TSTAMP}" />
-                              <filter token="COPYRIGHT" value="${product.copyright}" />
+                              <filter token="JMS_VERSION" value="${javax-jms.version}"/>
+                              <filter token="PRODUCT_NAME" value="${product.name}"/>
+                              <filter token="PRODUCT_ABBREVNAME" value="${product.abbrevname}"/>
+                              <filter token="DATE" value="${TODAY} ${TSTAMP}"/>
+                              <filter token="COPYRIGHT" value="${product.copyright}"/>
                            </filterset>
                         </copy>
-                        <tstamp />
-                        <delete file="${project.build.outputDirectory}/com/sun/messaging/jmq/brand_version.properties" />
-                        <copy file="src/main/java/com/sun/messaging/jmq/brand_version.template" tofile="${project.build.outputDirectory}/com/sun/messaging/jmq/brand_version.properties">
+                        <tstamp/>
+                        <delete file="${project.build.outputDirectory}/com/sun/messaging/jmq/brand_version.properties"/>
+                        <copy file="src/main/java/com/sun/messaging/jmq/brand_version.template"
+                            tofile="${project.build.outputDirectory}/com/sun/messaging/jmq/brand_version.properties">
                            <filterset>
-                              <filter token="BRAND_NAME" value="${brand.name}" />
-                              <filter token="MAJOR_VERSION" value="${major.version}" />
-                              <filter token="MINOR_VERSION" value="${minor.version}" />
-                              <filter token="MICRO_VERSION" value="${micro.version}" />
+                              <filter token="BRAND_NAME" value="${brand.name}"/>
+                              <filter token="MAJOR_VERSION" value="${major.version}"/>
+                              <filter token="MINOR_VERSION" value="${minor.version}"/>
+                              <filter token="MICRO_VERSION" value="${micro.version}"/>
                               <filter token="PRODUCT_VERSION" value="${major.version}.${minor.version}.${micro.version}" />
                            </filterset>
                         </copy>
@@ -116,11 +119,11 @@
                 <phase>process-classes</phase>
                   <configuration>
                     <target>
-                    <echo message="Make directory ${ws.binary.share.dir}/opt" />
-                    <mkdir dir="${ws.binary.share.dir}/opt/classes" />
-                    <echo message="Copy ${project.build.outputDirectory} to ${ws.binary.share.dir}/opt/classes" />
+                    <echo  message="Make directory ${ws.binary.share.dir}/opt"/>
+                    <mkdir dir="${ws.binary.share.dir}/opt/classes"/>
+                    <echo message="Copy ${project.build.outputDirectory} to ${ws.binary.share.dir}/opt/classes"/>
                     <copy todir="${ws.binary.share.dir}/opt/classes/">
-                        <fileset dir="${project.build.outputDirectory}/" />
+                        <fileset dir="${project.build.outputDirectory}/"/>
                     </copy>
                     </target>
                   </configuration>

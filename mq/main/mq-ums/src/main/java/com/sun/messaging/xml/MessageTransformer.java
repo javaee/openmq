@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -54,6 +54,8 @@ import javax.jms.JMSException;
 
 import javax.xml.messaging.*;
 import javax.xml.soap.*;
+
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 
 /**
  * The <code>Transformer</code> class encapsulates the functionality
@@ -141,7 +143,7 @@ public class MessageTransformer {
             bmessage.readBytes(mbuf, mimeLength);
 
             ByteArrayInputStream mbin = new ByteArrayInputStream (mbuf);
-            ObjectInputStream oi = new ObjectInputStream (mbin);
+            ObjectInputStream oi = new FilteringObjectInputStream (mbin);
             Hashtable ht = (Hashtable) oi.readObject();
             MimeHeaders mimeHeaders = hashtableToMime (ht);
 

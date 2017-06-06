@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -46,6 +46,8 @@ package com.sun.messaging.jmq.jmsserver.persist.api.util;
 
 import java.io.*;
 
+import com.sun.messaging.jmq.util.io.ClassFilter;
+
 /**
  * A special subclasses of ObjectInputStream that is used for store migration.
  * This class allow us to deserialize an old object format by allowing us to
@@ -73,6 +75,11 @@ public class MQObjectInputStream extends ObjectInputStream {
      */
     protected Class resolveClass(ObjectStreamClass osc)
         throws IOException, ClassNotFoundException {
+
+        String className = osc.getName();
+        if (className != null && !className.isEmpty() && ClassFilter.isBlackListed(className)) {
+          throw new InvalidClassException("Unauthorized deserialization attempt", osc.getName());
+        }
 
         Class clazz = null;
         String name = osc.getName();

@@ -4,7 +4,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2011 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2011-2017 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -52,8 +52,12 @@
     <url>http://mq.java.net/</url>
 
     <scm>
-        <connection>scm:hg:https://hg.java.net/hg/mq~mq5/</connection>
-        <developerConnection>scm:hg:https://hg.java.net/hg/mq~mq5/</developerConnection>
+        <connection>scm:git:https://github.com/javaee/openmq.git</connection>
+        <developerConnection>
+            scm:git:git@github.com:javaee/openmq.git
+        </developerConnection>
+        <url>https://github.com/javaee/openmq</url>
+        <tag>HEAD</tag>
     </scm>
 
     <repositories>

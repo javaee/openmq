@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -59,6 +59,7 @@ import com.sun.messaging.jmq.jmsservice.JMSService;
 //import java.io.DataInputStream;
 //import java.io.DataOutputStream;
 //import com.sun.messaging.jmq.io.JMQByteArrayOutputStream;
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 
 /**
  *  A <CODE>MapMessage</CODE> object is used to send a set of name-value pairs.
@@ -715,7 +716,7 @@ public class DirectMapPacket
         try {
             this.messageBody = super._getMessageBodyByteArray();
             this.byteArrayInputStream = new ByteArrayInputStream(messageBody);
-            this.objectInputStream = new ObjectInputStream (byteArrayInputStream);
+            this.objectInputStream = new FilteringObjectInputStream (byteArrayInputStream);
             this.map = (Map<String, Object>)objectInputStream.readObject();
         } catch (Exception e) {
             String errMsg = _lgrMID_EXC +

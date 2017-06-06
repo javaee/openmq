@@ -180,6 +180,7 @@
            	<include name="com/sun/messaging/jms/notification/**/**"/>   
            	<include name="com/sun/messaging/naming/**/**"/>   
            	<include name="com/sun/messaging/jmq/auth/**/**"/>   
+           	<include name="com/sun/messaging/jmq/util/io/**/**"/>   
            	<include name="com/sun/messaging/jmq/util/timer/**/**"/>   
 
            	<include name="com/sun/messaging/jmq/io/SysMessageID.class"/>   
@@ -291,6 +292,7 @@
                 <include name="com/sun/messaging/jms/notification/**/**"/>
                 <include name="com/sun/messaging/naming/**/**"/>
                 <include name="com/sun/messaging/jmq/auth/**/**"/>
+           	<include name="com/sun/messaging/jmq/util/io/**/**"/>   
                 <include name="com/sun/messaging/jmq/util/timer/**/**"/>
 
                 <include name="com/sun/messaging/jmq/io/SysMessageID.class"/>
@@ -512,6 +514,7 @@
            	<include name="com/sun/messaging/Version.class"/>   
 
            	<include name="com/sun/messaging/jmq/io/**/**"/>   
+           	<include name="com/sun/messaging/jmq/net/**/**"/>   
            	<include name="com/sun/messaging/jmq/util/**/**"/>   
            	<include name="com/sun/messaging/jmq/resources/**/**"/>   
            	<include name="com/sun/messaging/jmq/jmsselector/**/**"/>   

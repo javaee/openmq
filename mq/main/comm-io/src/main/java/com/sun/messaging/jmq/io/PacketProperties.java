@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,10 +44,18 @@
 
 package com.sun.messaging.jmq.io;
 
-import java.io.*;
-import java.util.*;
-import java.nio.ByteBuffer;
-import java.nio.charset.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 
 /*
  * Only the follow property types are supported:
@@ -187,7 +195,7 @@ public class PacketProperties
                     dis.read(buf,0,bytes);
                     JMQByteArrayInputStream bis = 
                         new JMQByteArrayInputStream(buf);
-                    ObjectInputStream ois = new ObjectInputStream(bis);
+                    ObjectInputStream ois = new FilteringObjectInputStream(bis);
                     value = ois.readObject();
                     ois.close();
                     bis.close();

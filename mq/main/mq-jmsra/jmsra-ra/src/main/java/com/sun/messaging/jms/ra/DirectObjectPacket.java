@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -60,6 +60,7 @@ import com.sun.messaging.jmq.io.JMSPacket;
 import com.sun.messaging.jmq.io.PacketType;
 import com.sun.messaging.jmq.jmsservice.JMSService;
 //import com.sun.messaging.jmq.io.JMQByteArrayOutputStream;
+import com.sun.messaging.jmq.util.io.ClassFilter;
 
 /**
  *
@@ -282,6 +283,12 @@ public class DirectObjectPacket
          */
         protected Class resolveClass(ObjectStreamClass classDesc)
         throws IOException, ClassNotFoundException {
+          
+            String className = classDesc.getName();
+            if (className != null && !className.isEmpty() && ClassFilter.isBlackListed(className)) {
+              throw new InvalidClassException("Unauthorized deserialization attempt", classDesc.getName());
+            }
+          
             try {
                 return super.resolveClass(classDesc);
             } catch (ClassNotFoundException e) {

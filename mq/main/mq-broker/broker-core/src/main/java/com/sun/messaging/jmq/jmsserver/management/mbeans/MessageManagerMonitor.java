@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -71,6 +71,7 @@ import com.sun.messaging.jmq.jmsserver.core.Subscription;
 import com.sun.messaging.jmq.jmsserver.core.Consumer;
 import com.sun.messaging.jmq.jmsserver.util.BrokerException;
 import com.sun.messaging.jmq.util.DestType;
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 
 public class MessageManagerMonitor extends MQMBeanReadOnly {
     private static MBeanParameterInfo[] getMessageInfoSignature = {
@@ -348,7 +349,7 @@ public class MessageManagerMonitor extends MQMBeanReadOnly {
                     ByteArrayInputStream byteArrayInputStream = 
 					new ByteArrayInputStream (msgBody);
                     ObjectInputStream objectInputStream = 
-				new ObjectInputStream(byteArrayInputStream);
+				new FilteringObjectInputStream(byteArrayInputStream);
                     HashMap mapMsg = (HashMap)objectInputStream.readObject();
 
                     h.put("MessageBody", mapMsg);
@@ -363,7 +364,7 @@ public class MessageManagerMonitor extends MQMBeanReadOnly {
                     ByteArrayInputStream byteArrayInputStream = 
 					new ByteArrayInputStream (msgBody);
                     ObjectInputStream objectInputStream = 
-				new ObjectInputStream(byteArrayInputStream);
+				new FilteringObjectInputStream(byteArrayInputStream);
                     Object objMsg = (Serializable)objectInputStream.readObject();
 
                     h.put("MessageBody", objMsg);

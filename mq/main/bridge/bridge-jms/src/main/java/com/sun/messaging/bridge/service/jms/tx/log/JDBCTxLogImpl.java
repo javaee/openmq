@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -49,6 +49,7 @@ import java.util.logging.Level;
 import java.io.ObjectInputStream;
 import java.io.ByteArrayInputStream;
 import com.sun.messaging.bridge.service.jms.tx.GlobalXid;
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 import com.sun.messaging.bridge.service.jms.tx.BranchXid;
 import com.sun.messaging.bridge.api.JMSBridgeStore;
 import com.sun.messaging.bridge.api.UpdateOpaqueDataCallback;
@@ -148,7 +149,7 @@ public class JDBCTxLogImpl extends TxLog {
         UpdateOpaqueDataCallback callback = new UpdateOpaqueDataCallback() {
                          
             public Object update(Object currlr) throws Exception { 
-                ObjectInputStream ois =  new ObjectInputStream(
+                ObjectInputStream ois =  new FilteringObjectInputStream(
                                          new ByteArrayInputStream((byte[])currlr)); 
                 LogRecord oldlr = (LogRecord)ois.readObject();
                 if (oldlr == null) {
@@ -216,7 +217,7 @@ public class JDBCTxLogImpl extends TxLog {
 
         if (data == null) return null;
 
-        ObjectInputStream ois =  new ObjectInputStream(
+        ObjectInputStream ois =  new FilteringObjectInputStream(
                                  new ByteArrayInputStream(data)); 
         LogRecord lr = (LogRecord)ois.readObject();
         ois.close(); 
@@ -245,7 +246,7 @@ public class JDBCTxLogImpl extends TxLog {
         Iterator<byte[]> itr = abytes.iterator();
         while (itr.hasNext()) {
             data = itr.next();
-            ObjectInputStream ois =  new ObjectInputStream(
+            ObjectInputStream ois =  new FilteringObjectInputStream(
                                      new ByteArrayInputStream(data));
             LogRecord lr = (LogRecord)ois.readObject();
             ois.close();

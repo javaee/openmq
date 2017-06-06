@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,13 +48,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.sun.messaging.jmq.jmsserver.core.BrokerAddress;
 import com.sun.messaging.jmq.jmsserver.data.BaseTransaction;
 import com.sun.messaging.jmq.jmsserver.data.LocalTransaction;
 import com.sun.messaging.jmq.jmsserver.data.TransactionAcknowledgement;
 import com.sun.messaging.jmq.jmsserver.data.TransactionState;
 import com.sun.messaging.jmq.jmsserver.data.TransactionWork;
 import com.sun.messaging.jmq.jmsserver.util.BrokerException;
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 
 public abstract class LocalTransactionEvent extends TransactionEvent {
 
@@ -191,7 +191,7 @@ class LocalTransaction2PPrepareEvent extends LocalTransactionEvent {
 		dis.read(objectBody);
 
 		ByteArrayInputStream bais2 = new ByteArrayInputStream(objectBody);
-		ObjectInputStream ois = new ObjectInputStream(bais2);
+		ObjectInputStream ois = new FilteringObjectInputStream(bais2);
 
 		try {
 

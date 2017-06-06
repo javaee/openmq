@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -202,6 +202,12 @@ public class MQResourceBundle extends ResourceBundle
 	return "[" + key + "]: " + getString(key);
     }
 
+    public String getKTString(String key)
+	throws MissingResourceException
+    {
+	return "[" + key + "]: "+"["+Thread.currentThread()+"]"+ getString(key);
+    }
+
     /**
      * Get formatted string with one argument. Prefix with key.
      *
@@ -229,6 +235,12 @@ public class MQResourceBundle extends ResourceBundle
 	throws MissingResourceException
     {
 	return "[" + key + "]: " + getString(key, arg1, arg2);
+    }
+
+    public String getKTString(String key, Object arg1, Object arg2)
+	throws MissingResourceException
+    {
+	return "[" + key + "]: "+"["+Thread.currentThread()+"]"+getString(key, arg1, arg2);
     }
 
     /**

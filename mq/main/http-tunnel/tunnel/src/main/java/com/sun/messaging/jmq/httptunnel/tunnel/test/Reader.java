@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,9 +44,11 @@
 
 package com.sun.messaging.jmq.httptunnel.tunnel.test;
 
-import java.io.*;
-import java.util.Random;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+
 import com.sun.messaging.jmq.httptunnel.api.share.HttpTunnelSocket;
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 
 class Reader extends Thread {
     private HttpTunnelSocket s = null;
@@ -71,7 +73,7 @@ class Reader extends Thread {
 
     public void run() {
         try {
-            ObjectInputStream dis = new ObjectInputStream(is);
+            ObjectInputStream dis = new FilteringObjectInputStream(is); 
             int n = 0;
 
             while (MAX < 0 || n < MAX) {

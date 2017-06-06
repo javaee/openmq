@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -61,6 +61,7 @@ import com.sun.messaging.jmq.jmsserver.core.DestinationList;
 import com.sun.messaging.jmq.jmsserver.persist.api.PartitionedStore;
 import com.sun.messaging.jmq.util.DestType;
 import com.sun.messaging.jmq.util.admin.MessageType;
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 import com.sun.messaging.jmq.util.log.Logger;
 
 public class AdminCmdHandler
@@ -139,7 +140,7 @@ public class AdminCmdHandler
 
 	// Extract the object from the message body
 	try {
-	    ois = new ObjectInputStream(pkt.getMessageBodyStream());
+	    ois = new FilteringObjectInputStream(pkt.getMessageBodyStream());
 	    o = ois.readObject();
         } catch (Exception e) {
 	    // Programing error. Do not need to localize

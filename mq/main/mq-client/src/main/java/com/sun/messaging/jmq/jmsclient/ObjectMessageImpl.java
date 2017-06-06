@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -50,6 +50,7 @@ import javax.jms.*;
 //import com.sun.messaging.AdministeredObject;
 import com.sun.messaging.jmq.io.*;
 import com.sun.messaging.jmq.jmsclient.resources.ClientResources;
+import com.sun.messaging.jmq.util.io.ClassFilter;
 
 /** An ObjectMessage is used to send a message that contains a serializable
   * Java object. It inherits from <CODE>Message</CODE> and adds a body
@@ -259,6 +260,11 @@ public class ObjectMessageImpl extends MessageImpl implements ObjectMessage {
         protected Class resolveClass(ObjectStreamClass classDesc)
             throws IOException, ClassNotFoundException
         {
+
+            String className = classDesc.getName();
+            if (className != null && !className.isEmpty() && ClassFilter.isBlackListed(className)) {
+              throw new InvalidClassException("Unauthorized deserialization attempt", classDesc.getName());
+            }
 
             try {
                 return super.resolveClass(classDesc);

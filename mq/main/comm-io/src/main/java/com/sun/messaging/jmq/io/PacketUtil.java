@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -50,6 +50,7 @@ import java.util.Map;
 import java.io.*;
 
 import com.sun.messaging.jmq.util.JMQXid;
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 
 public class PacketUtil {
 
@@ -127,7 +128,7 @@ public class PacketUtil {
         case PacketType.MAP_MESSAGE:
 	case PacketType.OBJECT_MESSAGE:
             try {
-                ObjectInputStream ois = new ObjectInputStream(is);
+                ObjectInputStream ois = new FilteringObjectInputStream(is);
                 Object o = ois.readObject();
                 String s = o.toString();
                 if (s.length() > 512) {
@@ -185,7 +186,7 @@ public class PacketUtil {
         case PacketType.INFO:
 
             try {
-                ObjectInputStream dis = new ObjectInputStream(is);
+                ObjectInputStream dis = new FilteringObjectInputStream(is);
                 Hashtable ht = (Hashtable)dis.readObject();
                 Iterator itr = ht.entrySet().iterator();
                 while (itr.hasNext()) {
@@ -227,7 +228,7 @@ public class PacketUtil {
             break;
         case PacketType.VERIFY_TRANSACTION_REPLY:
             try {
-                ObjectInputStream oos = new ObjectInputStream(is);
+                ObjectInputStream oos = new FilteringObjectInputStream(is);
                 Object newo = oos.readObject();
                 os.println(newo);
             } catch (Exception e) {

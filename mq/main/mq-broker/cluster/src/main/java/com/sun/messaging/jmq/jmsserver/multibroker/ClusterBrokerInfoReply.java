@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -47,8 +47,10 @@ package com.sun.messaging.jmq.jmsserver.multibroker;
 import java.io.*;
 import java.util.*;
 import java.nio.*;
+
 import com.sun.messaging.jmq.io.GPacket;
 import com.sun.messaging.jmq.jmsserver.multibroker.raptor.ProtocolGlobals;
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 
 /**
  * BROKER_INFO_REPLY
@@ -76,7 +78,7 @@ public class ClusterBrokerInfoReply
         status = ((Integer)pkt.getProp("S")).intValue(); 
 
         ByteArrayInputStream bis = new ByteArrayInputStream(pkt.getPayload().array());
-        ObjectInputStream ois = new ObjectInputStream(bis);
+        ObjectInputStream ois = new FilteringObjectInputStream(bis);
         brokerInfo = (BrokerInfo) ois.readObject();
  
     }

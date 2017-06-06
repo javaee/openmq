@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -51,6 +51,7 @@ import javax.jms.*;
 import com.sun.messaging.AdministeredObject;
 import com.sun.messaging.jmq.io.*;
 import com.sun.messaging.jmq.jmsclient.resources.ClientResources;
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 
 /** A MapMessage is used to send a set of name-value pairs where names are
   * Strings and values are Java primitive types. The entries can be accessed
@@ -160,7 +161,7 @@ public class MapMessageImpl extends MessageImpl implements MapMessage {
         try {
             messageBody = getMessageBody();
             byteArrayInputStream = new ByteArrayInputStream ( messageBody );
-            objectInputStream = new ObjectInputStream ( byteArrayInputStream );
+            objectInputStream = new FilteringObjectInputStream ( byteArrayInputStream );
 
             mapMessage = (Map) objectInputStream.readObject();
 

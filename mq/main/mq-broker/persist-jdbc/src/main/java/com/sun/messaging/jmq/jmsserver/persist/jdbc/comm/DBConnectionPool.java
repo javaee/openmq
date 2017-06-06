@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -214,6 +214,9 @@ public class DBConnectionPool {
                 } else if (name.equals(dbmgr.getJDBCPropPrefix()+INVALIDATE_ALL_PROP_SUFFIX)) {
                     invalidateAll = cfg.getBooleanProperty(dbmgr.getJDBCPropPrefix()+INVALIDATE_ALL_PROP_SUFFIX);
                     logger.log(logger.INFO, dbmgr.getJDBCPropPrefix()+INVALIDATE_ALL_PROP_SUFFIX+"="+invalidateAll);
+                } else if (name.equals(dbmgr.getJDBCPropPrefix()+VALIDATE_ON_GET_PROP_SUFFIX)) {
+                    validateOnGet = cfg.getBooleanProperty(dbmgr.getJDBCPropPrefix()+VALIDATE_ON_GET_PROP_SUFFIX);
+                    logger.log(logger.INFO, dbmgr.getJDBCPropPrefix()+VALIDATE_ON_GET_PROP_SUFFIX+"="+validateOnGet);
                 }
             } finally {
                 lock.unlock();
@@ -601,7 +604,7 @@ public class DBConnectionPool {
                                    buff.append("\n\tat " + trace[i]);
                                 }
                             }
-                            String emsg = br.getKString(br.I_DB_CONN_POLL_TIMEOUT,
+                            String emsg = br.getKTString(br.I_DB_CONN_POLL_TIMEOUT,
                                 "("+activeConnections.size()+","+idleConnections.size()+
                                 ")["+minConnections+","+maxConnections+"]",
                                  String.valueOf(slept))+"\n"+buff.toString(); 
@@ -609,8 +612,7 @@ public class DBConnectionPool {
                         }
                     }
                     if (cinfo == null) {
-                        throw new BrokerException(br.getKString(
-                            br.W_DB_POOL_POLL_TIMEOUT, Thread.currentThread()));
+                        throw new BrokerException(br.getKTString(br.W_DB_POOL_POLL_TIMEOUT));
                     }
                 } catch (Exception e) {
                     if (e instanceof BrokerException) {
@@ -1346,7 +1348,8 @@ class ConnectionInfo {
 
     public String toString() {
         return (conn instanceof Connection ? "[Connection":"[PooledConnection")+
-                ":0x"+conn.hashCode()+(thr == null ? "":", "+thr.toString()) +"]";
+                ":0x"+conn.hashCode()+", lastIdleTime="+idleStartTime+
+                (thr == null ? "":", "+thr.toString()) +"]";
     }
 } 
 

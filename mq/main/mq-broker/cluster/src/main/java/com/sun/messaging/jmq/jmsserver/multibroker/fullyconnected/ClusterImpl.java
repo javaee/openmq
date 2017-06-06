@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -51,6 +51,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+
 import com.sun.messaging.jmq.io.GPacket;
 import com.sun.messaging.jmq.io.Status;
 import com.sun.messaging.jmq.jmsserver.core.BrokerAddress;
@@ -73,6 +74,7 @@ import com.sun.messaging.jmq.jmsserver.util.VerifyAddressException;
 import com.sun.messaging.jmq.util.net.MQServerSocketFactory;
 import com.sun.messaging.jmq.util.log.Logger;
 import com.sun.messaging.jmq.util.UID;
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 import com.sun.messaging.jmq.jmsserver.persist.api.LoadException;
 import com.sun.messaging.jmq.jmsserver.persist.api.Store;
 import com.sun.messaging.jmq.jmsserver.persist.api.ChangeRecordInfo;
@@ -975,7 +977,7 @@ public class ClusterImpl implements Cluster, ClusterListener {
         BrokerInfo info = null;
 
         try {
-            ObjectInputStream ois = new ObjectInputStream(bis);
+            ObjectInputStream ois = new FilteringObjectInputStream(bis);
             info = (BrokerInfo) ois.readObject();
             info.setRealRemoteString(realRemote);
         }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -55,7 +55,7 @@ import com.sun.messaging.ConnectionConfiguration;
 import com.sun.messaging.AdministeredObject;
 import com.sun.messaging.jmq.io.*;
 import com.sun.messaging.jmq.util.DebugPrinter;
-
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 import com.sun.messaging.jms.notification.*;
 import com.sun.messaging.jmq.jmsclient.notification.*;
 import com.sun.messaging.jmq.jmsclient.resources.ClientResources;
@@ -508,7 +508,7 @@ public class ReadChannel implements PacketDispatcher, Runnable {
 
         try {
             InputStream is = pkt.getMessageBodyStream();
-            ObjectInputStream ois = new ObjectInputStream(is);
+            ObjectInputStream ois = new FilteringObjectInputStream(is);
             prop = (Hashtable) ois.readObject();
             ois.close();
             is.close();

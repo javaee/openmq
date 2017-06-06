@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -47,8 +47,8 @@ package com.sun.messaging.jmq.jmsclient;
 import javax.jms.*;
 import java.io.*;
 import com.sun.messaging.AdministeredObject;
-
 import com.sun.messaging.jmq.io.*;
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 
 /** A StreamMessage is used to send a stream of Java primitives.
   * It is filled and read sequentially. It inherits from <CODE>Message</CODE>
@@ -814,7 +814,7 @@ public class StreamMessageImpl extends MessageImpl implements StreamMessage {
 
             if (messageBody != null) {
                 byteArrayInputStream = new ByteArrayInputStream ( messageBody );
-                objectInputStream = new ObjectInputStream ( byteArrayInputStream );
+                objectInputStream = new FilteringObjectInputStream ( byteArrayInputStream );
             }
 
         } catch (Exception e) {

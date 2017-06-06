@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,11 +44,14 @@
 
 package com.sun.messaging.jmq.io;
 
-import java.util.Hashtable;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
+import java.util.Hashtable;
 
-import com.sun.messaging.jmq.util.net.IPAddress;
+import com.sun.messaging.jmq.util.io.FilteringObjectInputStream;
 
 /**
  * The payload of an iMQ packet. The payload consists of the message
@@ -296,7 +299,7 @@ public class PacketPayload {
     private Hashtable parseProperties(InputStream is)
         throws IOException, ClassNotFoundException {
 
-        ObjectInputStream p = new ObjectInputStream(is);
+        ObjectInputStream p = new FilteringObjectInputStream(is);
         return (Hashtable)p.readObject();
     }
 }
