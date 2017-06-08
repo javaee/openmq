@@ -515,6 +515,7 @@
 			
                     <copy todir="${ws.binary.share.dir}/opt/depend/">
                         <fileset dir="${project.build.directory}/artifacts/jars/">
+			    <include name="javax.jms-api.jar"/>
 			    <include name="grizzly-framework.jar"/>
 			    <include name="grizzly-portunif.jar"/>
 			    <include name="glassfish-api.jar"/>
