@@ -397,7 +397,8 @@ public class PHashMap extends ConcurrentHashMap {
 
 	ConcurrentHashMap.KeySetView set = keySet;
         if (set == null) {
-            keySet = super.newKeySet();
+            ConcurrentHashMap map = new ConcurrentHashMap(this);
+            keySet = map.keySet();
             set = keySet;
         }
 
