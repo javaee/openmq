@@ -391,12 +391,13 @@ public class PHashMap extends ConcurrentHashMap {
 	return set;
     }
 
-    public Set keySet() {
+    @Override
+    public ConcurrentHashMap.KeySetView keySet() {
 	checkLoaded();
 
-	Set set = keySet;
+	ConcurrentHashMap.KeySetView set = keySet;
         if (set == null) {
-            keySet = new HashSet(super.keySet());
+            keySet = super.newKeySet();
             set = keySet;
         }
 
@@ -437,7 +438,7 @@ public class PHashMap extends ConcurrentHashMap {
     // Views: key set, entry set, and value collection
 
     private Set entrySet = null;
-    private Set keySet = null;
+    private ConcurrentHashMap.KeySetView keySet = null;
     private Collection values = null;
 
     private void removeFromFile(Object key) throws IOException {
