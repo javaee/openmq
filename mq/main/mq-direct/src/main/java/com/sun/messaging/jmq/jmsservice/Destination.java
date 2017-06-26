@@ -44,10 +44,12 @@
 
 package com.sun.messaging.jmq.jmsservice;
 
+import java.io.Serializable;
+
 /**
  *
  */
-public class Destination {
+public class Destination implements Serializable {
 
     /**
      *  Enum values that specify the Type of the Destination
