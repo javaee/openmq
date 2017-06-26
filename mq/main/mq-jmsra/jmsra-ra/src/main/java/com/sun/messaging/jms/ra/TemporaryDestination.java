@@ -79,7 +79,7 @@ public abstract class TemporaryDestination
     /**
      *  Holds the DirectConnection that this TemporaryDestination was created in
      */
-    private DirectConnection dc = null;
+    private transient DirectConnection dc = null;
 
     /**
      *  Holds the jmsservice representation of this TemporaryDestination
