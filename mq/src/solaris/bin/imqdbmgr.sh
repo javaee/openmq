@@ -47,7 +47,7 @@
 #
 
 # Specify additional arguments to the JVM here
-jvm_args="-Xmx128m"
+_def_jvm_args="-Xmx128m"
 
 _bin_home=`/usr/bin/dirname $0`
 _init_file="imqinit"
@@ -76,6 +76,7 @@ while [ $# != 0 ]; do
   case "$1" in
     -verbose) _verbose=true; shift 1;;
     -javahome) shift 2;;
+    -vmargs) shift; _jvm_args="$1 $_jvm_args"; shift ;;
     *)  args="$args $1"; shift  ;;
   esac
 done
@@ -111,7 +112,7 @@ done
 _mainclass=com.sun.messaging.jmq.jmsserver.persist.jdbc.DBTool
 
 # setup arguments to the JVM
-jvm_args="-Dimq.home=$imq_home -Dimq.varhome=$imq_varhome -Dimq.libhome=$imq_sharelibimq_home -Dimq.etchome=$imq_etchome"
+jvm_args="$_def_jvm_args $_jvm_args -Dimq.home=$imq_home -Dimq.varhome=$imq_varhome -Dimq.libhome=$imq_sharelibimq_home -Dimq.etchome=$imq_etchome"
 
 # Needed to locate libimq
 #####hpux-dev#####
