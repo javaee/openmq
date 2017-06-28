@@ -42,10 +42,6 @@
 -->
 <FindBugsFilter>
  
-    <!--
-         Request: Nigel
-         Approval: Jill
-     -->
     <Match>
         <Class name="com.sun.messaging.jmq.io.ReadOnlyPacket"/>
         <Method name="clone"/>

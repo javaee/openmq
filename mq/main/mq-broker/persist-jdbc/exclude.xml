@@ -43,9 +43,6 @@
 <FindBugsFilter>
     
     <!--
-         Request: Dongbo Xiao
-         Approval: Bill Shannon
-
          These DEBUG fields need to be protected (not private) so
          that subclasses can access them, and they can't be final
          because they're written by imqcmd using reflection.
@@ -57,11 +54,6 @@
         <Bug pattern="MS_SHOULD_BE_FINAL"/>
     </Match>            
 
-    <!--
-         Request: Amy Kang 
-         Approval: Bill Shannon
-
-     -->
     <Match>
         <Class name="com.sun.messaging.jmq.jmsserver.persist.jdbc.comm.CommDBManager"/>
         <Method name="executeStatement"/>

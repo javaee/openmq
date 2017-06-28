@@ -42,10 +42,6 @@
 -->
 <FindBugsFilter>
     
-    <!--
-         Request: Dongbo Xiao
-         Approval: Bill Shannon
-     -->
      <Match>
         <Class name="com.sun.messaging.jmq.jmsserver.persist.file.FileStore"/>
         <Method name="close"/>

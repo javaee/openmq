@@ -42,11 +42,6 @@
 -->
 <FindBugsFilter>
     
-    <!--
-         Request: Nigel
-         Approval: Jill
-     -->
-
     <Match>
       <Or>
         <Class name="com.sun.messaging.jmq.auth.api.FailedLoginException"/>                      
@@ -54,5 +49,4 @@
       <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
     </Match> 
     
-<!-- ooooooooooooooooooooooooooooooooooooooooooooooo -->
 </FindBugsFilter>

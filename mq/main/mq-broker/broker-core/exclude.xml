@@ -42,22 +42,12 @@
 -->
 <FindBugsFilter>
  
-    <!--
-         Request: Nigel
-         Approval: Jill
-     -->
-
     <Match>
         <Class name="com.sun.messaging.jmq.jmsserver.data.handlers.TransactionHandler"/>
         <Method name="calculateStoredRouting"/>
         <Bug pattern="NP_NULL_ON_SOME_PATH"/>
     </Match>
 
-    
-    <!--
-         Request: Dongbo Xiao
-         Approval: Bill Shannon
-     -->
      <Match>
         <Class name="com.sun.messaging.jmq.jmsserver.data.handlers.admin.DebugHandler"/>
         <Method name="handle"/>
@@ -65,9 +55,6 @@
     </Match>            
     
     <!--
-         Request: Dongbo Xiao
-         Approval: Bill Shannon
-
          These DEBUG fields need to be protected (not private) so
          that subclasses can access them, and they can't be final
          because they're written by imqcmd using reflection.
