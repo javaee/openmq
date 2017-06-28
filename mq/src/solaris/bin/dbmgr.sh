@@ -53,7 +53,7 @@
 #  -javahome -> sets javahome
 #
 
-jvm_args="-Xmx128m"
+def_jvm_args="-Xmx128m"
 
 bin_home=`dirname $0`
 
@@ -82,13 +82,14 @@ while [ $# != 0 ]; do
     -imqhome) imq_home=$2; shift 2;;
     -imqvarhome) imq_varhome=$2 ; jvm_args="$jvm_args -Dimq.varhome=$imq_varhome"; shift 2;;
     -javahome) javahome=$2; shift 2;;
+    -vmargs) shift; jvm_args="$jvm_args $1"; shift ;;
     *)  args="$args $1"; shift  ;;
   esac
 done
 
 javacmd=$javahome/bin/$javacmd
 
-jvm_args="$jvm_args -Dimq.home=$imq_home"
+jvm_args="$def_jvm_args $jvm_args -Dimq.home=$imq_home"
 
 #_classes=$imq_home/../../share/opt/classes
 _classes=$imq_home/../../share/opt/classes:$dependlibs/javax.jms-api.jar:$dependlibs/grizzly-framework.jar:$dependlibs/grizzly-portunif.jar:$dependlibs/glassfish-api.jar:$dependlibs/hk2-api.jar:$dependlibs/javax.transaction-api.jar:$dependlibs/jhall.jar:$dependlibs/fscontext.jar:$dependlibs/audit.jar:$dependlibs/bdb_je.jar
