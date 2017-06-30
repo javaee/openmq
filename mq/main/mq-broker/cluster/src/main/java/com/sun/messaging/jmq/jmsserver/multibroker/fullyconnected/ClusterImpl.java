@@ -1906,7 +1906,7 @@ public class ClusterImpl implements Cluster, ClusterListener {
     public void clusterPropertyChanged(String name, String value) {
         if (name.equals(ClusterManager.PORT_PROPERTY)) {
             try {
-                setListenPort(Integer.valueOf(value).intValue()); 
+                setListenPort(Integer.parseInt(value)); 
             } catch (IOException e) {
                 logger.logStack(logger.ERROR, e.getMessage(), e);
             }

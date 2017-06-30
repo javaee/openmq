@@ -116,7 +116,7 @@ public class SizeString implements Serializable
                     throw new NumberFormatException("Unknown size " + multchar);
              }
         }
-        int val = (new Integer(setstr)).intValue();
+        int val = Integer.parseInt(setstr);
         bytes = val * multiplier;
  
     }

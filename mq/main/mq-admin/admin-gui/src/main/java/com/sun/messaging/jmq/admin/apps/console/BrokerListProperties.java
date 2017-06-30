@@ -185,8 +185,7 @@ public class BrokerListProperties extends UserProperties  {
 	 *	broker0.
 	 */
 	basePropName = PROP_NAME_BROKER_BASENAME
-				+ Integer.valueOf(index).toString()
-				+ ".";
+				+ Integer.toString(index) + ".";
 
 	/*
 	 * Construct property name string:
@@ -294,9 +293,7 @@ public class BrokerListProperties extends UserProperties  {
 	 * Construct base property name string:
 	 *	broker0.
 	 */
-	basePropName = PROP_NAME_BROKER_BASENAME
-				+ Integer.valueOf(index).toString()
-				+ ".";
+	basePropName = PROP_NAME_BROKER_BASENAME + Integer.toString(index) + ".";
 
 	/*
 	 * Construct property name string:

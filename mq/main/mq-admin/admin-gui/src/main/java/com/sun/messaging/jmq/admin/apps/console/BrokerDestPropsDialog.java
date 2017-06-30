@@ -1154,7 +1154,7 @@ public class BrokerDestPropsDialog extends AdminDialog
                 else if (col == 2 && i == row)
                     return String.valueOf(durInfo.isDurable);
                 else if (col == 3 && i == row)
-		    return (Integer.valueOf(durInfo.nMessages)).toString();
+		    return Integer.toString(durInfo.nMessages);
                 else if (col == 4 && i == row) {
                     if (durInfo.isActive)
 			return ar.getString(ar.I_ACTIVE);

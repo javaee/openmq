@@ -146,13 +146,13 @@ public class ConvertValue {
     static int
     toInt(Object obj) throws MessageFormatException {
         if (obj == null) {
-            return Integer.valueOf((String)null).intValue();
+            return Integer.parseInt((String)null);
         }
         else if (obj instanceof Integer) {
             return ((Integer)obj).intValue();
         }
         else if (obj instanceof String) {
-            return Integer.valueOf((String)obj).intValue();
+            return Integer.parseInt((String)obj);
         }
         else if (obj instanceof Byte) {
             return ((Byte)obj).intValue();
@@ -174,7 +174,7 @@ public class ConvertValue {
     static long
     toLong(Object obj) throws MessageFormatException {
         if (obj == null) {
-            return Long.valueOf((String)null).longValue();
+            return Long.parseLong((String)null);
         }
         else if (obj instanceof Long) {
             return ((Long)obj).longValue();

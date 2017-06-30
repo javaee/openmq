@@ -412,7 +412,7 @@ public class BrokerServicePropsDialog extends AdminDialog {
 		        dynamicPortLabel.setText(" ");
                         break;
                     default:
-		        dynamicPortLabel.setText(Integer.valueOf(svcInfo.port).toString());
+		        dynamicPortLabel.setText(Integer.toString(svcInfo.port));
                 }
             } else {
 	        staticPortButton.setSelected(true);

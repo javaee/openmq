@@ -199,10 +199,6 @@ public class NoCluster implements ClusterBroadcast {
             throw new RuntimeException("shared clientID's not supported w/o cluster");
         }
         String lockid = "clientid:" + clientid;
-        if (shared) {
-           // no reason to lock in multibroker
-           return ClusterBroadcast.LOCK_SUCCESS;
-        }
         return lockResource(lockid, System.currentTimeMillis(), owner);
     }
     public synchronized void unlockClientID(String clientid, Object owner) {

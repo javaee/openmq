@@ -178,13 +178,13 @@ class ValueConvert {
         if (obj == null) {
         	// deliberately delegate the handling of this null value to the primitive's valueOf method
         	// in this case it will throw a java.lang.NumberFormatException 
-            return Integer.valueOf((String)null).intValue();
+            return Integer.parseInt((String)null);
         }
         else if (obj instanceof Integer) {
             return ((Integer)obj).intValue();
         }
         else if (obj instanceof String) {
-            return Integer.valueOf((String)obj).intValue();
+            return Integer.parseInt((String)obj);
         }
         else if (obj instanceof Byte) {
             return ((Byte)obj).intValue();
@@ -208,7 +208,7 @@ class ValueConvert {
         if (obj == null) {
         	// deliberately delegate the handling of this null value to the primitive's valueOf method
         	// in this case it will throw a java.lang.NumberFormatException 
-            return Long.valueOf((String)null).longValue();
+            return Long.parseLong((String)null);
         }
         else if (obj instanceof Long) {
             return ((Long)obj).longValue();

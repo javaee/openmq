@@ -293,9 +293,7 @@ public class DirectPacket
         }
         if (!valid) {
             String exerrmsg = _lgrMID_EXC + "DirectPacket:constructMessage():"+
-                    "Failed on " +
-                    ((valid == false) ? " invalid " : "" )
-                    + "PacketType="+pType +
+                    "Failed on invalid " + "PacketType="+pType +
                     ((t != null) ? " due to Exception=" + t.getMessage() : "" )
                     + ".";
             JMSException jmse = new JMSException(exerrmsg);

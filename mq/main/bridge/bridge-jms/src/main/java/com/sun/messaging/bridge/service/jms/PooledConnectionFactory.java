@@ -99,18 +99,18 @@ public class PooledConnectionFactory implements Runnable {
         val = attrs.getProperty(JMSBridgeXMLConstant.CF.IDLETIMEOUT,
                                 JMSBridgeXMLConstant.CF.IDLETIMEOUT_DEFAULT);
         if (val != null) {
-            _idleTimeout = Integer.valueOf(val).intValue();
+            _idleTimeout = Integer.parseInt(val);
         }
         if (_idleTimeout < 0) _idleTimeout = 0;
         val = attrs.getProperty(JMSBridgeXMLConstant.CF.CONNECTATTEMPTS,
                                 JMSBridgeXMLConstant.CF.CONNECTATTEMPTS_DEFAULT);
         if (val != null) {
-            _maxRetries = Integer.valueOf(val).intValue();
+            _maxRetries = Integer.parseInt(val);
         }
         val = attrs.getProperty(JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
                                 JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT);
         if (val != null) {
-            _retryInterval = Integer.valueOf(val).intValue();
+            _retryInterval = Integer.parseInt(val);
         }
         if (_retryInterval < 0) _retryInterval = 0;
 

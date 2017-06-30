@@ -271,7 +271,7 @@ public abstract class RuntimeFaultInjection
          int secs = sleepIntervalDefault();
          if (str != null)  {
              try {
-                 secs = Integer.valueOf(str).intValue();
+                 secs = Integer.parseInt(str);
              } catch (Exception e) {}
          }
          if (secs <= 0) {

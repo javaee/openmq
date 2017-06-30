@@ -340,7 +340,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
                                     row[1] = ar.getString(ar.I_DYNAMIC); 
                                 break;
                                 default:
-                                    row[1] = Integer.valueOf(sInfo.port).toString() +
+                                    row[1] = Integer.toString(sInfo.port) +
 				    	     " (" + ar.getString(ar.I_DYNAMIC) + ")";
                             }
                         } else {
@@ -1180,7 +1180,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
             //row[j++] = DestState.toString(dInfo.destState);
             row[j++] = BrokerAdminUtil.getDestinationState(dInfo.destState);
             
-            row[j++] = Integer.valueOf(dInfo.nProducers).toString();
+            row[j++] = Integer.toString(dInfo.nProducers);
 
             if (listType != LIST_QUEUE)  {
 	    if (DestType.isTopic(dInfo.type))  {
@@ -3748,19 +3748,19 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 		    String indent = "    ";
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_ACTUAL);
-                    row[1] = Integer.valueOf(dInfo.nMessages - dInfo.nTxnMessages).toString();
+                    row[1] = Integer.toString(dInfo.nMessages - dInfo.nTxnMessages);
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_REMOTE);
-                    row[1] = Integer.valueOf(dInfo.nRemoteMessages).toString();
+                    row[1] = Integer.toString(dInfo.nRemoteMessages);
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_INDELAY);
-                    row[1] = Integer.valueOf(dInfo.nInDelayMessages).toString();
+                    row[1] = Integer.toString(dInfo.nInDelayMessages);
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_HELD_IN_TXN);
-                    row[1] = Integer.valueOf(dInfo.nTxnMessages).toString();
+                    row[1] = Integer.toString(dInfo.nTxnMessages);
                     bcp.add(row);
 
                     row[0] = ar.getString(ar.I_JMQCMD_DST_CUR_MSG_BYTES);
@@ -3768,32 +3768,32 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_ACTUAL);
-                    row[1] = Long.valueOf(dInfo.nMessageBytes - dInfo.nTxnMessageBytes).toString();
+                    row[1] = Long.toString(dInfo.nMessageBytes - dInfo.nTxnMessageBytes);
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_REMOTE);
-                    row[1] = Long.valueOf(dInfo.nRemoteMessageBytes).toString();
+                    row[1] = Long.toString(dInfo.nRemoteMessageBytes);
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_INDELAY);
-                    row[1] = Long.valueOf(dInfo.nInDelayMessageBytes).toString();
+                    row[1] = Long.toString(dInfo.nInDelayMessageBytes);
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_HELD_IN_TXN);
-                    row[1] = Long.valueOf(dInfo.nTxnMessageBytes).toString();
+                    row[1] = Long.toString(dInfo.nTxnMessageBytes);
                     bcp.add(row);
 
                     row[0] = ar.getString(ar.I_JMQCMD_DST_CUR_PRODUCERS);
-                    row[1] = Integer.valueOf(dInfo.nProducers).toString();
+                    row[1] = Integer.toString(dInfo.nProducers);
                     bcp.add(row);
 
 		    if (DestType.isQueue(destTypeMask)) {
                         row[0] = ar.getString(ar.I_JMQCMD_DST_CUR_ACTIVE_CONS);
-                        row[1] = Integer.valueOf(dInfo.naConsumers).toString();
+                        row[1] = Integer.toString(dInfo.naConsumers);
                         bcp.add(row);
 
                         row[0] = ar.getString(ar.I_JMQCMD_DST_CUR_FAILOVER_CONS);
-                        row[1] = Integer.valueOf(dInfo.nfConsumers).toString();
+                        row[1] = Integer.toString(dInfo.nfConsumers);
                         bcp.add(row);
 		    } else  {
 			Hashtable h = dInfo.producerWildcards;
@@ -7649,7 +7649,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 	 }
 
          if (ret == null)  {
-             ret = Integer.valueOf(value).toString();
+             ret = Integer.toString(value);
          }
 
 	 return (ret);
@@ -7661,7 +7661,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
          if (value == unlimitedValue)  {
              ret = ar.getString(ar.I_UNLIMITED) + " (-1)";
          } else  {
-             ret = Integer.valueOf(value).toString();
+             ret = Integer.toString(value);
          }
 
 	 return (ret);

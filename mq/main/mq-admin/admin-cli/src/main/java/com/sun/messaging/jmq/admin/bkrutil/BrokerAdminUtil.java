@@ -144,7 +144,7 @@ public class BrokerAdminUtil {
 	    if (value == -1) 
 		return ar.getString(ar.I_UNLIMITED);
 	    else
-	    	return Integer.valueOf(value).toString();
+	    	return Integer.toString(value);
 	}
     }
 
@@ -155,7 +155,7 @@ public class BrokerAdminUtil {
 	    if (value == -1) 
 		return ar.getString(ar.I_UNLIMITED);
 	    else
-	    	return Integer.valueOf(value).toString();
+	    	return Integer.toString(value);
 	}
     }
 

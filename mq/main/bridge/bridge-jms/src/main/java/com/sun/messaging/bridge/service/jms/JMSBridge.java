@@ -1196,7 +1196,7 @@ public class JMSBridge {
         String val = attrs.getProperty(JMSBridgeXMLConstant.CF.CONNECTATTEMPTS,
                                        JMSBridgeXMLConstant.CF.CONNECTATTEMPTS_DEFAULT);
         if (val != null) {
-            maxAttempts = Integer.valueOf(val).intValue();
+            maxAttempts = Integer.parseInt(val);
         }
         val = attrs.getProperty(JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
                                 JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT);

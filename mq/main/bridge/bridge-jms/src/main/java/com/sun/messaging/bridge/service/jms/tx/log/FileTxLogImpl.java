@@ -428,7 +428,7 @@ public class FileTxLogImpl extends TxLog implements JMSBridgeStore, ObjectInputS
             return;
         }
         if (key.equals("txlogMaxBranches")) {
-            setMaxBranches(Integer.valueOf(value).intValue());
+            setMaxBranches(Integer.parseInt(value));
             return;
         }
         if (key.equals("txlogDirParent")) {

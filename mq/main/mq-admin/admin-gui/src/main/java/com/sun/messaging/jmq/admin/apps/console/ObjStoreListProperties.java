@@ -177,7 +177,7 @@ public class ObjStoreListProperties extends UserProperties  {
 	int		objstoreAttrsStrLen;
 
 	basePropName = PROP_NAME_OBJSTORE_BASENAME
-				+ Integer.valueOf(index).toString()
+				+ Integer.toString(index)
 				+ ".";
 
 	idPropName = basePropName
@@ -227,7 +227,7 @@ public class ObjStoreListProperties extends UserProperties  {
 	*/
 
 	basePropName = PROP_NAME_OBJSTORE_BASENAME
-				+ Integer.valueOf(index).toString()
+				+ Integer.toString(index)
 				+ ".";
 
 	idPropName = basePropName

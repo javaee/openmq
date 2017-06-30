@@ -374,7 +374,7 @@ public abstract class BrokerAdminConn implements ExceptionListener {
 
     public String getBrokerPort()  {
 	if (address != null)  {
-	    return ((Integer.valueOf(address.getPort())).toString());
+	    return ((Integer.toString(address.getPort())));
 	}
 
 	return (getFactoryAttr(ConnectionConfiguration.imqBrokerHostPort));

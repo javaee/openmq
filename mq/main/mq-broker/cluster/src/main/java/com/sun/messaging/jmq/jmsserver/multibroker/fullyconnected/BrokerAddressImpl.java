@@ -311,9 +311,9 @@ public class BrokerAddressImpl extends BrokerAddress {
                      a.getPort(),
                      isha,
                      a.getProperty("brokerID"),
-                     new UID(Long.valueOf(a.getProperty("brokerSessionUID")).longValue()),
+                     new UID(Long.parseLong(a.getProperty("brokerSessionUID"))),
                      (a.getProperty("storeSessionUID") == null ? null:
-                      new UID(Long.valueOf(a.getProperty("storeSessionUID")).longValue())));
+                      new UID(Long.parseLong(a.getProperty("storeSessionUID")))));
     }
 
     /**
@@ -323,8 +323,8 @@ public class BrokerAddressImpl extends BrokerAddress {
     public void writeBrokerAddress(GPacket gp) {
         gp.putProp("HA", Boolean.valueOf(getHAEnabled()));
         if (brokerID != null) gp.putProp("brokerID", getBrokerID());
-        if (brokerSessionUID != null) gp.putProp("brokerSession", Long.valueOf(getBrokerSessionUID().longValue()));
-        if (storeSessionUID != null) gp.putProp("storeSession", Long.valueOf(getStoreSessionUID().longValue()));
+        if (brokerSessionUID != null) gp.putProp("brokerSession", getBrokerSessionUID().longValue());
+        if (storeSessionUID != null) gp.putProp("storeSession", getStoreSessionUID().longValue());
         gp.putProp("instanceName", getInstanceName());
         gp.putProp("host", getHostName());
         gp.putProp("port", Integer.valueOf(getPort()));

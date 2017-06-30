@@ -219,7 +219,7 @@ public class Link implements Runnable {
                                              JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
                                              JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT);
         if (val != null) {
-            _sourceAttemptInterval = Integer.valueOf(val).intValue();
+            _sourceAttemptInterval = Integer.parseInt(val);
         }
 
         val = _parent.getCFAttributes(_targetCF).getProperty(

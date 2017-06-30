@@ -3454,10 +3454,7 @@ public final class DestinationList implements ConnToPartitionStrategyContext
         // check message size
         long indsize = individual_max_size.getBytes();
         if (indsize > 0 && ref.byteSize() > indsize) {
-            String limitstr = (indsize <= 0 ?
-                               Globals.getBrokerResources().getString(
-                                    BrokerResources.M_UNLIMITED):
-                                individual_max_size.toString());
+            String limitstr = individual_max_size.toString();
 
             String msgs[] = { String.valueOf(ref.byteSize()),
                               ref.getSysMessageID().toString(), 
