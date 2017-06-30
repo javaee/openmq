@@ -164,10 +164,10 @@ public class DMQ {
 
         _maxAttempts = Integer.valueOf(_dmqAttrs.getProperty(
                          JMSBridgeXMLConstant.CF.CONNECTATTEMPTS,
-                         JMSBridgeXMLConstant.CF.CONNECTATTEMPTS_DEFAULT));
+                         JMSBridgeXMLConstant.CF.CONNECTATTEMPTS_DEFAULT)).intValue();
         _attemptInterval = Long.valueOf(_dmqAttrs.getProperty(
                        JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
-                       JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT));
+                       JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT)).longValue();
         if (_attemptInterval < 0) _attemptInterval = 0;
         _attemptInterval = _attemptInterval*1000;
 

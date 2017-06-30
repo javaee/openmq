@@ -219,14 +219,14 @@ public class Link implements Runnable {
                                              JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
                                              JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT);
         if (val != null) {
-            _sourceAttemptInterval = Integer.valueOf(val);
+            _sourceAttemptInterval = Integer.valueOf(val).intValue();
         }
 
         val = _parent.getCFAttributes(_targetCF).getProperty(
                                       JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
                                       JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT);
         if (val != null) {
-            _targetAttemptInterval = Integer.valueOf(val);
+            _targetAttemptInterval = Integer.valueOf(val).intValue();
         }
 
         if (_sourceCF instanceof XAConnectionFactory) {
