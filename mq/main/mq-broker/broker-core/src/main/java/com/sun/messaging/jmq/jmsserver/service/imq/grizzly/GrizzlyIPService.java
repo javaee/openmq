@@ -916,6 +916,12 @@ implements GrizzlyService, NotificationInfo
                 "ThreadPool["+pname+"] task queue overflow event");
             }
         }
+        public void onTaskCancelEvent(AbstractThreadPool threadPool, Runnable task) {
+            if (DEBUG) {
+                logger.log(logger.DEBUGHIGH, 
+                "ThreadPool["+pname+"] task canceled event");
+            }
+        }
     }
 }
 
