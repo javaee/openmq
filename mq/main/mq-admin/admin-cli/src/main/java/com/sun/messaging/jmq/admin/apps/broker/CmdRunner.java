@@ -1230,10 +1230,10 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 		}
 	    }
 
-            row[j++] = Integer.valueOf(numMsgs).toString();
-            row[j++] = Integer.valueOf(dInfo.nRemoteMessages).toString();
-            row[j++] = Integer.valueOf(dInfo.nUnackMessages).toString();
-            row[j++] = Integer.valueOf(dInfo.nInDelayMessages).toString();
+            row[j++] = Integer.toString(numMsgs);
+            row[j++] = Integer.toString(dInfo.nRemoteMessages);
+            row[j++] = Integer.toString(dInfo.nUnackMessages);
+            row[j++] = Integer.toString(dInfo.nInDelayMessages);
             row[j++] = Float.valueOf(avgMsgSize).toString();
 
             bcp.add(row);
@@ -4026,7 +4026,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 					         ")";
 			    }
 		        } else {
-                    	    row[1] = Integer.valueOf(sInfo.port).toString() +
+                    	    row[1] = Integer.toString(sInfo.port) +
 				     " (" + ar.getString(ar.I_STATIC) + ")";
 		        }
 		        bcp.add(row);
@@ -4040,11 +4040,11 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 		     * 'Curent' numbers
 		     */
                     row[0] = ar.getString(ar.I_JMQCMD_SVC_CUR_THREADS);
-                    row[1] = Integer.valueOf(sInfo.currentThreads).toString();
+                    row[1] = Integer.toString(sInfo.currentThreads);
 		    bcp.add(row);
 		
                     row[0] = ar.getString(ar.I_JMQCMD_SVC_NUM_CXN);
-                    row[1] = Integer.valueOf(sInfo.nConnections).toString();
+                    row[1] = Integer.toString(sInfo.nConnections);
 		    bcp.add(row);
 
                     row[0] = "";
@@ -4055,11 +4055,11 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 		     * Min/Max numbers
 		     */
                     row[0] = ar.getString(ar.I_JMQCMD_SVC_MIN_THREADS);
-                    row[1] = Integer.valueOf(sInfo.minThreads).toString();
+                    row[1] = Integer.toString(sInfo.minThreads);
 		    bcp.add(row);
 		
                     row[0] = ar.getString(ar.I_JMQCMD_SVC_MAX_THREADS);
-                    row[1] = Integer.valueOf(sInfo.maxThreads).toString();
+                    row[1] = Integer.toString(sInfo.maxThreads);
 		    bcp.add(row);
 
 		

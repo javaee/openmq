@@ -1408,7 +1408,7 @@ Serializable, com.sun.messaging.jmq.util.lists.EventListener
         assert type != DestState.UNKNOWN;
         assert type != DestState.RUNNING;
         assert type <= DestState.PAUSED;
-        assert state == DestState.RUNNING;
+        //assert state == DestState.RUNNING;
 	int oldstate = state;
 	boolean pauseCon = false, pauseProd = false;
 	boolean resumeCon = false, resumeProd = false;

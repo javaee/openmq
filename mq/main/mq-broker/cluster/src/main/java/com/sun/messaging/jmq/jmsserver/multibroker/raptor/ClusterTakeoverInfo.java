@@ -139,9 +139,9 @@ public class ClusterTakeoverInfo
     }
 
     public GPacket getGPacket(short protocol) throws BrokerException { 
-        assert ( protocol == ProtocolGlobals.G_TAKEOVER_COMPLETE ||
-                 protocol == ProtocolGlobals.G_TAKEOVER_PENDING ||
-                 protocol == ProtocolGlobals.G_TAKEOVER_ABORT );
+//        assert ( protocol == ProtocolGlobals.G_TAKEOVER_COMPLETE ||
+//                 protocol == ProtocolGlobals.G_TAKEOVER_PENDING ||
+//                 protocol == ProtocolGlobals.G_TAKEOVER_ABORT );
         if (!Globals.getHAEnabled() && !Globals.isBDBStore()) {
             throw new BrokerException(
                 Globals.getBrokerResources().getKString(

@@ -1137,7 +1137,7 @@ public class PacketReference implements Sized, Ordered
             return pkt;
         }
 
-        assert persist;
+//        assert persist;
 
         if (!persist) {
             return null;
