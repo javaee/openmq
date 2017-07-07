@@ -165,6 +165,19 @@
             </modules>
         </profile>
 
+        <profile>
+            <id>release-phase1</id>
+            <modules>
+                 <!--
+                    The resource provided by the copyright module is needed
+                    before running "mvn glassfish-copyright:copyright".
+                    To ensure that, we build it in this separate phase.
+                -->
+                <module>copyright</module>
+            </modules>
+        </profile>
+
+
     </profiles>
 
     <build>
@@ -608,7 +621,6 @@
             <plugin>
                 <groupId>org.glassfish.copyright</groupId>
                 <artifactId>glassfish-copyright-maven-plugin</artifactId>
-                <version>1.42</version>
                 <configuration>
                     <excludeFile>
                         copyright-exclude
