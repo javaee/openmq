@@ -176,9 +176,8 @@ class ValueConvert {
     static int
     toInt(Object obj) throws MessageFormatException {
         if (obj == null) {
-        	// deliberately delegate the handling of this null value to the primitive's valueOf method
-        	// in this case it will throw a java.lang.NumberFormatException 
-            return Integer.parseInt((String)null);
+        	// must throw the same exception as if we had passed a null value to the primitive's valueOf method
+            throw new NumberFormatException("null");
         }
         else if (obj instanceof Integer) {
             return ((Integer)obj).intValue();
@@ -206,15 +205,14 @@ class ValueConvert {
     static long
     toLong(Object obj) throws MessageFormatException {
         if (obj == null) {
-        	// deliberately delegate the handling of this null value to the primitive's valueOf method
-        	// in this case it will throw a java.lang.NumberFormatException 
-            return Long.parseLong((String)null);
+        	// must throw the same exception as if we had passed a null value to the primitive's valueOf method
+            throw new NumberFormatException("null");
         }
         else if (obj instanceof Long) {
             return ((Long)obj).longValue();
         }
         else if (obj instanceof String) {
-            return Long.valueOf((String)obj).longValue();
+            return Long.parseLong((String)obj);
         }
         else if (obj instanceof Byte) {
             return ((Byte)obj).longValue();
