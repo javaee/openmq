@@ -181,7 +181,7 @@ public class DMQ {
 
         val = _dmqAttrs.getProperty(JMSBridgeXMLConstant.DMQ.SENDATTEMPTS, 
                                     JMSBridgeXMLConstant.DMQ.SENDATTEMPTS_DEFAULT);
-        _maxSendAttempts = Integer.intValue(val);
+        _maxSendAttempts = Integer.parseInt(val);
         if (_maxSendAttempts <= 0) {
             _maxSendAttempts = 1;
         }

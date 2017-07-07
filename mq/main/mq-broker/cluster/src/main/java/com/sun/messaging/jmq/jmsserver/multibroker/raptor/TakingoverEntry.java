@@ -134,7 +134,7 @@ public class TakingoverEntry {
         public int compare(Object o1, Object o2) {
             XidEntry x1 = (XidEntry)o1;
             XidEntry x2 = (XidEntry)o2;
-            return (Long.valueOf(x1.expire)).compareTo(Long.valueOf(x2.expire));
+            return (Long.compare(x1.expire,x2.expire));
         }
         public int hashCode() {
             return super.hashCode();
@@ -149,8 +149,7 @@ public class TakingoverEntry {
         public int compare(Object o1, Object o2) {
             XidEntry x1 = (XidEntry)o1;
             XidEntry x2 = (XidEntry)o2;
-            return (Long.valueOf(x1.brokerSession.getTimestamp())).compareTo(
-                    Long.valueOf(x2.brokerSession.getTimestamp()));
+            return Long.compare(x1.brokerSession.getTimestamp(),x2.brokerSession.getTimestamp());
         }
         public int hashCode() {
             return super.hashCode();

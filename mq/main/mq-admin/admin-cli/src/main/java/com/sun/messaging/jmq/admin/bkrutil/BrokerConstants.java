@@ -137,7 +137,7 @@ public interface BrokerConstants  {
     /*
      * Valid values for broker log level.
      */
-    public static String[] BKR_LOG_LEVEL_VALID_VALUES	= {
+    public static final String[] BKR_LOG_LEVEL_VALID_VALUES	= {
 					    "NONE",
 					    "ERROR",
 					    "WARNING",
@@ -156,7 +156,7 @@ public interface BrokerConstants  {
      * Note: Indices for the strings below need to match the
      * array contents.
      */
-    public static String[] BKR_LIMIT_BEHAV_VALID_VALUES	= {
+    public static final String[] BKR_LIMIT_BEHAV_VALID_VALUES	= {
 					    "FLOW_CONTROL",
 					    "REMOVE_OLDEST",
 					    "REJECT_NEWEST",
