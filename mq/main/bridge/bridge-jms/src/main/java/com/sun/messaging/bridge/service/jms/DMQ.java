@@ -188,7 +188,7 @@ public class DMQ {
 
         val = _dmqAttrs.getProperty(JMSBridgeXMLConstant.DMQ.SENDATTEMPTINTERVAL, 
                                     JMSBridgeXMLConstant.DMQ.SENDATTEMPTINTERVAL_DEFAULT);
-        _sendInterval = Long.valueOf(val).longValue()*1000;
+        _sendInterval = Long.parseLong(val)*1000;
         if (_sendInterval < 0) _sendInterval = 0;
 
         String cn = _dmqAttrs.getProperty(JMSBridgeXMLConstant.DMQ.MTFCLASS);

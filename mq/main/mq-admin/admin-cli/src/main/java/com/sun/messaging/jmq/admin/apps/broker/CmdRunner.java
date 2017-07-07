@@ -453,7 +453,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
                             row[indx++] = (dInfo.consumer == null) ? "" : dInfo.consumer.destination;
                         }
                         row[indx++] = String.valueOf(dInfo.isDurable);
-                        row[indx++] = Integer.valueOf(dInfo.nMessages).toString();
+                        row[indx++] = Integer.toString(dInfo.nMessages);
 			if (dInfo.isActive) {
                             if (dInfo.isShared) {
                                 row[indx] = ar.getString(ar.I_ACTIVE)+"["+dInfo.activeCount+"]"+
@@ -1219,11 +1219,10 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
                 row[j++] = Integer.toString(getWildcardCount(h));
 	    } else  {
 	        if (listType == LIST_QUEUE)  {
-	            row[j++] = Integer.valueOf(dInfo.naConsumers).toString();
-	            row[j++] = Integer.valueOf(dInfo.nfConsumers).toString();
+	            row[j++] = Integer.toString(dInfo.naConsumers);
+	            row[j++] = Integer.toString(dInfo.nfConsumers);
 		} else  {
-	            row[j++] = 
-			Integer.valueOf(dInfo.naConsumers + dInfo.nfConsumers).toString();
+	            row[j++] = Integer.toString(dInfo.naConsumers + dInfo.nfConsumers);
 		    /*
 		     * Wildcards not applicable for queues.
 		     */
@@ -4018,7 +4017,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 			            row[1] = ar.getString(ar.I_DYNAMIC);
 			        break;
 			        default:
-                                    row[1] = Integer.valueOf(sInfo.port).toString()
+                                    row[1] = Integer.toString(sInfo.port)
 					     + 
  					         " (" 
 				             + 

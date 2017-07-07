@@ -423,10 +423,9 @@ public class BrokerServicePropsDialog extends AdminDialog {
 	}
 	//svcState.setText(ServiceState.getString(svcInfo.state));
 	svcState.setText(BrokerAdminUtil.getServiceState(svcInfo.state));
-	minThreads.setText(Integer.valueOf(svcInfo.minThreads).toString());
-	maxThreads.setText(Integer.valueOf(svcInfo.maxThreads).toString());
-	allocatedThreads.setText(Integer.valueOf(svcInfo.currentThreads).toString());
-	numConnections.setText(Integer.valueOf(svcInfo.nConnections).toString());
+	maxThreads.setText(Integer.toString(svcInfo.minThreads));
+	allocatedThreads.setText(Integer.toString(svcInfo.currentThreads));
+	numConnections.setText(Integer.toString(svcInfo.nConnections));
 	super.show();
     }
 
