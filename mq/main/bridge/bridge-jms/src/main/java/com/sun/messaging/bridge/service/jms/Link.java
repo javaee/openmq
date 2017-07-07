@@ -226,7 +226,7 @@ public class Link implements Runnable {
                                       JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
                                       JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT);
         if (val != null) {
-            _targetAttemptInterval = Integer.intValue(val);
+            _targetAttemptInterval = Integer.parseInt(val);
         }
 
         if (_sourceCF instanceof XAConnectionFactory) {

@@ -177,7 +177,7 @@ public class DMQ {
 
         val = _dmqAttrs.getProperty(JMSBridgeXMLConstant.DMQ.TIMETOLIVE, 
                                     JMSBridgeXMLConstant.DMQ.TIMETOLIVE_DEFAULT);
-        _timeToLive = Long.longValue(val);
+        _timeToLive = Long.parseLong(val);
 
         val = _dmqAttrs.getProperty(JMSBridgeXMLConstant.DMQ.SENDATTEMPTS, 
                                     JMSBridgeXMLConstant.DMQ.SENDATTEMPTS_DEFAULT);
