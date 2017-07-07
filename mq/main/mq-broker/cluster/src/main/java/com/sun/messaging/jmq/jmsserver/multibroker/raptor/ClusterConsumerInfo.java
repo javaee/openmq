@@ -358,7 +358,7 @@ public class ClusterConsumerInfo
             if (key.startsWith(PROP_PREFIX_PENDING_TID)) {
                 tidstr = key.substring(PROP_PREFIX_PENDING_TID.length());
                 if (tidstr.length() > 0) {
-                    tid = new TransactionUID(Long.valueOf(tidstr));
+                    tid = new TransactionUID(Long.parseLong(tidstr));
                 } 
                 val = (String)pkt.getProp(key);
                 if (val == null || val.length() == 0) { 

@@ -344,7 +344,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 				    	     " (" + ar.getString(ar.I_DYNAMIC) + ")";
                             }
                         } else {
-                            row[1] = Integer.valueOf(sInfo.port).toString() +
+                            row[1] = Integer.toString(sInfo.port) +
 			    	     " (" + ar.getString(ar.I_STATIC) + ")";;
 			}
                         // row[2] = ServiceState.getString(sInfo.state);
@@ -1210,7 +1210,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 	     *	  -> show "-"  for queues
 	     */
 	    if (DestType.isTopic(dInfo.type))  {
-	        row[j++] = Integer.valueOf(dInfo.nConsumers).toString();
+	        row[j++] = Integer.toString(dInfo.nConsumers);
 
 		/*
 		 * For topics, show number of producer wildcards, if any.
@@ -3823,7 +3823,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 
 
                         row[0] = ar.getString(ar.I_JMQCMD_DST_CUR_CONS);
-                        row[1] = Integer.valueOf(dInfo.nConsumers).toString();
+                        row[1] = Integer.toString(dInfo.nConsumers);
                         bcp.add(row);
 
 			h = dInfo.consumerWildcards;

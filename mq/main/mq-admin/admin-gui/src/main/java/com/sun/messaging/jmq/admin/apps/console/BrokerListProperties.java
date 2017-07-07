@@ -374,7 +374,7 @@ public class BrokerListProperties extends UserProperties  {
 	}
 
 	index++;
-	setProperty(PROP_NAME_BROKER_COUNT, Integer.valueOf(index).toString());
+	setProperty(PROP_NAME_BROKER_COUNT, Integer.toString(index));
     }
 
     public Object setProperty(String key, String value)  {

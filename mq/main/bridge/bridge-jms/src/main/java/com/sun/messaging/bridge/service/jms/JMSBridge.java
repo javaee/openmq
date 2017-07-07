@@ -1201,7 +1201,7 @@ public class JMSBridge {
         val = attrs.getProperty(JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
                                 JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT);
         if (val != null) {
-            attemptInterval = Integer.valueOf(val);
+            attemptInterval = Integer.parseInt(val);
         }
         if (attemptInterval < 0) attemptInterval = 0;
         attemptInterval = attemptInterval*1000;

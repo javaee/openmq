@@ -417,7 +417,7 @@ public class BrokerServicePropsDialog extends AdminDialog {
             } else {
 	        staticPortButton.setSelected(true);
 	        staticPortIF.setEnabled(true);
-	        staticPortIF.setText(Integer.valueOf(svcInfo.port).toString());
+	        staticPortIF.setText(Integer.toString(svcInfo.port));
 	        dynamicPortLabel.setText(" ");
 	    }
 	}

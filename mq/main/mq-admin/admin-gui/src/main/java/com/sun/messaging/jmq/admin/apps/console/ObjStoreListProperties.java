@@ -195,7 +195,7 @@ public class ObjStoreListProperties extends UserProperties  {
 	 *	objstore1.attrs.
 	 */
 	objstoreAttrsStr = PROP_NAME_OBJSTORE_BASENAME
-				+ Integer.valueOf(index).toString()
+				+ Integer.toString(index)
 				+ "."
 				+ PROP_NAME_OBJSTORE_ATTR_PREFIX
 				+ ".";
@@ -275,7 +275,7 @@ public class ObjStoreListProperties extends UserProperties  {
 	}
 
 	index++;
-	setProperty(PROP_NAME_OBJSTORE_COUNT, Integer.valueOf(index).toString());
+	setProperty(PROP_NAME_OBJSTORE_COUNT, Integer.toString(index));
 	/*
 	System.err.println("\t" 
 			+ PROP_NAME_OBJSTORE_COUNT

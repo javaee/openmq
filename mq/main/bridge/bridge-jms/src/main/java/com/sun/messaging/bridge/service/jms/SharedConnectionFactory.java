@@ -98,16 +98,16 @@ public class SharedConnectionFactory implements Runnable {
             _username = val.trim();
             _password = attrs.getProperty(JMSBridgeXMLConstant.CF.PASSWORD);
         } 
-        _idleTimeout = Integer.valueOf(attrs.getProperty(
+        _idleTimeout = Integer.parseInt(attrs.getProperty(
                                        JMSBridgeXMLConstant.CF.IDLETIMEOUT, 
-                                       JMSBridgeXMLConstant.CF.IDLETIMEOUT_DEFAULT)).intValue();
+                                       JMSBridgeXMLConstant.CF.IDLETIMEOUT_DEFAULT));
         if (_idleTimeout < 0) _idleTimeout = 0;
-        _maxRetries = Integer.valueOf(attrs.getProperty(
+        _maxRetries = Integer.parseInt(attrs.getProperty(
                                       JMSBridgeXMLConstant.CF.CONNECTATTEMPTS,
-                                      JMSBridgeXMLConstant.CF.CONNECTATTEMPTS_DEFAULT)).intValue();
-        _retryInterval = Integer.valueOf(attrs.getProperty(
+                                      JMSBridgeXMLConstant.CF.CONNECTATTEMPTS_DEFAULT));
+        _retryInterval = Integer.parseInt(attrs.getProperty(
                                          JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
-                                         JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT)).intValue();
+                                         JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT));
         if (_retryInterval < 0) _retryInterval = 0;
 
         _scheduler = Executors.newSingleThreadScheduledExecutor();

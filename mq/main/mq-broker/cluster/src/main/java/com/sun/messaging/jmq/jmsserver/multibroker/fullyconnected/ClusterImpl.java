@@ -1913,7 +1913,7 @@ public class ClusterImpl implements Cluster, ClusterListener {
         } else if (name.equals(ClusterManager.CLUSTER_PING_INTERVAL_PROP)) {
             int newInterval = pingInterval;
             try {
-                newInterval = Integer.valueOf(value);
+                newInterval = Integer.parseInt(value);
             } catch (Exception e) { /* ignore */ }
 
             if (newInterval != pingInterval) {

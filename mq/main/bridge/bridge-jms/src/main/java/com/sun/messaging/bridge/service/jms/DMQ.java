@@ -177,11 +177,11 @@ public class DMQ {
 
         val = _dmqAttrs.getProperty(JMSBridgeXMLConstant.DMQ.TIMETOLIVE, 
                                     JMSBridgeXMLConstant.DMQ.TIMETOLIVE_DEFAULT);
-        _timeToLive = Long.valueOf(val).longValue();
+        _timeToLive = Long.longValue(val);
 
         val = _dmqAttrs.getProperty(JMSBridgeXMLConstant.DMQ.SENDATTEMPTS, 
                                     JMSBridgeXMLConstant.DMQ.SENDATTEMPTS_DEFAULT);
-        _maxSendAttempts = Integer.valueOf(val).intValue();
+        _maxSendAttempts = Integer.intValue(val);
         if (_maxSendAttempts <= 0) {
             _maxSendAttempts = 1;
         }
