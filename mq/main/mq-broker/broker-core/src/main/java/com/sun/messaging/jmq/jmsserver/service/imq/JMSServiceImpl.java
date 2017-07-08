@@ -2699,7 +2699,7 @@ public class JMSServiceImpl implements JMSService
                 // remove the event listener since we arent sure if we will care
                 c.removeEventListener(lock);
             }
-            if (stopped) return null;
+            //if (stopped) return null;
             synchronized (c.getConsumerUID()) {
                 cuidNotify.remove(c.getConsumerUID());
             }

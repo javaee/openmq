@@ -53,6 +53,16 @@
         <Method name="handle"/>
         <Bug pattern="DM_GC"/>
     </Match>            
+
+    <!--
+     no match null check as reported by findbug at line 
+         'Destination[] ds = DL.getDestination(con.getPartitionedStore(), ...)' 
+     -->
+    <Match>
+        <Class name="com.sun.messaging.jmq.jmsserver.data.handlers.QBrowseHandler"/>
+        <Method name="handle"/>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
+    </Match>            
     
     <!--
          These DEBUG fields need to be protected (not private) so
