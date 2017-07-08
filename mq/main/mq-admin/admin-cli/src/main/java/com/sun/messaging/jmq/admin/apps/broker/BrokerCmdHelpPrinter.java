@@ -132,10 +132,10 @@ public class BrokerCmdHelpPrinter implements CommonHelpPrinter, BrokerCmdOptions
 			PROP_NAME_LIMIT_BEHAVIOUR));
 
         Globals.stdOutPrint("\t");
-	for (int i = 0; i < BKR_LIMIT_BEHAV_VALID_VALUES.length; ++i)  {
-            Globals.stdOutPrint(BKR_LIMIT_BEHAV_VALID_VALUES[i]);
+	for (int i =  0; i < BKR_LIMIT_BEHAV_VALID_VALUES.size(); ++i)  {
+            Globals.stdOutPrint(BKR_LIMIT_BEHAV_VALID_VALUES.get(i));
 	    
-	    if ((i+1) < BKR_LIMIT_BEHAV_VALID_VALUES.length)  {
+	    if ((i+1) < BKR_LIMIT_BEHAV_VALID_VALUES.size()) {
                 Globals.stdOutPrint(" ");
 	    }
 	}
@@ -250,10 +250,10 @@ public class BrokerCmdHelpPrinter implements CommonHelpPrinter, BrokerCmdOptions
 			PROP_NAME_BKR_LOG_LEVEL));
 
         Globals.stdOutPrint("\t");
-	for (int i = 0; i < BKR_LOG_LEVEL_VALID_VALUES.length; ++i)  {
-            Globals.stdOutPrint(BKR_LOG_LEVEL_VALID_VALUES[i]);
+	for (int i = 0; i < BKR_LOG_LEVEL_VALID_VALUES.size(); ++i)  {
+            Globals.stdOutPrint(BKR_LOG_LEVEL_VALID_VALUES.get(i));
 	    
-	    if ((i+1) < BKR_LOG_LEVEL_VALID_VALUES.length)  {
+	    if ((i+1) < BKR_LOG_LEVEL_VALID_VALUES.size())  {
                 Globals.stdOutPrint(" ");
 	    }
 	}

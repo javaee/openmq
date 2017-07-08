@@ -775,8 +775,6 @@ public class VRFileRAF extends VRFile {
 		+ bbuf.remaining() + " bytes from " + pos);
 	}
         if (interruptSafe) {
-            //int p = bbuf.position();
-            bbuf.position();
             int m = bbuf.remaining();
             byte[] bytes = new byte[m];
             read(pos, bytes, 0, m);

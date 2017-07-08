@@ -1396,8 +1396,8 @@ public class BrokerCmd implements BrokerCmdOptions, BrokerConstants  {
 	throws BrokerCmdException {
         BrokerCmdException ex = null;
 
-	for (int i = 0; i < BKR_LOG_LEVEL_VALID_VALUES.length; ++i)  {
-	    if (logLevelValue.equals(BKR_LOG_LEVEL_VALID_VALUES[i]))  {
+	for (String value : BKR_LOG_LEVEL_VALID_VALUES)  {
+	    if (logLevelValue.equals(value)) {
 		return;
 	    }
 	}
@@ -1442,8 +1442,8 @@ public class BrokerCmd implements BrokerCmdOptions, BrokerConstants  {
 	throws BrokerCmdException {
         BrokerCmdException ex = null;
 
-	for (int i = 0; i < BKR_LIMIT_BEHAV_VALID_VALUES.length; ++i)  {
-	    if (limitBehaviourValue.equals(BKR_LIMIT_BEHAV_VALID_VALUES[i]))  {
+	for (String value : BKR_LIMIT_BEHAV_VALID_VALUES)  {
+	    if (limitBehaviourValue.equals(value))  {
 		return;
 	    }
 	}
@@ -2290,9 +2290,9 @@ public class BrokerCmd implements BrokerCmdOptions, BrokerConstants  {
 	    Globals.stdErrPrintln(ar.getString(ar.I_BROKERCMD_VALID_VALUES,
 				    PROP_NAME_BKR_LOG_LEVEL));
 	    Globals.stdErrPrint("\t");
-	    for (int i = 0; i < BKR_LOG_LEVEL_VALID_VALUES.length; ++i)  {
-	        Globals.stdErrPrint(BKR_LOG_LEVEL_VALID_VALUES[i]);
-                if ((i+1) < BKR_LOG_LEVEL_VALID_VALUES.length)  {
+	    for (int i = 0; i < BKR_LOG_LEVEL_VALID_VALUES.size(); ++i)  {
+	        Globals.stdErrPrint(BKR_LOG_LEVEL_VALID_VALUES.get(i));
+                if ((i+1) < BKR_LOG_LEVEL_VALID_VALUES.size())  {
                     Globals.stdErrPrint(" ");
                 }
 	    } 
@@ -2309,9 +2309,9 @@ public class BrokerCmd implements BrokerCmdOptions, BrokerConstants  {
 	    Globals.stdErrPrintln(ar.getString(ar.I_BROKERCMD_VALID_VALUES,
 				    PROP_NAME_LIMIT_BEHAVIOUR));
 	    Globals.stdErrPrint("\t");
-	    for (int i = 0; i < BKR_LIMIT_BEHAV_VALID_VALUES.length; ++i)  {
-	        Globals.stdErrPrint(BKR_LIMIT_BEHAV_VALID_VALUES[i]);
-                if ((i+1) < BKR_LIMIT_BEHAV_VALID_VALUES.length)  {
+	    for (int i = 0; i < BKR_LIMIT_BEHAV_VALID_VALUES.size(); ++i)  {
+	        Globals.stdErrPrint(BKR_LIMIT_BEHAV_VALID_VALUES.get(i));
+                if ((i+1) < BKR_LIMIT_BEHAV_VALID_VALUES.size())  {
                     Globals.stdErrPrint(" ");
                 }
 	    } 

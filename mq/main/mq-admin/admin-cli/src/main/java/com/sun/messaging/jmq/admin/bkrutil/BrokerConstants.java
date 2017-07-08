@@ -44,6 +44,10 @@
 
 package com.sun.messaging.jmq.admin.bkrutil;
 
+import java.util.Arrays;;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Interface containing constants related to broker administration.
  *
@@ -137,12 +141,13 @@ public interface BrokerConstants  {
     /*
      * Valid values for broker log level.
      */
-    public static String[] BKR_LOG_LEVEL_VALID_VALUES	= {
+    public static List<String> BKR_LOG_LEVEL_VALID_VALUES	= 
+        Collections.unmodifiableList(Arrays.asList(
 					    "NONE",
 					    "ERROR",
 					    "WARNING",
 					    "INFO"
-						};
+						));
 
     /*
      * Queue flavour property names, as expected by the broker
@@ -156,16 +161,17 @@ public interface BrokerConstants  {
      * Note: Indices for the strings below need to match the
      * array contents.
      */
-    public static String[] BKR_LIMIT_BEHAV_VALID_VALUES	= {
+    public static List<String> BKR_LIMIT_BEHAV_VALID_VALUES	= 
+        Collections.unmodifiableList(Arrays.asList(
 					    "FLOW_CONTROL",
 					    "REMOVE_OLDEST",
 					    "REJECT_NEWEST",
 					    "REMOVE_LOW_PRIORITY"
-						};
-    public static String LIMIT_BEHAV_FLOW_CONTROL = BKR_LIMIT_BEHAV_VALID_VALUES[0];
-    public static String LIMIT_BEHAV_RM_OLDEST = BKR_LIMIT_BEHAV_VALID_VALUES[1];
-    public static String LIMIT_BEHAV_REJECT_NEWEST = BKR_LIMIT_BEHAV_VALID_VALUES[2];
-    public static String LIMIT_BEHAV_RM_LOW_PRIORITY = BKR_LIMIT_BEHAV_VALID_VALUES[3];
+						));
+    public static String LIMIT_BEHAV_FLOW_CONTROL = BKR_LIMIT_BEHAV_VALID_VALUES.get(0);
+    public static String LIMIT_BEHAV_RM_OLDEST = BKR_LIMIT_BEHAV_VALID_VALUES.get(1);
+    public static String LIMIT_BEHAV_REJECT_NEWEST = BKR_LIMIT_BEHAV_VALID_VALUES.get(2);
+    public static String LIMIT_BEHAV_RM_LOW_PRIORITY = BKR_LIMIT_BEHAV_VALID_VALUES.get(3);
 
     /*
      * Transaction types
