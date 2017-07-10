@@ -23,7 +23,9 @@ Select the version you desire from the tables below.
 
 ### Open MQ 5.1.1 Promoted Builds
 
-[Open MQ 5.1.1 Promoted Builds](http://download.oracle.com/mq/open-mq/5.1.1/index.html)
+Open MQ 5.1.1 is currently under development. 
+
+Index of [Open MQ 5.1.1 Promoted Builds](http://download.oracle.com/mq/open-mq/5.1.1/index.html)
 
 ### Open MQ 5.1 Latest Developer Release, Binary Downloads 
 
