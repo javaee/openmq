@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1906,14 +1906,14 @@ public class ClusterImpl implements Cluster, ClusterListener {
     public void clusterPropertyChanged(String name, String value) {
         if (name.equals(ClusterManager.PORT_PROPERTY)) {
             try {
-                setListenPort(Integer.valueOf(value).intValue()); 
+                setListenPort(Integer.parseInt(value)); 
             } catch (IOException e) {
                 logger.logStack(logger.ERROR, e.getMessage(), e);
             }
         } else if (name.equals(ClusterManager.CLUSTER_PING_INTERVAL_PROP)) {
             int newInterval = pingInterval;
             try {
-                newInterval = Integer.valueOf(value);
+                newInterval = Integer.parseInt(value);
             } catch (Exception e) { /* ignore */ }
 
             if (newInterval != pingInterval) {

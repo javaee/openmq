@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -177,7 +177,7 @@ public class ObjStoreListProperties extends UserProperties  {
 	int		objstoreAttrsStrLen;
 
 	basePropName = PROP_NAME_OBJSTORE_BASENAME
-				+ Integer.valueOf(index).toString()
+				+ Integer.toString(index)
 				+ ".";
 
 	idPropName = basePropName
@@ -195,7 +195,7 @@ public class ObjStoreListProperties extends UserProperties  {
 	 *	objstore1.attrs.
 	 */
 	objstoreAttrsStr = PROP_NAME_OBJSTORE_BASENAME
-				+ Integer.valueOf(index).toString()
+				+ Integer.toString(index)
 				+ "."
 				+ PROP_NAME_OBJSTORE_ATTR_PREFIX
 				+ ".";
@@ -227,7 +227,7 @@ public class ObjStoreListProperties extends UserProperties  {
 	*/
 
 	basePropName = PROP_NAME_OBJSTORE_BASENAME
-				+ Integer.valueOf(index).toString()
+				+ Integer.toString(index)
 				+ ".";
 
 	idPropName = basePropName
@@ -275,7 +275,7 @@ public class ObjStoreListProperties extends UserProperties  {
 	}
 
 	index++;
-	setProperty(PROP_NAME_OBJSTORE_COUNT, Integer.valueOf(index).toString());
+	setProperty(PROP_NAME_OBJSTORE_COUNT, Integer.toString(index));
 	/*
 	System.err.println("\t" 
 			+ PROP_NAME_OBJSTORE_COUNT

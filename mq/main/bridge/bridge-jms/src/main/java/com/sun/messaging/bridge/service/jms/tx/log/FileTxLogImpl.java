@@ -361,8 +361,18 @@ public class FileTxLogImpl extends TxLog implements JMSBridgeStore, ObjectInputS
         if (reset) {
             _logger.log(Level.INFO, _jbr.getString(_jbr.I_FILETXNLOG_INIT_WITH_RESET, fname));
             if (_txlogdirParent != null) {
-                File f = new File(_txlogdirParent+File.separator+FILENAME_JMSBRIDGES);
-                if (f.exists()) f.delete();
+                String fn = _txlogdirParent+File.separator+FILENAME_JMSBRIDGES;
+                File f = new File(fn);
+                if (f.exists()) {
+                    if (!f.delete()) {
+                        _logger.log(Level.WARNING, "Failed to delete file " + fn + " on reset");
+                        File dfn = new File(_txlogdirParent, FILENAME_JMSBRIDGES + ".deleted");
+                        if (!f.renameTo(dfn)) {
+                            _logger.log(Level.WARNING, "Failed rename file "
+                                 + fn + " to " + dfn + " after deletion failure");
+                        }
+                    }
+                }
             }
         } else {
             _logger.log(Level.INFO, _jbr.getString(_jbr.I_FILETXNLOG_INIT, fname));
@@ -418,7 +428,7 @@ public class FileTxLogImpl extends TxLog implements JMSBridgeStore, ObjectInputS
             return;
         }
         if (key.equals("txlogMaxBranches")) {
-            setMaxBranches(Integer.valueOf(value));
+            setMaxBranches(Integer.parseInt(value));
             return;
         }
         if (key.equals("txlogDirParent")) {

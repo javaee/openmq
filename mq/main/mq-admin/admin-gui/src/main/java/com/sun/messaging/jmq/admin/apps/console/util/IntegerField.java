@@ -119,7 +119,7 @@ class IntegerDocument extends PlainDocument {
 	    return;
 	} else if (!sval.equals("-") && sval.length() > 0) {
 	    // Evaluate only if it's not a single '-' char.
-	    long ival = Long.valueOf(sval).longValue();
+	    long ival = Long.parseLong(sval);
 	    if (ival < min || ival > max) {
 		Toolkit.getDefaultToolkit().beep();
 		return;

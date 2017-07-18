@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -162,10 +162,10 @@ public class DMQ {
                 JMSBridge.getJMSBridgeResources().X_DMQ_NOT_SUPPORT, "XAConnectionFactory"));
         }
 
-        _maxAttempts = Integer.valueOf(_dmqAttrs.getProperty(
+        _maxAttempts = Integer.parseInt(_dmqAttrs.getProperty(
                          JMSBridgeXMLConstant.CF.CONNECTATTEMPTS,
                          JMSBridgeXMLConstant.CF.CONNECTATTEMPTS_DEFAULT));
-        _attemptInterval = Long.valueOf(_dmqAttrs.getProperty(
+        _attemptInterval = Long.parseLong(_dmqAttrs.getProperty(
                        JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
                        JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT));
         if (_attemptInterval < 0) _attemptInterval = 0;
@@ -177,18 +177,18 @@ public class DMQ {
 
         val = _dmqAttrs.getProperty(JMSBridgeXMLConstant.DMQ.TIMETOLIVE, 
                                     JMSBridgeXMLConstant.DMQ.TIMETOLIVE_DEFAULT);
-        _timeToLive = Long.valueOf(val).longValue();
+        _timeToLive = Long.parseLong(val);
 
         val = _dmqAttrs.getProperty(JMSBridgeXMLConstant.DMQ.SENDATTEMPTS, 
                                     JMSBridgeXMLConstant.DMQ.SENDATTEMPTS_DEFAULT);
-        _maxSendAttempts = Integer.valueOf(val).intValue();
+        _maxSendAttempts = Integer.parseInt(val);
         if (_maxSendAttempts <= 0) {
             _maxSendAttempts = 1;
         }
 
         val = _dmqAttrs.getProperty(JMSBridgeXMLConstant.DMQ.SENDATTEMPTINTERVAL, 
                                     JMSBridgeXMLConstant.DMQ.SENDATTEMPTINTERVAL_DEFAULT);
-        _sendInterval = Long.valueOf(val).longValue()*1000;
+        _sendInterval = Long.parseLong(val)*1000;
         if (_sendInterval < 0) _sendInterval = 0;
 
         String cn = _dmqAttrs.getProperty(JMSBridgeXMLConstant.DMQ.MTFCLASS);

@@ -88,7 +88,7 @@ public class Producer extends ProducerSpi {
     }
 
 
-    public synchronized void destroyProducer() {
+    public void destroyProducer() {
         if (getDestinationUID().isWildcard()) {
             wildcardProducers.remove(getProducerUID());
             // remove from each destination

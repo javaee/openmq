@@ -246,7 +246,7 @@
 	</copy>
 
 	<!-- lib/install dir -->
-	<!-- These files only used if image was installed by the installer.-->
+	<!-- These files only used if image was installed by the installer.
 	<echo message="### lib/props"/>
         <mkdir dir="${mq.zip.installdir}/lib/install"/>
 
@@ -274,6 +274,7 @@
 		<include name="mqconfigmf"/>
 	    </fileset>
 	</chmod>
+        -->
 
 	<!-- lib/ext dir -->
 	<echo message="### lib/ext"/>

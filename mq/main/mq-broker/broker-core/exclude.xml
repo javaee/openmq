@@ -42,32 +42,29 @@
 -->
 <FindBugsFilter>
  
-    <!--
-         Request: Nigel
-         Approval: Jill
-     -->
-
     <Match>
         <Class name="com.sun.messaging.jmq.jmsserver.data.handlers.TransactionHandler"/>
         <Method name="calculateStoredRouting"/>
         <Bug pattern="NP_NULL_ON_SOME_PATH"/>
     </Match>
 
-    
-    <!--
-         Request: Dongbo Xiao
-         Approval: Bill Shannon
-     -->
      <Match>
         <Class name="com.sun.messaging.jmq.jmsserver.data.handlers.admin.DebugHandler"/>
         <Method name="handle"/>
         <Bug pattern="DM_GC"/>
     </Match>            
+
+    <!--
+     no match null check as reported by findbug at line 
+         'Destination[] ds = DL.getDestination(con.getPartitionedStore(), ...)' 
+     -->
+    <Match>
+        <Class name="com.sun.messaging.jmq.jmsserver.data.handlers.QBrowseHandler"/>
+        <Method name="handle"/>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
+    </Match>            
     
     <!--
-         Request: Dongbo Xiao
-         Approval: Bill Shannon
-
          These DEBUG fields need to be protected (not private) so
          that subclasses can access them, and they can't be final
          because they're written by imqcmd using reflection.

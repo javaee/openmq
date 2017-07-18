@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -132,10 +132,10 @@ public class BrokerCmdHelpPrinter implements CommonHelpPrinter, BrokerCmdOptions
 			PROP_NAME_LIMIT_BEHAVIOUR));
 
         Globals.stdOutPrint("\t");
-	for (int i = 0; i < BKR_LIMIT_BEHAV_VALID_VALUES.length; ++i)  {
-            Globals.stdOutPrint(BKR_LIMIT_BEHAV_VALID_VALUES[i]);
+	for (int i =  0; i < BKR_LIMIT_BEHAV_VALID_VALUES.size(); ++i)  {
+            Globals.stdOutPrint(BKR_LIMIT_BEHAV_VALID_VALUES.get(i));
 	    
-	    if ((i+1) < BKR_LIMIT_BEHAV_VALID_VALUES.length)  {
+	    if ((i+1) < BKR_LIMIT_BEHAV_VALID_VALUES.size()) {
                 Globals.stdOutPrint(" ");
 	    }
 	}
@@ -250,10 +250,10 @@ public class BrokerCmdHelpPrinter implements CommonHelpPrinter, BrokerCmdOptions
 			PROP_NAME_BKR_LOG_LEVEL));
 
         Globals.stdOutPrint("\t");
-	for (int i = 0; i < BKR_LOG_LEVEL_VALID_VALUES.length; ++i)  {
-            Globals.stdOutPrint(BKR_LOG_LEVEL_VALID_VALUES[i]);
+	for (int i = 0; i < BKR_LOG_LEVEL_VALID_VALUES.size(); ++i)  {
+            Globals.stdOutPrint(BKR_LOG_LEVEL_VALID_VALUES.get(i));
 	    
-	    if ((i+1) < BKR_LOG_LEVEL_VALID_VALUES.length)  {
+	    if ((i+1) < BKR_LOG_LEVEL_VALID_VALUES.size())  {
                 Globals.stdOutPrint(" ");
 	    }
 	}

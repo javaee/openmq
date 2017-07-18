@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -126,6 +126,12 @@ public abstract class TemporaryDestination extends com.sun.messaging.Destination
             //owner/creator.
             String errorString = AdministeredObject.cr.getKString(AdministeredObject.cr.X_DELETE_DESTINATION);
             throw new JMSException (errorString, AdministeredObject.cr.X_DELETE_DESTINATION);
+        }
+        
+        if (connection.isClosed()) {
+        	// the connection is closed which means its temporary destinations will already have been deleted
+        	// nothing else to do
+        	return;
         }
 
         //check if there are active consumer on this destination.

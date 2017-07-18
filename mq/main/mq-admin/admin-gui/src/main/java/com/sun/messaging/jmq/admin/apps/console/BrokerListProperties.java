@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -185,8 +185,7 @@ public class BrokerListProperties extends UserProperties  {
 	 *	broker0.
 	 */
 	basePropName = PROP_NAME_BROKER_BASENAME
-				+ Integer.valueOf(index).toString()
-				+ ".";
+				+ Integer.toString(index) + ".";
 
 	/*
 	 * Construct property name string:
@@ -294,9 +293,7 @@ public class BrokerListProperties extends UserProperties  {
 	 * Construct base property name string:
 	 *	broker0.
 	 */
-	basePropName = PROP_NAME_BROKER_BASENAME
-				+ Integer.valueOf(index).toString()
-				+ ".";
+	basePropName = PROP_NAME_BROKER_BASENAME + Integer.toString(index) + ".";
 
 	/*
 	 * Construct property name string:
@@ -377,7 +374,7 @@ public class BrokerListProperties extends UserProperties  {
 	}
 
 	index++;
-	setProperty(PROP_NAME_BROKER_COUNT, Integer.valueOf(index).toString());
+	setProperty(PROP_NAME_BROKER_COUNT, Integer.toString(index));
     }
 
     public Object setProperty(String key, String value)  {

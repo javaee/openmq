@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -98,14 +98,14 @@ public class SharedConnectionFactory implements Runnable {
             _username = val.trim();
             _password = attrs.getProperty(JMSBridgeXMLConstant.CF.PASSWORD);
         } 
-        _idleTimeout = Integer.valueOf(attrs.getProperty(
+        _idleTimeout = Integer.parseInt(attrs.getProperty(
                                        JMSBridgeXMLConstant.CF.IDLETIMEOUT, 
                                        JMSBridgeXMLConstant.CF.IDLETIMEOUT_DEFAULT));
         if (_idleTimeout < 0) _idleTimeout = 0;
-        _maxRetries = Integer.valueOf(attrs.getProperty(
+        _maxRetries = Integer.parseInt(attrs.getProperty(
                                       JMSBridgeXMLConstant.CF.CONNECTATTEMPTS,
                                       JMSBridgeXMLConstant.CF.CONNECTATTEMPTS_DEFAULT));
-        _retryInterval = Integer.valueOf(attrs.getProperty(
+        _retryInterval = Integer.parseInt(attrs.getProperty(
                                          JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
                                          JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT));
         if (_retryInterval < 0) _retryInterval = 0;

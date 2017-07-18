@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -412,21 +412,20 @@ public class BrokerServicePropsDialog extends AdminDialog {
 		        dynamicPortLabel.setText(" ");
                         break;
                     default:
-		        dynamicPortLabel.setText(Integer.valueOf(svcInfo.port).toString());
+		        dynamicPortLabel.setText(Integer.toString(svcInfo.port));
                 }
             } else {
 	        staticPortButton.setSelected(true);
 	        staticPortIF.setEnabled(true);
-	        staticPortIF.setText(Integer.valueOf(svcInfo.port).toString());
+	        staticPortIF.setText(Integer.toString(svcInfo.port));
 	        dynamicPortLabel.setText(" ");
 	    }
 	}
 	//svcState.setText(ServiceState.getString(svcInfo.state));
 	svcState.setText(BrokerAdminUtil.getServiceState(svcInfo.state));
-	minThreads.setText(Integer.valueOf(svcInfo.minThreads).toString());
-	maxThreads.setText(Integer.valueOf(svcInfo.maxThreads).toString());
-	allocatedThreads.setText(Integer.valueOf(svcInfo.currentThreads).toString());
-	numConnections.setText(Integer.valueOf(svcInfo.nConnections).toString());
+	maxThreads.setText(Integer.toString(svcInfo.minThreads));
+	allocatedThreads.setText(Integer.toString(svcInfo.currentThreads));
+	numConnections.setText(Integer.toString(svcInfo.nConnections));
 	super.show();
     }
 

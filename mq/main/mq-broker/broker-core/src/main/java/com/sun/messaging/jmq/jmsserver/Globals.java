@@ -67,6 +67,7 @@ import com.sun.messaging.jmq.jmsserver.core.DestinationList;
 import com.sun.messaging.jmq.jmsserver.cluster.api.*;
 import com.sun.messaging.jmq.jmsserver.cluster.api.ha.HAMonitorService;
 import com.sun.messaging.jmq.jmsserver.util.BrokerException;
+import com.sun.messaging.jmq.jmsserver.util.BrokerShutdownRuntimeException;
 import com.sun.messaging.jmq.jmsserver.util.LoggerManager;
 import com.sun.messaging.jmq.jmsserver.config.BrokerConfig;
 import com.sun.messaging.jmq.jmsserver.cluster.api.*;
@@ -549,10 +550,17 @@ public final class Globals extends CommGlobals
         return metricManager;
     }
 
-    public static ConnectionManager getConnectionManager() {
-        return connectionManager;
-    }
+    public static ConnectionManager getConnectionManager() 
+        throws BrokerShutdownRuntimeException {
 
+        ConnectionManager cm = connectionManager;
+        if (cm != null) {
+            return cm;
+        }
+        throw new BrokerShutdownRuntimeException(
+            getBrokerResources().getKString(
+                BrokerResources.W_BROKER_IS_SHUTDOWN));
+    }
 
     public static ClusterBroadcast getClusterBroadcast() {
         return messageBus;

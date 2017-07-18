@@ -94,21 +94,23 @@ public abstract class TxLog {
      * @param reset true to reset the txlog
      */
     public void init(Properties props, boolean reset) throws Exception {
-        _jmsbridge = props.getProperty("jmsbridge");
+        if (props != null) {
+            _jmsbridge = props.getProperty("jmsbridge");
+            _tmname = props.getProperty("tmname");
+            String v = props.getProperty("txlogReapLimit");
+            if (v != null) {
+                _reapLimit = Integer.parseInt(v);
+            }
+            v = props.getProperty("txlogReapInterval");
+            if (v != null) {
+                _reapInterval = Integer.parseInt(v);
+            }
+        }
         if (_jmsbridge == null) {
             throw new IllegalArgumentException("Property 'jmsbridge' not set");
         }
-        _tmname = props.getProperty("tmname");
         if (_tmname == null) {
             throw new IllegalStateException("Property 'tmname' not set");
-        }
-        String v = props.getProperty("txlogReapLimit");
-        if (v != null) {
-            _reapLimit = Integer.parseInt(v);
-        }
-        v = props.getProperty("txlogReapInterval");
-        if (v != null) {
-            _reapInterval = Integer.parseInt(v);
         }
         _reaper = new TransactionReaper(this, _reapLimit, _reapInterval);
     }

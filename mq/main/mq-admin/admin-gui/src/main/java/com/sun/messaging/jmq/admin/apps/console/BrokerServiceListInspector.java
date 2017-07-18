@@ -111,13 +111,13 @@ public class BrokerServiceListInspector extends TabledInspector  {
                         portStr = ar.getString(ar.I_DYNAMIC);
                         break;
                     default:
-                        portStr = Integer.valueOf(svcInfo.port).toString()
+                        portStr = Integer.toString(svcInfo.port)
 					+ " (" 
 					+ ar.getString(ar.I_DYNAMIC) 
 					+ ")";
                  }
             } else {
-                portStr = Integer.valueOf(svcInfo.port).toString()
+                portStr = Integer.toString(svcInfo.port)
 				+ " (" 
 				+ ar.getString(ar.I_STATIC) 
 				+ ")";

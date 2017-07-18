@@ -73,6 +73,7 @@ import com.sun.messaging.jmq.jmsserver.memory.*;
 import com.sun.messaging.jmq.jmsserver.data.PacketRouter;
 import com.sun.messaging.jmq.util.net.IPAddress;
 import com.sun.messaging.jmq.jmsserver.util.BrokerException;
+import com.sun.messaging.jmq.jmsserver.util.BrokerShutdownRuntimeException;
 import com.sun.messaging.jmq.jmsserver.net.*;
 import com.sun.messaging.jmq.jmsserver.service.ConnectionManager;
 import com.sun.messaging.jmq.util.lists.*;
@@ -1735,7 +1736,11 @@ public class IMQIPConnection extends IMQBasicConnection
             }
         } else if (ex instanceof IOException) {
             throw (IOException)ex;
-        } else {
+        } else if (ex instanceof BrokerShutdownRuntimeException) {
+             logger.log(Logger.INFO, ex.getMessage());
+             closeConnection(true, 
+                 GoodbyeReason.SHUTDOWN_BKR, ex.toString());
+        } else {     
              logger.logStack(Logger.ERROR, "Internal Error: "
                      + "Received unexpected exception processing connection "
                      + " closing connection", ex);

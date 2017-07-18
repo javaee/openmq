@@ -1040,6 +1040,7 @@ public class BrokerResources extends MQResourceBundle {
     final public static String W_CLUSTER_LINK_IN_HANDSHAKE = "B2295";
     final public static String W_STORE_TXN_ACK_EXIST = "B2296";
     final public static String W_CLUSTER_INVALID_PACKET_SIZE_READ = "B2297";
+    final public static String W_BROKER_IS_SHUTDOWN = "B2298";
 
     // 3000-3999 Error Messages
     final public static String E_PERSISTENT_OPEN 	= "B3000";

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -449,7 +449,8 @@ public class BrokerQueryDialog extends AdminDialog
 
 	lvpItems = new LabelledComponent[3];
 
-	logLevelCb = new JComboBox(BKR_LOG_LEVEL_VALID_VALUES);
+	logLevelCb = new JComboBox(BKR_LOG_LEVEL_VALID_VALUES.toArray(
+                                   new String[BKR_LOG_LEVEL_VALID_VALUES.size()]));
 	tmpLabelC = new LabelledComponent(
 		acr.getString(acr.I_BROKER_LOG_LEVEL), 
 		logLevelCb);

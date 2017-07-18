@@ -42,10 +42,6 @@
 -->
 <FindBugsFilter>
     
-    <!--
-         Request: Kats
-         Approval: Amy
-     -->
      <Match>
         <Class name="com.sun.messaging.jmq.admin.jmsspi.JMSAdminImpl"/>
         <Method name="pingProvider"/>

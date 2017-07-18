@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -219,14 +219,14 @@ public class Link implements Runnable {
                                              JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
                                              JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT);
         if (val != null) {
-            _sourceAttemptInterval = Integer.valueOf(val);
+            _sourceAttemptInterval = Integer.parseInt(val);
         }
 
         val = _parent.getCFAttributes(_targetCF).getProperty(
                                       JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
                                       JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT);
         if (val != null) {
-            _targetAttemptInterval = Integer.valueOf(val);
+            _targetAttemptInterval = Integer.parseInt(val);
         }
 
         if (_sourceCF instanceof XAConnectionFactory) {

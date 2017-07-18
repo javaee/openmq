@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -609,7 +609,8 @@ public class BrokerDestPropsDialog extends AdminDialog
 	 */
         lvpItems = new LabelledComponent[2];
 
-        limitBehaviorCb = new JComboBox(BKR_LIMIT_BEHAV_VALID_VALUES);
+        limitBehaviorCb = new JComboBox(BKR_LIMIT_BEHAV_VALID_VALUES.toArray(
+                                        new String[BKR_LIMIT_BEHAV_VALID_VALUES.size()]));
 	tmpLabelC = new LabelledComponent(
 			acr.getString(acr.I_BROKER_LIMIT_BEHAVIOR),
 			limitBehaviorCb);
@@ -947,7 +948,7 @@ public class BrokerDestPropsDialog extends AdminDialog
         maxSizePerMsgBF.setText("0");
         maxSizePerMsgBF.setUnit(BytesField.BYTES);
 
-        limitBehaviorCb.setSelectedItem(BKR_LIMIT_BEHAV_VALID_VALUES[0]);
+        limitBehaviorCb.setSelectedItem(BKR_LIMIT_BEHAV_VALID_VALUES.get(0));
         useDMQCkb.setSelected(true);
 
 	clearSelection();
@@ -1154,7 +1155,7 @@ public class BrokerDestPropsDialog extends AdminDialog
                 else if (col == 2 && i == row)
                     return String.valueOf(durInfo.isDurable);
                 else if (col == 3 && i == row)
-		    return (Integer.valueOf(durInfo.nMessages)).toString();
+		    return Integer.toString(durInfo.nMessages);
                 else if (col == 4 && i == row) {
                     if (durInfo.isActive)
 			return ar.getString(ar.I_ACTIVE);

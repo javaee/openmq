@@ -42,11 +42,6 @@
 -->
 <FindBugsFilter>
 
-    <!--
-         Request: Nigel
-         Approval: Jill
-     -->
-
     <Match>
       <Or>
         <Class name="com.sun.messaging.jmq.jmsclient.XAResourceForMC"/>
@@ -109,6 +104,15 @@
         <Class name="com.sun.messaging.jmq.jmsclient.XAResourceImpl"/>
         <Method name="printXid"/>
         <Bug pattern="DMI_INVOKING_TOSTRING_ON_ARRAY"/>
+    </Match> 
+
+    <!--
+      no match to reported condition at line 353
+      -->
+    <Match>
+        <Class name="com.sun.messaging.jmq.jmsclient.XAResourceImpl"/>
+        <Method name="commit"/>
+        <Bug pattern="UC_USELESS_CONDITION"/>
     </Match> 
     
      <Match>

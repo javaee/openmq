@@ -79,7 +79,7 @@ public class XAResourceMap {
 
     private static int getMAXROLLBACKS() {
         try {
-            return Integer.valueOf(System.getProperty(
+            return Integer.parseInt(System.getProperty(
                 "imq.maxConsecutiveRollbacks", String.valueOf(DEFAULT_MAXROLLBACKS)));
         } catch (Exception e) {
             e.printStackTrace();

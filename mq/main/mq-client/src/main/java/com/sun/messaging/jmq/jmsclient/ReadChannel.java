@@ -1193,6 +1193,7 @@ public class ReadChannel implements PacketDispatcher, Runnable {
         }
         long ackId = pkt.getConsumerID();
         AsyncSendCallback cb = (AsyncSendCallback)requestMetaData.get(Long.valueOf(ackId));
+        requestMetaData.remove(ackId); 
         if (cb == null) {
             return false;
         }     

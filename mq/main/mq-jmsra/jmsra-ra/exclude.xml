@@ -42,11 +42,6 @@
 -->
 <FindBugsFilter>
  
-    <!--
-         Request: Nigel
-         Approval: Jill
-     -->
-
     <Match>
       <Or>
         <Class name="com.sun.messaging.jms.ra.DirectXAResource"/>

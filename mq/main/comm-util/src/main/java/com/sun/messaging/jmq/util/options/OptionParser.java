@@ -307,11 +307,7 @@ public class OptionParser implements OptionType {
 	int index = nameValuePair.indexOf("=");
 
 	if (index > 0) {
-	    if (index == 0)  {
-		return ("");
-	    } else  {
-		return (nameValuePair.substring(0, index));
-	    }
+	    return (nameValuePair.substring(0, index));
 	}
 
 	return (null);

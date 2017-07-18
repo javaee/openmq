@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -340,11 +340,11 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
                                     row[1] = ar.getString(ar.I_DYNAMIC); 
                                 break;
                                 default:
-                                    row[1] = Integer.valueOf(sInfo.port).toString() +
+                                    row[1] = Integer.toString(sInfo.port) +
 				    	     " (" + ar.getString(ar.I_DYNAMIC) + ")";
                             }
                         } else {
-                            row[1] = Integer.valueOf(sInfo.port).toString() +
+                            row[1] = Integer.toString(sInfo.port) +
 			    	     " (" + ar.getString(ar.I_STATIC) + ")";;
 			}
                         // row[2] = ServiceState.getString(sInfo.state);
@@ -453,7 +453,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
                             row[indx++] = (dInfo.consumer == null) ? "" : dInfo.consumer.destination;
                         }
                         row[indx++] = String.valueOf(dInfo.isDurable);
-                        row[indx++] = Integer.valueOf(dInfo.nMessages).toString();
+                        row[indx++] = Integer.toString(dInfo.nMessages);
 			if (dInfo.isActive) {
                             if (dInfo.isShared) {
                                 row[indx] = ar.getString(ar.I_ACTIVE)+"["+dInfo.activeCount+"]"+
@@ -1180,7 +1180,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
             //row[j++] = DestState.toString(dInfo.destState);
             row[j++] = BrokerAdminUtil.getDestinationState(dInfo.destState);
             
-            row[j++] = Integer.valueOf(dInfo.nProducers).toString();
+            row[j++] = Integer.toString(dInfo.nProducers);
 
             if (listType != LIST_QUEUE)  {
 	    if (DestType.isTopic(dInfo.type))  {
@@ -1210,7 +1210,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 	     *	  -> show "-"  for queues
 	     */
 	    if (DestType.isTopic(dInfo.type))  {
-	        row[j++] = Integer.valueOf(dInfo.nConsumers).toString();
+	        row[j++] = Integer.toString(dInfo.nConsumers);
 
 		/*
 		 * For topics, show number of producer wildcards, if any.
@@ -1219,11 +1219,10 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
                 row[j++] = Integer.toString(getWildcardCount(h));
 	    } else  {
 	        if (listType == LIST_QUEUE)  {
-	            row[j++] = Integer.valueOf(dInfo.naConsumers).toString();
-	            row[j++] = Integer.valueOf(dInfo.nfConsumers).toString();
+	            row[j++] = Integer.toString(dInfo.naConsumers);
+	            row[j++] = Integer.toString(dInfo.nfConsumers);
 		} else  {
-	            row[j++] = 
-			Integer.valueOf(dInfo.naConsumers + dInfo.nfConsumers).toString();
+	            row[j++] = Integer.toString(dInfo.naConsumers + dInfo.nfConsumers);
 		    /*
 		     * Wildcards not applicable for queues.
 		     */
@@ -1231,10 +1230,10 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 		}
 	    }
 
-            row[j++] = Integer.valueOf(numMsgs).toString();
-            row[j++] = Integer.valueOf(dInfo.nRemoteMessages).toString();
-            row[j++] = Integer.valueOf(dInfo.nUnackMessages).toString();
-            row[j++] = Integer.valueOf(dInfo.nInDelayMessages).toString();
+            row[j++] = Integer.toString(numMsgs);
+            row[j++] = Integer.toString(dInfo.nRemoteMessages);
+            row[j++] = Integer.toString(dInfo.nUnackMessages);
+            row[j++] = Integer.toString(dInfo.nInDelayMessages);
             row[j++] = Float.valueOf(avgMsgSize).toString();
 
             bcp.add(row);
@@ -3748,19 +3747,19 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 		    String indent = "    ";
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_ACTUAL);
-                    row[1] = Integer.valueOf(dInfo.nMessages - dInfo.nTxnMessages).toString();
+                    row[1] = Integer.toString(dInfo.nMessages - dInfo.nTxnMessages);
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_REMOTE);
-                    row[1] = Integer.valueOf(dInfo.nRemoteMessages).toString();
+                    row[1] = Integer.toString(dInfo.nRemoteMessages);
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_INDELAY);
-                    row[1] = Integer.valueOf(dInfo.nInDelayMessages).toString();
+                    row[1] = Integer.toString(dInfo.nInDelayMessages);
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_HELD_IN_TXN);
-                    row[1] = Integer.valueOf(dInfo.nTxnMessages).toString();
+                    row[1] = Integer.toString(dInfo.nTxnMessages);
                     bcp.add(row);
 
                     row[0] = ar.getString(ar.I_JMQCMD_DST_CUR_MSG_BYTES);
@@ -3768,32 +3767,32 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_ACTUAL);
-                    row[1] = Long.valueOf(dInfo.nMessageBytes - dInfo.nTxnMessageBytes).toString();
+                    row[1] = Long.toString(dInfo.nMessageBytes - dInfo.nTxnMessageBytes);
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_REMOTE);
-                    row[1] = Long.valueOf(dInfo.nRemoteMessageBytes).toString();
+                    row[1] = Long.toString(dInfo.nRemoteMessageBytes);
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_INDELAY);
-                    row[1] = Long.valueOf(dInfo.nInDelayMessageBytes).toString();
+                    row[1] = Long.toString(dInfo.nInDelayMessageBytes);
                     bcp.add(row);
 
                     row[0] = indent + ar.getString(ar.I_JMQCMD_DST_HELD_IN_TXN);
-                    row[1] = Long.valueOf(dInfo.nTxnMessageBytes).toString();
+                    row[1] = Long.toString(dInfo.nTxnMessageBytes);
                     bcp.add(row);
 
                     row[0] = ar.getString(ar.I_JMQCMD_DST_CUR_PRODUCERS);
-                    row[1] = Integer.valueOf(dInfo.nProducers).toString();
+                    row[1] = Integer.toString(dInfo.nProducers);
                     bcp.add(row);
 
 		    if (DestType.isQueue(destTypeMask)) {
                         row[0] = ar.getString(ar.I_JMQCMD_DST_CUR_ACTIVE_CONS);
-                        row[1] = Integer.valueOf(dInfo.naConsumers).toString();
+                        row[1] = Integer.toString(dInfo.naConsumers);
                         bcp.add(row);
 
                         row[0] = ar.getString(ar.I_JMQCMD_DST_CUR_FAILOVER_CONS);
-                        row[1] = Integer.valueOf(dInfo.nfConsumers).toString();
+                        row[1] = Integer.toString(dInfo.nfConsumers);
                         bcp.add(row);
 		    } else  {
 			Hashtable h = dInfo.producerWildcards;
@@ -3823,7 +3822,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 
 
                         row[0] = ar.getString(ar.I_JMQCMD_DST_CUR_CONS);
-                        row[1] = Integer.valueOf(dInfo.nConsumers).toString();
+                        row[1] = Integer.toString(dInfo.nConsumers);
                         bcp.add(row);
 
 			h = dInfo.consumerWildcards;
@@ -4018,7 +4017,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 			            row[1] = ar.getString(ar.I_DYNAMIC);
 			        break;
 			        default:
-                                    row[1] = Integer.valueOf(sInfo.port).toString()
+                                    row[1] = Integer.toString(sInfo.port)
 					     + 
  					         " (" 
 				             + 
@@ -4027,7 +4026,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 					         ")";
 			    }
 		        } else {
-                    	    row[1] = Integer.valueOf(sInfo.port).toString() +
+                    	    row[1] = Integer.toString(sInfo.port) +
 				     " (" + ar.getString(ar.I_STATIC) + ")";
 		        }
 		        bcp.add(row);
@@ -4041,11 +4040,11 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 		     * 'Curent' numbers
 		     */
                     row[0] = ar.getString(ar.I_JMQCMD_SVC_CUR_THREADS);
-                    row[1] = Integer.valueOf(sInfo.currentThreads).toString();
+                    row[1] = Integer.toString(sInfo.currentThreads);
 		    bcp.add(row);
 		
                     row[0] = ar.getString(ar.I_JMQCMD_SVC_NUM_CXN);
-                    row[1] = Integer.valueOf(sInfo.nConnections).toString();
+                    row[1] = Integer.toString(sInfo.nConnections);
 		    bcp.add(row);
 
                     row[0] = "";
@@ -4056,11 +4055,11 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 		     * Min/Max numbers
 		     */
                     row[0] = ar.getString(ar.I_JMQCMD_SVC_MIN_THREADS);
-                    row[1] = Integer.valueOf(sInfo.minThreads).toString();
+                    row[1] = Integer.toString(sInfo.minThreads);
 		    bcp.add(row);
 		
                     row[0] = ar.getString(ar.I_JMQCMD_SVC_MAX_THREADS);
-                    row[1] = Integer.valueOf(sInfo.maxThreads).toString();
+                    row[1] = Integer.toString(sInfo.maxThreads);
 		    bcp.add(row);
 
 		
@@ -7649,7 +7648,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
 	 }
 
          if (ret == null)  {
-             ret = Integer.valueOf(value).toString();
+             ret = Integer.toString(value);
          }
 
 	 return (ret);
@@ -7661,7 +7660,7 @@ public class CmdRunner implements BrokerCmdOptions, BrokerConstants, AdminEventL
          if (value == unlimitedValue)  {
              ret = ar.getString(ar.I_UNLIMITED) + " (-1)";
          } else  {
-             ret = Integer.valueOf(value).toString();
+             ret = Integer.toString(value);
          }
 
 	 return (ret);

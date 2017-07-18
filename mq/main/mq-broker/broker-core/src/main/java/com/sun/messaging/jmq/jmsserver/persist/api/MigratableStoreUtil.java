@@ -81,7 +81,7 @@ public final class MigratableStoreUtil {
         if (ind <= 0 || ind == (brokerid.length()-1)) {
             throw new BrokerException("Malformed effective brokerid "+brokerid);
         }
-        return new UID(Long.valueOf(brokerid.substring(ind+1)).longValue());
+        return new UID(Long.parseLong(brokerid.substring(ind+1)));
     }
 
     public static String makeReplicationGroupID(String instName, UID storeSession)

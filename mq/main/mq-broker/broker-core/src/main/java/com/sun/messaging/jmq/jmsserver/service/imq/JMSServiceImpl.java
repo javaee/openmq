@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -2699,7 +2699,7 @@ public class JMSServiceImpl implements JMSService
                 // remove the event listener since we arent sure if we will care
                 c.removeEventListener(lock);
             }
-            if (stopped) return null;
+            //if (stopped) return null;
             synchronized (c.getConsumerUID()) {
                 cuidNotify.remove(c.getConsumerUID());
             }

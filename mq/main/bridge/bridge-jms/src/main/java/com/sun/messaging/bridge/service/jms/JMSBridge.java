@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -1196,12 +1196,12 @@ public class JMSBridge {
         String val = attrs.getProperty(JMSBridgeXMLConstant.CF.CONNECTATTEMPTS,
                                        JMSBridgeXMLConstant.CF.CONNECTATTEMPTS_DEFAULT);
         if (val != null) {
-            maxAttempts = Integer.valueOf(val);
+            maxAttempts = Integer.parseInt(val);
         }
         val = attrs.getProperty(JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL,
                                 JMSBridgeXMLConstant.CF.CONNECTATTEMPTINTERVAL_DEFAULT);
         if (val != null) {
-            attemptInterval = Integer.valueOf(val);
+            attemptInterval = Long.parseLong(val);
         }
         if (attemptInterval < 0) attemptInterval = 0;
         attemptInterval = attemptInterval*1000;

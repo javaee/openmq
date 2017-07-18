@@ -3013,7 +3013,7 @@ public class FileStore extends Store implements PartitionedStore,
                 msgStore.removeMessage(did, mid, false);
             } else {
                 logger.log(logger.FORCE,
-                    BrokerResources.I_RECONSTRUCT_MSG_TXNLOG, mid);
+                    BrokerResources.I_RECONSTRUCT_MSG_TXNLOG, mid, dst + "[load]");
             }
 
             PacketReference pr =
