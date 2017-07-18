@@ -134,7 +134,7 @@ implements javax.resource.spi.LocalTransaction
             if (!xac._isClosed()) {
                 xac.getProtocolHandler().rollback(transactionID, null);
             } else {
-                ResourceException re = new EISSystemException("MQRA:LT:rillbackTransaction exception:Connection is closed");
+                ResourceException re = new EISSystemException("MQRA:LT:rollbackTransaction exception:Connection is closed");
                 throw re;
             }
         } catch (Exception ex) {
