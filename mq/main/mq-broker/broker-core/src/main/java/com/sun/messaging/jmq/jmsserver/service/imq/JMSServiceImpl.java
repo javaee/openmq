@@ -2638,6 +2638,8 @@ public class JMSServiceImpl implements JMSService
 
                 // add an event listener to wake us up when the consumer is busy
                 Object lock = c.addEventListener(this,EventType.BUSY_STATE_CHANGED, null);
+                try {
+
                 while (!c.isBusy() || stopped) {
                     try {
                         // wait until the consumer is not busy
@@ -2697,6 +2699,10 @@ public class JMSServiceImpl implements JMSService
 			}
                     } catch (Exception ex) {}
                 // remove the event listener since we arent sure if we will care
+                //c.removeEventListener(lock);
+            } //while
+
+            } finally { 
                 c.removeEventListener(lock);
             }
             //if (stopped) return null;
