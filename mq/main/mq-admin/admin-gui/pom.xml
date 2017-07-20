@@ -113,7 +113,7 @@
             <artifactId>mqadmin-cli</artifactId>
           </dependency>
           <dependency>
-            <groupId>javax.help</groupId>
+            <groupId>org.glassfish.external</groupId>
             <artifactId>javahelp</artifactId>
 	  </dependency>
       </dependencies>

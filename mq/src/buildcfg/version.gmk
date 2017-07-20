@@ -59,7 +59,7 @@
 VERSION_NUM = 1
 
 # general version info
-JMQ_BUILD_NUMBER= 4
+JMQ_BUILD_NUMBER= 5
 JMQ_BUILD_LETTER= a
 
 #

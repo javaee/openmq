@@ -67,7 +67,7 @@
 
     <properties>
 	<!-- Change these for each build -->
-	<build.number>4</build.number>
+	<build.number>5</build.number>
         <build.letter>a</build.letter>
 
 	<!-- Product-specific -->
@@ -99,7 +99,7 @@
         <servlet-api.version>4.0.0-b07</servlet-api.version>
         <jsp-api.version>2.3.2-b02</jsp-api.version>
         <javax.resource-api.version>1.7</javax.resource-api.version>
-        <javahelp.version>2.0.05</javahelp.version>
+        <javahelp.version>2.0.06</javahelp.version>
 
         <jaf.version>1.1.1</jaf.version>
         <javamail.version>1.6.0-rc2</javamail.version>
@@ -850,7 +850,7 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>javax.help</groupId>
+                <groupId>org.glassfish.external</groupId>
                 <artifactId>javahelp</artifactId>
                 <version>${javahelp.version}</version>
             </dependency>
