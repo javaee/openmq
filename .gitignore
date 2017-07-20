@@ -1,0 +1,4 @@
+# Ignore target directories
+**/target/**
+# Ignore examples .class
+**/src/share/java/examples/**/*.class
