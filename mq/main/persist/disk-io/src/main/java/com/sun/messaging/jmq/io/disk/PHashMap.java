@@ -339,6 +339,7 @@ public class PHashMap extends ConcurrentHashMap {
         return oldValue;
     }
 
+    @Override
     public Object remove(Object key) {
 	checkLoaded();
 
@@ -363,6 +364,7 @@ public class PHashMap extends ConcurrentHashMap {
         throw new UnsupportedOperationException("Operation not supported");
     }
 
+    @Override
     public void clear() {
 	checkLoaded();
 
@@ -395,14 +397,7 @@ public class PHashMap extends ConcurrentHashMap {
     public ConcurrentHashMap.KeySetView keySet() {
 	checkLoaded();
 
-	ConcurrentHashMap.KeySetView set = keySet;
-        if (set == null) {
-            ConcurrentHashMap map = new ConcurrentHashMap(this);
-            keySet = map.keySet();
-            set = keySet;
-        }
-
-	return set;
+	return super.keySet();
     }
 
     public VRFileWarning getWarning() {
@@ -439,7 +434,6 @@ public class PHashMap extends ConcurrentHashMap {
     // Views: key set, entry set, and value collection
 
     private Set entrySet = null;
-    private ConcurrentHashMap.KeySetView keySet = null;
     private Collection values = null;
 
     private void removeFromFile(Object key) throws IOException {
