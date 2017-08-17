@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2012-2016 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2012-2017 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -67,7 +67,7 @@
 
     <properties>
 	<!-- Change these for each build -->
-	<build.number>5</build.number>
+	<build.number>6</build.number>
         <build.letter>a</build.letter>
 
 	<!-- Product-specific -->
@@ -85,27 +85,27 @@
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 	<!-- Versions of dependencies -->
-        <hk2.version>2.5.0-b36</hk2.version>
-        <hk2.plugin.version>2.5.0-b33</hk2.plugin.version>
+        <hk2.version>2.5.0-b42</hk2.version>
+        <hk2.plugin.version>2.5.0-b42</hk2.plugin.version>
         <glassfishbuild.version>3.2.4</glassfishbuild.version>
         <glassfish.version>4.1.2</glassfish.version>
-        <grizzly.version>2.4.0-beta9</grizzly.version>
+        <grizzly.version>2.4.1</grizzly.version>
 
 	<!-- begin of websocket dependencies -->
 	<json.version>1.1</json.version>
         <tyrus.version>1.13.1</tyrus.version>
 	<!-- end of websocket dependencies -->
 	
-        <servlet-api.version>4.0.0-b07</servlet-api.version>
+        <servlet-api.version>4.0.0</servlet-api.version>
         <jsp-api.version>2.3.2-b02</jsp-api.version>
         <javax.resource-api.version>1.7</javax.resource-api.version>
         <javahelp.version>2.0.06</javahelp.version>
 
         <jaf.version>1.1.1</jaf.version>
-        <javamail.version>1.6.0-rc2</javamail.version>
+        <javamail.version>1.6.0</javamail.version>
         <javax.xml.soap-api.version>1.4.0-b01</javax.xml.soap-api.version>
         <saaj-impl.version>1.4.0-b03</saaj-impl.version>
-        <junit.version>4.10</junit.version>
+        <junit.version>4.12</junit.version>
         <findbugs.skip>false</findbugs.skip>
         <findbugs.threshold>High</findbugs.threshold>
         <findbugs.exclude />

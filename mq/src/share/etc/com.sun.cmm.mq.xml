@@ -123,7 +123,7 @@
        The InstalledProduct's Build Number.
        --> 
        <param-name>BuildNumber</param-name>   
-       <param-value>5</param-value> 
+       <param-value>6</param-value> 
     </parameter>
     
     <parameter> 
