@@ -131,12 +131,12 @@
     <tr valign="middle">
       <td><div>JMS over WebSocket</div></td>
       <td>&nbsp;</td>
-      <td><div>Allows MQ JMS clients connect to broker over WebSocket</div></td>
+      <td><div>Allows MQ JMS clients connect to broker over WebSocket (<a href="https://javaee.github.io/openmq/www/5.0.1/ws.html">details</a>)</div></td>
     </tr>
     <tr valign="middle">
       <td><div>STOMP over WebSocket</div></td>
       <td>&nbsp;</td>
-      <td><div>Allows STOMP clients connect to broker over WebSocket</div></td>
+      <td><div>Allows STOMP clients connect to broker over WebSocket (<a href="https://javaee.github.io/openmq/www/5.0.1/ws.html">details</a>)</div></td>
     </tr>
     <tr valign="middle">
       <td><div>JMS Bridge Service</div></td>
