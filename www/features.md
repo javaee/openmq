@@ -129,6 +129,26 @@
       <td><div>Allows JMS messaging through firewall tunneling </div></td>
     </tr>
     <tr valign="middle">
+      <td><div>JMS over WebSocket</div></td>
+      <td>&nbsp;</td>
+      <td><div>Allows MQ JMS clients connect to broker over WebSocket</div></td>
+    </tr>
+    <tr valign="middle">
+      <td><div>STOMP over WebSocket</div></td>
+      <td>&nbsp;</td>
+      <td><div>Allows STOMP clients connect to broker over WebSocket</div></td>
+    </tr>
+    <tr valign="middle">
+      <td><div>JMS Bridge Service</div></td>
+      <td>&nbsp;</td>
+      <td><div>Allows Message Queue broker to communicate with clients of the external JMS providers</div></td>
+    </tr>
+    <tr valign="middle">
+      <td><div>STOMP Bridge Service</div></td>
+      <td>&nbsp;</td>
+      <td><div>Allows STOMP clients connect to broker over TCP</div></td>
+    </tr>
+    <tr valign="middle">
       <td><div>GUI based administration utility  </div></td>
       <td>&nbsp;</td>
       <td><div>Basic administration command support </div></td>
@@ -159,24 +179,9 @@
       <td><div>Allows common configuration management integration</div></td>
     </tr>
     <tr valign="middle">
-      <td><div>Java Enterprise System Management Framework</div></td>
-      <td>&nbsp;</td>
-      <td><div>Integrated management support for Java Enterprise family products </div></td>
-    </tr>
-    <tr valign="middle">
       <td><div>Internationalization</div></td>
       <td>&nbsp;</td>
       <td><div>All message strings can be localized</div></td>
-    </tr>
-    <tr valign="middle">
-      <td><div>Native packages or archive distributions </div></td>
-      <td>&nbsp;</td>
-      <td><div>Can use native install for Solaris, Linux RPM. File archive for OEM or isolated install</div></td>
-    </tr>
-    <tr valign="middle">
-      <td><div>Same product, community or commercial support. No technical barrier to move from community to production support. </div></td>
-      <td>&nbsp;</td>
-      <td><div>Commercial support provides patches, telephone technical support; service response commitments. Develop with confidence that your deployment will be fully supportable without additional developer or deployment expense. </div></td>
     </tr>
   </tbody>
 </table>
