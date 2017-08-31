@@ -36,7 +36,7 @@
     <tr valign="middle">
       <td><div>High Availability (Automatic Takeover) </div></td>
       <td>&nbsp;</td>
-      <td><div>HA via JDBC data store configuration. For best resilience and full availability. Tested with Oracle, GlassFish HADB (Enterprise Profile). MySQL coming soon! </div></td>
+      <td><div>HA via JDBC data store configuration. For best resilience and full availability. Tested with Oracle and MySQL</div></td>
     </tr>
     <tr valign="middle">
       <td><div>High Availability (Active / Standby)  </div></td>
