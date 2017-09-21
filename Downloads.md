@@ -1,9 +1,9 @@
 # Downloads
 
 The latest release of Open Message Queue is 5.1.1.
-This is a quality improvement release which supports JMS 2.0.1
-Open Message Queue 5.1 is the JMS provider included with GlassFish Enterprise Server Open Source Edition 4.1.
+This is a quality improvement release which supports JMS 2.0.1.
 Open Message Queue 5.1.1 is the JMS provider in GlassFish Server 5.0.
+Open Message Queue 5.1 is the JMS provider included with GlassFish Enterprise Server Open Source Edition 4.1.
 
 ## License
 
