@@ -1,9 +1,9 @@
 # Downloads
 
-The latest release of Open Message Queue is 5.1.
-This is a quality improvement and minor feature update which supports JMS 2.0.
+The latest release of Open Message Queue is 5.1.1.
+This is a quality improvement release which supports JMS 2.0.1
 Open Message Queue 5.1 is the JMS provider included with GlassFish Enterprise Server Open Source Edition 4.1.
-Open Message Queue is also included in the Java EE 8 SDK update.
+Open Message Queue 5.1.1 is the JMS provider in GlassFish Server 5.0.
 
 ## License
 
@@ -18,14 +18,9 @@ By downloading the source or binary archives from this site, you are agreeing to
 
 ## Downloads
 
-Open Message Queue is available for Solaris Sparc, Solaris x86, AIX, Linux, and Windows. 
-Select the version you desire from the tables below.
+### Open MQ 5.1.1 Latest Developer Release
 
-### Open MQ 5.1.1 Promoted Builds
-
-Open MQ 5.1.1 is currently under development. 
-
-Index of [Open MQ 5.1.1 Promoted Builds](http://download.oracle.com/mq/open-mq/5.1.1/index.html)
+[Open MQ 5.1.1 Latest Release](http://download.oracle.com/mq/open-mq/5.1.1/latest/index.html)
 
 ### Open MQ 5.1 Latest Developer Release, Binary Downloads 
 
