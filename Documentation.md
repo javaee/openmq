@@ -9,7 +9,7 @@ Open Message Queue 5 documentation is available as part of the [GlassFish Server
 | :--- | :--- | :--- |  
 | Javadocs (including JMS 2.0) | | [browse](https://javaee.github.io/openmq/www/javadoc/5.0/javadoc/index.html) |
 | Technical Overview | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-tech-over.pdf) |
-| Release Notes | [pdf](https://javaee.github.io/glassfish/doc/5.0/mq-release-notes.pdf) |
+| Open MQ 5.1.1 Release Notes | [pdf](https://javaee.github.io/glassfish/doc/5.0/mq-release-notes.pdf) |
 | Developer's Guide for Java Clients | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-java.pdf) |
 | Developer's Guide for JMX Clients | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-jmx.pdf) |
 | Developer's Guide for C Clients | [pdf](https://javaee.github.io/glassfish/doc/4.0/mq-dev-guide-c.pdf) |
