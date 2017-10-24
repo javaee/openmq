@@ -55,7 +55,7 @@ Welcome_WELCOME_TEXT=${BODY_START}&lt;b&gt;${PRODUCT_NAME}&lt;/b&gt; \uc124\uce5
 
 RegistrationWelcome_WELCOME_TEXT=${BODY_START}&lt;b&gt;${PRODUCT_NAME}&lt;/b&gt; \uc124\uce58 \ud504\ub85c\uadf8\ub7a8\uc785\ub2c8\ub2e4(\ub4f1\ub85d \uc804\uc6a9 \ubaa8\ub4dc).&lt;BR&gt;&lt;BR&gt;${Copyright_HTML_FRAGMENT}${BODY_END}
 
-Copyright_HTML_FRAGMENT=Copyright (c) 2010, Oracle and/or its affiliates. \ubaa8\ub4e0 \uad8c\ub9ac\ub294 \uc800\uc791\uad8c\uc790\uc758 \uc18c\uc720\uc785\ub2c8\ub2e4.
+Copyright_HTML_FRAGMENT=Copyright (c) 2010-2017 Oracle and/or its affiliates. \ubaa8\ub4e0 \uad8c\ub9ac\ub294 \uc800\uc791\uad8c\uc790\uc758 \uc18c\uc720\uc785\ub2c8\ub2e4.
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~L I C E N S E   P A G E~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

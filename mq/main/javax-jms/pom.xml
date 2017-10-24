@@ -78,7 +78,7 @@
     <licenses>
         <license>
             <name>CDDL + GPLv2 with classpath exception</name>
-            <url>https://glassfish.java.net/nonav/public/CDDL+GPL_1_1.html</url>
+            <url>https://oss.oracle.com/licenses/CDDL+GPL-1.1</url>
             <distribution>repo</distribution>
             <comments>A business-friendly OSS license</comments>
         </license>
@@ -86,7 +86,7 @@
 
     <developers>
         <developer>
-            <url>http://java.net/projects/jms-spec/pages/Home/</url>
+            <url>https://javaee.github.io/jms-spec/</url>
             <organization>Oracle Corporation</organization>
         </developer>
     </developers>

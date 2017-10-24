@@ -65,7 +65,7 @@ RegistrationWelcome_WELCOME_TEXT=${BODY_START}\
            ${Copyright_HTML_FRAGMENT}\
            ${BODY_END}
 
-Copyright_HTML_FRAGMENT=Copyright (c) 2011, Oracle and/or its affiliates.  All rights reserved.
+Copyright_HTML_FRAGMENT=Copyright (c) 2011-2017 Oracle and/or its affiliates.  All rights reserved.
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~L I C E N S E   P A G E~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

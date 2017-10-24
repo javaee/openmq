@@ -114,168 +114,19 @@ public class Version {
      *String representing the value of the mini copyright  of the product
      */
     private String miniCopyright =
-        "Copyright (c) 2013, Oracle and/or its affiliates.  All rights reserved.";
+        "Copyright (c) 2013-2017 Oracle and/or its affiliates.  All rights reserved.";
 
     /**
      * String representing the shortCopyright of the product
      */
     private String shortCopyright =
-        "Copyright (c) 2013, Oracle and/or its affiliates.  All rights reserved.";
-/*
-        "Copyright (c) 2013 Sun Microsystems, Inc. All rights reserved.\n" +
-	"\n" +
-        "Sun Microsystems, Inc. has intellectual property rights relating\n" +
-        "to technology embodied in the product that is described in this\n" +
-        "document.  In particular, and without limitation, these\n" +
-        "intellectual property rights may include one or more of the U.S.\n" +
-        "patents listed at http://www.sun.com/patents and one or more\n" +
-        "additional patents or pending patent applications in the U.S.\n" +
-        "and in other countries.\n" +
-	"\n" +
-        "U.S. Government Rights - Commercial software. Government users\n" +
-        "are subject to the Sun Microsystems, Inc. standard license\n" +
-        "agreement and applicable provisions of the FAR and its supplements.\n" +
-	"\n" +
-        "Use is subject to license terms.\n" +
-	"\n" +
-        "This distribution may include materials developed by third\n" +
-        "parties.Sun, Sun Microsystems, the Sun logo, Java, Solaris,\n" +
-        "SunTone, The Network is the Computer, We're the dot in .com,\n" +
-        "iForce and Sun GlassFish Message Queue are trademarks or\n" +
-        "registered trademarks of Sun Microsystems, Inc. in the U.S. and\n" +
-        "other countries. All SPARC trademarks are used under license and\n" +
-        "are trademarks or registered trademarks of SPARC International,\n" +
-        "Inc. in the U.S. and other countries.\n" +
-	"\n" +
-        "UNIX is a registered trademark in the U.S. and other countries,\n" +
-        "exclusively licensed through X/Open Company, Ltd.\n" +
-	"\n" +
-        "Sun Microsystems, Inc. d\u00e9tient les droits de propri\u00e9t\u00e9\n" +
-        "intellectuels relatifs \u00e0 la technologie incorpor\u00e9e dans le\n" +
-        "produit qui est d\u00e9crit dans ce document. En particulier, et ce\n" +
-        "sans limitation, ces droits de propri\u00e9t\u00e9 intellectuelle peuvent\n" +
-        "inclure un ou plus des brevets am\u00e9ricains list\u00e9s \u00e0 l'adresse\n" +
-        "http://www.sun.com/patents et un ou les brevets suppl\u00e9mentaires\n" +
-        "ou les applications de brevet en attente aux Etats - Unis et\n" +
-        "dans les autres pays.\n" +
-	"\n" +
-        "L'utilisation est soumise aux termes du contrat de licence.\n" +
-	"\n" +
-        "Cette distribution peut comprendre des composants d\u00e9velopp\u00e9s par\n" +
-        "des tierces parties.\n" +
-	"\n" +
-        "Sun, Sun Microsystems, le logo Sun, Java, Solaris, SunTone, The\n" +
-        "Network is the Computer, We're the dot in .com, iForce et Sun\n" +
-        "GlassFish Message Queue sont des marques de fabrique ou des\n" +
-        "marques d\u00e9pos\u00e9es de Sun Microsystems, Inc. aux Etats-Unis et\n" +
-        "dans d'autres pays.\n" +
-	"\n" +
-        "Toutes les marques SPARC sont utilis\u00e9es sous licence et sont des\n" +
-        "marques de fabrique ou des marques d\u00e9pos\u00e9es de SPARC\n" +
-        "International, Inc. aux Etats-Unis et dans d'autres pays.\n" +
-	"\n" +
-        "UNIX est une marque d\u00e9pos\u00e9e aux Etats-Unis et dans d'autres pays\n" +
-        "et licenci\u00e9e exlusivement par X/Open Company, Ltd.\n";
-*/
+        "Copyright (c) 2013-2017 Oracle and/or its affiliates.  All rights reserved.";
 
     /**
      *String representing the long copyright value of the product
      */
     private String longCopyright =
-        "Copyright (c) 2013, Oracle and/or its affiliates.  All rights reserved.";
-/*
-        "Copyright (c) 2013 Sun Microsystems, Inc., 4150 Network Circle,\n" +
-        "Santa Clara, California 95054, U.S.A.  All rights reserved.\n" +
-	"\n" +
-        "Sun Microsystems, Inc. has intellectual property rights relating\n" +
-        "to technology embodied in the product that is described in this\n" +
-        "document.  In particular, and without limitation, these\n" +
-        "intellectual property rights may include one or more of the U.S.\n" +
-        "patents listed at http://www.sun.com/patents and one or more\n" +
-        "additional patents or pending patent applications in the U.S.\n" +
-        "and in other countries.\n" +
-	"\n" +
-        "U.S. Government Rights - Commercial software.  Government users\n" +
-        "are subject to the Sun Microsystems, Inc. standard license\n" +
-        "agreement and applicable provisions of the FAR and its supplements.\n" +
-	"\n" +
-        "Use is subject to license terms.\n" +
-	"\n" +
-        "This distribution may include materials developed by third parties.\n" +
-	"\n" +
-        "Sun, Sun Microsystems, the Sun logo, Java, Solaris, SunTone, The\n" +
-        "Network is the Computer, We're the dot in .com, iForce, Sun\n" +
-        "GlassFish Message Queue , Sun Java Enterprise System and Sun Java\n" +
-        "System are trademarks or registered trademarks of Sun\n" +
-        "Microsystems, Inc. in the U.S. and other countries.\n" +
-	"\n" +
-        "All SPARC trademarks are used under license and are trademarks\n" +
-        "or registered trademarks of SPARC International, Inc. in the\n" +
-        "U.S. and other countries.  Products bearing SPARC trademarks are\n" +
-        "based upon architecture developed by Sun Microsystems, Inc.\n" +
-	"\n" +
-        "UNIX is a registered trademark in the U.S. and other countries,\n" +
-        "exclusively licensed through X/Open Company, Ltd.\n" +
-	"\n" +
-        "This product is covered and controlled by U.S. Export Control\n" +
-        "laws and may be subject to the export or import laws in other\n" +
-        "countries.  Nuclear, missile, chemical biological weapons or\n" +
-        "nuclear maritime end uses or end users, whether direct or\n" +
-        "indirect, are strictly prohibited.  Export or reexport to\n" +
-        "countries subject to U.S. embargo or to entities identified on\n" +
-        "U.S. export exclusion lists, including, but not limited to, the\n" +
-        "denied persons and specially designated nationals lists is\n" +
-        "strictly prohibited.\n" +
-	"\n" +
-        "Copyright (c) 2013 Sun Microsystems, Inc., 4150 Network Circle,\n" +
-        "Santa Clara, California 95054, Etats-Unis.  Tous droits r\u00e9serv\u00e9s.\n" +
-	"\n" +
-        "Sun Microsystems, Inc. d\u00e9tient les droits de propri\u00e9t\u00e9\n" +
-        "intellectuels relatifs \u00e0 la technologie incorpor\u00e9e dans le\n" +
-        "produit qui est d\u00e9crit dans ce document.  En particulier, et ce\n" +
-        "sans limitation, ces droits de propri\u00e9t\u00e9 intellectuelle peuvent\n" +
-        "inclure un ou plus des brevets am\u00e9ricains list\u00e9s \u00e0 l'adresse\n" +
-        "http://www.sun.com/patents et un ou les brevets suppl\u00e9mentaires\n" +
-        "ou les applications de brevet en attente aux Etats - Unis et\n" +
-        "dans les autres pays.\n" +
-	"\n" +
-        "L'utilisation est soumise aux termes de la Licence.\n" +
-	"\n" +
-        "Cette distribution peut comprendre des composants d\u00e9velopp\u00e9s par\n" +
-        "des tierces parties.\n" +
-	"\n" +
-        "Sun, Sun Microsystems, le logo Sun, Java, Solaris, SunTone, The\n" +
-        "Network is the Computer, We're the dot in .com, iForce, Sun Glassfish\n" +
-        "Message Queue , Sun Java Enterprise System et Sun Java\n" +
-        "System sont des marques de fabrique ou des marques d\u00e9pos\u00e9es de\n"+
-        "Sun Microsystems, Inc. aux Etats-Unis et dans d'autres pays.\n" +
-	"\n" +
-        "Toutes les marques SPARC sont utilis\u00e9es sous licence et sont des\n" +
-        "marques de fabrique ou des marques d\u00e9pos\u00e9es de SPARC\n" +
-        "International, Inc. aux Etats-Unis et dans d'autres pays.  Les\n" +
-        "produits portant les marques SPARC sont bas\u00e9s sur une\n" +
-        "architecture d\u00e9velopp\u00e9e par Sun Microsystems, Inc.\n" +
-	"\n" +
-        "UNIX est une marque d\u00e9pos\u00e9e aux Etats-Unis et dans d'autres pays\n" +
-        "et licenci\u00e9e exlusivement par X/Open Company, Ltd.\n" +
-	"\n" +
-        "Ce produit est soumis \u00e0 la l\u00e9gislation am\u00e9ricaine en mati\u00e8re de\n" +
-        "contr\u00f4le des exportations et peut \u00eatre soumis \u00e0 la\n" +
-        "r\u00e8glementation en vigueur dans d'autres pays dans le domaine des\n" +
-        "exportations et importations.  Les utilisations, ou utilisateurs\n" +
-        "finaux, pour des armes nucl\u00e9aires,des missiles, des armes\n" +
-        "biologiques et chimiques ou du nucl\u00e9aire maritime, directement\n" +
-        "ou indirectement, sont strictement interdites.  Les exportations\n" +
-        "ou r\u00e9exportations vers les pays sous embargo am\u00e9ricain, ou vers\n" +
-        "des entit\u00e9s figurant sur les listes d'exclusion d'exportation\n" +
-        "am\u00e9ricaines, y compris, mais de mani\u00e8re non exhaustive, la liste\n" +
-        "de personnes qui font objet d'un ordre de ne pas participer,\n" +
-        "d'une fa\u00e7on directe ou indirecte, aux exportations des produits\n" +
-        "ou des services qui sont r\u00e9gis par la l\u00e9gislation am\u00e9ricaine en\n" +
-        "mati\u00e8re de contr\u00f4le des exportations et la liste de\n" +
-        "ressortissants sp\u00e9cifiquement d\u00e9sign\u00e9s, sont rigoureusement\n" +
-        "interdites.\n";
-*/
+        "Copyright (c) 2013-2017 Oracle and/or its affiliates.  All rights reserved.";
 
     /**
      * Represents the mini copyright value for the product
