@@ -967,7 +967,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.3.1</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
       </dependency>
     </dependencies>
