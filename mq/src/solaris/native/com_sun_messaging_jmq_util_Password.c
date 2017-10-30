@@ -1,32 +1,19 @@
-#include <jni.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include "com_sun_messaging_jmq_util_Password.h"
-#if defined(HPUX)
-#include <string.h>
-#include <sys/termios.h>
-#endif
-#if defined(AIX)
-#include <string.h>
-#include <termios.h>
-#endif
-
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
  * may not use this file except in compliance with the License.  You can
  * obtain a copy of the License at
- * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
- * or packager/legal/LICENSE.txt.  See the License for the specific
+ * https://oss.oracle.com/licenses/CDDL+GPL-1.1
+ * or LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
  *
  * When distributing the software, include this License Header Notice in each
- * file and include the License file at packager/legal/LICENSE.txt.
+ * file and include the License file at LICENSE.txt.
  *
  * GPL Classpath Exception:
  * Oracle designates this particular file as subject to the "Classpath"
@@ -50,6 +37,19 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+
+#include <jni.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include "com_sun_messaging_jmq_util_Password.h"
+#if defined(HPUX)
+#include <string.h>
+#include <sys/termios.h>
+#endif
+#if defined(AIX)
+#include <string.h>
+#include <termios.h>
+#endif
 
 /*
  * @(#)com_sun_messaging_jmq_util_Password.c	1.9 07/02/07
