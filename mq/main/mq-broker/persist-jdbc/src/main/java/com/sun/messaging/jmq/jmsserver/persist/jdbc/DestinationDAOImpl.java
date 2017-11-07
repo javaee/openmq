@@ -146,13 +146,6 @@ class DestinationDAOImpl extends BaseDAOImpl implements DestinationDAO {
             .append(   dbMgr.getTableName( MessageDAO.TABLE_NAME_PREFIX ) )
             .append(   " WHERE " )
             .append(   MessageDAO.DESTINATION_ID_COLUMN ).append( " = ?)" )
-            .append( " AND NOT EXISTS (SELECT * FROM " )
-            .append(   dbMgr.getTableName( BrokerDAO.TABLE_NAME_PREFIX ) )
-            .append(   " WHERE " )
-            .append(   BrokerDAO.ID_COLUMN ).append( " <> ? " )
-            .append(   " AND " )
-            .append(   BrokerDAO.STATE_COLUMN ).append( " = " )
-            .append(   BrokerState.I_OPERATING ).append( ")" )
             .toString();
 
         selectSQL = new StringBuffer(128)
@@ -556,7 +549,6 @@ class DestinationDAOImpl extends BaseDAOImpl implements DestinationDAO {
                 pstmt = dbMgr.createPreparedStatement( conn, sql );
                 pstmt.setString( 1, destName );
                 pstmt.setString( 2, destName );
-                pstmt.setString( 3, dbMgr.getBrokerID() );
             } else {
                 sql = deleteSQL;
                 pstmt = dbMgr.createPreparedStatement( conn, sql );
