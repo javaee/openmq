@@ -4,7 +4,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2000-2018 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -123,7 +123,7 @@
        The InstalledProduct's Build Number.
        --> 
        <param-name>BuildNumber</param-name>   
-       <param-value>6</param-value> 
+       <param-value>1</param-value> 
     </parameter>
     
     <parameter> 
@@ -139,7 +139,7 @@
        The InstalledProduct's Revision
        --> 
        <param-name>RevisionNumber</param-name>   
-       <param-value>5.1.1</param-value> 
+       <param-value>5.1.2</param-value> 
     </parameter>
     
     <parameter>
@@ -188,7 +188,7 @@
        The scoping Product's version.
        -->    
        <param-name>ProductVersion</param-name>   
-       <param-value>5.1.1.0</param-value>
+       <param-value>5.1.2.0</param-value>
     </parameter>
     
     
