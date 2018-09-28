@@ -44,19 +44,10 @@
 
 package com.sun.messaging.jmq.jmsserver.service.imq;
 
-import java.io.IOException;
-import java.security.Principal;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
-
-import javax.jms.JMSException;
-
 import com.sun.messaging.jmq.io.Packet;
+import com.sun.messaging.jmq.io.PacketDispatcher;
 import com.sun.messaging.jmq.io.PacketType;
 import com.sun.messaging.jmq.io.ReadWritePacket;
-import com.sun.messaging.jmq.io.PacketDispatcher;
 import com.sun.messaging.jmq.jmsserver.Globals;
 import com.sun.messaging.jmq.jmsserver.core.Session;
 import com.sun.messaging.jmq.jmsserver.data.PacketRouter;
@@ -70,6 +61,16 @@ import com.sun.messaging.jmq.jmsservice.HandOffQueue;
 import com.sun.messaging.jmq.util.lists.EventType;
 import com.sun.messaging.jmq.util.lists.Reason;
 import com.sun.messaging.jmq.util.log.Logger;
+
+import javax.jms.JMSException;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
+
+import static com.sun.messaging.jmq.jmsserver.comm.CommGlobals.IMQ;
 
 public class IMQDualThreadConnection extends IMQBasicConnection implements DirectBrokerConnection
 {
@@ -288,6 +289,9 @@ public class IMQDualThreadConnection extends IMQBasicConnection implements Direc
        
     public void sendControlMessage(Packet p)
     {
+        if (Globals.getConfig().getBooleanProperty(IMQ + ".simulate.noreply")) {
+            return;
+        }
         if (p.getPacketType() > PacketType.MESSAGE) {
            p.setIP(ipAddress);
            p.setPort(0);

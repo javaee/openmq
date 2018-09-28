@@ -40,7 +40,7 @@
 
 /*
  * @(#)HelloHandler.java	1.71 06/28/07
- */ 
+ */
 
 package com.sun.messaging.jmq.jmsserver.common.handlers;
 
@@ -73,7 +73,7 @@ import com.sun.messaging.jmq.jmsserver.plugin.spi.CoreLifecycleSpi;
 import com.sun.messaging.jmq.util.UID;
 import com.sun.messaging.jmq.util.GoodbyeReason;
 
-
+import static com.sun.messaging.jmq.jmsserver.comm.CommGlobals.IMQ;
 
 
 /**
@@ -84,7 +84,7 @@ import com.sun.messaging.jmq.util.GoodbyeReason;
  * (e.g. tcp does not need the HELLO message to set up a connection, since
  * each socket corresponds to a new connection)
  */
-public class HelloHandler extends PacketHandler 
+public class HelloHandler extends PacketHandler
 {
     private ConnectionManager connectionList;
 
@@ -118,7 +118,7 @@ public class HelloHandler extends PacketHandler
     public static void DUMP(String title) {
         Globals.getLogger().log(Logger.DEBUG,title);
         Globals.getLogger().log(Logger.DEBUG,"------------------------");
-        Globals.getLogger().log(Logger.DEBUG,"Number of connections is " + 
+        Globals.getLogger().log(Logger.DEBUG,"Number of connections is " +
                           Globals.getConnectionManager().getNumConnections(null));
         List l = Globals.getConnectionManager().getConnectionList(null);
         for (int i=0; i < l.size(); i ++ ) {
@@ -139,9 +139,9 @@ public class HelloHandler extends PacketHandler
     /**
      * Method to handle HELLO messages
      */
-    public boolean handle(IMQConnection con, Packet msg) 
-        throws BrokerException 
-    { 
+    public boolean handle(IMQConnection con, Packet msg)
+        throws BrokerException
+    {
 
          if (DEBUG) {
              logger.log(Logger.DEBUGHIGH, "HelloHandler: handle() [ Received Hello Message]");
@@ -407,8 +407,9 @@ public class HelloHandler extends PacketHandler
               }   
           }
 
-          HAMonitorService hamonitor = Globals.getHAMonitorService(); 
-          if (hamonitor != null && hamonitor.inTakeover()) {
+          HAMonitorService hamonitor = Globals.getHAMonitorService();
+          if (hamonitor != null && hamonitor.inTakeover()
+            || Globals.getConfig().getBooleanProperty(IMQ + ".simulate.takeover") ) {
               if (((IMQService)con.getService()).getServiceType() != ServiceType.ADMIN) {
                   status = Status.TIMEOUT;
                   if (oldCID != null) {
