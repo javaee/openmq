@@ -15,7 +15,7 @@ node('java') {
 
             stage('Build') {
                 sh "cd mq; mvn -V -U -e clean package"
-                archive 'mq/dist/bundles/mq_5_1_1.zip'
+                archive 'mq/dist/bundles/mq5_1_1.zip'
             }
 
         }
