@@ -40,47 +40,59 @@
 
 /*
  * @(#)IMQIPConnection.java	1.10 11/06/07
- */ 
+ */
 
 package com.sun.messaging.jmq.jmsserver.service.imq;
 
-import java.net.*;
-import java.util.*;
-import java.nio.channels.*;
-import java.nio.channels.spi.*;
-import java.io.*;
-
-import com.sun.messaging.jmq.jmsserver.service.*;
+import com.sun.messaging.jmq.io.BigPacketException;
+import com.sun.messaging.jmq.io.Packet;
+import com.sun.messaging.jmq.io.PacketType;
+import com.sun.messaging.jmq.io.Status;
 import com.sun.messaging.jmq.jmsserver.Globals;
-import com.sun.messaging.jmq.util.log.Logger;
-import com.sun.messaging.jmq.jmsserver.resources.BrokerResources;
-
-import java.security.Principal;
 import com.sun.messaging.jmq.jmsserver.auth.AccessController;
-
-import com.sun.messaging.jmq.io.*;
-import com.sun.messaging.jmq.jmsserver.service.MetricManager;
-
-import com.sun.messaging.jmq.util.admin.ConnectionInfo;
-
-import com.sun.messaging.jmq.util.timer.MQTimer;
-
-import com.sun.messaging.jmq.util.GoodbyeReason;
-
 import com.sun.messaging.jmq.jmsserver.core.PacketReference;
 import com.sun.messaging.jmq.jmsserver.core.Session;
-import com.sun.messaging.jmq.jmsserver.memory.*;
 import com.sun.messaging.jmq.jmsserver.data.PacketRouter;
-import com.sun.messaging.jmq.util.net.IPAddress;
+import com.sun.messaging.jmq.jmsserver.memory.MemoryCallback;
+import com.sun.messaging.jmq.jmsserver.memory.MemoryGlobals;
+import com.sun.messaging.jmq.jmsserver.net.ProtocolStreams;
+import com.sun.messaging.jmq.jmsserver.resources.BrokerResources;
+import com.sun.messaging.jmq.jmsserver.service.Connection;
+import com.sun.messaging.jmq.jmsserver.service.ConnectionManager;
+import com.sun.messaging.jmq.jmsserver.service.MetricManager;
+import com.sun.messaging.jmq.jmsserver.service.Service;
 import com.sun.messaging.jmq.jmsserver.util.BrokerException;
 import com.sun.messaging.jmq.jmsserver.util.BrokerShutdownRuntimeException;
-import com.sun.messaging.jmq.jmsserver.net.*;
-import com.sun.messaging.jmq.jmsserver.service.ConnectionManager;
-import com.sun.messaging.jmq.util.lists.*;
+import com.sun.messaging.jmq.util.GoodbyeReason;
+import com.sun.messaging.jmq.util.admin.ConnectionInfo;
+import com.sun.messaging.jmq.util.lists.EventType;
+import com.sun.messaging.jmq.util.lists.NFLPriorityFifoSet;
+import com.sun.messaging.jmq.util.lists.Reason;
+import com.sun.messaging.jmq.util.log.Logger;
+import com.sun.messaging.jmq.util.net.IPAddress;
+import com.sun.messaging.jmq.util.timer.MQTimer;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StreamCorruptedException;
+import java.net.InetAddress;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
+import java.nio.channels.spi.AbstractSelectableChannel;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TimerTask;
+import java.util.Vector;
+
+import static com.sun.messaging.jmq.jmsserver.comm.CommGlobals.IMQ;
 
 
-
-public class IMQIPConnection extends IMQBasicConnection 
+public class IMQIPConnection extends IMQBasicConnection
         implements Operation, MemoryCallback
 {
 
@@ -89,16 +101,16 @@ public class IMQIPConnection extends IMQBasicConnection
     /**
      * a value of -1 or 0 turns off feature
      */
-    public static final int closeInterval = Globals.getConfig().getIntProperty(Globals.IMQ + 
+    public static final int closeInterval = Globals.getConfig().getIntProperty(Globals.IMQ +
               ".ping.close.interval", 5);
 
-    public static final boolean enablePingReply = Globals.getConfig().getBooleanProperty(Globals.IMQ + 
+    public static final boolean enablePingReply = Globals.getConfig().getBooleanProperty(Globals.IMQ +
               ".ping.reply.enable", true);
 
     protected int ctrlPktsToConsumer = 0;
 
-    boolean STREAMS = true; 
-    boolean BLOCKING = false; 
+    boolean STREAMS = true;
+    boolean BLOCKING = false;
 
     protected Set tmpDestinations = Collections.synchronizedSet(new HashSet());
 
@@ -112,7 +124,7 @@ public class IMQIPConnection extends IMQBasicConnection
 
    // XXX-CODE TO OVERRIDE BEHAVIOR OF PACKETS
 
-   // to override the type of packet ... 
+   // to override the type of packet ...
    //  jmq.packet.[ctrl|read|fill].override = [direct/heap/unset]
    //        direct -> always use direct packets
    //        heap -> always use heap packets
@@ -145,7 +157,7 @@ public class IMQIPConnection extends IMQBasicConnection
                         "DEBUG: Overriding ctrl message "
                         + " packet behavior to HEAP BUFFERS");
                 } else {
-                    Globals.getLogger().log(Logger.ERROR, 
+                    Globals.getLogger().log(Logger.ERROR,
                         "DEBUG: Can not determine behavior from "
                         +" imq.packet.ctrl.override = "+ctrlover
                         +"  not one of the valid setting [heap,direct]");
@@ -168,7 +180,7 @@ public class IMQIPConnection extends IMQBasicConnection
                        "DEBUG: Overriding read packet "
                        + " behavior to HEAP BUFFERS");
                 } else {
-                    Globals.getLogger().log(Logger.ERROR, 
+                    Globals.getLogger().log(Logger.ERROR,
                         "DEBUG: Can not determine behavior from "
                         + " imq.packet.read.override = "+readover
                         +"  not one of the valid setting [heap,direct]");
@@ -192,7 +204,7 @@ public class IMQIPConnection extends IMQBasicConnection
                             "DEBUG: Overriding fill packet "
                             + " behavior to HEAP BUFFERS");
                 } else {
-                    Globals.getLogger().log(Logger.ERROR, 
+                    Globals.getLogger().log(Logger.ERROR,
                       "DEBUG: Can not determine "
                        + " behavior from jmq.packet.fill.override = "
                        +fillover
@@ -229,7 +241,7 @@ public class IMQIPConnection extends IMQBasicConnection
         public void run() {
             con.checkConnection(state);
         }
-    }    
+    }
 
     private StateWatcher stateWatcher = null;
     private long interval = DEFAULT_INTERVAL;
@@ -258,8 +270,8 @@ public class IMQIPConnection extends IMQBasicConnection
      */
 
 
-    public IMQIPConnection(Service svc, ProtocolStreams ps, 
-             PacketRouter router) 
+    public IMQIPConnection(Service svc, ProtocolStreams ps,
+             PacketRouter router)
         throws IOException, BrokerException
     {
         super(svc, router);
@@ -289,7 +301,7 @@ public class IMQIPConnection extends IMQBasicConnection
         ctrlEL = this.control.addEventListener(this,EventType.EMPTY,  null);
 
         setConnectionState(Connection.STATE_CONNECTED);
-        waitingWritePkt = new Packet(OVERRIDE_FILL_PACKET 
+        waitingWritePkt = new Packet(OVERRIDE_FILL_PACKET
                 ? O_FILL_USE_DIRECT : !STREAMS);
 
         if (!isAdminConnection() && Globals.getMemManager() != null)
@@ -324,12 +336,12 @@ public class IMQIPConnection extends IMQBasicConnection
         return ps.getLocalPort();
     }
 
-    /** 
+    /**
      * The debug state of this object
      */
     public synchronized Hashtable getDebugState() {
         Hashtable ht = super.getDebugState();
-        ht.put("pkts[TOTAL](in,out) ", "("+msgsIn + "," + (ctrlPktsToConsumer + 
+        ht.put("pkts[TOTAL](in,out) ", "("+msgsIn + "," + (ctrlPktsToConsumer +
                      msgsToConsumer) + ")");
         for (int i=0; i < pktsIn.length; i ++) {
             if (pktsIn[i] == 0 && pktsOut[i] == 0)
@@ -366,7 +378,7 @@ public class IMQIPConnection extends IMQBasicConnection
             }
         }
         return ht;
-       
+
     }
 
     public ConnectionInfo getConnectionInfo() {
@@ -375,7 +387,7 @@ public class IMQIPConnection extends IMQBasicConnection
         return coninfo;
     }
 
- 
+
     public boolean useDirectBuffers() {
         return (OVERRIDE_CTRL_PACKET ? O_CTRL_USE_DIRECT : !STREAMS);
         // return !STREAMS;
@@ -388,7 +400,7 @@ public class IMQIPConnection extends IMQBasicConnection
     NotificationInfo ninfo = null;
 
     public synchronized AbstractSelectableChannel getChannel() {
-        if (ps == null) 
+        if (ps == null)
             return null;
         return ps.getChannel();
     }
@@ -419,9 +431,9 @@ public class IMQIPConnection extends IMQBasicConnection
      * (if any)
      */
     public synchronized void notifyRelease(
-               OperationRunnable runner, int events) 
+               OperationRunnable runner, int events)
     {
-        /* 
+        /*
          * the thread is giving us UP ...
          */
         int release_events = 0;
@@ -443,18 +455,18 @@ public class IMQIPConnection extends IMQBasicConnection
 
     public synchronized void waitForRelease(long timeout) {
         long waitt = 5000;
-        while (read_assigned != null || write_assigned != null) { 
+        while (read_assigned != null || write_assigned != null) {
             if (timeout <= 0) {
-                Globals.getLogger().log(Logger.WARNING, 
+                Globals.getLogger().log(Logger.WARNING,
                 "Timeout in waiting for runnable threads release in "+this);
                 return;
             }
             Globals.getLogger().log(Logger.INFO, "Waiting for runnable threads release in "+this);
             if (timeout < waitt) waitt = timeout;
             try {
-                wait(waitt); 
+                wait(waitt);
             } catch (InterruptedException e) {
-                Globals.getLogger().log(Logger.WARNING, 
+                Globals.getLogger().log(Logger.WARNING,
                 "Interrupted in waiting for runnable threads release in "+this);
                 return;
             }
@@ -476,8 +488,8 @@ public class IMQIPConnection extends IMQBasicConnection
     }
 
     public synchronized void threadAssigned(
-            OperationRunnable runner, int events) 
-        throws IllegalAccessException 
+            OperationRunnable runner, int events)
+        throws IllegalAccessException
     {
         int release_events = 0;
         if ((events & SelectionKey.OP_WRITE) != 0) {
@@ -494,7 +506,7 @@ public class IMQIPConnection extends IMQBasicConnection
             }
             read_assigned = runner;
          }
- 
+
          if (ninfo != null) {
             if (release_events != 0)
                 ninfo.released(this, release_events);
@@ -524,7 +536,7 @@ public class IMQIPConnection extends IMQBasicConnection
     */
 
 
-    public boolean process(int events, boolean wait) 
+    public boolean process(int events, boolean wait)
         throws IOException
     {
          boolean didSomething = false;
@@ -539,14 +551,14 @@ public class IMQIPConnection extends IMQBasicConnection
                  processedLastIteration = false;
                  if ((events & SelectionKey.OP_WRITE) != 0) {
                      while (true) {
-    
-                         if (writeData(wait) != 
-                            Operation.PROCESS_PACKETS_REMAINING) 
+
+                         if (writeData(wait) !=
+                            Operation.PROCESS_PACKETS_REMAINING)
                          {
                              // wasnt able to write anymore
                              // break out of the loop
                              break;
-                         } 
+                         }
                          processedLastIteration = true;
                          writecount++;
                      }
@@ -589,11 +601,11 @@ public class IMQIPConnection extends IMQBasicConnection
                     userString = principal.getName();
                     userset = true;
                 }
-            } catch (BrokerException e) { 
+            } catch (BrokerException e) {
                 if (IMQBasicConnection.DEBUG)
                     logger.log(Logger.DEBUG,"Exception getting authentication name "
                         + conId, e );
-                        
+
             }
         }
 
@@ -625,15 +637,15 @@ public class IMQIPConnection extends IMQBasicConnection
 // -------------------------------------------------------------------------
 
     public synchronized void closeConnection(
-            boolean force, int reason, String reasonStr) 
-    { 
+            boolean force, int reason, String reasonStr)
+    {
 
         if (state >= Connection.STATE_CLOSED)  {
              logger.log(logger.DEBUG,"Requested close of already closed connection:"
                     + this);
              return;
         }
-               
+
         stopConnection();
         if (Globals.getMemManager() != null)
              Globals.getMemManager().removeMemoryCallback(this);
@@ -641,11 +653,11 @@ public class IMQIPConnection extends IMQBasicConnection
             sayGoodbye(false, reason, reasonStr);
             flushControl(1000);
         }
-        
+
         // CR 6798464: Don't mark connection as closed until we've flushed the queue and sent the GOODBYE
         state = Connection.STATE_CLOSED;
         notifyConnectionClosed();
-        
+
         // clean up everything 
         this.control.removeEventListener(ctrlEL);
         cleanup(reason == GoodbyeReason.SHUTDOWN_BKR);
@@ -690,7 +702,7 @@ public class IMQIPConnection extends IMQBasicConnection
      * destroy the connection to the client
      * clearing out messages, etc
      */
-    public void destroyConnection(boolean force, int reason, String reasonstr) { 
+    public void destroyConnection(boolean force, int reason, String reasonstr) {
         int oldstate = 0;
         boolean destroyOK = false;
         try {
@@ -699,16 +711,16 @@ public class IMQIPConnection extends IMQBasicConnection
                 oldstate = state;
                 if (state >= Connection.STATE_DESTROYING)
                     return;
-    
+
                 if (state < Connection.STATE_CLOSED) {
                      closeConnection(force, reason, reasonstr);
                 }
-    
+
                 setConnectionState(Connection.STATE_DESTROYING);
             }
             Globals.getConnectionManager().removeConnection(getConnectionUID(),
                    force, reason, reasonstr);
-    
+
             if (accessController.isAuthenticated()) {
                 accessController.logout();
             }
@@ -747,8 +759,8 @@ public class IMQIPConnection extends IMQBasicConnection
             destroyOK = true;
             wakeup();
         } finally {
-            if (!destroyOK && reason != GoodbyeReason.SHUTDOWN_BKR 
-                    &&  (Globals.getMemManager() == null 
+            if (!destroyOK && reason != GoodbyeReason.SHUTDOWN_BKR
+                    &&  (Globals.getMemManager() == null
                     || Globals.getMemManager().getCurrentLevel() > 0)) {
 
                 state = oldstate;
@@ -756,8 +768,8 @@ public class IMQIPConnection extends IMQBasicConnection
                     destroyRecurse ++;
                     destroyConnection(force, reason, reasonstr);
                 }
-            } 
-                
+            }
+
             // free the lock
             Globals.getClusterBroadcast().connectionClosed(
                 getConnectionUID(), isAdminConnection());
@@ -765,10 +777,10 @@ public class IMQIPConnection extends IMQBasicConnection
     }
 
     /**
-     * sets the connection state 
+     * sets the connection state
      * @return false if connection being destroyed
      */
-    public boolean setConnectionState(int state) { 
+    public boolean setConnectionState(int state) {
         synchronized (timerLock) {
             this.state = state;
             if (this.state >= Connection.STATE_CLOSED) {
@@ -796,7 +808,7 @@ public class IMQIPConnection extends IMQBasicConnection
                     logger.log(Logger.DEBUG,"InternalError: timer canceled ", ex);
                 }
 
-            } else if (state == Connection.STATE_INITIALIZED 
+            } else if (state == Connection.STATE_INITIALIZED
                    || state == Connection.STATE_AUTH_REQUESTED
                    || state == Connection.STATE_AUTH_RESPONSED) {
                 if (stateWatcher != null) {
@@ -825,8 +837,8 @@ public class IMQIPConnection extends IMQBasicConnection
                 } catch (IllegalStateException ex) {
                     logger.log(Logger.DEBUG,"InternalError: timer canceled ", ex);
                 }
-            } else if (state >= Connection.STATE_AUTHENTICATED 
-                    || state == Connection.STATE_UNAVAILABLE) 
+            } else if (state >= Connection.STATE_AUTHENTICATED
+                    || state == Connection.STATE_UNAVAILABLE)
             {
                 if (stateWatcher != null) {
                     try {
@@ -883,11 +895,14 @@ public class IMQIPConnection extends IMQBasicConnection
      * @param msg message to send back to the client
      */
     public void sendControlMessage(Packet msg) {
+        if (!isAdminConnection() && Globals.getConfig().getBooleanProperty(IMQ + ".simulate.noreply")) {
+            return;
+        }
         if (!isValid() && msg.getPacketType() != PacketType.GOODBYE ) {
             logger.log(Logger.INFO,"Internal Warning: message " + msg
                   + "queued on destroyed connection " + this);
         }
-            
+
         control.add(msg);
         synchronized (control) {
             hasCtrl = !control.isEmpty();
@@ -897,8 +912,8 @@ public class IMQIPConnection extends IMQBasicConnection
     protected void sendControlMessage(Packet msg, boolean priority)
     {
         if (IMQBasicConnection.DEBUG) {
-            logger.log(Logger.DEBUGHIGH, 
-                "IMQIPConnection[ {0} ] queueing Admin packet {1}", 
+            logger.log(Logger.DEBUGHIGH,
+                "IMQIPConnection[ {0} ] queueing Admin packet {1}",
                 this.toString(), msg.toString());
         }
         if (!isValid()) { // we are being destroyed
@@ -912,7 +927,7 @@ public class IMQIPConnection extends IMQBasicConnection
     }
 
 
-    /** 
+    /**
      * Flush all control messages on this connection to
      * the client.
      * @param timeout the lenght of time to try and flush the
@@ -925,7 +940,7 @@ public class IMQIPConnection extends IMQBasicConnection
             return;
         }
 
-        synchronized (flushCtrlLock) { 
+        synchronized (flushCtrlLock) {
             if (IMQBasicConnection.DEBUG) {
                 logger.log(Logger.DEBUG,
                         "Flushing Control Messages with timeout of " + timeout);
@@ -954,7 +969,7 @@ public class IMQIPConnection extends IMQBasicConnection
                 } catch (InterruptedException ex) {
                    // no reason to do anything w/ it
                 }
-                if (flushCtrl && timeout > 0 && 
+                if (flushCtrl && timeout > 0 &&
                     System.currentTimeMillis() >= time+timeout)
                     break;
             }
@@ -962,7 +977,7 @@ public class IMQIPConnection extends IMQBasicConnection
             if (IMQBasicConnection.DEBUG) {
                 if (flush) {
                     logger.log(Logger.DEBUG,
-                        "Control Flush did not complete in timeout of " 
+                        "Control Flush did not complete in timeout of "
                         + timeout);
                 } else {
                     logger.log(Logger.DEBUG,
@@ -999,7 +1014,7 @@ public class IMQIPConnection extends IMQBasicConnection
 
     }
 
-    /** 
+    /**
      * Flush all control and JMS messages on this connection to
      * the client.
      * @param timeout the lenght of time to try and flush the
@@ -1010,14 +1025,14 @@ public class IMQIPConnection extends IMQBasicConnection
             localFlush();
             return;
         }
-        if ( !inCtrlWrite && control.isEmpty() 
+        if ( !inCtrlWrite && control.isEmpty()
             && !inJMSWrite && hasBusySessions()
-            && !flushCritical && !lockCritical) 
+            && !flushCritical && !lockCritical)
         {
             // nothing to do
             return;
         }
-        synchronized (flushLock) { 
+        synchronized (flushLock) {
             if (IMQBasicConnection.DEBUG) {
                 logger.log(Logger.DEBUG,
                         "Flushing Messages with timeout of " + timeout);
@@ -1028,7 +1043,7 @@ public class IMQIPConnection extends IMQBasicConnection
             // window we should still be woken up w/ the ctrl 
             // notify -> since that happens AFTER a message is
             // removed from the list
-            if ( !inCtrlWrite && control.isEmpty() 
+            if ( !inCtrlWrite && control.isEmpty()
                 && !inJMSWrite && hasBusySessions()
                 && !flushCritical && !lockCritical)
             {
@@ -1047,7 +1062,7 @@ public class IMQIPConnection extends IMQBasicConnection
                 } catch (InterruptedException ex) {
                     // valid, no reason to check
                 }
-                if (flush && timeout > 0 && 
+                if (flush && timeout > 0 &&
                     System.currentTimeMillis() >= time+timeout)
                     break;
             }
@@ -1088,18 +1103,18 @@ public class IMQIPConnection extends IMQBasicConnection
         String[] args = {toString(), getConnectionStateString(this.state),
                          getConnectionStateString(state),
                          String.valueOf(interval)};
-        synchronized (this) { 
-            if (this.state >= state) 
-            { 
+        synchronized (this) {
+            if (this.state >= state)
+            {
                 return;
             }
-            if (this.state >= Connection.STATE_CLOSED 
-                || this.state == Connection.STATE_UNAVAILABLE) 
+            if (this.state >= Connection.STATE_CLOSED
+                || this.state == Connection.STATE_UNAVAILABLE)
             {
                 return;
             }
 
-            logger.log(Logger.WARNING, 
+            logger.log(Logger.WARNING,
                  Globals.getBrokerResources().getKString(
 				   BrokerResources.W_CONNECTION_TIMEOUT, args));
         }
@@ -1112,7 +1127,7 @@ public class IMQIPConnection extends IMQBasicConnection
        // dont bother being nice
         destroyConnection(false, GoodbyeReason.CON_FATAL_ERROR,
             Globals.getBrokerResources().getKString(
-            BrokerResources.W_CONNECTION_TIMEOUT, args)); 
+            BrokerResources.W_CONNECTION_TIMEOUT, args));
     }
 
 
@@ -1138,11 +1153,11 @@ public class IMQIPConnection extends IMQBasicConnection
 
     // new method to handle how we get the packet
     // this is overridden in Embedded more to get it from a queue
-    protected boolean readInPacket(Packet p) 
+    protected boolean readInPacket(Packet p)
            throws IllegalArgumentException, StreamCorruptedException, BigPacketException, IOException
     {
         boolean OK = true;
-            
+
         if (STREAMS) {
            assert is!= null;
            readpkt.readPacket(is);
@@ -1170,33 +1185,33 @@ public class IMQIPConnection extends IMQBasicConnection
 
             if (IMQBasicConnection.DEBUG || DUMP_PACKET || IN_DUMP_PACKET) {
                 logger.log(Logger.DEBUG,
-                        "Reading from " + getClass() + "{0} ", 
-                        this.toString() 
+                        "Reading from " + getClass() + "{0} ",
+                        this.toString()
                         + Thread.currentThread());
             }
-    
+
            if (!isValid()) {
                 if (IMQBasicConnection.DEBUG) {
                     logger.log(Logger.DEBUG,
-                            "Invalid Connection {0} ", 
-                            this.toString() + 
+                            "Invalid Connection {0} ",
+                            this.toString() +
                             Thread.currentThread());
                 }
                throw new IOException(
                     "Connection has been closed " + this);
            }
-    
-    
+
+
            try {
                if (readpkt == null) { // heck its a new packet
-                  readpkt = new Packet(OVERRIDE_READ_PACKET 
-                                 ? O_READ_USE_DIRECT 
+                  readpkt = new Packet(OVERRIDE_READ_PACKET
+                                 ? O_READ_USE_DIRECT
                                  : !STREAMS);
                   readpkt.generateSequenceNumber(false);
                   readpkt.generateTimestamp(false);
                   if (IMQBasicConnection.DEBUG) {
-                      logger.log(Logger.DEBUG,  
-                          "IMQIPConnection {0} getting a new read packet {1} ", 
+                      logger.log(Logger.DEBUG,
+                          "IMQIPConnection {0} getting a new read packet {1} ",
                           this.toString(), readpkt.toString());
                   }
                }
@@ -1214,12 +1229,12 @@ public class IMQIPConnection extends IMQBasicConnection
            if (isValid()) {
                try {
                    boolean OK = true;
-            
+
                    OK = readInPacket(readpkt);
                    msgsIn ++;
                    if (readpkt.getPacketType() < PacketType.LAST)
                        pktsIn[readpkt.getPacketType()] ++;
-    
+
                    if (!OK) { // we didnt finish reading
                        return Operation.PROCESS_WRITE_INCOMPLETE;
 
@@ -1233,18 +1248,18 @@ public class IMQIPConnection extends IMQBasicConnection
                        // not just packet version
 
                        if (packetVersion < CURVERSION)
-                           convertPkt = new ConvertPacket(this, 
+                           convertPkt = new ConvertPacket(this,
                                     packetVersion,
                                     CURVERSION);
                    }
                    // convert to new packet type if necessary
                    if (convertPkt != null)
-                       convertPkt.handleReadPacket(readpkt); 
-    
+                       convertPkt.handleReadPacket(readpkt);
+
                } catch (IllegalArgumentException ex) {
                    handleIllegalArgumentExceptionPacket(readpkt, ex);
                    throw ex;
-                       
+
                } catch (OutOfMemoryError ex) {
                    // Dump header to help with debugging (i.e. was it an
                    // unusually large packet? Corrupted read?)
@@ -1252,17 +1267,17 @@ public class IMQIPConnection extends IMQBasicConnection
                     Globals.getBrokerResources().getKString(
                     BrokerResources.M_LOW_MEMORY_READALLOC) + ": " +
                     readpkt.headerToString());
-    
-                   // re-read the packet ... 
+
+                   // re-read the packet ...
                    //  in 99.??? % of the time, we just lost a packet
-                   // 
+                   //
                    // if we fail a second time  or get an unexpected
                    // error ... its fatal for the connection
                     boolean OK = readInPacket(readpkt);
                     if (!OK) { // we didnt finish reading
                         return Operation.PROCESS_WRITE_INCOMPLETE;
                     }
-    
+
                 } catch (StreamCorruptedException ex) {
                    String connStr = getRemoteConnectionString();
                     logger.logStack(Logger.WARNING,
@@ -1285,7 +1300,7 @@ public class IMQIPConnection extends IMQBasicConnection
                     readpkt = clearReadPacket(readpkt);
                     return Operation.PROCESS_PACKETS_REMAINING;
                 }
-    
+
                 if (Globals.getConnectionManager().PING_ENABLED) {
                     updateAccessTime(true);
                 }
@@ -1293,16 +1308,16 @@ public class IMQIPConnection extends IMQBasicConnection
                     countInPacket(readpkt);
                 }
             }
-                      
+
             if (IMQBasicConnection.DEBUG || DUMP_PACKET || IN_DUMP_PACKET) {
                 int flag = (DUMP_PACKET || IN_DUMP_PACKET) ? Logger.INFO
                     : Logger.DEBUGHIGH;
 
                 logger.log(flag, "\n------------------------------"
                     + "\nReceived incoming Packet - Dumping"
-                    + "\nConnection: " + this 
+                    + "\nConnection: " + this
                     + "\n------------------------------"
-                    + "\n" + readpkt.dumpPacketString(">>>>****") 
+                    + "\n" + readpkt.dumpPacketString(">>>>****")
                     + "\n------------------------------");
             }
 
@@ -1325,13 +1340,13 @@ public class IMQIPConnection extends IMQBasicConnection
    	                router.handleMessage(this, readpkt);
                     readpkt = clearReadPacket(readpkt);
                 } catch (OutOfMemoryError ex) {
-                    logger.logStack(Logger.ERROR, 
-                        BrokerResources.E_LOW_MEMORY_FAILED, 
+                    logger.logStack(Logger.ERROR,
+                        BrokerResources.E_LOW_MEMORY_FAILED,
                         ex);
                     throw ex;
                 }
 
-            } finally { 
+            } finally {
                  setCritical(false);
             }
             return Operation.PROCESS_PACKETS_REMAINING;
@@ -1341,7 +1356,7 @@ public class IMQIPConnection extends IMQBasicConnection
             inReadProcess = false;
         }
 
-    } 
+    }
 
 
 // -------------------------------------------------------------------------
@@ -1404,7 +1419,7 @@ public class IMQIPConnection extends IMQBasicConnection
             inWriteProcess = true;
 
             if (IMQBasicConnection.DEBUG) {
-                logger.log(Logger.DEBUG,  
+                logger.log(Logger.DEBUG,
                     "Writing IMQIPConnection {0} ", this.toString());
             }
 
@@ -1421,9 +1436,9 @@ public class IMQIPConnection extends IMQBasicConnection
             }
             if (!isBusy()) {
                 return Operation.PROCESS_PACKETS_COMPLETE;
-            }    
+            }
 
-            
+
             flushCritical = true;
 
             if ((!inCtrlWrite) && (!inJMSWrite)) {
@@ -1448,7 +1463,7 @@ public class IMQIPConnection extends IMQBasicConnection
                 }
                 // first convert it
                 if (convertPkt != null)
-                    convertPkt.handleWritePacket(ctrlpkt); 
+                    convertPkt.handleWritePacket(ctrlpkt);
                 if (IMQBasicConnection.DEBUG || DUMP_PACKET || OUT_DUMP_PACKET) {
                     dumpControlPacket(ctrlpkt);
                 }
@@ -1490,20 +1505,20 @@ public class IMQIPConnection extends IMQBasicConnection
                     return Operation.PROCESS_PACKETS_COMPLETE;
                 }
 
-            }    
+            }
 
             // the broker is no longer in a critical state
             flushCritical = false;
 
             // OK .. now try normal messages
-    
+
             if (IMQBasicConnection.DEBUG) {
-                logger.log(Logger.DEBUGHIGH, 
+                logger.log(Logger.DEBUGHIGH,
                     "IMQIPConnection[ {0} ] - processing "
                     + " normal msg queue", this.toString());
             }
 
-           
+
             // we shouldnt be here if we are paused or waiting for a resume
 
 
@@ -1535,14 +1550,14 @@ public class IMQIPConnection extends IMQBasicConnection
                     // restart the resume flow
 
                     // LKS - XXX
-                    convertPkt.handleWritePacket(waitingWritePkt); 
+                    convertPkt.handleWritePacket(waitingWritePkt);
                 }
 
 
                 // check for connection flow control
                 sent_count ++;
-                boolean aboutToWaitForRF = flowCount != 0 && 
-                                   sent_count >= flowCount;    
+                boolean aboutToWaitForRF = flowCount != 0 &&
+                                   sent_count >= flowCount;
 
                 if (aboutToWaitForRF) {
                     sent_count = 0;
@@ -1552,10 +1567,10 @@ public class IMQIPConnection extends IMQBasicConnection
                 if (IMQBasicConnection.DEBUG || DUMP_PACKET || OUT_DUMP_PACKET) {
                     int flag = (DUMP_PACKET || OUT_DUMP_PACKET) ? Logger.INFO
                             : Logger.DEBUGHIGH;
-    
-                    logger.log(flag, 
+
+                    logger.log(flag,
                           "\n------------------------------"
-                         +"\nSending JMS Packet -[block = "+BLOCKING 
+                         +"\nSending JMS Packet -[block = "+BLOCKING
                          + ",nio = "+!STREAMS+"] " + this + "  Dumping"
                          + "\n" + waitingWritePkt.dumpPacketString("<<<<****")
                          + "\n------------------------------");
@@ -1563,8 +1578,8 @@ public class IMQIPConnection extends IMQBasicConnection
 
             }
 
-    
-            if (inJMSWrite) { 
+
+            if (inJMSWrite) {
                 inJMSWrite = !writeOutPacket(waitingWritePkt);
             }
             lockCritical = false;
@@ -1576,7 +1591,7 @@ public class IMQIPConnection extends IMQBasicConnection
 
             if (waitingWritePkt.getPacketType() < PacketType.LAST)
                    pktsOut[waitingWritePkt.getPacketType()] ++;
-   
+
             if (Globals.getConnectionManager().PING_ENABLED) {
                 updateAccessTime(false);
             }
@@ -1597,21 +1612,21 @@ public class IMQIPConnection extends IMQBasicConnection
              // connection is gone
              logger.log(logger.DEBUGMED, "closed connection " + this, ex);
              inJMSWrite = false;
-             destroyConnection(false, GoodbyeReason.CLIENT_CLOSED, 
+             destroyConnection(false, GoodbyeReason.CLIENT_CLOSED,
                 Globals.getBrokerResources().getKString(
                     BrokerResources.M_CONNECTION_CLOSE));
-             throw ex; 
+             throw ex;
         } finally {
 
              inWriteProcess = false;
 
-             synchronized (flushCtrlLock) { 
+             synchronized (flushCtrlLock) {
                  if (flushCtrl) {
-                      if ((ctrlpkt == null && control.isEmpty()) 
+                      if ((ctrlpkt == null && control.isEmpty())
                                   || !isValid()) {
                           if (IMQBasicConnection.DEBUG) {
                               logger.log(Logger.DEBUG,
-                                  "Done flushing control messages on " 
+                                  "Done flushing control messages on "
                                   + this);
                           }
                           flushCtrl = false;
@@ -1622,11 +1637,11 @@ public class IMQIPConnection extends IMQBasicConnection
                  }
              }
              if (flush) {
-                 synchronized (flushLock) { 
+                 synchronized (flushLock) {
                       if (!isBusy() || !isValid()) {
                           if (IMQBasicConnection.DEBUG) {
                               logger.log(Logger.DEBUG,
-                                     "Done flushing control messages on " 
+                                     "Done flushing control messages on "
                                       + this);
                           }
                           flush = false;
@@ -1640,7 +1655,7 @@ public class IMQIPConnection extends IMQBasicConnection
                      waitingWritePkt = clearWritePacket(waitingWritePkt);
                  }
              }
-        } 
+        }
 
         assert false : " should never happen";
 
@@ -1652,10 +1667,10 @@ public class IMQIPConnection extends IMQBasicConnection
     }
 
     protected void dumpControlPacket(Packet pkt) {
-        int loglevel = ((DUMP_PACKET || OUT_DUMP_PACKET) ? 
+        int loglevel = ((DUMP_PACKET || OUT_DUMP_PACKET) ?
                         Logger.INFO : Logger.DEBUGHIGH);
         logger.log(loglevel, "\n------------------------------"
-                            +"\nSending Control Packet -[block = "+BLOCKING 
+                            +"\nSending Control Packet -[block = "+BLOCKING
                             + ",nio = "+!STREAMS+"]   Dumping"
                             + "\n------------------------------"
                             + "\n" + pkt.dumpPacketString("<<<<****")
@@ -1682,9 +1697,9 @@ public class IMQIPConnection extends IMQBasicConnection
                         ((NotificationInfo)service).setReadyToWrite(this, busy);
                     }
                 }
-            } 
-        } 
-                 
+            }
+        }
+
     }
 
 
@@ -1716,11 +1731,11 @@ public class IMQIPConnection extends IMQBasicConnection
             int count = 0;
             boolean firstpass = true;
             while (true) {
-                try {        
-                    logger.log(Logger.ERROR, 
+                try {
+                    logger.log(Logger.ERROR,
                         Globals.getBrokerResources().getKString(
                         BrokerResources.E_CLOSE_CONN_ON_OOM, this.toString()));
-                    closeConnection(firstpass, 
+                    closeConnection(firstpass,
                         GoodbyeReason.CON_FATAL_ERROR, ex.toString());
                     firstpass = false;
                     break;
@@ -1738,14 +1753,14 @@ public class IMQIPConnection extends IMQBasicConnection
             throw (IOException)ex;
         } else if (ex instanceof BrokerShutdownRuntimeException) {
              logger.log(Logger.INFO, ex.getMessage());
-             closeConnection(true, 
+             closeConnection(true,
                  GoodbyeReason.SHUTDOWN_BKR, ex.toString());
-        } else {     
+        } else {
              logger.logStack(Logger.ERROR, "Internal Error: "
                      + "Received unexpected exception processing connection "
                      + " closing connection", ex);
              // something went wrong, close connection
-             closeConnection(true, 
+             closeConnection(true,
                  GoodbyeReason.CON_FATAL_ERROR, ex.toString());
         }
     }
@@ -1763,8 +1778,8 @@ public class IMQIPConnection extends IMQBasicConnection
     protected void handleIllegalArgumentExceptionPacket(
         Packet pkt, IllegalArgumentException e) {
 
-        logger.log(Logger.ERROR, 
-        "Bad version packet received: "+e.getMessage()+", reject connection ["+this+"]"); 
+        logger.log(Logger.ERROR,
+        "Bad version packet received: "+e.getMessage()+", reject connection ["+this+"]");
 
         // queue a HELLO_REPLY w/ error
         Packet reply = new Packet(useDirectBuffers());
@@ -1822,7 +1837,7 @@ public class IMQIPConnection extends IMQBasicConnection
         boolean sendAck = false;
         if (enablePingReply && closeInterval > 0 && getClientProtocolVersion() >= PacketType.VERSION364 ) {
             sendAck = true;
-            
+
             // see if we need to kill the connection
             // get access time
             long access = getLastResponseTime();
@@ -1834,9 +1849,9 @@ public class IMQIPConnection extends IMQBasicConnection
             // if is, kill the connection
             if (delta >= interval) {
                 logger.log(Logger.INFO, BrokerResources.W_UNRESPONSIVE_CONNECTION,
-                   String.valueOf(this.getConnectionUID().longValue()), 
+                   String.valueOf(this.getConnectionUID().longValue()),
                    String.valueOf(delta/1000));
-                    
+
                 destroyConnection(false,GoodbyeReason.ADMIN_KILLED_CON,
                     "Connection unresponsive");
             }
@@ -1868,8 +1883,8 @@ public class IMQIPConnection extends IMQBasicConnection
         sendResume(cnt, memory, max, true);
     }
 
-    protected void sendResume(int cnt, long memory, 
-          long max, boolean priority) 
+    protected void sendResume(int cnt, long memory,
+          long max, boolean priority)
     {
         if (packetVersion < Packet.VERSION1)
             return; // older protocol cant handle resume
@@ -1891,11 +1906,11 @@ public class IMQIPConnection extends IMQBasicConnection
 
     /**
      * called when either the session or the
-     * control message is busy 
+     * control message is busy
      */
     public void eventOccured(EventType type,  Reason r,
-            Object target, Object oldval, Object newval, 
-            Object userdata) 
+            Object target, Object oldval, Object newval,
+            Object userdata)
     {
 
         // LKS - at this point, we are in a write lock
@@ -1904,18 +1919,18 @@ public class IMQIPConnection extends IMQBasicConnection
 
         synchronized (stateLock) {
             if (type == EventType.EMPTY) {
-    
+
                 // this can only be from the control queue
                 assert target == control;
                 assert newval instanceof Boolean;
-    
-            } else if (type == 
+
+            } else if (type ==
                     EventType.BUSY_STATE_CHANGED) {
                 assert target instanceof Session;
                 assert newval instanceof Boolean;
-    
+
                 Session s = (Session) target;
-    
+
                 synchronized(busySessions) {
                     synchronized (s.getBusyLock()) {
                         if (s.isBusy()) {
@@ -1923,22 +1938,22 @@ public class IMQIPConnection extends IMQBasicConnection
                         }
                     }
                 }
-                
+
             }
             checkState();
         }
     }
 
-    private boolean fillNextPacket(Packet p) 
+    private boolean fillNextPacket(Packet p)
     {
         Session s = null;
-        
+
         synchronized(busySessions) {
            Iterator itr = busySessions.iterator();
            while (itr.hasNext()) {
                s = (Session)itr.next();
                itr.remove();
-               if (s == null) 
+               if (s == null)
                    continue;
                synchronized (s.getBusyLock()) {
                    if (s.isBusy()) {
@@ -1946,7 +1961,7 @@ public class IMQIPConnection extends IMQBasicConnection
                        break;
                    }
                }
-               
+
            }
         }
 

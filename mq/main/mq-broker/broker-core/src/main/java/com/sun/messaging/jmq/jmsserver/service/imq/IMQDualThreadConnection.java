@@ -289,7 +289,7 @@ public class IMQDualThreadConnection extends IMQBasicConnection implements Direc
        
     public void sendControlMessage(Packet p)
     {
-        if (Globals.getConfig().getBooleanProperty(IMQ + ".simulate.noreply")) {
+        if (!isAdminConnection() && Globals.getConfig().getBooleanProperty(IMQ + ".simulate.noreply")) {
             return;
         }
         if (p.getPacketType() > PacketType.MESSAGE) {

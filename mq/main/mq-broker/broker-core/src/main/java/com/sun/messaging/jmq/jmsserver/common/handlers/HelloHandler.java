@@ -409,7 +409,7 @@ public class HelloHandler extends PacketHandler
 
           HAMonitorService hamonitor = Globals.getHAMonitorService();
           if (hamonitor != null && hamonitor.inTakeover()
-            || Globals.getConfig().getBooleanProperty(IMQ + ".simulate.takeover") ) {
+            || !con.isAdminConnection() && Globals.getConfig().getBooleanProperty(IMQ + ".simulate.takeover") ) {
               if (((IMQService)con.getService()).getServiceType() != ServiceType.ADMIN) {
                   status = Status.TIMEOUT;
                   if (oldCID != null) {
