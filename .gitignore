@@ -2,3 +2,7 @@
 **/target/**
 # Ignore examples .class
 **/src/share/java/examples/**/*.class
+**/*.iml
+.idea
+binary
+dist

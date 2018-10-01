@@ -213,9 +213,14 @@ public class BridgeServiceManagerImpl extends BridgeServiceManager
                 }
                 try {
                     store.addJMSBridge(name, true, null);
-                } catch (DupKeyException e)  {
-                    _bc.logInfo(_bmr.getKString(_bmr.I_JMSBRIDGE_NOT_OWNER, name), null);
-                    itr.remove();
+                } catch (Exception e) {
+                    // DupKeyException gets wrapped into a BrokerException
+                    if (e instanceof DupKeyException || e.getCause() != null && e.getCause() instanceof DupKeyException) {
+                        _bc.logInfo(_bmr.getKString(_bmr.I_JMSBRIDGE_NOT_OWNER, name), null);
+                        itr.remove();
+                    } else {
+                        throw e;
+                    }
                 }
             }
             jmsbridges = store.getJMSBridges(null);
