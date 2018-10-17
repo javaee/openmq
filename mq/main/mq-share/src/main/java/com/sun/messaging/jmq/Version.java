@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2000-2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000-2018 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -114,19 +114,19 @@ public class Version {
      *String representing the value of the mini copyright  of the product
      */
     private String miniCopyright =
-        "Copyright (c) 2013-2017 Oracle and/or its affiliates.  All rights reserved.";
+        "Copyright (c) 2013-2018 Oracle and/or its affiliates.  All rights reserved.";
 
     /**
      * String representing the shortCopyright of the product
      */
     private String shortCopyright =
-        "Copyright (c) 2013-2017 Oracle and/or its affiliates.  All rights reserved.";
+        "Copyright (c) 2013-2018 Oracle and/or its affiliates.  All rights reserved.";
 
     /**
      *String representing the long copyright value of the product
      */
     private String longCopyright =
-        "Copyright (c) 2013-2017 Oracle and/or its affiliates.  All rights reserved.";
+        "Copyright (c) 2013-2018 Oracle and/or its affiliates.  All rights reserved.";
 
     /**
      * Represents the mini copyright value for the product

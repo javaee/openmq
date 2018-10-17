@@ -1,7 +1,7 @@
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2010-2017 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010-2018 Oracle and/or its affiliates. All rights reserved.
 #
 # The contents of this file are subject to the terms of either the GNU
 # General Public License Version 2 only ("GPL") or the Common Development
@@ -59,7 +59,7 @@
 VERSION_NUM = 1
 
 # general version info
-JMQ_BUILD_NUMBER= 6
+JMQ_BUILD_NUMBER= 1
 JMQ_BUILD_LETTER= a
 
 #
@@ -79,7 +79,7 @@ JMQ_BUILD_MILESTONE=
 #
 JMQ_MAJOR_VERSION=5
 JMQ_MINOR_VERSION=1
-JMQ_MICRO_VERSION=1
+JMQ_MICRO_VERSION=2
 JMQ_SERVICE_PACK_VERSION=
 JMQ_PROTOCOL_VERSION= 5.1
 JMS_API_VERSION= 2.0
